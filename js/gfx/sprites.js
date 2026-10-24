@@ -13,8 +13,16 @@ function workerSprite() {
   else if(G?.job){x.fillStyle=pal.j;x.fillRect(3,7,8,5);x.fillStyle=pal.c;x.fillRect(6,7,2,4);x.fillStyle=pal.q;x.fillRect(6,7,1,4);}
   return c;
 }
-// desenho do bicho: SPR (formas) > rows (texto) > emoji provisório
+// bicho na batalha: arte em imagem (data/art.js) se houver, senão o desenho em código
 function animalSprite(a) {
+  const own = artCanvas("animal/" + a.id), c = own || (ART[a.id] && artCanvas("animal/" + ART[a.id]));
+  if (!c) return codeAnimalSprite(a);
+  c.className = "spr"; c.style.setProperty("--n", c.width / c.dataset.scale * (a.boss ? 1.35 : 1));
+  if (!own && a.tint) c.style.filter = a.tint;   // chefe usando a arte do bicho base
+  return c;
+}
+// desenho em código: SPR (formas) > rows (texto) > emoji provisório
+function codeAnimalSprite(a) {
   let c; const k = ART[a.id] || a.id;
   if (SPR[k]) c = artSprite(k);
   else if (a.rows) c = sprite(a.rows, a.palette, Math.max(...a.rows.map(r => r.length)));

@@ -1,7 +1,9 @@
 /* Exploração das fases vista de cima. O Rhanon anda livre (8 direções), os bichos passeiam e perseguem.
    Quem acerta primeiro começa a batalha: golpe/arremesso do Rhanon = turno dele, com dano;
    bicho alcança ou o Rhanon esbarra nele = turno do bicho. Bem mais forte que o bicho = abate direto. */
-const VIEW_W = 240, VIEW_H = 176;            // tamanho da câmera em pixels do desenho (15 x 11 quadrados)
+const VIEW_W = 240, VIEW_H = 176;            // tamanho da câmera em pixels do jogo (15 x 11 quadrados)
+const RS = 3;                                // resolução do canvas: cada pixel do jogo vira 3x3 (arte em imagem com scale 3 fica nítida)
+const snap = v => Math.round(v * RS) / RS;  // posição na grade da tela, para o movimento andar de 1/3 em 1/3 de pixel
 const HERO_SPEED = 74;                       // pixels por segundo
 const ANIMAL_SPEED = {pequeno: 46, "médio": 40, grande: 34, chefe: 0};
 const CHASE_RANGE = 72;                      // distância em que o bicho percebe o Rhanon
@@ -47,8 +49,8 @@ function pickFromPool(zone) {
   return ANIMALS.find(a => a.id === z.pool[0][0]);
 }
 function makeAnimalEnt(a, tx, ty) {
-  const img = animalSprite(a), x = tx * TILE + 8, y = ty * TILE + 12;
-  return {a, img, x, y, homeX: x, homeY: y, hw: Math.min(7, Math.round(img.width / 3)), hh: 3,
+  const img = artCanvas("animal/" + a.id + "/mapa") || codeAnimalSprite(a), k = +img.dataset.scale || 1, x = tx * TILE + 8, y = ty * TILE + 12;
+  return {a, img, w: img.width / k, h: img.height / k, x, y, homeX: x, homeY: y, hw: Math.min(7, Math.round(img.width / k / 3)), hh: 3,
     speed: a.id === "preguica" ? 18 : (ANIMAL_SPEED[a.size] ?? 40), boss: !!a.boss, alive: true,
     state: "wander", vx: 0, vy: 0, until: 0, face: -1, walk: 0, stunUntil: 0};
 }
@@ -89,7 +91,7 @@ function resumeExplore(result) {
 }
 
 /* ---------- ações do Rhanon ---------- */
-const entH = en => Math.min(en.img.height, 20);
+const entH = en => Math.min(en.h, 20);
 function exStrike() {
   if (!EX || EX.locked || EX.cool > 0) return;
   const h = EX.hero; EX.cool = .35; EX.jab = .16; sfx("spear");
@@ -119,11 +121,10 @@ function exHit(en) {
 function exStartBattle(en, opts) {
   if (EX.locked) return;
   EX.locked = true; EX.fighting = en; exKeys.clear();
-  if (opts.enemyFirst) sfx("roar");
-  setTimeout(() => wipe(() => {
+  setTimeout(() => battleCutin(opts.enemyFirst ? "ambush" : "first", () => {
     $("explore").hidden = true; fromExplore = true; curZone = EX.zone; bossFight = en.boss;
     init({animal: en.a, ...opts});
-  }), 260);
+  }), opts.enemyFirst ? 0 : 160);
 }
 
 /* ---------- atualização ---------- */
@@ -138,7 +139,7 @@ function exAnimal(en, dt, now) {
   const safe = now < EX.invulnUntil || EX.locked;
   if (dist < en.hw + h.hw + 3 && !safe) return exStartBattle(en, {enemyFirst: true});
   if (en.boss) {   // o chefe espera parado, soltando brilho
-    if (Math.random() < dt * 8) EX.fx.push({x: en.x + (Math.random() - .5) * en.img.width, y: en.y - Math.random() * en.img.height, vx: 0, vy: -14, life: .8, col: (AURA[en.a.id] || ["#ffd23a"])[Math.random() * 2 | 0]});
+    if (Math.random() < dt * 8) EX.fx.push({x: en.x + (Math.random() - .5) * en.w, y: en.y - Math.random() * en.h, vx: 0, vy: -14, life: .8, col: (AURA[en.a.id] || ["#ffd23a"])[Math.random() * 2 | 0]});
     return;
   }
   if (now < en.stunUntil) { exMove(en, -dx / dist, -dy / dist, en.speed * .8 * dt); return; }   // assustado, foge
@@ -192,6 +193,8 @@ function exBurst(x, y, cols, n) {
 }
 
 /* ---------- desenho ---------- */
+const OW_ART = {};
+function overworldArt(dir, f) { const key = dir + f; return OW_ART[key] || (OW_ART[key] = artCanvas("hero/walk/" + dir, f)); }
 // mato alto na frente dos pés de quem está nele
 function grassOver(x, ent, cx, cy) {
   const ty = Math.floor(ent.y / TILE);
@@ -200,14 +203,17 @@ function grassOver(x, ent, cx, cy) {
 }
 function drawShadow(x, sx, sy, w) { x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(sx - w / 2, sy - 1, w, 2); x.fillRect(sx - w / 2 + 2, sy - 2, w - 4, 4); }
 function drawHeroEnt(x, h, cx, cy, now) {
-  const sx = Math.round(h.x - cx), sy = Math.round(h.y - cy);
+  const sx = snap(h.x - cx), sy = snap(h.y - cy);
   if (now < EX.invulnUntil && Math.floor(now / 100) % 2) return;
-  const walking = now - h.movedT < 90;
-  const img = heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][Math.floor(h.walk / 7) % 4] : "stand", !EX.spear && EX.jab <= 0);
+  const walking = now - h.movedT < 90, step = Math.floor(h.walk / 7);
+  const art = IMG["hero/walk/" + h.dir];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
+  const img = art ? overworldArt(h.dir, walking ? step % art.frames : 0)
+    : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", !EX.spear && EX.jab <= 0);
+  const iw = art ? art.w / art.scale : 20, ih = art ? art.h / art.scale : 28;
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
   drawShadow(x, sx, sy, 12);
-  if (h.dir === "side" && h.flip) { x.save(); x.translate(sx + ox, 0); x.scale(-1, 1); x.drawImage(img, -10, sy - 27 + oy); x.restore(); }
-  else x.drawImage(img, sx - 10 + ox, sy - 27 + oy);
+  if (h.dir === "side" && h.flip) { x.save(); x.translate(sx + ox, 0); x.scale(-1, 1); x.drawImage(img, -iw / 2, sy - ih + 1 + oy, iw, ih); x.restore(); }
+  else x.drawImage(img, sx - iw / 2 + ox, sy - ih + 1 + oy, iw, ih);
   if (EX.jab > 0) {   // estocada da lança
     const bx = sx + ox, by = sy - 12 + oy;
     lineP(x, bx - h.aim.x * 4, by - h.aim.y * 4, bx + h.aim.x * 15, by + h.aim.y * 15, "#7a4a1e");
@@ -216,20 +222,20 @@ function drawHeroEnt(x, h, cx, cy, now) {
   grassOver(x, h, cx, cy);
 }
 function drawAnimalEnt(x, en, cx, cy, now) {
-  const sx = Math.round(en.x - cx), sy = Math.round(en.y - cy), w = en.img.width, hg = en.img.height;
+  const sx = snap(en.x - cx), sy = snap(en.y - cy), w = en.w, hg = en.h;
   if (sx < -40 || sx > VIEW_W + 40 || sy < -8 || sy > VIEW_H + 40) return;
   const bob = (en.vx || en.vy || en.state === "chase") ? Math.floor(en.walk / 5) % 2 : Math.floor(now / 500) % 2;
   drawShadow(x, sx, sy, Math.max(8, Math.round(w * .7)));
   x.save();
   if (en.a.tint) x.filter = en.a.tint;
-  if (en.face > 0) { x.translate(sx, 0); x.scale(-1, 1); x.drawImage(en.img, -Math.round(w / 2), sy - hg - bob); }
-  else x.drawImage(en.img, sx - Math.round(w / 2), sy - hg - bob);
+  if (en.face > 0) { x.translate(sx, 0); x.scale(-1, 1); x.drawImage(en.img, -Math.round(w / 2), sy - hg - bob, w, hg); }
+  else x.drawImage(en.img, sx - Math.round(w / 2), sy - hg - bob, w, hg);
   x.restore();
   grassOver(x, en, cx, cy);
 }
 // etiqueta de nível (verde = cai com um golpe, vermelha = chefe) e "!" quando o bicho vê o Rhanon
 function drawAnimalTags(x, en, cx, cy, now) {
-  const sx = Math.round(en.x - cx), sy = Math.round(en.y - cy) - en.img.height - 4;
+  const sx = Math.round(en.x - cx), sy = Math.round(en.y - cy) - Math.round(en.h) - 4;
   if (sx < -20 || sx > VIEW_W + 20 || sy < -10 || sy > VIEW_H) return;
   const lv = String(en.a.lv || 1), bw = lv.length * 4 + 3;
   x.fillStyle = OUTLINE; x.fillRect(sx - bw / 2 - 1, sy - 8, bw + 2, 9);
@@ -242,10 +248,12 @@ function drawAnimalTags(x, en, cx, cy, now) {
   }
 }
 function exDraw(now) {
-  const x = $("exCanvas").getContext("2d"), h = EX.hero;
+  const cv = $("exCanvas"), x = cv.getContext("2d"), h = EX.hero;
+  if (cv.width !== VIEW_W * RS) { cv.width = VIEW_W * RS; cv.height = VIEW_H * RS; }
+  x.setTransform(RS, 0, 0, RS, 0, 0);
   x.imageSmoothingEnabled = false;
-  const cx = Math.round(Math.max(0, Math.min(EX.map.width - VIEW_W, h.x - VIEW_W / 2)));
-  const cy = Math.round(Math.max(0, Math.min(EX.map.height - VIEW_H, h.y - 12 - VIEW_H / 2)));
+  const cx = snap(Math.max(0, Math.min(EX.map.width - VIEW_W, h.x - VIEW_W / 2)));
+  const cy = snap(Math.max(0, Math.min(EX.map.height - VIEW_H, h.y - 12 - VIEW_H / 2)));
   x.drawImage(EX.map, cx, cy, VIEW_W, VIEW_H, 0, 0, VIEW_W, VIEW_H);
   const t0x = Math.floor(cx / TILE), t0y = Math.floor(cy / TILE);
   for (let ty = t0y; ty <= t0y + 11; ty++) for (let tx = t0x; tx <= t0x + 15; tx++) {

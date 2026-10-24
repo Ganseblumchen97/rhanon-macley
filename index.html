@@ -13,6 +13,7 @@
   <div class="layer p4"><div class="dia"></div><div class="floor"></div><div class="tape t1"></div><div class="tape t2"></div></div>
 </div>
 <div class="wipe" id="wipe"></div>
+<div class="cutin" id="cutin" hidden aria-hidden="true"></div>
 <section class="title-screen" id="titleScreen" aria-label="Tela inicial do jogo">
   <div class="title-copy">
     <h1 class="title" id="titleLogo" aria-label="Macley's Adventure"></h1>
@@ -105,12 +106,14 @@
 <!-- Ordem importa: utilidades e estado, depois dados, depois quem usa os dados. main.js por último. -->
 <script src="js/core/utils.js"></script>
 <script src="js/core/state.js"></script>
+<script src="js/core/assets.js"></script>
 <script src="js/data/sprites.js"></script>
 <script src="js/data/animals.js"></script>
 <script src="js/data/commands.js"></script>
 <script src="js/data/questions.js"></script>
 <script src="js/data/world.js"></script>
 <script src="js/data/stages.js"></script>
+<script src="js/data/art.js"></script>
 <script src="js/audio/sfx.js"></script>
 <script src="js/audio/music.js"></script>
 <script src="js/gfx/sprites.js"></script>
@@ -118,6 +121,7 @@
 <script src="js/gfx/actors.js"></script>
 <script src="js/gfx/tiles.js"></script>
 <script src="js/ui/screen-fx.js"></script>
+<script src="js/ui/cutin.js"></script>
 <script src="js/systems/combat.js"></script>
 <script src="js/systems/challenge.js"></script>
 <script src="js/systems/world-map.js"></script>

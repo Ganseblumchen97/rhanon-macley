@@ -424,3 +424,33 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .ex-ab button{width:78px;height:78px;border-radius:50%;font-size:15px}
 #exA{translate:0 -18px}
 @media (pointer:coarse),(max-width:760px){.ex-pad{display:flex}.ex-help{display:none}#exCanvas{width:min(96vw,calc((100vh - 290px) * 1.3636))}}
+/* ===== cinemática de abertura da batalha ===== */
+.cutin{position:fixed;inset:0;z-index:1900;pointer-events:none;overflow:hidden}
+.cutin[hidden]{display:none}
+.ci-dim{position:absolute;inset:0;background:rgba(0,0,0,.55);animation:ciFade .12s}
+.ci-flash{position:absolute;inset:0;background:#fff;opacity:0;animation:ciFlash .3s;z-index:5}
+.ci-band{position:absolute;left:-30vw;right:-30vw;height:34vh;background:var(--ink);rotate:-8deg;border-block:5px solid var(--paper)}
+.ci-b1{top:-12vh;animation:ciInL .22s var(--snap) backwards}
+.ci-b2{bottom:-12vh;animation:ciInR .22s var(--snap) backwards}
+.ci-strip{position:absolute;left:-6vw;right:-6vw;top:50%;height:min(44vh,40vw);translate:0 -50%;rotate:-4deg;background:#1b1a24;border-block:7px solid var(--accent);overflow:hidden;box-shadow:0 0 0 4px var(--ink);animation:ciStrip .3s var(--snap) .08s backwards;z-index:2}
+.ci-zoom{position:absolute;inset:0;animation:ciZoom 1.4s cubic-bezier(.2,.8,.3,1) forwards}
+.ci-zoom canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+.ci-glow,.ci-art{filter:drop-shadow(0 0 2px #ffc040) drop-shadow(0 0 9px #ff6a10);animation:ciPulse .16s steps(2) infinite}
+.ci-shake{animation:gshake .32s steps(6)}
+.ci-name{position:absolute;left:5vw;top:9vh;margin:0;font-size:clamp(30px,6.5vw,84px);rotate:-7deg;z-index:3;animation:rpop .35s var(--pop) .3s backwards}
+.ci-sub{position:absolute;right:6vw;bottom:10vh;z-index:3;font-family:var(--display);font-size:clamp(20px,3.4vw,40px);letter-spacing:.04em;background:var(--accent);color:var(--on-accent);padding:4px 22px;rotate:-5deg;clip-path:polygon(4% 0,100% 0,96% 100%,0 100%);animation:rpop .35s var(--pop) .45s backwards}
+.cutin.out .ci-strip{animation:ciSlash .2s ease-in forwards}
+.cutin.out :is(.ci-name,.ci-sub,.ci-bang){opacity:0;transition:opacity .1s}
+.cutin.out .ci-flash{animation:ciFlash .38s}
+.cutin.ambush .ci-band{background:#e5001c;border-color:var(--ink)}
+.cutin.ambush .ci-sub{background:var(--ink);color:#fff;bottom:auto;top:58%;right:auto;left:50%;translate:-50% 0;animation-delay:.12s}
+.ci-bang{position:absolute;left:50%;top:22%;translate:-50% 0;z-index:3;font-family:'Luckiest Guy',var(--display);font-size:clamp(90px,22vw,240px);line-height:1;color:#fff;-webkit-text-stroke:10px var(--ink);paint-order:stroke fill;rotate:8deg;animation:rpop .3s var(--pop) backwards}
+@keyframes ciFade{from{opacity:0}}
+@keyframes ciFlash{0%{opacity:.95}100%{opacity:0}}
+@keyframes ciInL{from{translate:-130vw 0}}
+@keyframes ciInR{from{translate:130vw 0}}
+@keyframes ciStrip{from{translate:120vw -50%}}
+@keyframes ciSlash{to{scale:1 0;opacity:0}}
+@keyframes ciZoom{from{scale:1.25}to{scale:1.06}}
+@keyframes ciPulse{50%{opacity:.82}}
+.cutin.ambush .ci-dim{background:rgba(50,0,0,.7)}

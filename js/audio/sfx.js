@@ -87,3 +87,18 @@ function impactSound() {
     }
   } catch (_) {}
 }
+
+// cinemática da batalha: "fuuip" subindo e um impacto grave quando os olhos acendem; na emboscada, um baque seco
+function cutinSound(kind) {
+  if (!AC || muted) return;
+  const t = AC.currentTime;
+  if (kind === "ambush") { noise(t, .35, .25, 300); tone(90, t, .4, "sawtooth", .16, 40); tone(880, t, .12, "square", .05, 220); return; }
+  const n = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+  if (!NB) noise(t, .001, 0, 1000);   // cria o buffer de ruído
+  n.buffer = NB; n.loop = true; f.type = "bandpass"; f.Q.value = 3;
+  f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(6000, t + .3);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .28); g.gain.exponentialRampToValueAtTime(.0001, t + .34);
+  n.connect(f).connect(g).connect(master); n.start(t); n.stop(t + .36);
+  tone(140, t + .3, .6, "sine", .35, 38); noise(t + .3, .25, .2, 120);
+  tone(1320, t + .3, .25, "square", .04, 1320); tone(1980, t + .32, .3, "triangle", .03);
+}

@@ -9,13 +9,23 @@ const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
 function makeHeroActor() {
   const W = 32, H = 39, SX = 6, SY = 10;   // o sprite 20x28 fica com os pés na linha 37; linha 38 é a sombra
   let cv = null, g = null, parts = null, state = "idle", since = 0, nextBlink = 0, blinkUntil = 0, mode = "battle", lastFx = 0, stT = 0;
+  let k = 1;   // resolução extra quando há arte em imagem (hero/battle em data/art.js)
+  const artCache = {};
+  // quadro da arte do estado atual (hero/battle/<estado> ou hero/battle); null sem arte
+  function heroArt(t) {
+    const key = IMG["hero/battle/" + state] ? "hero/battle/" + state : "hero/battle", a = IMG[key];
+    if (!a) return null;
+    const f = Math.floor(t / 150) % a.frames;
+    return artCache[key + f] || (artCache[key + f] = artCanvas(key, f));
+  }
   const off = document.createElement("canvas"); off.width = 20; off.height = 28;
   const og = off.getContext("2d", {willReadFrequently: true});
   const set = (s) => { state = s; since = performance.now(); lastFx = 0; };
   function mount(el, opts = {}) {
     parts = heroParts(!opts.weapon);
     mode = opts.mode || "battle";
-    cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    k = IMG["hero/battle"] ? IMG["hero/battle"].scale : 1;
+    cv = document.createElement("canvas"); cv.width = W * k; cv.height = H * k;
     cv.className = "spr actor"; cv.style.setProperty("--n", W);
     cv.style.margin = `calc(var(--px) * -${SY * .75}) calc(var(--px) * -${SX * .75}) calc(var(--px) * -.75) calc(var(--px) * -${SX * .75})`;
     el.innerHTML = ""; el.appendChild(cv); g = cv.getContext("2d");
@@ -116,27 +126,32 @@ function makeHeroActor() {
     }
     if (REDUCE) lift = 0;
 
+    g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;
     g.clearRect(0, 0, W, H);
     // sombra no chão: encolhe quando ele pula
     g.fillStyle = "rgba(0,0,0,.3)";
     const sw = rot ? 26 : Math.max(6, 14 - Math.round(lift));
     g.fillRect(Math.round((W - sw) / 2) + ox, H - 1, sw, 1);
 
+    const art = heroArt(t);
     og.clearRect(0, 0, 20, 28);
-    drawHero(og, parts, o);
-    shadeCanvas(off);
+    if (!art) { drawHero(og, parts, o); shadeCanvas(off); }
     // braço estendido no arremesso, mão na testa ao observar, comida na boca
+    if (art) extra = null;
     if (extra === "arm") { og.fillStyle = parts.pal.s; og.fillRect(18, 19, 2, 1); og.fillStyle = parts.pal.k; og.fillRect(18, 18, 2, 1); og.fillRect(18, 20, 2, 1); }
     if (extra === "brow") { og.fillStyle = parts.pal.s; og.fillRect(13 + o.lean, 9, 4, 1); og.fillStyle = parts.pal.k; og.fillRect(13 + o.lean, 8, 4, 1); }
     if (extra === "food") { og.fillStyle = "#7a4a1e"; og.fillRect(9, 13, 3, 2); og.fillStyle = "#f4ecd8"; og.fillRect(9, 13, 1, 2); }
-    const src = flash ? whiteOf(off) : off;
+    const base = art || off, src = flash ? whiteOf(base) : base;
+    // a arte em imagem fica com os pés na mesma linha do sprite de 20x28
+    const put = () => art ? g.drawImage(src, 10 - art.width / k / 2, 28 - art.height / k, art.width / k, art.height / k) : g.drawImage(src, 0, 0);
 
     g.save();
-    if (rot) { g.translate(2, H - 1); g.rotate(-Math.PI / 2); g.drawImage(src, 0, 0); }
+    if (rot) { g.translate(2, H - 1); g.rotate(-Math.PI / 2); put(); }
     else {
       const bx = SX + ox, by = SY - Math.round(lift);
       if (flip) { g.translate(bx + 20, by); g.scale(-1, 1); } else g.translate(bx, by);
-      g.drawImage(src, 0, 0);
+      put();
+      if (art) weapon = null;   // a arte já traz a lança
       // arma (coordenadas do sprite)
       if (weapon === "up") spear(19, o.dy, 19, 27);
       else if (weapon === "back") spear(21, 1, 16, 27);
@@ -178,11 +193,12 @@ function makeHeroActor() {
 
 /* ---------- ator dos bichos (e de quem mais for desenhado pronto) ---------- */
 function makeBeastActor() {
-  let cv = null, g = null, base = null, white = null, w = 0, h = 0, f = 1, kind = "", motion = "", state = "idle", since = 0, lastFx = 0, nextHop = 0, info = {}, swT = 0;
+  let cv = null, g = null, base = null, white = null, w = 0, h = 0, f = 1, k = 1, CW = 0, CH = 0, kind = "", motion = "", state = "idle", since = 0, lastFx = 0, nextHop = 0, info = {}, swT = 0;
   const MX = 6, MT = 8, MB = 2;
   const set = (s) => { state = s; since = performance.now(); lastFx = 0; };
   function mount(el, src, opts = {}) {
-    base = src; w = src.width; h = src.height; f = opts.boss ? 1.35 : 1; kind = opts.id || ""; info = opts;
+    // w/h em pixels do jogo; k = resolução extra da arte em imagem (data-scale)
+    k = +src.dataset.scale || 1; base = src; w = src.width / k; h = src.height / k; f = opts.boss ? 1.35 : 1; kind = opts.id || ""; info = opts;
     // bicho alto demais para o palco (harpia, chefes): diminui um pouco para os pés ficarem na plataforma e a cabeça aparecer
     if (opts.fit) {
       const st = $("stage"), unit = src.getBoundingClientRect().width / w;   // tamanho de 1 pixel do desenho, já com o tamanho de chefe
@@ -195,8 +211,9 @@ function makeBeastActor() {
     }
     motion = MOTION[kind] || (opts.person ? "person" : "");
     white = whiteOf(src);
-    cv = document.createElement("canvas"); cv.width = w + MX * 2; cv.height = h + MT + MB;
-    cv.className = "spr actor"; cv.style.setProperty("--n", cv.width * f);
+    CW = w + MX * 2; CH = h + MT + MB;
+    cv = document.createElement("canvas"); cv.width = Math.round(CW * k); cv.height = Math.round(CH * k);
+    cv.className = "spr actor"; cv.style.setProperty("--n", CW * f);
     if (src.style.filter) cv.style.filter = src.style.filter;
     const u = n => `calc(var(--px) * -${(n * f).toFixed(2)})`;
     cv.style.margin = `${u(MT)} ${u(MX)} ${u(MB)} ${u(MX)}`;
@@ -206,7 +223,7 @@ function makeBeastActor() {
     return cv;
   }
   function grid(lx, ly) {
-    const r = cv.getBoundingClientRect(), u = r.width / cv.width;
+    const r = cv.getBoundingClientRect(), u = r.width / CW;
     return PFX.toGrid(r.left + lx * u, r.top + ly * u);
   }
   // desenha o sprite com a parte de cima "respirando" e, nas cobras, ondulando
@@ -214,14 +231,14 @@ function makeBeastActor() {
     const split = Math.round(h * .55), wave = motion === "sway" || motion === "swim";
     if (wave && !REDUCE) {
       for (let yy = 0; yy < h; yy++) {
-        const amp = motion === "swim" ? .9 : 1.2, k = motion === "swim" ? .5 : .35;
-        const dx = Math.round(Math.sin(t / (motion === "swim" ? 200 : 320) + yy * k) * amp * (yy < h * .8 ? 1 : .3));
-        g.drawImage(img, 0, yy, w, 1, x + dx, y + yy + (yy < split ? o.dy : 0), w, 1);
+        const amp = motion === "swim" ? .9 : 1.2, freq = motion === "swim" ? .5 : .35;
+        const dx = Math.round(Math.sin(t / (motion === "swim" ? 200 : 320) + yy * freq) * amp * (yy < h * .8 ? 1 : .3));
+        g.drawImage(img, 0, yy * k, w * k, k, x + dx, y + yy + (yy < split ? o.dy : 0), w, 1);
       }
       return;
     }
-    g.drawImage(img, 0, split, w, h - split, x, y + split, w, h - split);
-    g.drawImage(img, 0, 0, w, split, x, y + o.dy, w, split);
+    g.drawImage(img, 0, split * k, w * k, (h - split) * k, x, y + split, w, h - split);
+    g.drawImage(img, 0, 0, w * k, split * k, x, y + o.dy, w, split);
   }
   function draw(t) {
     if (!cv || !cv.isConnected || !cv.offsetParent) return;
@@ -275,17 +292,18 @@ function makeBeastActor() {
         if (el < 260) { flash = Math.floor(el / 60) % 2 === 0; lift = Math.round(Math.sin(el / 260 * Math.PI) * 4); }
         else {
           rot = 1;
-          if (lastFx === 0) { lastFx = 1; const [gx, gy] = grid(cv.width / 2, cv.height - 3); PFX.burst(12, "puff", ["#d8d2c0", "#a89f8a", "#ffffff"], gx, gy, 20, {life: .7, up: 4}); sfx("guard"); }
+          if (lastFx === 0) { lastFx = 1; const [gx, gy] = grid(CW / 2, CH - 3); PFX.burst(12, "puff", ["#d8d2c0", "#a89f8a", "#ffffff"], gx, gy, 20, {life: .7, up: 4}); sfx("guard"); }
           if (el > 2200) alpha = Math.floor(el / 90) % 2 ? .35 : .8;
         }
         break;
       }
     }
-    g.clearRect(0, 0, cv.width, cv.height);
+    g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;
+    g.clearRect(0, 0, CW, CH);
     g.globalAlpha = alpha;
     g.fillStyle = "rgba(0,0,0,.3)";
     const sw = Math.max(6, Math.round(w * .8) - lift * 2);
-    g.fillRect(Math.round((cv.width - sw) / 2), cv.height - 1, sw, 1);
+    g.fillRect(Math.round((CW - sw) / 2), CH - 1, sw, 1);
     const img = flash ? white : base;
     if (shake) ox += Math.floor(t / 40) % 2 ? 1 : -1;
     if (rot) {
@@ -296,7 +314,7 @@ function makeBeastActor() {
       if (state === "defeat" && !REDUCE) {
         for (let i = 0; i < 3; i++) {
           const a = t / 300 + i * 2.1;
-          glyphP(g, "star", "#ffd200", cv.width / 2 - 1 + Math.cos(a) * 6, MT + h * .35 + Math.sin(a) * 2);
+          glyphP(g, "star", "#ffd200", CW / 2 - 1 + Math.cos(a) * 6, MT + h * .35 + Math.sin(a) * 2);
         }
       }
     } else if (scale !== 1) {
@@ -311,8 +329,8 @@ function makeBeastActor() {
       const an = cv.animate([{transform: `translateX(${fromX})`}, {transform: `translateX(${toX})`}], {duration: REDUCE ? 1 : ms, easing: `steps(${Math.max(4, Math.round(ms / 50))})`, fill: "forwards"});
       an.onfinish = () => after && after();
     },
-    dust() { if (!cv) return; const [gx, gy] = grid(cv.width / 2, cv.height - 2); PFX.burst(10, "puff", ["#d8d2c0", "#a89f8a"], gx, gy, 18, {life: .6, up: 3}); },
-    bang() { if (!cv) return; const [gx, gy] = grid(cv.width / 2, 1); PFX.emit("bang", ["#ffd200"], gx, gy, 0, -4, .9); }};
+    dust() { if (!cv) return; const [gx, gy] = grid(CW / 2, CH - 2); PFX.burst(10, "puff", ["#d8d2c0", "#a89f8a"], gx, gy, 18, {life: .6, up: 3}); },
+    bang() { if (!cv) return; const [gx, gy] = grid(CW / 2, 1); PFX.emit("bang", ["#ffd200"], gx, gy, 0, -4, .9); }};
 }
 const HERO_A = makeHeroActor(), BEAST_A = makeBeastActor();
 

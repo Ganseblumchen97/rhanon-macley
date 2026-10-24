@@ -3,6 +3,7 @@
 buildMapNodes();
 buildLocalNodes();
 setupExploreInput();
+loadArt();   // imagens de data/art.js (carregam enquanto a tela inicial está aberta)
 
 /* ----- botões fixos ----- */
 $("startAdventure").addEventListener("click", () => { audio(); musicStop(); $("titleScreen").hidden = true; showMapNow(); musicStart("map"); });
