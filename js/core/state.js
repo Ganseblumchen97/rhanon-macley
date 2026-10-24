@@ -21,6 +21,8 @@ let mode = "hunt";
 // batalha: p = Rhanon, e = bicho; holdE/holdP seguram as barras até a animação do golpe chegar
 let p, e, busy, lines, holdE = null, holdP = null, preE = 0;
 let curZone = "mata", bossFight = false, fromLocal = false;
+// batalha que começou na exploração e como ela terminou ("win", "flee" ou "lose")
+let fromExplore = false, battleResult = null;
 // desafios de Curitiba
 let interviewIndex = 0, activeQuestions = null, challengeKind = "interview";
 // mapas

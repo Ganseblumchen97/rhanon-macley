@@ -421,8 +421,8 @@ function startAnimationLoop() {
   function loop(t) {
     requestAnimationFrame(loop);
     const dt = Math.min((t - last) / 1000, .05); last = t;
-    HERO_A.draw(t); BEAST_A.draw(t); TITLE_A.draw(t, dt); WALKER.tick(t);
-    const battleOn = !$("stage").closest(".game")?.classList.contains("working-mode") && $("map").hidden && $("local").hidden && $("titleScreen").hidden && mode === "hunt";
+    HERO_A.draw(t); BEAST_A.draw(t); TITLE_A.draw(t, dt); WALKER.tick(t); exploreFrame(t, dt);
+    const battleOn = !$("stage").closest(".game")?.classList.contains("working-mode") && $("map").hidden && $("local").hidden && $("explore").hidden && $("titleScreen").hidden && mode === "hunt";
     if ($("titleScreen").hidden) PFX.frame(dt, HERO_A.unit() || 4, battleOn && $("over").hidden);
   }
   requestAnimationFrame(loop);

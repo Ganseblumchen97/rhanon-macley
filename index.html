@@ -76,6 +76,28 @@
       <div class="info" id="linfo"></div>
     </div>
   </div>
+  <div class="over" id="explore" hidden>
+    <div class="ex-wrap">
+      <div class="ex-top"><div class="hud" id="exHud"></div><button class="ex-exit" id="exExit" type="button">Sair</button></div>
+      <div class="ex-view">
+        <canvas id="exCanvas" width="240" height="176" aria-label="Exploração vista de cima"></canvas>
+        <div class="ex-msg" id="exMsg" aria-live="polite"></div>
+      </div>
+      <p class="ex-help">Setas ou WASD andam · Z ou Espaço: golpe de lança · X: arremessar · Esc: sair<br>Etiqueta verde = cai com um golpe só</p>
+      <div class="ex-pad" id="exPad">
+        <div class="ex-dpad">
+          <button type="button" data-dir="up" aria-label="Cima">▲</button>
+          <button type="button" data-dir="left" aria-label="Esquerda">◀</button>
+          <button type="button" data-dir="right" aria-label="Direita">▶</button>
+          <button type="button" data-dir="down" aria-label="Baixo">▼</button>
+        </div>
+        <div class="ex-ab">
+          <button type="button" id="exB" aria-label="Arremessar">LANÇAR</button>
+          <button type="button" id="exA" aria-label="Golpe">GOLPE</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="over" id="over" hidden>
     <div class="card"><h1 id="overTitle"></h1><p id="overTxt"></p><button id="again">Lutar de novo</button><button id="toMap">Voltar ao mapa</button></div>
   </div>
@@ -88,16 +110,19 @@
 <script src="js/data/commands.js"></script>
 <script src="js/data/questions.js"></script>
 <script src="js/data/world.js"></script>
+<script src="js/data/stages.js"></script>
 <script src="js/audio/sfx.js"></script>
 <script src="js/audio/music.js"></script>
 <script src="js/gfx/sprites.js"></script>
 <script src="js/gfx/fx.js"></script>
 <script src="js/gfx/actors.js"></script>
+<script src="js/gfx/tiles.js"></script>
 <script src="js/ui/screen-fx.js"></script>
 <script src="js/systems/combat.js"></script>
 <script src="js/systems/challenge.js"></script>
 <script src="js/systems/world-map.js"></script>
 <script src="js/systems/local.js"></script>
+<script src="js/systems/explore.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

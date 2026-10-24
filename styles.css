@@ -401,3 +401,26 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 @keyframes encIn{from{translate:-140vw 0}}
 @keyframes encOut{to{translate:140vw 0}}
 @media (prefers-reduced-motion:reduce){.enc-band,.enc-band::after,.enc-sub{animation:none}}
+
+/* ===== exploração vista de cima ===== */
+#explore{background:var(--ink);align-items:start;overflow:auto;padding:12px}
+.game:has(#explore:not([hidden])) :is(.stage,.log,.ui){visibility:hidden}
+.ex-wrap{display:grid;gap:10px;justify-items:center;max-width:980px;margin:auto}
+.ex-top{display:flex;gap:12px;align-items:center;justify-content:space-between;width:100%}
+.ex-exit{all:unset;cursor:pointer;font-family:var(--display);font-size:16px;letter-spacing:.06em;padding:6px 18px;background:var(--paper);color:var(--ink);clip-path:polygon(6% 0,100% 0,94% 100%,0 100%)}
+.ex-exit:hover,.ex-exit:focus-visible{background:var(--accent);color:var(--on-accent)}
+.ex-view{position:relative;line-height:0}
+#exCanvas{width:min(94vw,960px,calc((100vh - 190px) * 1.3636));height:auto;image-rendering:pixelated;border:4px solid var(--paper);box-shadow:8px 8px 0 var(--accent);background:#000}
+.ex-msg{position:absolute;left:50%;top:10px;translate:-50% -12px;max-width:88%;opacity:0;pointer-events:none;line-height:1.4;font:700 13px var(--mono);background:var(--paper);color:var(--ink);padding:6px 14px;clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);transition:opacity .2s,translate .2s;text-align:center}
+.ex-msg.show{opacity:1;translate:-50% 0}
+.ex-help{margin:0;font:700 11px/1.5 var(--mono);color:var(--paper);text-align:center;opacity:.85}
+.ex-pad{display:none;width:100%;justify-content:space-between;align-items:center;user-select:none;-webkit-user-select:none;touch-action:none}
+.ex-pad button{all:unset;display:grid;place-items:center;background:var(--paper);color:var(--ink);font-family:var(--display);box-shadow:4px 4px 0 var(--ink);touch-action:none}
+.ex-pad button:active{background:var(--accent);color:var(--on-accent)}
+.ex-dpad{display:grid;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(3,54px);gap:4px}
+.ex-dpad [data-dir=up]{grid-area:1/2}.ex-dpad [data-dir=left]{grid-area:2/1}.ex-dpad [data-dir=right]{grid-area:2/3}.ex-dpad [data-dir=down]{grid-area:3/2}
+.ex-dpad button{font-size:22px;border-radius:8px}
+.ex-ab{display:flex;gap:12px;align-items:center}
+.ex-ab button{width:78px;height:78px;border-radius:50%;font-size:15px}
+#exA{translate:0 -18px}
+@media (pointer:coarse),(max-width:760px){.ex-pad{display:flex}.ex-help{display:none}#exCanvas{width:min(96vw,calc((100vh - 290px) * 1.3636))}}

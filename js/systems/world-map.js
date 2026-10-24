@@ -53,13 +53,9 @@ function select(id) {
   });
   i.appendChild(r);
 }
-// vai caçar na zona z (com boss = true, enfrenta o chefe)
-function hunt(z, boss) {
-  wipe(() => { curZone = z || curZone; bossFight = !!boss; $("homeButton").hidden = true; musicStop(); $("map").hidden = true; fromLocal = !$("local").hidden; $("local").hidden = true; init(); });
-}
 function showMap() { wipe(showMapNow); }
 // sem a transição (usado ao sair da tela inicial)
-function showMapNow() { $("local").hidden = true; $("homeButton").hidden = false; $("game").classList.remove("working-mode"); $("stage").classList.remove("working"); $("workScene").hidden = true; $("beast").style.display = ""; $("hero").style.display = ""; $("over").hidden = true; $("map").hidden = false; musicStart("map"); refreshHero(); drawMap(); select(G.loc); }
+function showMapNow() { $("local").hidden = true; $("explore").hidden = true; $("homeButton").hidden = false; $("game").classList.remove("working-mode"); $("stage").classList.remove("working"); $("workScene").hidden = true; $("beast").style.display = ""; $("hero").style.display = ""; $("over").hidden = true; $("map").hidden = false; musicStart("map"); refreshHero(); drawMap(); select(G.loc); }
 function go(id, cost) {
   if (moving) return;
   moving = true;

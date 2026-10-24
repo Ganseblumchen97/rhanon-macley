@@ -31,8 +31,9 @@ function getBattleTrackFor(animal) {
   return "battleP3";
 }
 
-function init() {
-  $("homeButton").hidden = true;
+// opts: animal (bicho escolhido), firstHit (dano do golpe de abertura na exploração), enemyFirst (o bicho começa)
+function init(opts = {}) {
+  $("homeButton").hidden = true; $("map").hidden = true; $("local").hidden = true;
   $("game").classList.remove("working-mode"); $("stage").classList.remove("working"); $("workScene").hidden = true; $("beast").style.display = ""; $("hero").style.display = "";
   setBattleDecor(curZone);
   mode = "hunt";
@@ -42,16 +43,18 @@ function init() {
     b.addEventListener("click", () => act(c.id));
     const showDesc = () => { $("desc").textContent = c.d; sfx("blip"); }; b.addEventListener("focus", showDesc); b.addEventListener("mouseenter", showDesc); $("cmds").appendChild(b);
   });
-  const animal = pickAnimal();
-  $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = animal.size.toUpperCase();
+  const animal = opts.animal || pickAnimal();
+  $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = "Nv " + (animal.lv || 1);
   $("beast").innerHTML = ""; $("beast").appendChild(animalSprite(animal)); refreshHero();
  $("beast").style.top = `calc(46% - ${((SPR[ART[animal.id] || animal.id] || {h: animal.rows ? animal.rows.length : 20}).h) * (animal.boss ? 1.35 : 1)} * var(--px) + 12px)`; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", animal.name); $("hero").style.display = ""; $("intent").style.display = ""; $("ehp").parentElement.style.display = ""; $("spTxt").parentElement.style.display = ""; $("sp").parentElement.style.display = "";
   musicStop();
-  vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = ""; $("again").textContent = "Lutar de novo";
+  vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = "Lutar de novo"; $("toMap").textContent = fromExplore ? "Continuar explorando" : "Voltar ao mapa";
   p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, man:G.man};
   e = { ...animal, hp:animal.hp, max:animal.hp, intent:null, known:false, assustada:false };
   busy = false;
   lines = [animal.intro];
+  if (opts.firstHit) { e.hp = Math.max(1, e.hp - opts.firstHit); lines.push(`Rhanon acertou primeiro: −${opts.firstHit}. Sua vez!`); }
+  if (opts.enemyFirst) lines.push(`${animal.name} pegou Rhanon desprevenido!`);
   $("over").hidden = true;
   $("beast").className = "beast"; $("hero").className = "hero"; holdE = null; holdP = null; $("lvTxt").textContent = "Nv " + G.lv + (defense() ? " · DEF " + defense() : "");
   pick(); render();
@@ -65,7 +68,7 @@ function init() {
   HERO_A.slide("-38vw", "0px", 650, () => HERO_A.set("idle"));
   BEAST_A.slide("42vw", "0px", 600, () => { BEAST_A.set("idle"); BEAST_A.dust(); BEAST_A.bang(); sfx(boss ? "roar" : "guard"); });
   setTimeout(() => encounterBanner(e.name), 380);
-  setTimeout(() => { busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus(); }, REDUCE ? 300 : 1350);
+  setTimeout(() => { if (opts.enemyFirst) return enemyTurn(); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus(); }, REDUCE ? 300 : 1350);
 }
 function pick() {
   const r = Math.random() * 100;
@@ -168,8 +171,8 @@ function finish(kind) {
   else if (kind === "lose") HERO_A.set("defeat");
   else if (kind === "flee") { HERO_A.set("flee"); HERO_A.slide("0px", "-60vw", 1000); }
   // depois da fanfarra, a música do lugar volta baixinho enquanto o cartão de resultado está na tela
-  setTimeout(() => { if (!$("over").hidden && mode === "hunt") musicStart(fromLocal ? "local" : "map"); }, 2800);
-  busy = true;
+  setTimeout(() => { if (!$("over").hidden && mode === "hunt") musicStart(fromLocal || fromExplore ? "local" : "map"); }, 2800);
+  busy = true; battleResult = kind;
   musicStop(); keepVitals(kind); const rw = kind === "win" ? reward() : kind === "lose" ? " Rhanon desmaiou e acordou na aldeia, com metade das forças" + (G.lastLoss ? ` e R$ ${G.lastLoss} a menos.` : ".") : ""; if (kind === "win") $("beast").classList.add("dead"); fanfare(kind);
   const T = {
     win:  ["Rhanon sobreviveu!", `${e.name} foi vencido ou afugentado. A mata guarda mais encontros e recompensas diferentes. Rhanon ainda não sabe, mas o futuro dele tem teclado, pendrive e uma lojinha de cópias.`],
@@ -178,7 +181,9 @@ function finish(kind) {
   }[kind];
   setTimeout(() => {
     $("overTitle").textContent = T[0]; $("overTxt").textContent = T[1] + rw;
-    $("again").style.display = kind === "lose" ? "none" : ""; $("over").hidden = false; (kind === "lose" ? $("toMap") : $("again")).focus();
+    const again = kind !== "lose" && !fromExplore;
+    if (fromExplore && kind === "lose") $("toMap").textContent = "Voltar à aldeia";
+    $("again").style.display = again ? "" : "none"; $("over").hidden = false; (again ? $("again") : $("toMap")).focus();
   }, kind === "win" ? 1700 : kind === "lose" ? 1900 : 1150);
 }
 function sayLate(t) { setTimeout(() => { say(t); render(); }, 450); }
@@ -217,11 +222,8 @@ function strike(d, cls, kind) {
   };
 }
 function pickAnimal() {
-  const z = ZONES[curZone];
-  if (bossFight && !BS()[curZone]) return ANIMALS.find(a => a.id === z.boss);
-  let r = Math.random() * z.pool.reduce((s, [, w]) => s + w, 0);
-  for (const [id, w] of z.pool) if ((r -= w) < 0) return ANIMALS.find(a => a.id === id);
-  return ANIMALS[0];
+  if (bossFight && !BS()[curZone]) return ANIMALS.find(a => a.id === ZONES[curZone].boss);
+  return pickFromPool(curZone);
 }
 function special() {
   const s = e.special, d = rnd(e.damage[0], e.damage[1]);
@@ -243,13 +245,14 @@ function tick() {
   if (p.weak > 0) p.weak--;
   if (p.preso > 0) p.preso--;
 }
-function reward() {
-  if (e.boss) BS()[curZone] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = e.xp, L0 = G.lv; vit(); G.pelts[e.id] = (G.pelts[e.id] || 0) + 1;
+// XP, pele e progresso por vencer o bicho a (na batalha, o bicho atual)
+function reward(a = e) {
+  if (a.boss) BS()[curZone] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = a.xp, L0 = G.lv; vit(); G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }
   vit(); G.hp = Math.min(maxHP(G.lv), G.hp + maxHP(G.lv) - maxHP(L0)); G.sp = Math.min(maxSP(G.lv), G.sp + maxSP(G.lv) - maxSP(L0));
   save();
-  return ` Ganhou ${xp} XP e conseguiu ${peltName(e.id).toLowerCase()} (vale R$ ${peltValue(e.id)} na feira).` + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (e.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
+  return ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).` + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
 }
 function keepVitals(kind) {
   vit();

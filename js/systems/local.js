@@ -27,11 +27,8 @@ function selectSub(id, msg) {
     lh("Fogueira recupera metade de PV e PE. Dormir na tenda recupera tudo e passa o dia.");
   } else if (id === "feira") feiraButtons(i);
   else if (z) {
-    btn("Caçar aqui", () => hunt(id), false, i);
-    const n = K()[id] || 0;
-    if (BS()[id]) lh("Chefe derrotado ✓");
-    else if (n >= 4) btn(`Chefe: ${ANIMALS.find(a => a.id === z.boss).name}`, () => hunt(id, true), false, i);
-    else lh(`${n}/4 vitórias para enfrentar o chefe.`);
+    btn("Explorar", () => startExplore(id), false, i);
+    lh(BS()[id] ? "Chefe derrotado ✓ · a passagem no fim da trilha está aberta." : `O chefe (${ANIMALS.find(a => a.id === z.boss).name}) espera no fim da trilha.`);
     if (G.hp < maxHP(G.lv) * .35) lh("Rhanon está muito ferido. Descanse na aldeia antes de caçar.");
   }
   if (msg) lh(msg);
