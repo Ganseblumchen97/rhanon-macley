@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rhanon Macley — RPG (offline)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Luckiest+Guy&family=JetBrains+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="bg" aria-hidden="true">
+  <div class="layer a"><div class="star"></div><div class="band b2"></div><div class="band b1"></div><div class="band b3"></div></div>
+  <div class="layer p4"><div class="dia"></div><div class="floor"></div><div class="tape t1"></div><div class="tape t2"></div></div>
+</div>
+<div class="wipe" id="wipe"></div>
+<section class="title-screen" id="titleScreen" aria-label="Tela inicial do jogo">
+  <div class="title-copy">
+    <h1 class="title" id="titleLogo" aria-label="Macley's Adventure"></h1>
+    <nav class="t-menu"><button class="cmd sel" id="startAdventure" type="button"><span>Iniciar aventura</span></button><p class="desc">Da mata ao mundo. Sobreviva, aprenda e construa seu próprio caminho.</p></nav>
+  </div>
+  <div class="title-art" id="titleArt" aria-hidden="true"></div>
+  <div class="title-bottom"><span>RHANON MACLEY · RPG</span><span>UMA JORNADA COMEÇA COM UM PASSO</span></div>
+</section>
+<main class="game" id="game">
+  <section class="stage" id="stage">
+    <div class="bg-decor" id="bgDecor"></div>
+    <div class="plate" id="plate"><b>Onça-pintuda</b><span class="lv">Nv 4</span><div class="bar"><i id="ehp"></i></div></div>
+    <div class="beast" id="beast" role="img" aria-label="Onça-pintuda"></div>
+    <div class="work-scene" id="workScene" hidden aria-label="Visão por cima do ombro de Rhanon, olhando para um monitor"><div class="office-window"></div><div class="office-plant"></div><div class="office-monitor"><div class="monitor-top"><span>TERMINAL // TASK MODE</span><span>● ONLINE</span></div><div class="monitor-screen" id="monitorScreen"></div></div><div class="monitor-stand"></div><div class="monitor-base"></div><div class="office-person" id="officePerson"></div><div class="office-desk"></div><div class="office-leg"></div><div class="office-leg right"></div><div class="coffee"></div></div>
+    <div class="hero" id="hero" role="img" aria-label="Rhanon"></div>
+    <div class="fx" id="fx"></div>
+    <div class="intent" id="intent"><span id="intentTxt"></span></div>
+  </section>
+  <section class="log" id="log" aria-live="polite"></section>
+  <section class="ui">
+    <div>
+      <nav class="cmds" id="cmds" aria-label="Comandos"></nav>
+      <p class="desc" id="desc"></p>
+    </div>
+    <aside class="me">
+      <h2>Rhanon <small id="lvTxt"></small></h2>
+      <div class="row"><span>PV</span><span id="pvTxt"></span></div>
+      <div class="bar pv"><i id="pv"></i></div>
+      <div class="row"><span>PE</span><span id="spTxt"></span></div>
+      <div class="bar sp"><i id="sp"></i></div>
+      <div class="status" id="status"></div>
+    </aside>
+  </section>
+  <button class="home-button" id="homeButton" type="button" aria-label="Voltar à tela principal" hidden>⌂ Tela principal</button>
+  <button class="mute" id="mute" type="button" aria-label="Alternar som" aria-pressed="false">♪</button>
+  <div class="over" id="map">
+    <div class="mapwrap">
+      <div class="hud" id="hud"></div>
+      <svg id="mapsvg" viewBox="0 0 600 620" role="img" aria-label="Mapa do Brasil em silhueta, com rota entre Ananindeua e Curitiba">
+        <defs><pattern id="mapgrid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#f4ecd8" stroke-opacity=".06" stroke-width="1"/></pattern></defs>
+        <rect width="600" height="620" fill="url(#mapgrid)"/>
+        <g class="land">
+          <path d="M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"/>
+        </g>
+        <line id="route" x1="322" y1="168" x2="315" y2="478"/>
+        <g id="nodes"></g>
+        <g id="mk"><g class="pin"><path d="M0 0 L-7 -14 L7 -14Z"/><circle cx="0" cy="-19" r="7"/></g></g>
+      </svg>
+      <div class="info" id="info"></div>
+    </div>
+  </div>
+  <div class="over" id="local" hidden>
+    <div class="mapwrap">
+      <div class="hud" id="lhud"></div>
+      <svg id="lsvg" viewBox="0 0 400 300" role="img" aria-label="Mapa estilizado de Ananindeua">
+        <polygon class="land" points="20,60 70,20 190,10 300,25 380,70 385,170 350,250 240,285 110,280 40,230 15,150"/>
+        <path class="river" d="M335,20 C300,70 330,100 312,140 C296,180 335,215 305,285"/>
+        <g id="lroutes"></g><g id="lnodes"></g>
+        <g id="lmk"><g class="pin"><path d="M0 0 L-7 -14 L7 -14Z"/><circle cx="0" cy="-19" r="7"/></g></g>
+      </svg>
+      <div class="info" id="linfo"></div>
+    </div>
+  </div>
+  <div class="over" id="over" hidden>
+    <div class="card"><h1 id="overTitle"></h1><p id="overTxt"></p><button id="again">Lutar de novo</button><button id="toMap">Voltar ao mapa</button></div>
+  </div>
+</main>
+<!-- Ordem importa: utilidades e estado, depois dados, depois quem usa os dados. main.js por último. -->
+<script src="js/core/utils.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/data/sprites.js"></script>
+<script src="js/data/animals.js"></script>
+<script src="js/data/commands.js"></script>
+<script src="js/data/questions.js"></script>
+<script src="js/data/world.js"></script>
+<script src="js/audio/sfx.js"></script>
+<script src="js/audio/music.js"></script>
+<script src="js/gfx/sprites.js"></script>
+<script src="js/gfx/fx.js"></script>
+<script src="js/gfx/actors.js"></script>
+<script src="js/ui/screen-fx.js"></script>
+<script src="js/systems/combat.js"></script>
+<script src="js/systems/challenge.js"></script>
+<script src="js/systems/world-map.js"></script>
+<script src="js/systems/local.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
