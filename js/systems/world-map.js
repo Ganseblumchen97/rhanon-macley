@@ -1,5 +1,5 @@
 /* Mapa do Brasil: HUD, painel de informações, viagem e troca de telas. */
-const curVis = () => G.lv >= REQ.lv || G.loc === "curitiba";
+const curVis = () => CURITIBA_OPEN && (G.lv >= REQ.lv || G.loc === "curitiba");
 function drawMap() {
   vit(); $("hud").textContent = `Nv ${G.lv} · XP ${G.xp}/${need(G.lv)} · R$ ${G.money}` + (G.loc === "ananindeua" ? ` · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)}` : "") + (G.job ? ` · PROGRAMADOR · XP PROF. ${G.jobXp||0}` : "") + (G.betterJob ? " · SÊNIOR" : "");
   $("n-curitiba").style.display = $("route").style.display = curVis() ? "" : "none";
@@ -16,20 +16,23 @@ function buildMapNodes() {
   });
 }
 // botão de comando dentro de um painel (por padrão, o painel do mapa do Brasil)
+// (cada botão ganha um número: a tecla 1-9 que o aperta, ver ui/mapnav.js)
 function btn(txt, fn, off, host) {
-  const b = document.createElement("button");
-  b.className = "cmd"; b.type = "button"; b.innerHTML = `<span>${txt}</span>`;
+  host = host || $("info");
+  const b = document.createElement("button"), n = host.querySelectorAll(".cmd[data-key]").length + 1;
+  b.className = "cmd"; b.type = "button"; b.innerHTML = `<span>${n <= 9 ? `<i class="key">${n}</i>` : ""}${txt}</span>`;
+  b.dataset.key = n;
   if (off) b.setAttribute("aria-disabled", "true");
   b.addEventListener("click", () => { if (!off) fn(); });
-  (host || $("info")).appendChild(b);
+  host.appendChild(b);
 }
 function select(id) {
-  sfx("blip");
+  sfx("blip"); markNode("map", id);
   const l = LOC[id], here = id === G.loc, i = $("info");
   i.innerHTML = `<h2>${l.n}</h2><p>${l.txt}</p>` + (here ? '<p class="hint">Você está aqui.</p>' : "");
   if (here && id === "ananindeua") {
     btn("Entrar em Ananindeua", openLocal);
-    i.insertAdjacentHTML("beforeend", curVis() ? '<p class="hint">Curitiba apareceu no mapa. Toque nela para viajar.</p>' : `<p class="hint">Existe um destino distante. Para ir até lá: Nv ${REQ.lv} e R$ ${REQ.money}.</p>`);
+    i.insertAdjacentHTML("beforeend", !CURITIBA_OPEN ? '<p class="hint">Em breve: novos destinos.</p>' : curVis() ? '<p class="hint">Curitiba apareceu no mapa. Toque nela para viajar.</p>' : `<p class="hint">Existe um destino distante. Para ir até lá: Nv ${REQ.lv} e R$ ${REQ.money}.</p>`);
   } else if (here && id === "curitiba") {
     if (!G.job) {
       btn("Entrevista: vaga de programador", () => startChallenge("interview"));

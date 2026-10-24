@@ -17,7 +17,7 @@ function drawLocal() {
   const l = SUB[G.sub]; $("lmk").setAttribute("transform", `translate(${l.x} ${l.y})`);
 }
 function selectSub(id, msg) {
-  sfx("blip"); vit();
+  sfx("blip"); vit(); markNode("local", id);
   const l = SUB[id], z = ZONES[id], here = id === G.sub, i = $("linfo"), lock = z && !unlocked(id);
   i.innerHTML = `<h2>${l.n}</h2><p>${l.txt}</p>` + (here ? '<p class="hint">Você está aqui.</p>' : "");
   if (!here) { btn(lock ? `${l.n} (vença o chefe: ${SUB[NEED[id]].n})` : "Ir até lá", () => goSub(id), lock, i); if (lock) lh(`Derrote o chefe de ${SUB[NEED[id]].n} para liberar este local.`); }

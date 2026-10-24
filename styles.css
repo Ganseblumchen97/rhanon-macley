@@ -454,3 +454,11 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 @keyframes ciZoom{from{scale:1.25}to{scale:1.06}}
 @keyframes ciPulse{50%{opacity:.82}}
 .cutin.ambush .ci-dim{background:rgba(50,0,0,.7)}
+
+/* ===== teclado nos mapas ===== */
+.node.sel circle{fill:var(--paper);stroke:var(--blood);stroke-width:5}
+.node.sel text{fill:var(--accent)}
+.cmd .key{display:inline-block;font:700 .42em var(--mono);font-style:normal;vertical-align:middle;background:var(--paper);color:var(--ink);padding:.12em .45em;margin-right:.5em;rotate:-4deg;border:2px solid currentColor}
+.info .cmd:hover .key,.info .cmd:focus-visible .key{background:var(--ink);color:var(--paper)}
+.nav-help{grid-column:1/-1;justify-self:center;margin:0;font:700 11px var(--mono);color:var(--paper);opacity:.85;text-align:center}
+@media (pointer:coarse){.nav-help,.cmd .key{display:none}}
