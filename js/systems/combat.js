@@ -26,13 +26,8 @@ function setBattleDecor(zone) {
   }
 }
 
-function getBattleTrackFor(animal) {
-  if (animal.boss) return "battleP5";
-  if (animal.size === "pequeno") return "battleP3";
-  if (animal.size === "médio") return "battleP4";
-  if (animal.size === "grande") return "battleP5";
-  return "battleP3";
-}
+// batalha comum: a roda de capoeira acelerada; chefe: a versão tensa
+function getBattleTrackFor(animal) { return animal.boss ? "battleBoss" : "battleCapo"; }
 
 /* ---------- comandos: lista principal e submenus (Especial e Itens) ---------- */
 let subMenu = null, subFrom = 0;   // opções do submenu aberto no lugar dos comandos; subFrom = comando que o abriu

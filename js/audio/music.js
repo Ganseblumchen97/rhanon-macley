@@ -21,7 +21,8 @@ function stepWork(s, t) {
    e é composta por instrumentos sintetizados (sino, flauta, piano elétrico, pad, baixo, bateria,
    berimbau, atabaque, caxixi). As melodias são refeitas a cada trecho, então a música não fica igual.
    Faixas: "title" (abertura), "map" (mapa grande: Pará/Brasil), "local" (Ananindeua, toque de capoeira com flauta),
-   "battleP3/P4/P5" (bicho pequeno, médio e grande/chefe). Entrevista e trabalho seguem com as faixas antigas. */
+   "localNight" (Ananindeua à noite), "battleCapo" (batalha: a roda de capoeira acelerada), "battleBoss" (chefe, tenso);
+   "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
   let X = null, DEST = null;              // contexto de áudio e saída (troca no teste offline)
   let bus = null, timer = null, nextTime = 0, step = 0, track = null, trackId = null, NB2 = null;
@@ -139,6 +140,34 @@ const MUS = (() => {
       g.gain.value = 0; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.006, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + .08);
       o.connect(g).connect(bus.mix); o.start(t); o.stop(t + .1);
     }
+  }
+
+  // grilo: "cri-cri" de pulsos bem agudos (noite)
+  function cricket(when) {
+    for (let k = 0; k < 2; k++) for (let j = 0; j < 4; j++) {
+      const t = when + k * .16 + j * .022, o = X.createOscillator(), g = X.createGain();
+      o.type = "sine"; o.frequency.value = 4400 + Math.random() * 300;
+      g.gain.value = 0; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.004, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + .018);
+      o.connect(g).connect(bus.mix); o.start(t); o.stop(t + .02);
+    }
+  }
+  // coruja ao longe: "hu-huu"
+  function owl(when) {
+    [[0, 380, .25], [.38, 340, .5]].forEach(([o0, f0, len]) => {
+      const t = when + o0, o = X.createOscillator(), g = X.createGain();
+      o.type = "sine"; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * .9, t + len);
+      g.gain.value = 0; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.012, t + .06); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+      o.connect(g).connect(bus.mix); o.start(t); o.stop(t + len + .02);
+    });
+  }
+  // agogô: sino de duas bocas (alto e baixo), metálico
+  function agogo(when, high, vol = .014) { const f = high ? 1320 : 990; synth("sine", f, when, .18, vol); synth("sine", f * 2.76, when, .06, vol * .4); }
+  // surdo/atabaque grave e comprido, para a música do chefe
+  function surdo(when, vol) {
+    const o = X.createOscillator(), g = X.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(95, when); o.frequency.exponentialRampToValueAtTime(48, when + .35);
+    g.gain.value = 0; g.gain.setValueAtTime(vol, when); g.gain.exponentialRampToValueAtTime(.0001, when + .5);
+    o.connect(g).connect(bus.mix); o.start(when); o.stop(when + .55);
   }
 
   // viradas e melodias das batalhas (iguais às da vitrine)
@@ -293,7 +322,105 @@ const MUS = (() => {
         }
         return out;
       }
+    },
+    // Ananindeua à noite: a mesma roda de capoeira, mais lenta e baixinha, com acordes mais escuros, flauta grave,
+    // grilos e uma coruja ao longe no lugar dos passarinhos
+    localNight: {
+      bpm: 84, wet: .5, level: .4, swing: .12,
+      chords: [
+        {bass: 38, notes: [50, 53, 57, 62, 64]},                                   // Dm(add9)
+        {bass: 46, notes: [50, 53, 58, 62, 64]},                                   // Bb(add9)
+        {bass: 43, notes: [50, 55, 58, 62, 65]},                                   // Gm9
+        {bass: 45, notes: [49, 52, 57, 61, 64], resolve: [49, 52, 55, 58, 61]}     // A7 -> A7(b9)
+      ],
+      chordsB: [
+        {bass: 41, notes: [48, 53, 57, 60, 64]},                                   // Fmaj7
+        {bass: 40, notes: [50, 55, 58, 62, 67]},                                   // Em7(b5)
+        {bass: 39, notes: [50, 55, 58, 62, 67]},                                   // Ebmaj7
+        {bass: 45, notes: [49, 52, 55, 57, 61], resolve: [49, 52, 55, 58, 61]}     // A7sus -> A7(b9)
+      ],
+      form: ["A", "A2", "B", "A3"],
+      toque: ["c...d...c.c.h...", "c...d..hc...d..."],
+      melody: null,
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const list = part === "B" ? this.chordsB : this.chords, chord = list[Math.floor(barIn / 2)];
+        const notes = chord.resolve && barIn % 2 ? chord.resolve : chord.notes;
+        if (i % 128 === 0) this.melody = part === "A" ? null : TRACKS.local.makeMelody(list, -12);
+        if (s === 0 && barIn % 2 === 0) { pad(notes, t, d * 32, .012); synth("sine", mtof(chord.bass), t, d * 30, .06); }
+        const b = this.toque[bar % 2][s];
+        if (b === "c") chi(t, .014); else if (b === "d") berimbau(50, t, .04); else if (b === "h") berimbau(52, t, .035);
+        if (s === 0) atabaque(t, .06);
+        if (s === 10 && bar % 2) atabaque(t, .04, true);
+        if (s % 4 === 3 && Math.random() < .4) caxixi(t, .004);
+        if (s === 0 && barIn % 2 === 0) bell(mtof(notes[4]), t, .016, 2.6);
+        if (s % 8 === 4 && Math.random() < .5) cricket(t);
+        if (Math.random() < .002) owl(t);
+        const m = this.melody && this.melody[i % 128];
+        if (m) flute(mtof(m.note), t, m.len * d, .026);
+      }
+    },
+    // batalha: a roda de capoeira acelerada (toque de São Bento Grande), com atabaque, pandeiro, baixo marcado
+    // e flauta mais agitada. Forma A - B - A' - C (C = ponte só de percussão com virada crescente)
+    battleCapo: {
+      bpm: 132, wet: .24, level: .32, swing: .08,
+      chords: [{bass: 38, notes: [50, 53, 57, 62]}, {bass: 36, notes: [48, 52, 55, 60]}, {bass: 46, notes: [50, 53, 58, 62]}, {bass: 45, notes: [49, 52, 57, 61]}],
+      chordsB: [{bass: 43, notes: [50, 55, 58, 62]}, {bass: 41, notes: [48, 53, 57, 60]}, {bass: 39, notes: [51, 55, 58, 63]}, {bass: 45, notes: [49, 52, 55, 61], resolve: [49, 52, 57, 61]}],
+      scale: [62, 65, 67, 69, 72, 74, 77, 79, 81], form: ["A", "B", "A2", "C"],
+      toque: ["d.c.h.c.d.c.hhc.", "d.c.h.c.d.chc.h."], bassline: [[0, 0], [3, 12], [6, 7], [8, 0], [11, 10], [14, 12]], melody: null,
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const list = part === "B" ? this.chordsB : this.chords, chord = list[barIn % 4];
+        const notes = chord.resolve && s >= 8 ? chord.resolve : chord.notes;
+        const bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "C" ? null : battleMelody(list, this.scale, part === "A2" ? 12 : 0); hat(t, .02, true); }
+        // berimbau sempre; na ponte ele puxa a roda sozinho com o atabaque
+        const b = this.toque[bar % 2][s];
+        if (b === "c") chi(t, .02); else if (b === "d") berimbau(50, t, .05); else if (b === "h") berimbau(52, t, .045);
+        if (s === 0 || s === 8) atabaque(t, .1); if (s === 3 || s === 11) atabaque(t, .07, true); if (s === 14) atabaque(t, .06, true);
+        if (bridge) { if (s === 4 || s === 12) tapa(t, .022); return; }
+        if (s === 0 || s === 7 || s === 10) kick(t, .1);
+        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) tapa(t, .03);
+        noiseHit(t, .035, s % 4 === 2 ? .016 : .007, "highpass", 6500);   // pandeiro
+        if (s % 2 === 1) caxixi(t, .007);
+        const bl = this.bassline.find(([at]) => at === s);
+        if (bl) synth("triangle", mtof(chord.bass + bl[1]), t, d * 1.6, .1);
+        if (s === 0) pad(notes, t, d * 16, .008);
+        if (s === 6 || s === 14) notes.slice(1, 4).forEach(m => ep(mtof(m + 12), t, .14, .01));
+        if (s === 0) bell(mtof(notes[3] + 12), t, .016, .8);
+        const m = this.melody && this.melody[i % 128];
+        if (m) flute(mtof(m.note), t, m.len * d * .9, part === "A2" ? .032 : .028);
+      }
+    },
+    // chefe: a mesma roda, mas em ré frígio/menor harmônico, com pedal grave pulsando, surdo pesado,
+    // agogô de alerta, pad com nota "fora" e flauta + lead em escala tensa
+    battleBoss: {
+      bpm: 138, wet: .3, level: .3,
+      chords: [{bass: 38, notes: [50, 53, 57, 62]}, {bass: 39, notes: [51, 55, 58, 63]}, {bass: 38, notes: [50, 53, 57, 60]}, {bass: 37, notes: [49, 52, 55, 58], resolve: [49, 52, 55, 57]}],
+      chordsB: [{bass: 34, notes: [50, 53, 58, 62]}, {bass: 33, notes: [49, 52, 57, 61]}, {bass: 34, notes: [50, 55, 58, 62]}, {bass: 33, notes: [49, 52, 55, 58], resolve: [49, 53, 57, 61]}],
+      scale: [62, 63, 65, 67, 69, 70, 73, 74, 75, 77], form: ["A", "B", "A2", "C"], pedal: [0, 0, 1, 0, 0, 0, 1, 0], melody: null,
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const list = part === "B" ? this.chordsB : this.chords, chord = list[barIn % 4];
+        const notes = chord.resolve && s >= 8 ? chord.resolve : chord.notes;
+        const bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "C" ? null : battleMelody(list, this.scale, 12); sweep(t, d * 8, .025); }
+        // pedal grave em colcheias (ré e mi bemol), o coração da tensão
+        if (s % 2 === 0) synth("sawtooth", mtof(26 + this.pedal[s / 2]), t, d * 1.7, bridge ? .03 : .045, 500);
+        if ([0, 3, 6, 8, 11, 14].includes(s)) surdo(t, s === 0 || s === 8 ? .13 : .08);
+        if (s === 6 || s === 14) agogo(t, s === 6);
+        if (s % 4 === 2) chi(t, .016); if (s === 0 || s === 8) berimbau(45, t, .05);   // berimbau gunga, mais grave
+        if (s === 0) pad([...notes, notes[0] + 1], t, d * 16, .009);   // nota "fora" no pad
+        if (bridge) { if (s % 4 === 0) tapa(t, .025); return; }
+        if (s === 0 || s === 10) kick(t, .12);
+        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) snare(t, .05);
+        if (s % 2 === 0) hat(t, s % 4 === 2 ? .014 : .007);
+        if (s % 2 === 1) caxixi(t, .006);
+        const m = this.melody && this.melody[i % 128];
+        if (m) { lead(mtof(m.note), t, m.len * d, .012); flute(mtof(m.note - 12), t, m.len * d, .02); }
+      }
     }
+
   };
   function makeLick(from, dense) {
     const out = new Array(16).fill(null); let idx = 3;
@@ -474,7 +601,8 @@ function legacyStop() { if (legacyTimer) clearInterval(legacyTimer); legacyTimer
 
 /* ----- o que o resto do jogo usa ----- */
 function musicStart(id) {
-  id = id || "battleP3";
+  id = id || "battleCapo";
+  if (id === "local" && G.night) id = "localNight";   // à noite a música da exploração muda de clima
   if (MUS.has(id)) { legacyStop(); MUS.play(id); }
   else { MUS.stop(.4); legacyStart(id); }
 }

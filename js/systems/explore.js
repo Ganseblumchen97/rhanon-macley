@@ -43,10 +43,57 @@ function spearBlocked(px, py) {
 }
 
 /* ---------- entrar, sair e trocar de fase ---------- */
-function pickFromPool(zone) {
-  const z = zoneDef(zone); let r = Math.random() * z.pool.reduce((s, [, w]) => s + w, 0);
-  for (const [id, w] of z.pool) if ((r -= w) < 0) return ANIMALS.find(a => a.id === id);
-  return ANIMALS.find(a => a.id === z.pool[0][0]);
+// peixes vivem só na água: nadam de um lado para o outro, cospem água quando veem o Rhanon e só a flecha alcança
+const AQUATIC = new Set(["piranha", "poraque"]);
+// where: "terra" (sem peixes, para os "a" do mapa), "agua" (só peixes) ou nada (qualquer um, usado na batalha)
+function pickFromPool(zone, where) {
+  const z = zoneDef(zone), pool = where ? z.pool.filter(([id]) => (where === "agua") === AQUATIC.has(id)) : z.pool;
+  if (!pool.length) return null;
+  let r = Math.random() * pool.reduce((s, [, w]) => s + w, 0);
+  for (const [id, w] of pool) if ((r -= w) < 0) return ANIMALS.find(a => a.id === id);
+  return ANIMALS.find(a => a.id === pool[0][0]);
+}
+// espalha peixes pela água da fase (em trechos com água dos dois lados, para terem por onde nadar)
+function spawnFish(zone, rows) {
+  const water = [];
+  rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
+    if (ch !== "~") return;
+    const h = row[tx - 1] === "~" && row[tx + 1] === "~", v = (rows[ty - 1] || "")[tx] === "~" && (rows[ty + 1] || "")[tx] === "~";
+    if (h || v) water.push([tx, ty, h ? "x" : "y"]);
+  }));
+  for (let k = Math.min(6, Math.floor(water.length / 25)); k > 0 && water.length; k--) {
+    const a = pickFromPool(zone, "agua"); if (!a) return;
+    const [tx, ty, axis] = water.splice(Math.floor(Math.random() * water.length), 1)[0];
+    EX.ents.push(Object.assign(makeAnimalEnt(a, tx, ty), {aquatic: true, axis, dir: Math.random() < .5 ? 1 : -1}));
+  }
+}
+// peixe: nada sem sair da água; ao ver o Rhanon, "!" e cospe um jato d'água (se acertar, a batalha começa com ele)
+function exFish(en, dt, now) {
+  const h = EX.hero, sp = en.speed * .5 * dt, ax = en.axis === "x";
+  const nx = en.x + (ax ? en.dir * sp : 0), ny = en.y + (ax ? 0 : en.dir * sp);
+  if (stageTile(Math.floor((nx + (ax ? en.dir * 9 : 0)) / TILE), Math.floor((ny - 4 + (ax ? 0 : en.dir * 9)) / TILE)) === "~") { en.x = nx; en.y = ny; en.walk += sp; }
+  else en.dir *= -1;
+  if (ax) en.face = en.dir;
+  if (en.state === "windup" && now > en.until) en.state = "wander";
+  if (Math.hypot(h.x - en.x, h.y - en.y) < 92 && now > (en.spitT || 0) && now > EX.invulnUntil && !EX.locked && !EX.camp) {
+    en.spitT = now + 2600; en.state = "windup"; en.until = now + 450; en.face = h.x > en.x ? 1 : -1; animalCry(en.a.id, false, .5);
+    setTimeout(() => {
+      if (!EX || !en.alive || EX.locked) return;
+      const sx = en.x, sy = en.y - 7, tx = h.x, ty = h.y - 9, d = Math.hypot(tx - sx, ty - sy) || 1;
+      EX.spits.push({x: sx, y: sy, vx: (tx - sx) / d * 140, vy: (ty - sy) / d * 140, left: 120, en}); sfx("blip");
+    }, 450);
+  }
+}
+// jatos d'água voando: acertou o Rhanon = batalha; bateu em árvore/pedra ou acabou o alcance = some num respingo
+function exSpits(dt, now) {
+  const h = EX.hero;
+  for (const s of EX.spits) {
+    s.x += s.vx * dt; s.y += s.vy * dt; s.left -= Math.hypot(s.vx, s.vy) * dt;
+    const ch = stageTile(Math.floor(s.x / TILE), Math.floor((s.y + 6) / TILE));
+    if (Math.hypot(h.x - s.x, h.y - 9 - s.y) < 7 && now > EX.invulnUntil && !EX.locked) { EX.spits = []; exBurst(h.x, h.y - 10, ["#86d6ff", "#ffffff"], 10); return exStartBattle(s.en, {enemyFirst: true}); }
+    if (s.left <= 0 || ch === "T" || ch === "o") { s.done = true; exBurst(s.x, s.y, ["#86d6ff", "#ffffff"], 5); }
+  }
+  EX.spits = EX.spits.filter(s => !s.done);
 }
 function makeAnimalEnt(a, tx, ty) {
   const img = artCanvas("animal/" + a.id + "/mapa") || codeAnimalSprite(a), k = +img.dataset.scale || 1, x = tx * TILE + 8, y = ty * TILE + 12;
@@ -63,13 +110,14 @@ function startExplore(zone, after) {
   wipe(() => {
     const st = STAGES[zone];
     EX = {zone, st, rows: st.rows, map: drawStageMap(st.rows, zone), pal: TILE_PAL[zone] || TILE_PAL.mata,
-      night: !!G.night, ents: [], fx: [], loot: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
+      night: !!G.night, ents: [], fx: [], loot: [], spits: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
     st.rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
       if (ch === "S") EX.hero = {x: tx * TILE + 8, y: ty * TILE + 12, hw: 5, hh: 3, dir: "down", aim: {x: 0, y: 1}, walk: 0, flip: false, movedT: 0};
-      else if (ch === "a") EX.ents.push(makeAnimalEnt(pickFromPool(zone), tx, ty));
+      else if (ch === "a") { const a = pickFromPool(zone, "terra"); if (a) EX.ents.push(makeAnimalEnt(a, tx, ty)); }
       else if (ch === "B" && !BS()[bossKey(zone)]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === zoneDef(zone).boss), tx, ty));
       else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "aldeao" ? "aldeao" + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
     }));
+    if (!st.safe) spawnFish(zone, st.rows);
     vit(); G.sub = zone; save();
     curZone = zone; fromLocal = false; exKeys.clear();
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
@@ -103,7 +151,9 @@ function exStrike() {
   const spot = nearSpot(); if (spot) return exOpenDialog(spot.kind, null, spot.look);   // perto de alguém: conversa em vez de golpe
   const h = EX.hero; EX.cool = .35; EX.jab = .16; sfx("spear");
   // a lança alcança uns 1,5 quadrado à frente: confere pontos ao longo dela
-  const target = EX.ents.find(en => en.alive && [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw));
+  const reach = en => [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw);
+  if (EX.ents.some(en => en.alive && en.aquatic && reach(en)) && !EX.ents.some(en => en.alive && !en.aquatic && reach(en))) exToast("O peixe está na água: a lança não alcança. Use a flecha (X)!");
+  const target = EX.ents.find(en => en.alive && !en.aquatic && [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw));
   if (target) exHit(target);
 }
 // flecha: só com arco (EQUIP.ranged, comprado no artesão da feira)
@@ -147,8 +197,8 @@ function exHit(en) {
     en.alive = false; en.koUntil = performance.now() + 1100; sfx("crit");
     exBurst(en.x, en.y - 6, ["#d8d2c0", "#a89f8a", "#ffffff"], 14);
     curZone = EX.zone;
-    exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a, ONE_HIT_XP, true));
-    EX.loot.push({id: a.id, x: en.x, y: en.y, t0: performance.now()});   // a pele fica no chão até ele passar por cima
+    exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a, ONE_HIT_XP, !en.aquatic));
+    if (!en.aquatic) EX.loot.push({id: a.id, x: en.x, y: en.y, t0: performance.now()});   // a pele fica no chão até ele passar por cima (peixe: vai direto para a bolsa)
     exHud();
     return;
   }
@@ -172,6 +222,7 @@ function exMove(en, ux, uy, sp) {
   return ok;
 }
 function exAnimal(en, dt, now) {
+  if (en.aquatic) return exFish(en, dt, now);
   const h = EX.hero, dx = h.x - en.x, dy = h.y - en.y, dist = Math.hypot(dx, dy) || 1;
   const safe = now < EX.invulnUntil || EX.locked;
   if (dist < en.hw + h.hw + 3 && !safe) return exStartBattle(en, {enemyFirst: true});
@@ -199,13 +250,14 @@ function exUpdate(dt, now) {
   const h = EX.hero;
   EX.cool = Math.max(0, EX.cool - dt); EX.jab = Math.max(0, EX.jab - dt); EX.shoot = Math.max(0, (EX.shoot || 0) - dt);
   if (EX.draw && (EX.draw.t += dt) >= BOW_DRAW) exRelease();
+  if (EX.spits.length && !EX.dialog && !EX.camp) { exSpits(dt, now); if (!EX || EX.locked) return; }
   if (EX.camp) {   // sons da fogueira: ronco com assobio enquanto dorme; ao dormir, a faixa do amanhecer traz o galo
     const c = EX.camp, el = now - c.t0;
     if (campAsleep(c, el) && !c.dawned && now - (c.snoreT || 0) > 1700) { c.snoreT = now; sfx("ronco"); }   // o amanhecer interrompe o ronco
     if (CAMP_DAWN_AT[c.kind] && el > CAMP_DAWN_AT[c.kind] && !c.dawned) {   // passa a faixa do amanhecer (galo e sol); por trás dela vira dia
       c.dawned = true;
       const toNight = c.kind === "noite";   // atrás da faixa o mundo troca: noite (lua e lobo) ou dia (sol e galo)
-      dawnWipe(() => { c.day = true; G.night = toNight; EX.night = toNight; save(); exHud(); }, toNight ? "Anoiteceu" : `Amanheceu · Dia ${G.day + 1}`, toNight);
+      dawnWipe(() => { c.day = true; G.night = toNight; EX.night = toNight; save(); exHud(); musicStart("local"); }, toNight ? "Anoiteceu" : `Amanheceu · Dia ${G.day + 1}`, toNight);
     }
   }
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
@@ -304,6 +356,16 @@ function drawAnimalEnt(x, en, cx, cy, now) {
   let bob = (en.vx || en.vy || en.state === "chase") ? Math.floor(en.walk / 5) % 2 : Math.floor(now / 500) % 2, img = en.img;
   if (!en.alive) { img = en.ko; bob = 0; if (en.koUntil - now < 400 && Math.floor(now / 80) % 2) return; }   // desmaiado, pisca e some
   else if (en.img2) { if (bob) img = en.img2; bob = 0; }   // traço novo: troca de quadro em vez de pular
+  if (en.aquatic && en.alive) {   // na água: só a parte de cima aparece, com marolinhas em volta
+    const vis = Math.round(hg * .6), top = sy - vis + 2 + (Math.floor(now / 400 + en.x) % 2), sh = img.height * .6;
+    x.save(); if (en.a.tint) x.filter = en.a.tint;
+    if (en.face > 0) { x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, 0, 0, img.width, sh, -Math.round(w / 2), top, w, vis); }
+    else x.drawImage(img, 0, 0, img.width, sh, sx - Math.round(w / 2), top, w, vis);
+    x.restore();
+    const k = Math.floor(now / 260) % 2; x.fillStyle = "#ffffffc0";
+    x.fillRect(Math.round(sx - w / 2 - 3 + k), top + vis - 1, 4, 1); x.fillRect(Math.round(sx + w / 2 - 1 - k), top + vis - 1, 4, 1);
+    return;
+  }
   drawShadow(x, sx, sy, Math.max(8, Math.round(w * .7)));
   x.save();
   if (en.a.tint) x.filter = en.a.tint;
@@ -355,6 +417,11 @@ function exDraw(now) {
   }
   if (EX.night) drawNightShade(x, cx, cy, now);
   if (EX.camp && EX.camp.kind !== "fogueira") drawCampSky(x, cx, cy, now);
+  for (const s of EX.spits) {   // jato d'água: gota com rastro
+    const n = Math.hypot(s.vx, s.vy) || 1, px = Math.round(s.x - cx), py = Math.round(s.y - cy);
+    x.fillStyle = "#86d6ff80"; x.fillRect(Math.round(px - s.vx / n * 4), Math.round(py - s.vy / n * 4), 2, 2);
+    x.fillStyle = OUTLINE; x.fillRect(px - 2, py - 2, 4, 4); x.fillStyle = "#86d6ff"; x.fillRect(px - 1, py - 1, 3, 3); x.fillStyle = "#ffffff"; x.fillRect(px - 1, py - 1, 1, 1);
+  }
   for (const q of EX.fx) { x.fillStyle = q.col; x.fillRect(Math.round(q.x - cx) - 1, Math.round(q.y - cy) - 1, 2, 2); }
   alive.forEach(en => drawAnimalTags(x, en, cx, cy, now));
   drawSpotPrompt(x, cx, cy, now);
@@ -536,6 +603,24 @@ function drawNightShade(x, cx, cy, now) {
   for (let ty = t0y - 3; ty <= t0y + 14; ty++) for (let tx = t0x - 3; tx <= t0x + 18; tx++)
     if (stageTile(tx, ty) === "F") light(tx * TILE + 8 - cx, ty * TILE + 8 - cy, 46 + Math.sin(now / 110 + tx) * 2.5);
   x.drawImage(c, 0, 0);
+  // neblina: tufos claros e lentos sobre as árvores longe do Rhanon (só estética)
+  const puff = FOG_PUFF || (FOG_PUFF = fogPuff());
+  for (let ty = t0y; ty <= t0y + 11; ty++) for (let tx = t0x; tx <= t0x + 15; tx++) {
+    if (stageTile(tx, ty) !== "T" || (tx * 7 + ty * 13) % 4) continue;
+    const px = tx * TILE + 8 - cx, py = ty * TILE + 8 - cy, far = Math.hypot(px - (h.x - cx), py - (h.y - cy - 12));
+    if (far < 70) continue;
+    x.globalAlpha = Math.min(.32, (far - 70) / 160) * (.75 + .25 * Math.sin(now / 1700 + tx));
+    x.drawImage(puff, Math.round(px - 20 + Math.sin(now / 2300 + ty * .7) * 7), Math.round(py - 8), 40, 18);
+  }
+  x.globalAlpha = 1;
+}
+let FOG_PUFF = null;
+function fogPuff() {   // tufo de neblina: elipse clara que some nas bordas
+  const c = document.createElement("canvas"); c.width = 40; c.height = 18;
+  const g = c.getContext("2d"); g.scale(2.2, 1);
+  const gr = g.createRadialGradient(9, 9, 1, 9, 9, 9); gr.addColorStop(0, "rgba(205,215,245,.95)"); gr.addColorStop(1, "rgba(205,215,245,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, 18, 18);
+  return c;
 }
 // noite por cima da fase: escuro com estrelas; o fogo e o Rhanon são redesenhados por cima para continuarem acesos
 function drawCampSky(x, cx, cy, now) {
