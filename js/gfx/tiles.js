@@ -135,38 +135,15 @@ function drawGate(x, sx, sy, P) {
 }
 
 /* ---------- Rhanon visto de cima ---------- */
-const OW_CACHE = {};
-// dir: "down" (de frente) ou "up" (de costas)
+const OW_SCALE = .75;   // desenho do esqueleto (gfx/rig.js) em 24x33 na exploração
+// dir: "down" (de frente) ou "up" (de costas); legs: chave de RIG_LEGS
+// weapon: lança na diagonal com as duas mãos, ponta para o lado side (1 direita, -1 esquerda)
 // bowBack = false enquanto o arco está na mão (atirando), para não aparecer dois arcos
-// side = 1 (andando para a direita) ou -1 (esquerda): a ponta da lança aponta para esse lado
 function heroOverworld(dir, legs, weapon, bowBack = true, side = 1) {
-  const key = dir + legs + weapon + bowBack + side + JSON.stringify(G?.equip || {}) + (G?.job ? 1 : 0) + (G?.betterJob ? 1 : 0);
-  if (OW_CACHE[key]) return OW_CACHE[key];
-  const parts = dir === "up" ? heroBackParts(heroParts(true)) : heroParts(true);
-  const c = document.createElement("canvas"); c.width = 20; c.height = 28;
-  const x = c.getContext("2d");
-  drawHero(x, parts, {legs});
-  shadeCanvas(c);
-  if (dir === "up" && bowBack && G?.equip?.ranged) drawBowOnBack(x);
-  if (weapon) {   // lança segura com as duas mãos na frente do corpo, ponta para o lado em que ele anda
-    const X = v => side > 0 ? v : 19 - v;
-    const tip = () => { pxl(x, X(19), 13, "#eef3f5"); pxl(x, X(19), 12, "#cfd8dc"); pxl(x, X(18), 13, "#cfd8dc"); };
-    if (dir === "up") {   // de costas: o corpo esconde o meio da lança; só aparecem a ponta em cima e o cabo embaixo
-      x.globalCompositeOperation = "destination-over";   // pinta só onde ainda não tem nada (atrás do corpo)
-      tip(); lineP(x, X(1), 27, X(18), 14, SPEAR_WOOD); lineP(x, X(1), 28, X(18), 15, OUTLINE);
-      x.globalCompositeOperation = "source-over";
-    } else {
-      spearShaft(x, X(1), 27, X(18), 14); tip();
-      // antebraços saindo dos lados do corpo até a lança, e as mãos fechadas por cima da haste
-      for (const [sx, sy, hx, hy] of [[2, 21, 7, 22], [17, 20, 12, 18]]) {
-        lineP(x, X(sx), sy + 1, X(hx), hy + 1, OUTLINE); lineP(x, X(sx), sy, X(hx), hy, parts.pal.s);
-        const cx = side > 0 ? hx : 18 - hx;
-        x.fillStyle = OUTLINE; x.fillRect(cx - 1, hy - 2, 4, 4);
-        x.fillStyle = parts.pal.s; x.fillRect(cx, hy - 1, 2, 2); x.fillStyle = parts.pal.S; x.fillRect(cx, hy, 2, 1);
-      }
-    }
-  }
-  return OW_CACHE[key] = c;
+  const look = rhanonLook();
+  if (!bowBack) look.bowBack = false;
+  const walking = legs !== "stand";
+  return rigCanvas(dir === "up" ? "back" : "front", {...RIG_LEGS[legs], dy: walking ? 1 : 0, weapon: weapon ? "diag" : null, side}, look, OW_SCALE);
 }
 // número em pixels (glifos 3x5 de GL) para a etiqueta de nível dos bichos
 function drawTinyNumber(x, str, px, py, col) {
@@ -182,20 +159,7 @@ function drawFire(x, sx, sy, t) {
   x.fillStyle = fl[0]; x.fillRect(sx + 7 - (f % 2), sy + 1 + (f === 2 ? 1 : 0), 2, 5);
   x.fillStyle = "#fffbe0"; x.fillRect(sx + 7, sy + 6, 2, 2);
 }
-// pessoa da aldeia/feira: corpo do Rhanon de tanga com as cores e enfeites de VILLAGER_LOOK[look]
-const VILLAGER_CACHE = {};
+// pessoa da aldeia/feira: o mesmo esqueleto do Rhanon, de tanga, com as cores e enfeites de VILLAGER_LOOK[look]
 function villagerSprite(look) {
-  if (VILLAGER_CACHE[look]) return VILLAGER_CACHE[look];
-  const L = VILLAGER_LOOK[look] || {}, pal = {...RH.base, ...(L.pal || {})};
-  for (const k in RH_OUT.tribo) pal[k] = pal[RH_OUT.tribo[k]] || RH_OUT.tribo[k];
-  const torso = RH.torso.map((r, i) => i >= 6 ? r.replace(/c/g, "t").replace(/C/g, "T") : r);
-  const c = document.createElement("canvas"); c.width = 20; c.height = 28; const x = c.getContext("2d");
-  drawHero(x, {head: RH.head.slice(), torso, pal, short: false, glasses: false}, {legs: "stand"});
-  if (L.longHair) for (let y = 7; y < 18; y++) { x.fillStyle = y > 15 ? pal.H : pal.h; x.fillRect(1, y, 2, 1); x.fillRect(17, y, 2, 1); }
-  if (L.top) { x.fillStyle = L.top; x.fillRect(4, 17, 12, 2); x.fillStyle = "#1b1a24"; x.fillRect(4, 19, 12, 1); }
-  if (L.feather) { x.fillStyle = "#1b1a24"; x.fillRect(14, 0, 3, 6); x.fillStyle = L.feather; x.fillRect(15, 1, 1, 5); x.fillStyle = "#ffffff"; x.fillRect(15, 1, 1, 1); }
-  if (L.prop === "pelt") { x.fillStyle = "#1b1a24"; x.fillRect(14, 18, 6, 7); x.fillStyle = "#9c6339"; x.fillRect(15, 19, 4, 5); x.fillStyle = "#d9b25a"; x.fillRect(16, 20, 1, 1); x.fillRect(17, 22, 1, 1); }
-  if (L.prop === "basket") { x.fillStyle = "#1b1a24"; x.fillRect(0, 19, 6, 6); x.fillStyle = "#d9b25a"; x.fillRect(1, 20, 4, 4); x.fillStyle = "#e5001c"; x.fillRect(2, 19, 1, 1); x.fillStyle = "#3f9a5c"; x.fillRect(3, 19, 2, 1); }
-  if (L.prop === "bow") { x.fillStyle = "#7a4a1e"; for (let y = 4; y < 26; y++) x.fillRect(18 - Math.round(Math.sin((y - 4) / 22 * Math.PI) * 2), y, 1, 1); x.fillStyle = "#f4ecd8"; x.fillRect(18, 4, 1, 22); }
-  return VILLAGER_CACHE[look] = shadeCanvas(c);
+  return rigCanvas("front", {}, VILLAGER_LOOK[look] || {}, OW_SCALE);
 }

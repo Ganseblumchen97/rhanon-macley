@@ -105,7 +105,18 @@ function gearButtons(i) {
     const lock = G.lv < it.lv; any = true;
     btn(lock ? `${it.n} (Nv ${it.lv})` : `Comprar ${it.n} · R$ ${it.price} · ${gearBonus(slot, it)}`, () => buyGear(slot, id), lock || G.money < it.price, i);
   }));
+  // especiais de batalha à venda (SPECIALS com price), como a tocha
+  SPECIALS.forEach(s => {
+    if (!s.price || G.owned[s.id]) return;
+    const lock = G.lv < s.lv; any = true;
+    btn(lock ? `${s.n} (Nv ${s.lv})` : `Comprar ${s.n} · R$ ${s.price} · especial de batalha`, () => buySpecial(s.id), lock || G.money < s.price, i);
+  });
   if (!any) lh("Você já tem tudo o que o artesão faz por enquanto.", i);
+}
+function buySpecial(id) {
+  const s = SPECIALS.find(q => q.id === id); if (G.money < s.price || G.lv < s.lv) return;
+  G.money -= s.price; G.owned[id] = true; save(); sfx("heal");
+  localDone("feira", `Comprou: ${s.n}. Use em "Especial" na batalha.`);
 }
 function buyGear(slot, id) {
   const it = EQUIP[slot][id]; if (G.money < it.price || G.lv < it.lv) return;

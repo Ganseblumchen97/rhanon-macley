@@ -21,36 +21,20 @@ function animalSprite(a) {
   if (!own && a.tint) c.style.filter = a.tint;   // chefe usando a arte do bicho base
   return c;
 }
-// desenho em código: SPR (formas) > rows (texto) > emoji provisório
+// desenho em código: traço novo (gfx/beasts.js) > emoji provisório
 function codeAnimalSprite(a) {
-  let c; const k = ART[a.id] || a.id;
-  if (SPR[k]) c = artSprite(k);
-  else if (a.rows) c = sprite(a.rows, a.palette, Math.max(...a.rows.map(r => r.length)));
-  else {
-    c = document.createElement("canvas"); const x = c.getContext("2d");
-    c.width = c.height = 20; c.className = "spr"; c.style.setProperty("--n", 20);
+  const rig = beastFrame(a.id), c = document.createElement("canvas"), x = c.getContext("2d");
+  if (rig) {   // traço novo (gfx/beasts.js): cópia do quadro parado, em resolução 2x
+    c.width = rig.width; c.height = rig.height; x.drawImage(rig, 0, 0);
+    Object.assign(c.dataset, rig.dataset); c.dataset.rig = beastId(a.id);
+  } else {   // bicho ainda sem desenho: emoji provisório
+    c.width = c.height = 20;
     x.font = "16px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
     x.fillText(a.emoji, 10, 11);
   }
-  if (a.boss) c.style.setProperty("--n", c.width * 1.35);
+  c.className = "spr"; c.style.setProperty("--n", c.width / (+c.dataset.scale || 1) * (a.boss ? 1.35 : 1));
   if (a.tint) c.style.filter = a.tint;
   return c;
-}
-function artSprite(k) {
-  const d = SPR[k], c = document.createElement("canvas"), x = c.getContext("2d");
-  c.width = d.w; c.height = d.h; c.className = "spr"; c.style.setProperty("--n", d.w);
-  const g = Array.from({length: d.h}, () => Array(d.w).fill(null));
-  const put = (px, py, col) => { if (px >= 0 && py >= 0 && px < d.w && py < d.h) g[py][px] = col; };
-  d.s.forEach(([t, ...a]) => {
-    if (t === "e") { const [cx, cy, rx, ry, col] = a; for (let y = 0; y < d.h; y++) for (let i = 0; i < d.w; i++) if (((i - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1) put(i, y, col); }
-    else if (t === "r") { const [rx, ry, w, h, col] = a; for (let y = ry; y < ry + h; y++) for (let i = rx; i < rx + w; i++) put(i, y, col); }
-    else if (t === "p") a[0].forEach(([px, py]) => put(px, py, a[1]));
-    else if (t === "s") a[0].forEach(([px, py]) => { put(px, py, a[1]); put(px + 1, py, a[1]); put(px, py + 1, a[1]); put(px + 1, py + 1, a[1]); });
-  });
-  const out = g.map(r => r.slice());
-  for (let y = 0; y < d.h; y++) for (let i = 0; i < d.w; i++) if (!g[y][i]) for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) if (g[y + dy] && g[y + dy][i + dx]) { out[y][i] = "#1a0f0a"; break; }
-  out.forEach((r, y) => r.forEach((col, i) => { if (col) { x.fillStyle = col; x.fillRect(i, y, 1, 1); } }));
-  return shadeCanvas(c);
 }
 function sprite(rows, pal, W) { return shadeCanvas(spriteRaw(rows, pal, W)); }
 function shadeCanvas(c) {
@@ -63,25 +47,6 @@ function shadeCanvas(c) {
   }
   d.data.set(o); x.putImageData(d, 0, 0); return c;
 }
-/* ---------- montagem do Rhanon ---------- */
-function heroParts(noWeapon = false) {
-  const o = G?.betterJob ? "blazer" : G?.job ? "social" : "tribo", d = RH_OUT[o], pal = {...RH.base}, eq = G?.equip || {legs: "tanga", torso: null};
-  for (const k in d) pal[k] = RH.base[d[k]] || d[k];
-  const head = RH.head.slice(); let torso = RH.torso.slice(), short = false;
-  if (o !== "tribo") head[6] = head[6].replace(/g/g, "h");
-  else {
-    const T = EQUIP.torso[eq.torso], L = EQUIP.legs[eq.legs] || EQUIP.legs.tanga;
-    if (T) {
-      pal.c = T.color; pal.C = T.shade;
-      torso = torso.map((r, y) => y > 5 ? r : [...r].map((ch, i) => ch === "r" ? "c" : "cCw".includes(ch) ? (i < 5 || i > 14 ? (ch === "C" ? "S" : "s") : ch === "w" ? "c" : ch) : ch).join(""));
-    }
-    if (L.color) { pal.q = L.color; pal.Q = L.shade; short = true; [6, 7].forEach(i => torso[i] = torso[i].replace(/c/g, "q").replace(/C/g, "Q")); }
-    else [6, 7].forEach(i => torso[i] = torso[i].replace(/c/g, "t").replace(/C/g, "T"));
-  }
-  const glasses = o === "blazer";
-  if (glasses) { head[11] = ".khhs" + "x".repeat(10) + "shhk."; head[12] = ".khhsxwxxxxxwxxshhk."; }
-  return {head, torso, pal, short, glasses, weapon: !noWeapon};
-}
 // haste da lança: madeira clara com contorno escuro ao lado (a mesma em exploração, batalha e tela inicial)
 const SPEAR_WOOD = "#d9b25a";
 function spearShaft(ctx, x0, y0, x1, y1) {
@@ -89,48 +54,6 @@ function spearShaft(ctx, x0, y0, x1, y1) {
   lineP(ctx, x0 + ox, y0 + oy, x1 + ox, y1 + oy, "#1a2418");
   lineP(ctx, x0, y0, x1, y1, SPEAR_WOOD);
 }
-// Rhanon de costas (batalha e exploração andando para cima): o rosto vira cabelo e a pintura/gravata do peito some
-function heroBackParts(parts) {
-  return {...parts, back: true,
-    head: parts.head.map((r, i) => i >= 7 && i <= 14 ? r.replace(/[sewrmx]/g, "h") : r),
-    torso: parts.torso.map((r, i) => i <= 5 ? r.replace(/r/g, "c") : r)};
-}
-// arco atravessado nas costas (sprite de 20x28 visto de trás)
-function drawBowOnBack(ctx) {
-  for (let k = 0; k <= 11; k++) { const b = Math.round(Math.sin(k / 11 * Math.PI) * 2); pxl(ctx, 4 + k - b, 14 + k + b, "#9c6339"); }
-  lineP(ctx, 4, 14, 15, 25, "#f4ecd8");
-  pxl(ctx, 4, 14, "#1b1a24"); pxl(ctx, 15, 25, "#1b1a24");
-}
-function legsFor(parts, pose) {
-  const rows = LEGPOSE[pose] || LEGPOSE.stand;
-  return parts.short ? rows.map((r, i) => i < 2 ? r.replace(/p/g, "q").replace(/P/g, "Q") : r) : rows;
-}
-// desenha o Rhanon 20x28 em (ox, oy): o = {legs, dy, lean, face}
-function drawHero(ctx, parts, o, ox = 0, oy = 0) {
-  const pal = parts.pal;
-  const put = (rows, y0, dx = 0) => rows.forEach((row, y) => {
-    for (let i = 0; i < row.length; i++) {
-      const ch = row[i]; if (ch === "." || !pal[ch]) continue;
-      ctx.fillStyle = pal[ch]; ctx.fillRect(ox + i + dx, oy + y0 + y, 1, 1);
-    }
-  });
-  const legs = legsFor(parts, o.legs || "stand");
-  put(legs, 28 - legs.length);
-  const dy = o.legs === "sit" ? 2 : (o.dy || 0);
-  put(parts.torso, 16 + dy);
-  const face = !parts.glasses && !parts.back && o.face && FACE[o.face];
-  put(parts.head.map((r, i) => (face && face[i]) || r), dy, o.lean || 0);
-}
-// Rhanon parado, como imagem estática
-function heroSprite(noWeapon = false) {
-  const parts = heroParts(noWeapon), c = document.createElement("canvas"), x = c.getContext("2d");
-  c.width = 20; c.height = 28; c.className = "spr"; c.style.setProperty("--n", 20);
-  drawHero(x, parts, {legs: "stand"});
-  shadeCanvas(c);
-  if (!noWeapon) { spearShaft(x, 18, 2, 18, 27); x.fillStyle = "#cfd8dc"; x.fillRect(18, 0, 1, 2); }
-  return c;
-}
-
 /* ---------- utilidades de desenho ---------- */
 function pxl(ctx, x, y, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), 1, 1); }
 function lineP(ctx, x0, y0, x1, y1, c) {

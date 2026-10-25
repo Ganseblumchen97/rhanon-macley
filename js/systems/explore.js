@@ -50,7 +50,9 @@ function pickFromPool(zone) {
 }
 function makeAnimalEnt(a, tx, ty) {
   const img = artCanvas("animal/" + a.id + "/mapa") || codeAnimalSprite(a), k = +img.dataset.scale || 1, x = tx * TILE + 8, y = ty * TILE + 12;
-  return {a, img, w: img.width / k, h: img.height / k, x, y, homeX: x, homeY: y, hw: Math.min(7, Math.round(img.width / k / 3)), hh: 3,
+  // traço novo: segundo quadro (respirando/andando) e o desmaiado, para quando cai com um golpe só
+  const rig = img.dataset.rig, img2 = rig && beastFrame(a.id, "idle", 1), ko = rig && beastFrame(a.id, "ko");
+  return {a, img, img2, ko, w: img.width / k, h: img.height / k, x, y, homeX: x, homeY: y, hw: Math.min(7, Math.round(img.width / k / 3)), hh: 3,
     speed: a.id === "preguica" ? 18 : (ANIMAL_SPEED[a.size] ?? 40), boss: !!a.boss, alive: true,
     state: "wander", vx: 0, vy: 0, until: 0, face: -1, walk: 0, stunUntil: 0};
 }
@@ -112,7 +114,7 @@ function exHit(en) {
   const a = en.a, d = rnd(6, 10) + G.lv - 1 + weaponAtk();
   exBurst(en.x, en.y - entH(en) / 2, ["#ffffff", "#ffd23a"], 8);
   if (!a.boss && (G.lv - (a.lv || 1) >= ONE_HIT_LEVELS || d >= a.hp)) {
-    en.alive = false; sfx("crit");
+    en.alive = false; en.koUntil = performance.now() + 1100; sfx("crit");
     exBurst(en.x, en.y - 6, ["#d8d2c0", "#a89f8a", "#ffffff"], 14);
     curZone = EX.zone;
     exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a, ONE_HIT_XP));
@@ -213,7 +215,7 @@ function drawHeroEnt(x, h, cx, cy, now) {
   const art = IMG["hero/walk/" + h.dir];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
   const img = art ? overworldArt(h.dir, walking ? step % art.frames : 0)
     : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0), h.side || 1);
-  const iw = art ? art.w / art.scale : 20, ih = art ? art.h / art.scale : 28;
+  const iw = art ? art.w / art.scale : img.width, ih = art ? art.h / art.scale : img.height;
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
   drawShadow(x, sx, sy, 12);
   x.drawImage(img, sx - iw / 2 + ox, sy - ih + 1 + oy, iw, ih);
@@ -232,12 +234,14 @@ function drawHeroEnt(x, h, cx, cy, now) {
 function drawAnimalEnt(x, en, cx, cy, now) {
   const sx = snap(en.x - cx), sy = snap(en.y - cy), w = en.w, hg = en.h;
   if (sx < -40 || sx > VIEW_W + 40 || sy < -8 || sy > VIEW_H + 40) return;
-  const bob = (en.vx || en.vy || en.state === "chase") ? Math.floor(en.walk / 5) % 2 : Math.floor(now / 500) % 2;
+  let bob = (en.vx || en.vy || en.state === "chase") ? Math.floor(en.walk / 5) % 2 : Math.floor(now / 500) % 2, img = en.img;
+  if (!en.alive) { img = en.ko; bob = 0; if (en.koUntil - now < 400 && Math.floor(now / 80) % 2) return; }   // desmaiado, pisca e some
+  else if (en.img2) { if (bob) img = en.img2; bob = 0; }   // traço novo: troca de quadro em vez de pular
   drawShadow(x, sx, sy, Math.max(8, Math.round(w * .7)));
   x.save();
   if (en.a.tint) x.filter = en.a.tint;
-  if (en.face > 0) { x.translate(sx, 0); x.scale(-1, 1); x.drawImage(en.img, -Math.round(w / 2), sy - hg - bob, w, hg); }
-  else x.drawImage(en.img, sx - Math.round(w / 2), sy - hg - bob, w, hg);
+  if (en.face > 0) { x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -Math.round(w / 2), sy - hg - bob, w, hg); }
+  else x.drawImage(img, sx - Math.round(w / 2), sy - hg - bob, w, hg);
   x.restore();
   grassOver(x, en, cx, cy);
 }
@@ -270,9 +274,9 @@ function exDraw(now) {
     if (ch === "G" && !BS()[EX.zone]) drawGate(x, sx, sy, EX.pal);
     if (ch === "F") drawFire(x, sx, sy, now);
   }
-  const alive = EX.ents.filter(en => en.alive);
+  const alive = EX.ents.filter(en => en.alive), knocked = EX.ents.filter(en => !en.alive && en.ko && en.koUntil > now);
   const people = EX.spots.filter(s => PEOPLE.includes(s.kind)).map(s => ({y: s.y + 5, draw: () => drawNpc(x, s, cx, cy, now)}));
-  [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...people, {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)}]
+  [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...knocked.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...people, {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)}]
     .sort((a, b) => a.y - b.y).forEach(o => o.draw());
   const s = EX.spear;
   if (s) {
@@ -336,9 +340,10 @@ const SPOT_LABEL = {fogueira: "descansar ou dormir na fogueira", tenda: "dormir 
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã"};
 const VILLAGER_TIPS = [
   "Etiqueta verde em cima do bicho? Ele cai com um golpe só.",
-  "Acertar o bicho de longe com a lança (X) te dá o primeiro turno da luta.",
+  "Acertar o bicho primeiro, com a lança (Z) ou uma flecha (X), te dá o primeiro turno da luta.",
   "Se o bicho te alcançar antes, quem começa batendo é ele. Fique esperto com o \"!\".",
-  "A tocha assusta os bichos: eles fraquejam e você ataca de novo na mesma hora.",
+  "A tocha do artesão assusta os bichos: eles fraquejam e você ataca de novo na mesma hora.",
+  "Sem arco? Jogue a lança (Especial): bate forte, mas às vezes erra.",
   "O chefe de cada mata fica no fim da trilha. Vencer ele abre o caminho para a próxima.",
   "Na fogueira dá para descansar (metade) ou dormir (tudo, mas o dia passa). Dizem que tem fogueira até no meio das trilhas.",
   "O vendedor da feira paga bem por couro de jacaré. Dizem."
@@ -351,9 +356,10 @@ function nearSpot() {
 }
 function drawNpc(x, s, cx, cy, now) {
   const img = villagerSprite(s.look), sx = snap(s.x - cx), sy = snap(s.y + 5 - cy), bob = Math.floor(now / 600 + s.tx) % 2;
+  const hw = img.width / 2, top = sy - img.height + 1 - bob;
   drawShadow(x, sx, sy, 10);
-  if (EX.hero.x > s.x + 4) { x.save(); x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -10, sy - 27 - bob); x.restore(); }
-  else x.drawImage(img, sx - 10, sy - 27 - bob);
+  if (EX.hero.x > s.x + 4) { x.save(); x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -hw, top); x.restore(); }
+  else x.drawImage(img, sx - hw, top);
 }
 // setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
 function drawSpotPrompt(x, cx, cy, now) {
@@ -377,7 +383,7 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => wipe(() => rest("dormir")), false, d); }
   else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }
   else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme."); foodButtons(d); }
-  else if (kind === "artesao") { say("Artesão", "Roupas e equipamentos feitos à mão, inclusive arco e flecha para caçar de longe. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
+  else if (kind === "artesao") { say("Artesão", "Roupas e equipamentos feitos à mão, inclusive arco e flecha para caçar de longe e tocha para assustar os bichos. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
   else if (kind === "inventario") { say("Bolsa", invSummary()); invButtons(d); }
   else say(VILLAGER_NAME[look] || "Aldeão", VILLAGER_TIPS[Math.floor(Math.random() * VILLAGER_TIPS.length)]);
   if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);

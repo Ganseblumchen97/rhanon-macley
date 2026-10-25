@@ -57,8 +57,10 @@ const bagIds = () => Object.keys(ITEMS).filter(k => (p.items[k] || 0) > 0);
 function openItemMenu() {
   openSubMenu(bagIds().map(k => ({label: ITEMS[k].n, small: "×" + p.items[k], desc: `${ITEMS[k].n}: ${itemEffect(ITEMS[k])}.`, fn: () => useItem(k)})), "Fecha a bolsa sem gastar o turno.", CMDS.findIndex(c => c.id === "item"));
 }
+// por que um especial ainda não pode ser usado ("" = pode): flecha precisa de arco, os comprados precisam ter sido comprados
+const specialLock = s => s.id === "flecha" && !G.equip.ranged ? "sem arco" : s.price && !G.owned[s.id] ? "na feira" : "";
 function openSpecialMenu() {
-  openSubMenu(SPECIALS.map(s => ({label: s.n, small: s.id === "flecha" && !G.equip.ranged ? "sem arco" : s.cost + " PE", desc: s.d, off: !avail(s.id), fn: () => { buildCmds(); act(s.id); }})),
+  openSubMenu(SPECIALS.map(s => ({label: s.n, small: specialLock(s) || s.cost + " PE", desc: s.d + (s.price && !G.owned[s.id] ? " Compre com o artesão da feira." : ""), off: !avail(s.id), fn: () => { buildCmds(); act(s.id); }})),
     "Volta aos comandos sem gastar o turno.", CMDS.findIndex(c => c.id === "especial"));
 }// usa um item da bolsa: gasta o turno, como os outros comandos
 function useItem(k) {
@@ -114,8 +116,8 @@ function pick() {
 function say(t) { lines.push(t); if (lines.length > 4) lines.shift(); }
 function avail(id) {
   if (busy) return false;
-  if (id === "tocha") return p.sp >= 6;
-  if (id === "flecha") return !!G.equip.ranged && p.sp >= 3;
+  const sp = SPECIALS.find(s => s.id === id);
+  if (sp) return !specialLock(sp) && p.sp >= sp.cost;
   if (id === "especial") return SPECIALS.some(s => avail(s.id));
   if (id === "item") return bagIds().length > 0;
   return true;
@@ -159,6 +161,13 @@ function act(id) {
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
     wait = strike(d, crit ? "crit" : "", "spear", crit ? `Golpe certeiro! A lança acerta o ponto fraco: −${d}.` : `Rhanon avança e acerta a lança: −${d}.`);
+  } else if (id === "arremesso") {   // lança arremessada: mais dano que o golpe, mas pode errar
+    p.sp -= 3;
+    const miss = !p.atento && Math.random() < .2;
+    let d = miss ? 0 : rnd(10, 15) + G.lv - 1 + weaponAtk(), crit = !miss && p.atento;
+    if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
+    e.hp = Math.max(0, e.hp - d);
+    wait = strike(d, crit ? "crit" : "", "throw", miss ? `Rhanon arremessa a lança, mas ${e.name.toLowerCase()} desvia!` : crit ? `Arremesso certeiro no ponto fraco: −${d}!` : `Rhanon arremessa a lança: −${d}.`);
   } else if (id === "tocha") {
     p.sp -= 6;
     let d = rnd(14, 18) + G.lv - 1; if (p.weak > 0) d = Math.ceil(d / 2);
@@ -257,6 +266,21 @@ function strike(d, cls, kind, msg) {
     setTimeout(() => { hit(["#fff", "#cfd8dc", "#f2a20c"]); slash($("beast")); }, REDUCE ? 0 : 230);
     return 560;
   }
+  if (kind === "throw") {   // jogar a lança: toma impulso, arremessa e ela voa girando de leve até o bicho (ou passa por cima)
+    HERO_A.set("throw"); sfx("guard");
+    setTimeout(() => {
+      sfx("spear");
+      const c = spearC(4), miss = d === 0, tx = b.x - a.x - 20, ty = miss ? b.y - a.y - 90 : b.y - a.y;
+      c.style.left = a.x + 20 + "px"; c.style.top = a.y - 30 + "px"; $("fx").appendChild(c);
+      c.animate([{transform: "translate(-50%,-50%) rotate(-12deg)"}, {transform: `translate(calc(-50% + ${tx}px),calc(-50% + ${ty + 30}px)) rotate(${miss ? -20 : 8}deg)`}],
+        {duration: 260, easing: "steps(7)", fill: "forwards"}).onfinish = () => {
+        if (!miss) { c.remove(); hit(["#fff", "#d9b25a", "#f2a20c"]); return; }
+        holdE = null; if (msg) say(msg); render(); sfx("blip"); pop("ERROU!", $("beast"));
+        c.animate([{opacity: 1}, {transform: `translate(calc(-50% + ${tx + 160}px),calc(-50% + ${ty - 10}px)) rotate(-20deg)`, opacity: 0}], {duration: 300, easing: "steps(6)", fill: "forwards"}).onfinish = () => c.remove();
+      };
+    }, REDUCE ? 0 : 330);
+    return 330 + 260 + 120;
+  }
   if (kind === "arrow") {   // flecha: puxa o arco devagar, brilho na ponta, sai reta e rápida
     HERO_A.set("aim"); sfx("guard");
     setTimeout(() => {
@@ -277,7 +301,7 @@ function strike(d, cls, kind, msg) {
   setTimeout(() => {
     sfx("fire");
     for (let i = 0; i < 6; i++) setTimeout(() => {
-      const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width * .62, r.top + r.height * .32);
+      const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width * .66, r.top + r.height * .38);   // do lado da cabeça até a chama
       PFX.emit("puff", ["#e8e4dc", "#ffffff"], gx, gy, 16 + Math.random() * 6, (Math.random() - .5) * 6, .5);
     }, i * 70);
   }, 480);

@@ -22,6 +22,15 @@ function arrowC(sc) {
   x.fillStyle = "#e5001c"; x.fillRect(0, 1, 3, 1); x.fillRect(0, 3, 3, 1);
   return px(c, sc);
 }
+// lança voando (deitada, ponta para a direita): mesma madeira e ponta de pedra do Rhanon
+function spearC(sc) {
+  const c = document.createElement("canvas"), x = c.getContext("2d");
+  c.width = 26; c.height = 5;
+  spearShaft(x, 0, 1, 21, 1);
+  x.fillStyle = "#1a1426"; x.fillRect(21, 0, 3, 4); x.fillRect(24, 1, 2, 2);
+  x.fillStyle = "#e6edf0"; x.fillRect(22, 1, 2, 2); x.fillRect(24, 1, 1, 1);
+  return px(c, sc);
+}
 function numC(str, col, sc) {
   const g = [...str].map(ch => GL[ch === "\u2212" ? "-" : ch]).filter(Boolean), c = document.createElement("canvas"), x = c.getContext("2d");
   c.width = g.length * 4 + 1; c.height = 7;
