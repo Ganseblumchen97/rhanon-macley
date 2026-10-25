@@ -72,7 +72,7 @@ function startExplore(zone, after) {
     }));
     vit(); G.sub = zone; save();
     curZone = zone; fromLocal = false; exKeys.clear();
-    $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
+    $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
     musicStart("local"); exHud();
     exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : ZONES[zone].n + (BS()[zone] ? "" : " · o chefe espera no fim da trilha"));
     if (after) after();
@@ -198,12 +198,12 @@ function exUpdate(dt, now) {
   const h = EX.hero;
   EX.cool = Math.max(0, EX.cool - dt); EX.jab = Math.max(0, EX.jab - dt); EX.shoot = Math.max(0, (EX.shoot || 0) - dt);
   if (EX.draw && (EX.draw.t += dt) >= BOW_DRAW) exRelease();
-  if (EX.camp) {   // sons da fogueira: ronco com assobio enquanto dorme; na abertura, o galo canta e ele acorda
+  if (EX.camp) {   // sons da fogueira: ronco com assobio enquanto dorme; ao dormir, a faixa do amanhecer traz o galo
     const c = EX.camp, el = now - c.t0;
     if (campAsleep(c, el) && !c.dawned && now - (c.snoreT || 0) > 1700) { c.snoreT = now; sfx("ronco"); }   // o amanhecer interrompe o ronco
     if (CAMP_DAWN_AT[c.kind] && el > CAMP_DAWN_AT[c.kind] && !c.dawned) {   // passa a faixa do amanhecer (galo e sol); por trás dela vira dia
       c.dawned = true;
-      dawnWipe(() => { c.day = true; }, c.kind === "dormir" ? `Amanheceu · Dia ${G.day + 1}` : "Amanhece em Ananindeua");
+      dawnWipe(() => { c.day = true; }, `Amanheceu · Dia ${G.day + 1}`);
     }
   }
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
@@ -474,7 +474,7 @@ function exIntro() {
   const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), side = solidAt(f.x - 14, f.y + 5) ? 1 : -1;
   EX.camp = {kind: "intro", t0: performance.now(), dur: campWake("intro") + 2600, x: f.x + side * 14, y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
   h.x = EX.camp.x; h.y = EX.camp.y; h.dir = "down"; h.aim = {x: 0, y: 1};
-  exToast("Ananindeua (PA) · amanhece na aldeia...");
+  exToast("Ananindeua (PA) · manhã na aldeia...");
 }
 function exCampEnd() {
   const kind = EX.camp.kind; EX.camp = null;
@@ -483,14 +483,15 @@ function exCampEnd() {
   rest(kind, true);   // dormir: o galo já cantou no amanhecer da cena
 }
 /* Linha do tempo das cenas que acordam (ms desde o começo):
-   dormir: senta (0-900) e dorme enquanto a noite cai; abertura: já começa dormindo de madrugada.
-   Em CAMP_DAWN_AT passa a faixa do amanhecer (dawnWipe: galo e sol); quando ela some, ele acorda:
+   dormir: senta (0-900) e dorme enquanto a noite cai; em CAMP_DAWN_AT passa a faixa do amanhecer (dawnWipe: galo e sol).
+   abertura: já é de manhã; ele cochila um pouco e acorda em CAMP_INTRO_WAKE (o galo só canta ao dormir).
+   Ao acordar:
    "!" (W..W+400), sorri (W+500..W+1100), levanta e se espreguiça (W+1300..W+2000) e fica de pé. */
-const CAMP_DAWN_AT = {intro: 900, dormir: 2600};
-const campWake = kind => CAMP_DAWN_AT[kind] ? CAMP_DAWN_AT[kind] + DAWN_MS + 200 : 0;
+const CAMP_DAWN_AT = {dormir: 2600}, CAMP_INTRO_WAKE = 1500;
+const campWake = kind => kind === "intro" ? CAMP_INTRO_WAKE : CAMP_DAWN_AT[kind] ? CAMP_DAWN_AT[kind] + DAWN_MS + 200 : 0;
 const campAsleep = (c, el) => c.kind === "intro" ? el < campWake("intro") : c.kind === "dormir" && el > 900 && el < campWake("dormir");
 // escuridão da noite (some quando a faixa do amanhecer cobre a tela)
-const campDark = (c, el) => !CAMP_DAWN_AT[c.kind] || c.day ? 0 : c.kind === "intro" ? .6 : .65 * Math.max(0, Math.min(1, (el - 900) / 1700));
+const campDark = (c, el) => !CAMP_DAWN_AT[c.kind] || c.day ? 0 : .65 * Math.max(0, Math.min(1, (el - 900) / 1700));
 function drawCampHero(x, cx, cy, now) {
   const c = EX.camp, el = now - c.t0, W = campWake(c.kind), sx = snap(c.x - cx), sy = snap(c.y - cy);
   const sleep = campAsleep(c, el);
@@ -501,7 +502,7 @@ function drawCampHero(x, cx, cy, now) {
   drawShadow(x, sx, sy, up ? 12 : 18);
   if (!up) { spearShaft(x, sx - 11, sy, sx + 9, sy); pxl(x, sx + 10, sy, "#eef3f5"); }   // lança deitada no chão
   x.drawImage(img, sx - img.width / 2, sy - img.height + 1);
-  if (W && el > W && el < W + 400) glyphP(x, "bang", "#ffd23a", sx + 7, sy - 30);   // acordou com o galo!
+  if (W && el > W && el < W + 400) glyphP(x, "bang", "#ffd23a", sx + 7, sy - 30);   // acordou!
   for (let i = 0; i < 4; i++) {   // fumaça subindo do fogo
     const p = (now / 1700 + i / 4) % 1;
     if (p < .85 || Math.floor(now / 80) % 2) { x.fillStyle = i % 2 ? "#c9c4b8" : "#9e9a90"; x.fillRect(Math.round(c.fx - cx + Math.sin(p * 6 + i) * 2), Math.round(c.fy - cy - 6 - p * 20), 2, 2); }

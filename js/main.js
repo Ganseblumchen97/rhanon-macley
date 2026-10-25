@@ -10,8 +10,8 @@ loadArt();   // imagens de data/art.js (carregam enquanto a tela inicial está a
 
 /* ----- botões fixos ----- */
 $("startAdventure").addEventListener("click", () => {
-  audio(); musicStop(); $("titleScreen").hidden = true;
-  startIntro();   // a aventura começa com Rhanon acordando na fogueira da aldeia
+  audio(); musicStop();
+  startIntro();   // a aventura começa com Rhanon acordando na fogueira da aldeia (a tela inicial some por trás da transição)
 });
 $("local").querySelector(".nav-help").textContent = `Setas: escolher local · Enter: confirmar · 1-9: botões · Esc: mapa do ${MAP_REGIONS[MAP_REGION].n}`;
 $("homeButton").addEventListener("click", () => {
