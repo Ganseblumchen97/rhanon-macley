@@ -39,7 +39,7 @@ function nudge(ent, ix, iy) {
 }
 function spearBlocked(px, py) {
   const ch = stageTile(Math.floor(px / TILE), Math.floor(py / TILE));
-  return ch === "T" || ch === "o" || (ch === "G" && !BS()[EX.zone]);
+  return ch === "T" || ch === "o" || ch === "#" || (ch === "G" && !BS()[EX.zone]);
 }
 
 /* ---------- entrar, sair e trocar de fase ---------- */
@@ -152,7 +152,7 @@ function startExplore(zone, after) {
       if (ch === "S") EX.hero = {x: tx * TILE + 8, y: ty * TILE + 12, hw: 5, hh: 3, dir: "down", aim: {x: 0, y: 1}, walk: 0, flip: false, movedT: 0};
       else if (ch === "a") { const a = pickFromPool(zone, "terra"); if (a) EX.ents.push(makeAnimalEnt(a, tx, ty)); }
       else if (ch === "B" && !BS()[bossKey(zone)]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === zoneDef(zone).boss), tx, ty));
-      else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "aldeao" ? "aldeao" + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
+      else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "aldeao" ? (cityOf(zone) === "belem" ? "urbano" : "aldeao") + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
     }));
     if (!st.safe) spawnFish(zone, st.rows);
     vit(); G.sub = zone; save();
@@ -550,8 +550,19 @@ function setupExploreInput() {
 /* ---------- aldeia e feira: pontos de conversa ---------- */
 const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", P: "aldeao"};
 const PEOPLE = ["peles", "comida", "artesao", "armeiro", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir na tenda", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", aldeao: "conversar"};
-const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã"};
+const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", aldeao: "conversar"};
+const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
+// dicas da gente do Ver-o-Peso (em Belém)
+const BELEM_TIPS = [
+  "Aqui na capital tem malandro esperto: segura a bolsa! Se um deles levar seu dinheiro, vença e ele devolve.",
+  "Os urubus do Ver-o-Peso estão aqui desde antes de mim. Não mexe com eles que eles não mexem contigo.",
+  "Na Cidade Velha tem iguana tomando sol nas praças. Parece calma, mas a cauda dela é um chicote.",
+  "Dizem que de noite, na Cidade Velha, uma mulher de branco anda pelas ruas de pedra. É visagem, menino.",
+  "No porto, os ratos são do tamanho de um gato. E à noite contam que a Cobra Norato sobe a baía.",
+  "Do outro lado do canal ficam as Baixadas: casa de palafita e ponte de tábua. Na maré cheia, cuidado.",
+  "A rede da pensão é de graça para quem é da aldeia. Dorme aí que amanhã a gente conversa.",
+  "Erva de cheiro, banho de descarrego... aqui tem remédio para tudo. Menos para preguiça."
+];
 const VILLAGER_TIPS = [
   "Etiqueta verde em cima do bicho? Ele cai com um golpe só.",
   "Quando o bicho se encolhe tremendo, ele vai atacar: aperte Z quando o anel ficar verde e você bloqueia metade do golpe.",
@@ -612,6 +623,12 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "fogueira") {   // fogueira no meio da trilha: só um ponto para recuperar as forças
     say("Fogueira", "Um ponto para recuperar o fôlego no meio da trilha. Descansar recupera toda a vida e a energia.");
     btn("Descansar", () => exCampRest("fogueira"), false, d);
+  }
+  else if (kind === "tenda" && EX.zone === "veropeso") {   // Belém: rede na pensão do Ver-o-Peso (de graça)
+    say("Pensão do Ver-o-Peso", G.night ? "Uma rede limpa, o cheiro da maré e o barulho do mercado acordando cedo. Dormir recupera tudo." : "Uma rede para quem é de fora. Dá para descansar até a noite (metade) ou dormir até o dia seguinte (tudo).");
+    const nap = kind2 => () => { exCloseDialog(); wipe(() => { exToast(rest(kind2, false, true)); EX.night = G.night; exHud(); musicStart("local"); }); };
+    if (!G.night) btn("Descansar até a noite", nap("noite"), false, d);
+    btn("Dormir até o dia seguinte", nap("dormir"), false, d);
   }
   else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => { exCloseDialog(); wipe(() => { exToast(rest("dormir", false, true)); EX.night = false; exHud(); musicStart("local"); }); }, false, d); }
   else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }

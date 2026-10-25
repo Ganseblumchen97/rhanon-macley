@@ -1,7 +1,7 @@
 /* Mapa grande (Pará ou Brasil, ver MAP_REGION em data/world.js): HUD, painel de informações, viagem e troca de telas. */
 const curVis = () => CURITIBA_OPEN && (G.lv >= REQ.lv || G.loc === "curitiba");
 function drawMap() {
-  vit(); $("hud").textContent = `Nv ${G.lv} · XP ${G.xp}/${need(G.lv)} · R$ ${G.money}` + (G.loc === "ananindeua" ? ` · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)}` : "") + (G.job ? ` · PROGRAMADOR · XP PROF. ${G.jobXp||0}` : "") + (G.betterJob ? " · SÊNIOR" : "");
+  vit(); $("hud").textContent = `Nv ${G.lv} · XP ${G.xp}/${need(G.lv)} · R$ ${G.money}` + (G.loc === "ananindeua" || G.loc === "belem" ? ` · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)}` : "") + (G.job ? ` · PROGRAMADOR · XP PROF. ${G.jobXp||0}` : "") + (G.betterJob ? " · SÊNIOR" : "");
   const R = MAP_REGIONS[MAP_REGION];
   if ($("n-curitiba")) $("n-curitiba").style.display = curVis() ? "" : "none";
   $("route").style.display = R.route.includes("curitiba") && !curVis() ? "none" : "";
@@ -45,6 +45,10 @@ function select(id) {
   if (l.soon) {   // destino que ainda não abre (Belém)
     btn("Em breve", () => {}, true);
     i.insertAdjacentHTML("beforeend", '<p class="hint">Um dia Rhanon vai precisar chegar à capital para pegar um avião. Por enquanto, a aventura é em Ananindeua.</p>');
+  } else if (here && id === "belem") {
+    btn("Entrar em Belém", openLocal);
+  } else if (id === "belem" || (id === "ananindeua" && G.loc === "belem")) {   // entre as duas cidades só se vai de ônibus
+    i.insertAdjacentHTML("beforeend", id === "belem" ? `<p class="hint">Para chegar à capital, compre a passagem na cabine da BR-316, no fim da trilha de Ananindeua${G.passagem ? " (você já tem a passagem)" : ""}.</p>` : '<p class="hint">Para voltar, pegue o ônibus no terminal rodoviário de Belém.</p>');
   } else if (here && id === "ananindeua") {
     btn("Entrar em Ananindeua", openLocal);
     i.insertAdjacentHTML("beforeend", !CURITIBA_OPEN ? (MAP_REGION === "para" ? "" : '<p class="hint">Em breve: novos destinos.</p>') : curVis() ? '<p class="hint">Curitiba apareceu no mapa. Toque nela para viajar.</p>' : `<p class="hint">Existe um destino distante. Para ir até lá: Nv ${REQ.lv} e R$ ${REQ.money}.</p>`);

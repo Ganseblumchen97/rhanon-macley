@@ -11,6 +11,11 @@ const TILE_PAL = {
   manguezal: {g1: "#7a7458", g2: "#6a6448", tall: "#5a5a3a", tallHi: "#8a8a5a", path: "#a08a62", path2: "#86704c", leaf: "#3a5a32", leaf2: "#2a4424", leafHi: "#5a7a44", trunk: "#5a4a3a", rock: "#8a8478", rock2: "#5e5a50", water: "#4a6a6a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30"},
   // seringal: chão de folha seca, seringueiras de casca clara e copa verde-escura
   seringal: {g1: "#7a9a4a", g2: "#8a8a42", tall: "#5a7a32", tallHi: "#a8b85a", path: "#b8925a", path2: "#9a7844", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#c8b89a", rock: "#9a948a", rock2: "#6a645a", water: "#3a6a8a", water2: "#6a9ab8", wood: "#9c6339", wood2: "#6d4329"},
+  // cidade: chão de pedra/calçada, rua de asfalto ou paralelepípedo, telhado de telha (porto: zinco); walls = cores das fachadas
+  veropeso: {g1: "#b0a898", g2: "#9a9282", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7a7268", path2: "#5e574e", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#8a96a0", roof2: "#5e6a74", walls: ["#3a7ab8", "#5aa06a"]},
+  cidadevelha: {g1: "#a8a090", g2: "#948c7c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7e786c", path2: "#625c52", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22"},
+  porto: {g1: "#8e8e88", g2: "#7a7a74", tall: "#6a7a4a", tallHi: "#9aaa6a", path: "#55555a", path2: "#44444a", leaf: "#3a6a3a", leaf2: "#2a502a", leafHi: "#5a8a4a", trunk: "#5a4a3a", rock: "#8a8a8a", rock2: "#5a5a5a", water: "#3a6a7a", water2: "#7aa8b0", wood: "#8a6a4a", wood2: "#5a4430", roof: "#7a8a96", roof2: "#5a6670", walls: ["#8a8a8a", "#c8603a", "#3a7ab8", "#e8c040"]},
+  baixadas: {g1: "#7a7a5a", g2: "#6a6a4a", tall: "#5a7a3a", tallHi: "#8aaa5a", path: "#9a7a52", path2: "#7a5e3a", leaf: "#3a6a32", leaf2: "#2a5024", leafHi: "#5a8a44", trunk: "#5a4030", rock: "#8a847a", rock2: "#5e5a50", water: "#4a6a5a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30", roof: "#a85a3a", roof2: "#7a3e24", walls: ["#8a5a32", "#c8a070", "#3f9a5c", "#e89aaa"]},
   // várzea: capim claro, água de cheia azul-esverdeada e poucas árvores
   varzea: {g1: "#8ab04a", g2: "#7aa040", tall: "#5e8a34", tallHi: "#c0dc70", path: "#c8aa6a", path2: "#ac8e54", leaf: "#3f7f36", leaf2: "#2e6428", leafHi: "#5aa04a", trunk: "#6d4329", rock: "#a09d90", rock2: "#706d64", water: "#3a8aa0", water2: "#7ac4d0", wood: "#a8703f", wood2: "#6d4329"}
 };
@@ -67,6 +72,29 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
     fillEllipse(x, ox + 6, oy + 4, 3, 2, P.leafHi);
   }
 }
+// prédio/casarão de cidade ("#"): telhado de telha (ou zinco, no porto) por cima; na última fileira da quadra, a fachada
+// colorida com janelas e às vezes uma porta, como os casarões de azulejo de Belém. at(tx, ty) = letra do vizinho
+const WALLS = ["#3a7ab8", "#e8c040", "#e89aaa", "#5aa06a", "#e8e2cf", "#c8603a"];
+function drawBuilding(x, ox, oy, P, tx, ty, at) {
+  const r = k => rand(tx * 37.3 + ty * 91.1 + k), front = at(tx, ty + 1) !== "#", wall = P.walls ? P.walls[Math.floor(rand(tx * 7.7) * P.walls.length)] : WALLS[Math.floor(rand(tx * 7.7) * WALLS.length)];
+  x.fillStyle = P.roof; x.fillRect(ox, oy, TILE, TILE);
+  x.fillStyle = P.roof2; for (let k = 2; k < TILE; k += 4) x.fillRect(ox, oy + k, TILE, 1);   // fileiras de telha
+  if (r(1) < .08) { x.fillStyle = OUTLINE; x.fillRect(ox + 5, oy + 3, 5, 6); x.fillStyle = P.roof2; x.fillRect(ox + 6, oy + 4, 3, 4); }   // caixa d'água/chaminé
+  if (front) {
+    x.fillStyle = P.roof2; x.fillRect(ox, oy + 3, TILE, 2);   // beiral
+    x.fillStyle = wall; x.fillRect(ox, oy + 5, TILE, 11);
+    x.fillStyle = "#00000022"; x.fillRect(ox, oy + 14, TILE, 2);
+    const door = r(2) < .3;
+    x.fillStyle = OUTLINE;
+    if (door) { x.fillRect(ox + 5, oy + 8, 6, 8); x.fillStyle = "#6d4329"; x.fillRect(ox + 6, oy + 9, 4, 7); }
+    else for (const wx of [2, 9]) { x.fillRect(ox + wx, oy + 7, 5, 6); x.fillStyle = r(wx) < .5 ? "#bfe8ff" : "#2a3a4a"; x.fillRect(ox + wx + 1, oy + 8, 3, 4); x.fillStyle = OUTLINE; }
+  }
+  x.fillStyle = OUTLINE;   // contorno onde a quadra acaba
+  if (at(tx - 1, ty) !== "#") x.fillRect(ox, oy, 1, TILE);
+  if (at(tx + 1, ty) !== "#") x.fillRect(ox + TILE - 1, oy, 1, TILE);
+  if (at(tx, ty - 1) !== "#") x.fillRect(ox, oy, TILE, 1);
+  if (front) x.fillRect(ox, oy + TILE - 1, TILE, 1);
+}
 // oca de 2x2 quadrados: telhado de palha arredondado, parede de barro e porta escura
 // oca de 3x2 quadrados (48x32): a porta fica no meio do quadrado central, onde a trilha chega
 function hutCanvas() {
@@ -115,6 +143,7 @@ function drawStageMap(rows, zone) {
       }
       return;
     }
+    if (ch === "#") return drawBuilding(x, ox, oy, P, tx, ty, at);
     // chefe de água (Pirarucu, Cobra-Grande...): fica numa poça em vez de na grama
     drawTile(x, ch === "B" && ZONES[zone] && WATER_BATTLE.has(ZONES[zone].boss) ? "~" : TILE_BASE[ch] || ch, ox, oy, P, tx, ty);
     if (ch === "E") {   // seta de saída apontando para a borda mais perto

@@ -18,9 +18,10 @@ function localDone(where, msg) {
 function drawLocal() {
   vit();
   $("lhud").textContent = `Dia ${G.day}${G.night ? " (noite)" : ""} · Nv ${G.lv} · R$ ${G.money} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · DEF ${defense()} · Itens ×${itemCount(G.items)} · Peles ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
-  Object.keys(SUB).forEach(k => { const n = $("ln-" + k); n.classList.toggle("locked", !unlocked(k)); n.style.display = G.seen[k] ? "" : "none"; });
+  if ($("lnodes").dataset.city !== curCity()) buildLocalNodes();   // trocou de cidade (ônibus): redesenha o mapa
+  CITY[curCity()].route.forEach(k => { const n = $("ln-" + k); n.classList.toggle("locked", !unlocked(k)); n.style.display = G.seen[k] ? "" : "none"; });
   document.querySelectorAll("#lroutes [data-b], #lbridges [data-b]").forEach(el => { el.style.display = G.seen[el.dataset.b] ? "" : "none"; });
-  $("lroad").style.display = G.seen.parada ? "" : "none";
+  $("lroad").style.display = G.seen[CITY[curCity()].gate] ? "" : "none";
   const l = SUB[G.sub]; $("lmk").setAttribute("transform", `translate(${l.x} ${l.y})`);
 }
 function selectSub(id, msg) {
@@ -33,10 +34,19 @@ function selectSub(id, msg) {
     lh(id === "aldeia" ? "Lá dentro fica a fogueira: descanse até a noite ou durma até o dia seguinte. Os aldeões dão dicas." : "Lá dentro o vendedor compra suas peles, tem comida, o artesão vende roupas e o armeiro faz armas e armaduras.");
   }
   else if (id === "parada") {   // cobrador vende a passagem para Belém (BUS em data/world.js)
-    if (G.passagem) lh(BUS.open ? "Você já tem a passagem. O ônibus para Belém sai daqui." : "Passagem comprada! Assim que o ônibus para Belém voltar a rodar, é só embarcar aqui.");
+    if (G.passagem && BUS.open) { btn("Embarcar no ônibus para Belém", () => busRide("belem"), false, i); lh("A passagem vale ida e volta: do terminal de Belém dá para voltar quando quiser."); }
+    else if (G.passagem) lh("Passagem comprada! Assim que o ônibus para Belém voltar a rodar, é só embarcar aqui.");
     else btn(`Comprar passagem para Belém · R$ ${BUS.price}`, buyTicket, !BUS.open || G.money < BUS.price, i);
     if (!BUS.open) lh("O cobrador avisa: \"O ônibus para Belém ainda não está saindo. Volta daqui a uns dias!\" (em breve: episódio 2)");
     else if (!G.passagem && G.money < BUS.price) lh(`Faltam R$ ${BUS.price - G.money}. Peles de bicho forte valem bem mais na feira.`);
+  }
+  else if (id === "terminal") {   // em Belém: o mesmo ônibus volta pela BR-316
+    btn("Voltar para Ananindeua", () => busRide("ananindeua"), false, i);
+    lh("A passagem vale ida e volta. Na aldeia dá para descansar na fogueira e caçar nas matas de sempre.");
+  }
+  else if (id === "veropeso") {
+    btn("Entrar no Ver-o-Peso", () => startExplore(id), false, i);
+    lh("Lá dentro: comprador de peles, barraca de comida, artesão, armeiro e uma rede na pensão para dormir.");
   }
   else if (z) {
     btn("Explorar", () => startExplore(id), false, i);
@@ -61,11 +71,27 @@ function rest(kind, quiet, toast) {
   if (toast) return msg;
   localDone("aldeia", msg);
 }
+/* viagem de ônibus pela BR-316: o ônibus atravessa a tela e o Rhanon desce na outra cidade (passagem de ida e volta) */
+function busRide(city) {
+  if (moving || !G.passagem) return;
+  moving = true; sfx("look");
+  const b = document.createElement("div"); b.className = "busride"; b.setAttribute("aria-live", "polite");
+  b.innerHTML = `<div class="br-road"></div><div class="br-bus"><i></i><i></i><i></i><b></b></div><span>${city === "belem" ? "BR-316 · rumo a Belém" : "BR-316 · de volta a Ananindeua"}</span>`;
+  if (city !== "belem") b.classList.add("volta");
+  document.body.append(b);
+  setTimeout(() => sfx("guard"), 300); setTimeout(() => sfx("guard"), 900);
+  setTimeout(() => {
+    G.loc = city; G.sub = CITY[city].gate; G.seen[G.sub] = true; save();
+    moving = false; buildLocalNodes(); showLocal(true); sfx("more");
+    if (city === "belem" && !G.belemVisto) { G.belemVisto = true; save(); setTimeout(() => lh("Primeira vez na capital! Siga a trilha até o Ver-o-Peso: lá dá para vender peles e dormir."), 700); }
+  }, REDUCE ? 400 : 2200);
+  setTimeout(() => b.remove(), REDUCE ? 600 : 2700);
+}
 // passagem de ônibus para Belém: cara, comprada uma vez só
 function buyTicket() {
   if (!BUS.open || G.passagem || G.money < BUS.price) return;
   G.money -= BUS.price; G.passagem = true; save(); sfx("more");
-  localDone("parada", "Passagem para Belém comprada! Guarde bem: o ônibus sai da Parada da BR-316.");
+  localDone("parada", "Passagem para Belém comprada! Ela vale ida e volta: é só embarcar aqui na cabine.");
 }
 // compra um item da barraca de comida (vai para a bolsa)
 function buy(id) {
@@ -238,7 +264,7 @@ function showLocal(zoom) {
 }
 /* ---------- caminho novo: o mapa aparece e a trilha vai se desenhando até a área que abriu ---------- */
 // primeira área já liberada (chefe anterior vencido) que o jogador ainda não viu aparecer no mapa
-const pendingReveal = () => { vit(); return ROUTE.find(k => unlocked(k) && !G.seen[k]); };
+const pendingReveal = () => { vit(); return CITY[curCity()].route.find(k => unlocked(k) && !G.seen[k]); };
 function revealNext(done) { const k = pendingReveal(); if (k) revealPath(k, done); else if (done) done(); }
 let revealReady = false, revealDone = null;
 function revealPath(k, done) {
@@ -263,7 +289,7 @@ function revealPath(k, done) {
     node.style.display = ""; node.classList.remove("locked");
     const {x, y} = SUB[k];
     node.animate([{transform: `translate(${x}px,${y}px) scale(0)`}, {transform: `translate(${x}px,${y}px) scale(1.35)`, offset: .6}, {transform: `translate(${x}px,${y}px) scale(1)`}], {duration: 420, easing: "ease-out"});
-    if (k === "parada") svg.querySelector(".lroad")?.parentNode.style.removeProperty("display");   // a estrada para Belém aparece com a cabine
+    if (k === CITY[curCity()].gate) svg.querySelector(".lroad")?.parentNode.style.removeProperty("display");   // a estrada aparece com a cabine
     sfx("missao"); G.seen[k] = true; save();
     box.insertAdjacentHTML("beforeend", `<p class="hint">${k === "parada" ? "A trilha chegou ao fim: a BR-316, de onde sai o ônibus para Belém." : `Agora a trilha segue até: ${SUB[k].n}.`}</p>`);
     btn("Continuar", closeReveal, false, box); box.querySelector(".cmd").focus({preventScroll: true});
@@ -288,24 +314,25 @@ function setupReveal() {
 }
 function openLocal() {
   if (moving) return;
-  const svg = $("mapsvg"), l = LOC.ananindeua; $("map").style.overflow = "hidden"; sfx("look");
+  const svg = $("mapsvg"), l = LOC[curCity()]; $("map").style.overflow = "hidden"; sfx("look");
   svg.style.transformOrigin = `${l.x / 4}% ${l.y / 4.4}%`;
   const an = svg.animate([{transform: "scale(1)", opacity: 1}, {transform: "scale(7)", opacity: 0}], {duration: 520, easing: "cubic-bezier(.6,0,.9,.4)"});
   an.onfinish = () => { $("map").style.overflow = ""; showLocal(true); };
 }
 function closeLocal() { showMap(); }
-// cria trilhas e pontos clicáveis do mapa de Ananindeua a partir de SUB e EDGES
-// trilha de Ananindeua: curva suave passando por todos os locais na ordem (ROUTE), pontes onde ela cruza o rio
-// e a BR-316 saindo do mapa a partir da cabine do cobrador
+// mapa local da cidade atual (CITY em data/world.js): trilha em curva suave passando pelos locais na ordem (route),
+// pontes onde ela cruza o rio/canal e a BR-316 saindo do mapa a partir da cabine do cobrador (ou do terminal)
 function buildLocalNodes() {
-  const P = ROUTE.map(k => [SUB[k].x, SUB[k].y]), at = i => P[Math.max(0, Math.min(P.length - 1, i))];
+  const C = CITY[curCity()], ROUTE = C.route, P = ROUTE.map(k => [SUB[k].x, SUB[k].y]), at = i => P[Math.max(0, Math.min(P.length - 1, i))];
+  $("lnodes").dataset.city = curCity(); $("lsvg").setAttribute("aria-label", "Mapa estilizado de " + C.n);
+  $("lland").setAttribute("points", C.land); $("lbay").setAttribute("d", C.bay || "");
   const curve = i => {   // trecho i -> i+1 (Catmull-Rom virando Bézier)
     const [p0, p1, p2, p3] = [at(i - 1), at(i), at(i + 1), at(i + 2)];
     const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
     return `M${p1} C${c1} ${c2} ${p2}`;
   };
-  $("lriver").setAttribute("d", LOCAL_RIVER);
-  $("lroad").innerHTML = `<path class="lroad" d="${LOCAL_ROAD}"/><path class="lroad-faixa" d="${LOCAL_ROAD}"/><text class="lroad-txt" x="6" y="18">← Belém</text>`;
+  $("lriver").setAttribute("d", C.river);
+  $("lroad").innerHTML = `<path class="lroad" d="${C.road}"/><path class="lroad-faixa" d="${C.road}"/><text class="lroad-txt" x="${C.sign[0]}" y="${C.sign[1]}">${C.sign[2]}</text>`;
   $("lroutes").innerHTML = ROUTE.slice(1).map((k, i) => `<path class="lroute-base" data-b="${k}" d="${curve(i)}"/><path class="lroute" data-a="${ROUTE[i]}" data-b="${k}" d="${curve(i)}"/>`).join("");
   // pontes: anda pela trilha procurando onde ela passa por cima do rio, e põe uma ponte de tábuas alinhada com a trilha
   const river = $("lriver"), RL = river.getTotalLength(), rs = [];
@@ -322,10 +349,10 @@ function buildLocalNodes() {
     }
   });
   $("lbridges").innerHTML = bridges;
-  const mark = k => k === "parada"   // a BR-316 é uma cabine de cobrador, não uma bolinha
+  const mark = k => k === C.gate   // a BR-316 (e o terminal de Belém) é uma cabine de cobrador, não uma bolinha
     ? '<g class="cabin"><circle r="13" class="hit"/><rect x="-9" y="-12" width="18" height="15"/><path d="M-12 -12L0 -21L12 -12Z"/><rect class="win" x="-5" y="-8" width="10" height="5"/></g>'
     : '<circle r="10"/>';
-  $("lnodes").innerHTML = Object.entries(SUB).map(([k, l]) => `<g class="node" id="ln-${k}" data-k="${k}" transform="translate(${l.x} ${l.y})" tabindex="0" role="button" aria-label="${l.n}">${mark(k)}<text y="28" text-anchor="middle">${l.s || l.n}</text></g>`).join("");   // s = nome curto no mapa
+  $("lnodes").innerHTML = ROUTE.map(k => [k, SUB[k]]).map(([k, l]) => `<g class="node" id="ln-${k}" data-k="${k}" transform="translate(${l.x} ${l.y})" tabindex="0" role="button" aria-label="${l.n}">${mark(k)}<text y="28" text-anchor="middle">${l.s || l.n}</text></g>`).join("");   // s = nome curto no mapa
   document.querySelectorAll("#lnodes .node").forEach(n => {
     const k = n.dataset.k, pick = () => { if (!moving) selectSub(k); };
     n.addEventListener("click", pick);

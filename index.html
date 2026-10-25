@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rhanon Macley — RPG (offline)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Luckiest+Guy&family=JetBrains+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="styles.css?v=0.23.0">
+<link rel="stylesheet" href="styles.css?v=0.24.0">
 </head>
 <body>
 <div class="bg" aria-hidden="true">
@@ -78,7 +78,7 @@
     <div class="mapwrap">
       <div class="hud" id="lhud"></div>
       <svg id="lsvg" viewBox="0 0 440 325" role="img" aria-label="Mapa estilizado de Ananindeua">
-        <polygon class="land" points="10,70 60,20 190,8 305,18 395,55 430,140 428,235 398,300 300,316 170,314 60,304 12,255 5,160"/>
+        <path class="lbay" id="lbay"/><polygon class="land" id="lland"/>
         <path class="river" id="lriver"/>
         <g id="lroad"></g><g id="lroutes"></g><g id="lbridges"></g><g id="lnodes"></g>
         <g id="lmk"><g class="pin"><path d="M0 0 L-7 -14 L7 -14Z"/><circle cx="0" cy="-19" r="7"/></g></g>
@@ -117,37 +117,37 @@
   </div>
 </main>
 <!-- Ordem importa: utilidades e estado, depois dados, depois quem usa os dados. main.js por último. -->
-<script src="js/core/version.js?v=0.23.0"></script>
-<script src="js/core/utils.js?v=0.23.0"></script>
-<script src="js/core/state.js?v=0.23.0"></script>
-<script src="js/core/assets.js?v=0.23.0"></script>
-<script src="js/data/sprites.js?v=0.23.0"></script>
-<script src="js/data/animals.js?v=0.23.0"></script>
-<script src="js/data/commands.js?v=0.23.0"></script>
-<script src="js/data/questions.js?v=0.23.0"></script>
-<script src="js/data/world.js?v=0.23.0"></script>
-<script src="js/data/stages.js?v=0.23.0"></script>
-<script src="js/data/art.js?v=0.23.0"></script>
-<script src="js/audio/sfx.js?v=0.23.0"></script>
-<script src="js/audio/music.js?v=0.23.0"></script>
-<script src="js/gfx/sprites.js?v=0.23.0"></script>
-<script src="js/gfx/rig.js?v=0.23.0"></script>
-<script src="js/gfx/beasts.js?v=0.23.0"></script>
-<script src="js/gfx/fx.js?v=0.23.0"></script>
-<script src="js/gfx/actors.js?v=0.23.0"></script>
-<script src="js/gfx/tiles.js?v=0.23.0"></script>
-<script src="js/ui/screen-fx.js?v=0.23.0"></script>
-<script src="js/ui/theme.js?v=0.23.0"></script>
-<script src="js/ui/options.js?v=0.23.0"></script>
-<script src="js/ui/cutin.js?v=0.23.0"></script>
-<script src="js/ui/mapnav.js?v=0.23.0"></script>
-<script src="js/systems/combat.js?v=0.23.0"></script>
-<script src="js/systems/challenge.js?v=0.23.0"></script>
-<script src="js/systems/world-map.js?v=0.23.0"></script>
-<script src="js/systems/local.js?v=0.23.0"></script>
-<script src="js/systems/journal.js?v=0.23.0"></script>
-<script src="js/systems/equip.js?v=0.23.0"></script>
-<script src="js/systems/explore.js?v=0.23.0"></script>
-<script src="js/main.js?v=0.23.0"></script>
+<script src="js/core/version.js?v=0.24.0"></script>
+<script src="js/core/utils.js?v=0.24.0"></script>
+<script src="js/core/state.js?v=0.24.0"></script>
+<script src="js/core/assets.js?v=0.24.0"></script>
+<script src="js/data/sprites.js?v=0.24.0"></script>
+<script src="js/data/animals.js?v=0.24.0"></script>
+<script src="js/data/commands.js?v=0.24.0"></script>
+<script src="js/data/questions.js?v=0.24.0"></script>
+<script src="js/data/world.js?v=0.24.0"></script>
+<script src="js/data/stages.js?v=0.24.0"></script>
+<script src="js/data/art.js?v=0.24.0"></script>
+<script src="js/audio/sfx.js?v=0.24.0"></script>
+<script src="js/audio/music.js?v=0.24.0"></script>
+<script src="js/gfx/sprites.js?v=0.24.0"></script>
+<script src="js/gfx/rig.js?v=0.24.0"></script>
+<script src="js/gfx/beasts.js?v=0.24.0"></script>
+<script src="js/gfx/fx.js?v=0.24.0"></script>
+<script src="js/gfx/actors.js?v=0.24.0"></script>
+<script src="js/gfx/tiles.js?v=0.24.0"></script>
+<script src="js/ui/screen-fx.js?v=0.24.0"></script>
+<script src="js/ui/theme.js?v=0.24.0"></script>
+<script src="js/ui/options.js?v=0.24.0"></script>
+<script src="js/ui/cutin.js?v=0.24.0"></script>
+<script src="js/ui/mapnav.js?v=0.24.0"></script>
+<script src="js/systems/combat.js?v=0.24.0"></script>
+<script src="js/systems/challenge.js?v=0.24.0"></script>
+<script src="js/systems/world-map.js?v=0.24.0"></script>
+<script src="js/systems/local.js?v=0.24.0"></script>
+<script src="js/systems/journal.js?v=0.24.0"></script>
+<script src="js/systems/equip.js?v=0.24.0"></script>
+<script src="js/systems/explore.js?v=0.24.0"></script>
+<script src="js/main.js?v=0.24.0"></script>
 </body>
 </html>

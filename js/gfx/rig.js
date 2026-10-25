@@ -171,6 +171,7 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
     d.part().poly([[hx - 8, 7 + hy], [hx + 8, 7 + hy], [hx + 8, 12 + hy], [hx + 5, 15 + hy], [hx + 4, 11 + hy], [hx + 1, 14 + hy], [hx - 1, 10 + hy], [hx - 4, 14 + hy], [hx - 5, 11 + hy], [hx - 8, 14 + hy]], C.h)   // franja em pontas
       .dots([e(-5, 5), e(-4, 5), e(-3, 4), e(-2, 4), e(-4, 6)], C.H);
     if (!look.noBand) d.part().rect(hx - 8, 9 + hy, 17, 2, C.g).rect(hx - 8, 10 + hy, 17, 1, C.G);
+    if (look.cap) d.part().ellipse(hx, 8 + hy, 8.5, 4.5, look.cap[0]).rect(hx - 9, 10 + hy, 19, 2, look.cap[1]);   // boné (gente da cidade)
   }
   if (look.feather) d.part().limb(hx + 5, 9 + hy, hx + 7, 2 + hy, 1.5, look.feather);
   // armas na frente do corpo

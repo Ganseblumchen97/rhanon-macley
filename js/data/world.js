@@ -1,4 +1,4 @@
-/* Locais do mapa grande (Pará ou Brasil), sublocais de Ananindeua, loja e equipamentos. */
+/* Locais do mapa grande (Pará ou Brasil), sublocais de Ananindeua e de Belém, loja e equipamentos. */
 const REQ = {lv: 4, money: 150};   // para Curitiba aparecer e a passagem
 const CURITIBA_OPEN = false;       // false = Curitiba fica escondida (foco em Ananindeua por enquanto)
 /* Mapa grande: "para" (por enquanto: Ananindeua aberta e Belém, a capital, em breve) ou "brasil" (Ananindeua e Curitiba).
@@ -16,7 +16,7 @@ const MAP_REGIONS = {
 };
 const LOC = {
   ananindeua: {n: "Ananindeua (PA)", s: "Ananindeua", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor está cheia de perigo, e cada pele rende uns trocados."},
-  belem: {n: "Belém (PA)", s: "Belém", soon: true, txt: "A capital do Pará, do outro lado da baía. É de lá que saem os aviões para o resto do Brasil."},
+  belem: {n: "Belém (PA)", s: "Belém", txt: "A capital do Pará, na beira da baía do Guajará. Prédios, casarões de azulejo, o Ver-o-Peso... e bicho e malandro bem mais fortes que os da mata."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
 /* Mapa de Ananindeua (viewBox 440x325): uma trilha só, em zigue-zague, na ordem de dificuldade (ROUTE).
@@ -32,17 +32,35 @@ const SUB = {
   manguezal: {n: "Manguezal", x: 290, y: 128, txt: "De volta pela ponte de cima, a mata vira lama e raiz. Caranguejos, mão-peladas e, de noite, um assobio que ninguém quer ouvir."},
   seringal: {n: "Seringal", x: 212, y: 160, txt: "Seringueiras velhas, ainda com as marcas da faca, e a casa do seringueiro caindo aos pedaços. Lá ninguém caça à noite."},
   varzea: {n: "Várzea", x: 120, y: 134, txt: "Campo alagado de capim alto, como em Marajó. Manadas de búfalo, socós escondidos e, dizem os vaqueiros, um gigante que fede de longe."},
-  parada: {n: "Cabine da BR-316", s: "BR-316", x: 52, y: 62, txt: "No fim da trilha, a estrada. Uma cabine de madeira com um cobrador lá dentro: é daqui que sai o ônibus para Belém, a capital."}
+  parada: {n: "Cabine da BR-316", s: "BR-316", x: 52, y: 62, txt: "No fim da trilha, a estrada. Uma cabine de madeira com um cobrador lá dentro: é daqui que sai o ônibus para Belém, a capital."},
+  /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
+     pela Cidade Velha, pelo Porto e pelas Baixadas, cada vez mais difícil */
+  terminal: {city: "belem", n: "Terminal rodoviário", s: "Terminal", x: 392, y: 262, txt: "O ônibus da BR-316 para aqui. Do guichê dá para voltar para Ananindeua quando quiser: a passagem vale ida e volta."},
+  veropeso: {city: "belem", n: "Ver-o-Peso", x: 252, y: 250, txt: "A feira mais famosa do Pará, na beira da baía: peixe, açaí, ervas de cheiro, urubus no telhado de ferro... e uma rede para dormir na pensão."},
+  cidadevelha: {city: "belem", n: "Cidade Velha", x: 128, y: 266, txt: "Ruas de pedra, casarões de azulejo e praças com mangueiras. Pombos, gatos, iguanas... e uns malandros de olho na sua bolsa."},
+  porto: {city: "belem", n: "Porto e Docas", x: 86, y: 160, txt: "Galpões velhos, guindastes e barcos chegando de todo canto. Ratos do tamanho de gato e golpistas esperando quem desce do barco."},
+  baixadas: {city: "belem", n: "Baixadas", x: 262, y: 146, txt: "Do outro lado do canal, casas de palafita ligadas por pontes de tábua. Na maré cheia, a rua vira rio."}
 };
-const ROUTE = ["aldeia", "feira", "mata", "fechada", "rio", "igarape", "manguezal", "seringal", "varzea", "parada"];
-const EDGES = ROUTE.slice(1).map((k, i) => [ROUTE[i], k]);
-// rio do mapa (a trilha cruza ele duas vezes; as pontes são postas onde os dois se encontram) e a BR-316 saindo do mapa
-const LOCAL_RIVER = "M318,24 C305,70 358,96 346,140 C334,190 300,222 316,318", LOCAL_ROAD = "M52,62 C34,44 18,32 -4,26";
-/* ônibus para Belém (episódio 2): a passagem é comprada na Parada da BR-316 e fica em G.passagem.
-   open = false enquanto Belém não abre (a parada mostra o preço e avisa que o ônibus ainda não está rodando). */
-const BUS = {price: 800, open: false};
+/* cada cidade tem o seu mapa local (viewBox 440x325): a trilha única em ordem (route), o contorno (land), o rio ou
+   canal que a trilha cruza (com as pontes calculadas) e a estrada que sai do mapa (road), com a placa (sign) */
+const CITY = {
+  ananindeua: {n: "Ananindeua", route: ["aldeia", "feira", "mata", "fechada", "rio", "igarape", "manguezal", "seringal", "varzea", "parada"],
+    land: "10,70 60,20 190,8 305,18 395,55 430,140 428,235 398,300 300,316 170,314 60,304 12,255 5,160",
+    river: "M318,24 C305,70 358,96 346,140 C334,190 300,222 316,318", road: "M52,62 C34,44 18,32 -4,26", sign: [6, 18, "← Belém"], home: "aldeia", gate: "parada"},
+  belem: {n: "Belém", route: ["terminal", "veropeso", "cidadevelha", "porto", "baixadas"],
+    land: "40,40 150,14 300,10 400,40 432,130 430,240 400,300 300,316 160,316 40,300 22,230 36,150 20,90",
+    bay: "M0,0 L44,0 C28,40 46,80 28,110 C40,150 22,200 38,240 C28,270 34,300 46,325 L0,325Z",   // baía do Guajará
+    river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Ananindeua →"], home: "veropeso", gate: "terminal"}
+};
+const curCity = () => G.loc === "belem" ? "belem" : "ananindeua";
+const cityOf = k => (SUB[k] && SUB[k].city) || "ananindeua";
+const ROUTE = Object.values(CITY).flatMap(c => c.route);   // todos os locais das duas cidades
+const EDGES = Object.values(CITY).flatMap(c => c.route.slice(1).map((k, i) => [c.route[i], k]));
+/* ônibus da BR-316 entre Ananindeua (cabine da parada) e Belém (terminal): a passagem é comprada uma vez na cabine
+   (G.passagem) e vale ida e volta. open = false fecharia Belém de novo (a cabine só mostraria o preço). */
+const BUS = {price: 800, open: true};
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea"}, NEXT_Z = {mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea"};
+const NEED = {fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {
@@ -75,7 +93,8 @@ const QUESTS = [
 const itemEffect = it => [it.hp && `+${it.hp} PV`, it.sp && `+${it.sp} PE`].filter(Boolean).join(" e ");
 /* Equipamentos: para criar um item novo, basta acrescentar uma linha em legs, torso ou weapon. */
 const EQUIP = {
-  legs:   {tanga: {n: "Tanga", def: 0, lv: 1, price: 0}, short: {n: "Short", def: 2, lv: 3, price: 60, color: "#3b6ea5", shade: "#27496e"}},
+  legs:   {tanga: {n: "Tanga", def: 0, lv: 1, price: 0}, short: {n: "Short", def: 2, lv: 3, price: 60, color: "#3b6ea5", shade: "#27496e"},
+           brim: {n: "Calça de brim da capital", def: 9, lv: 21, price: 340, color: "#2a3a5a", shade: "#1a2440"}},
   torso:  {regata: {n: "Regata", def: 2, lv: 5, price: 90, color: "#e9e2cf", shade: "#c9bfa4"}},
   weapon: {lanca: {n: "Lança", atk: 0, lv: 1, price: 0}},
   // arma de longe (X na exploração); sem ela, o Rhanon só ataca de perto com a lança
@@ -87,14 +106,17 @@ const CRAFT = {
   weapon: {lanca_dente: {n: "Lança de dente de jacaré", atk: 3, lv: 6, craft: {jacare: 2}, cost: 60},
            lanca_presa: {n: "Lança com presa de onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120},
            lanca_pirarucu: {n: "Lança de osso de pirarucu", atk: 8, lv: 13, craft: {pirarucu: 1, tracaja: 2}, cost: 160},
-           lanca_chifre: {n: "Lança com chifre de búfalo", atk: 11, lv: 18, craft: {bufalo_touro: 1, bufalo: 2}, cost: 260}},
+           lanca_chifre: {n: "Lança com chifre de búfalo", atk: 11, lv: 18, craft: {bufalo_touro: 1, bufalo: 2}, cost: 260},
+           lanca_aco: {n: "Lança com ponta de aço do porto", atk: 15, lv: 24, craft: {ratao: 1, ratazana: 3}, cost: 380}},
   torso:  {colete_sucuri: {n: "Colete de couro de sucuri", def: 4, lv: 8, craft: {sucuri: 2}, cost: 90, color: "#5a7a3a", shade: "#3a5a24"},
            colete_tracaja: {n: "Colete de casco de tracajá", def: 6, lv: 12, craft: {tracaja: 3}, cost: 140, color: "#4a5a3a", shade: "#2e3a24"},
-           gibao_bufalo: {n: "Gibão de couro de búfalo", def: 9, lv: 17, craft: {bufalo: 3, jararaca: 1}, cost: 240, color: "#3a3234", shade: "#221c1e"}},
+           gibao_bufalo: {n: "Gibão de couro de búfalo", def: 9, lv: 17, craft: {bufalo: 3, jararaca: 1}, cost: 240, color: "#3a3234", shade: "#221c1e"},
+           jaqueta_jacare: {n: "Jaqueta de couro do Jacaré do canal", def: 13, lv: 26, craft: {jacare_canal: 1, cachorro_bravo: 2}, cost: 440, color: "#4a4a2e", shade: "#2e2e1a"}},
   legs:   {calca_anta: {n: "Calça de couro de anta", def: 3, lv: 7, craft: {anta: 1, capivara: 1}, cost: 70, color: "#5a4a40", shade: "#3a2e28"},
            calca_jacaretinga: {n: "Calça de couro de jacaretinga", def: 5, lv: 13, craft: {jacaretinga: 2, caranguejo: 1}, cost: 130, color: "#6a7a4a", shade: "#4a5632"},
            perneira_jararaca: {n: "Perneira de couro de jararaca", def: 7, lv: 16, craft: {jararaca: 2, ourico: 1}, cost: 200, color: "#7a6a4a", shade: "#54482e"}},
   ranged: {arco_harpia: {n: "Arco com penas de harpia", atk: 3, lv: 7, craft: {harpia: 1}, cost: 60},
-           arco_gaviao: {n: "Arco com penas de gavião-real", atk: 6, lv: 17, craft: {gaviao_real: 1, urubu: 2}, cost: 220}}
+           arco_gaviao: {n: "Arco com penas de gavião-real", atk: 6, lv: 17, craft: {gaviao_real: 1, urubu: 2}, cost: 220},
+           arco_gaivota: {n: "Arco de fibra com penas de gaivota", atk: 9, lv: 23, craft: {gaivota: 2, iguana_rei: 1}, cost: 320}}
 };
 for (const s in CRAFT) Object.assign(EQUIP[s], CRAFT[s]);

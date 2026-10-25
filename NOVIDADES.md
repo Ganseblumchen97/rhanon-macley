@@ -3,6 +3,23 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.24.0 — Belém, a capital
+
+- O ônibus da BR-316 está rodando! Depois de vencer o chefe da Várzea, compre a passagem na cabine do cobrador
+  (R$ 800). Ela vale ida e volta: dá para voltar para Ananindeua pelo terminal de Belém quando quiser.
+- Belém tem o seu próprio mapa, com a baía do Guajará e um canal com ponte. A trilha segue: terminal, Ver-o-Peso,
+  Cidade Velha, Porto e Docas e Baixadas, cada lugar mais difícil que o anterior.
+- Ver-o-Peso (sem bichos): o Mercado de Ferro, os trapiches, as barracas de peles, comida, artesão e armeiro, uma rede
+  na pensão para descansar ou dormir, e gente da cidade com dicas da capital.
+- Cidade Velha (níveis 20 a 22): pombos, gatos de rua, iguanas, vira-latas caramelo e batedores de carteira. Chefe:
+  a Iguana-rei da praça. À noite: a Mulher de Branco.
+- Porto e Docas (22 a 24): ratazanas, urubus, gaivotas e golpistas do cais. Chefe: o Ratão do galpão. À noite: a
+  Cobra Norato.
+- Baixadas (24 a 26): mucuras, ratos-d'água, cachorros bravos e ladrões de bicicleta, entre palafitas e pontes de tábua.
+  Chefe: o Jacaré do canal. À noite: a Visagem da maré.
+- Cuidado com os malandros: eles levam dinheiro de verdade da sua carteira. Vencendo, você recupera tudo.
+- Equipamentos novos: lança com ponta de aço, jaqueta de couro do Jacaré do canal, arco de gaivota e calça de brim.
+
 ## 0.23.0 — Ananindeua inteira e luta com peso
 
 - Luta com mais impacto: o golpe que acerta congela a tela por um instante e ela treme na medida da força; golpe forte

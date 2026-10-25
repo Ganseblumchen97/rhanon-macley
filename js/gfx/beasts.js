@@ -309,6 +309,17 @@ const QUADS = {
     },
     tail: (d, P, C) => { const x = P.cx + P.rx - 1, y = P.cy - 3; bChain(d, [[x, y], [x + 3, y + 6], [x + 3, y + 12]], [2, 1.5], C.B); d.ellipse(x + 3, y + 13, 1.5, 2, BN); },
     pattern: (d, P, C) => d.dots([[P.cx - 8, P.cy - 7], [P.cx - 2, P.cy - 8], [P.cx + 5, P.cy - 7], [P.cx + 11, P.cy - 5]], "#5a5658")},
+  // rato (ratazana do porto, rato-d'água e o Ratão): cinza, orelhas redondas rosadas e rabo comprido pelado
+  rato: {W: 48, H: 24, cx: 24, rx: 10, ry: 5.5, leg: 4, lw: 2.5, neck: 2, hu: 2, hr: 4,
+    C: {b: "#6a6a70", B: "#4a4a50", l: "#9a9aa0"}, legC: ["#d89a9a", "#b87878"],
+    head: (d, x, y, o, C) => {
+      d.part().ellipse(x + 2, y - 4, 2.6, 2.6, "#d89a9a", "#b87878");
+      d.part().ellipse(x, y, 4.5, 3.6, C.b, C.B, .6).poly([[x - 3, y - 2], [x - 9, y + 1], [x - 3, y + 2]], C.b, C.B, x - 6);
+      d.dots([[x - 9, y + 1]], "#e87a8a").dots([[x - 8, y + 3], [x - 10, y + 3], [x - 7, y - 1]], "#c8c8c8");   // focinho e bigode
+      bEye(d, x - 1, y - 1, o); if (o.mouth) bMouth(d, x - 8, y + 2, 3); if (o.tongue) d.dots([[x - 7, y + 3]], BR);
+    },
+    tail: (d, P, C) => { const x = P.cx + P.rx - 1, y = P.cy + 1, e = P.pose === "ko" ? [[x + 7, y + 3], [x + 15, y + 4]] : [[x + 6, y + 1], [x + 12, y - 2], [x + 18, y - 1]];
+      bChain(d, [[x, y], ...e], [2, 1], "#d89a9a", "#b87878"); }},
   // ouriço-cacheiro: corpo redondo coberto de espinhos claros de ponta escura, focinho rosado
   ourico: {W: 48, H: 32, cx: 26, rx: 11, ry: 8, leg: 4, lw: 3, neck: 1, hu: 1, hr: 4,
     C: {b: "#6a5a48", B: "#4a3e30", l: "#8a7a64"}, legC: ["#4a3e30", "#34281e"],
@@ -769,8 +780,75 @@ function mapinguari(pose, f) {
   return {c: d.canvas(), head: [hx, hy]};
 }
 
+/* ---------- Belém: pombo, gente da cidade (malandros) e as visagens ---------- */
+// pombo: corpo cinza, pescoço furta-cor (verde e roxo), pés laranja
+function pombo(pose, f) {
+  const d = rigGrid(1, 34, 30), G = 27, C = {b: "#8a8a9a", B: "#5e5e6e", n: "#5aa07a", p: "#9a6ab0", w: "#76768a", y: "#e86a3a"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  if (pose === "ko") {
+    d.part().ellipse(18, 23, 9, 4.5, C.b, C.B, .5).limb(22, 21, 25, 16, 1.2, C.y).limb(19, 21, 21, 16, 1.2, C.y);
+    d.part().ellipse(9, 23, 4, 3.4, C.b, C.B, .6).limb(6, 24, 3, 25, 1.2, "#3a3a3a"); bEye(d, 9, 22, o);
+    return {c: d.canvas(), head: [9, 20]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", cx = at ? 16 : pose === "hurt" ? 19 : 17, cy = (cr ? 19 : 16) + (pose === "idle" ? f : 0);
+  d.part().limb(cx + 2, cy + 5, cx + 1, G, 1.2, C.y).limb(cx - 1, cy + 5, cx - 2, G, 1.2, C.y);
+  d.part().poly([[cx + 7, cy - 1], [cx + 14, cy + 1], [cx + 7, cy + 3]], C.B);   // cauda
+  if (at) d.part().poly([[cx - 1, cy - 3], [cx + 4, cy - 14], [cx + 12, cy - 9], [cx + 6, cy - 1]], C.w, C.B, cx + 6);   // asas abertas
+  d.part().ellipse(cx, cy, 8, 6, C.b, C.B, .55);
+  if (!at) d.ellipse(cx + 2, cy - 1, 5.5, 3.5, C.w).dots([[cx + 2, cy], [cx + 4, cy], [cx + 3, cy - 2]], "#3a3a4a");   // asa com as listras
+  d.part().ellipse(cx - 5, cy - 4, 3.5, 4, C.n).dots([[cx - 6, cy - 3], [cx - 4, cy - 2]], C.p);   // pescoço furta-cor
+  const hx = at ? cx - 10 : cx - 7, hy = at ? cy - 5 : cy - 9;
+  d.part().ellipse(hx, hy, 3.5, 3.2, C.b, C.B, .6).limb(hx - 3, hy + 1, hx - 6, hy + 2, 1.2, "#3a3a3a").dots([[hx - 3, hy], [hx - 2, hy]], "#e8e8f0");
+  bEye(d, hx - 1, hy - 1, o);
+  return {c: d.canvas(), head: [hx, hy]};
+}
+// gente da cidade (malandros e golpistas): o mesmo esqueleto do Rhanon, de frente; no desmaio fica deitado
+function pessoa(look) {
+  return (pose, f) => {
+    const P = {idle: {dy: f}, blink: {face: "blink"}, crouch: {dy: 2, lf: [10, 40], rf: [22, 40]}, attack: {lean: -2, lh: [1, 20], face: "happy"}, hurt: {lean: 2, face: "hurt"}, ko: {face: "hurt"}}[pose] || {};
+    const S = 1.4, c = rigCanvas("front", P, look, S);   // 1.4 na grade 2x = do tamanho do Rhanon na batalha
+    if (pose !== "ko") return {c, head: [16 * S, 13 * S]};
+    const out = document.createElement("canvas"), x = out.getContext("2d");
+    out.width = c.height; out.height = c.width; x.translate(0, c.width); x.rotate(-Math.PI / 2); x.drawImage(c, 0, 0);   // deitado, cabeça para a esquerda
+    return {c: out, head: [13 * S, c.width - 16 * S]};
+  };
+}
+// visagem (assombração de Belém): vestido comprido sem pés, flutuando, cabelo escuro e olhos acesos; C troca as cores
+function visagem(C) {
+  return (pose, f) => {
+    const d = rigGrid(1, 40, 46), o = pose === "ko" ? "x" : pose === "hurt" ? "shut" : "open";
+    if (pose === "ko") {   // o vestido se desfaz no chão
+      d.part().poly([[8, 40], [14, 34], [34, 33], [38, 40], [33, 43], [28, 41], [22, 44], [16, 41], [10, 44]], C.w, C.W, 28);
+      d.part().poly([[6, 36], [14, 34], [12, 42]], C.h).ellipse(10, 38, 4.5, 4, C.s);
+      d.dots([[8, 37], [10, 37], [9, 38], [8, 39], [10, 39]], BN);
+      return {c: d.canvas(), head: [10, 35]};
+    }
+    const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (pose === "idle" ? f : 0) + (cr ? 3 : 0), bx = at ? -3 : hu ? 3 : 0, w = pose === "idle" ? f : 0;
+    const X = v => v + bx, Y = v => v + by;
+    d.part().poly([[X(13), Y(10)], [X(15), Y(30)], [X(12), Y(36)], [X(28), Y(36)], [X(25), Y(30)], [X(27), Y(10)]], C.h);   // cabelo comprido atrás
+    d.part().poly([[X(14), Y(16)], [X(26), Y(16)], [X(33), Y(38)], [X(30), Y(43 - w)], [X(26), Y(39)], [X(21), Y(44 + w)], [X(16), Y(39)], [X(12), Y(43 - w)], [X(7), Y(38)]], C.w, C.W, X(24));   // vestido
+    d.dots([[X(12), Y(30)], [X(18), Y(34)], [X(26), Y(30)], [X(22), Y(40)]], C.W);
+    const hand = at ? [[X(14), Y(18)], [X(1), Y(15)]] : cr ? [[X(14), Y(18)], [X(9), Y(30)]] : [[X(14), Y(18)], [X(10), Y(29)]];
+    d.part().limb(...hand[0], ...hand[1], 2, C.s, C.W);
+    d.part().limb(X(26), Y(18), X(30), Y(29), 2, C.s, C.W);
+    d.part().ellipse(X(20), Y(10), 5.5, 6, C.s, C.W, .7);
+    d.part().poly([[X(14), Y(5)], [X(26), Y(5)], [X(26), Y(10)], [X(23), Y(7)], [X(17), Y(7)], [X(14), Y(11)]], C.h);   // franja
+    if (o === "shut") d.dots([[X(17), Y(10)], [X(18), Y(10)], [X(22), Y(10)], [X(23), Y(10)]], BN);
+    else d.ellipse(X(17.5), Y(10), 1.4, 1.6, C.e).ellipse(X(22.5), Y(10), 1.4, 1.6, C.e);
+    if (at) d.part().ellipse(X(20), Y(14), 1.5, 2, BN);   // grito
+    return {c: d.canvas(), head: [X(20), Y(10)]};
+  };
+}
+
 /* ---------- registro e cache ---------- */
-const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, coruja, chupacabra, garca, pirarucu, caranguejo, matinta, curupira, mapinguari,
+const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, coruja, chupacabra, garca, pirarucu, caranguejo, matinta, curupira, mapinguari, pombo,
+  gaivota: (pose, f) => garca(pose, f, {b: "#f4f4f4", B: "#a8b0b8", y: "#e8b030", Y: "#b88a20", k: "#e8b030"}),   // gaivota: a garça em branco e cinza
+  cobra_norato: cobra({b: "#2a3a4a", B: "#1a2430", k: "#7cf2ff", eye: "#bff8ff"}, false),   // Cobra Norato: escura, com desenhos e olhos de luz
+  batedor: pessoa({pal: {s: "#9a6236", S: "#6e4424", h: "#1a1420"}, shirt: ["#2a2a30", "#18181c"], pants: ["#3a5a8a", "#24405a"], noBand: true, cap: ["#e5401c", "#a82a10"], prop: "pelt"}),
+  golpista: pessoa({pal: {s: "#b47a48", S: "#8a5a32", h: "#2a2238"}, shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#2a2a30", "#18181c"], noBand: true, glasses: true}),
+  ladrao_bike: pessoa({pal: {s: "#8a5a32", S: "#5e3a1e"}, shirt: ["#3f9a5c", "#25663a"], pants: ["#2a2a30", "#18181c"], noBand: true, cap: ["#e8c040", "#b8902a"]}),
+  mulher_branco: visagem({w: "#f4f4ee", W: "#c0c0cc", s: "#e8e0d8", h: "#1a1420", e: "#ff3a3a"}),
+  visagem_mare: visagem({w: "#9ad8d0", W: "#5aa8a0", s: "#c8e8e0", h: "#2a4a48", e: "#ffffff"}),
   jararaca: cobra({b: "#8a7a5a", B: "#5e5038", k: "#3a2a1a"}, true),   // jararaca: cabeça triangular, marrom com desenhos escuros
   soco: (pose, f) => garca(pose, f, {b: "#9a7a52", B: "#6e5436", y: "#d8b040", Y: "#a88a2a", k: "#c8a040"}),   // socó-boi: a garça em marrom listrado
   cobra_cipo: cobra({b: "#6ab83a", B: "#3e8a24", k: "#a8e070"}, false),   // cobra-cipó: verde-folha, fina

@@ -132,6 +132,8 @@ const CRIES = {
   mula: (t, k) => { voice(700, t, .5, "sawtooth", .08 * k, 450, 18, 60); voice(450, t + .45, .3, "sawtooth", .07 * k, 300, 14, 30); hum(t, .9, .08 * k, 1500, .7, .1); },
   boitata: (t, k) => { hum(t, .8, .1 * k, 5000, .7, .2); [.4, .46, .52, .58, .64, .7].forEach(o => hum(t + o, .03, .12 * k, 3500, 5)); voice(70, t, .9, "sawtooth", .06 * k, 55, 10, 5); }
 };
+CRIES.gente = (t, k) => { voice(240, t, .12, "square", .09 * k, 300); voice(330, t + .14, .2, "square", .09 * k, 260); };   // "Ei!"
+CRIES.visagem = (t, k) => { voice(520, t, 1.1, "sine", .08 * k, 900, 5, 40); hum(t, 1, .06 * k, 1200, 3, .3); };   // lamento que sobe
 const CRY_OF = {onca: "felino", jaguatirica: "felinoP", cotia: "roedor", cassaco: "roedor", quati: "roedor", queixada: "porco", macaco: "macaco",
   harpia: "ave", sucuri: "cobra", surucucu: "cobra", jacare: "jacare", calango: "calango", anta: "anta", capivara: "capivara", ariranha: "ariranha",
   preguica: "preguica", tamandua: "fungada", tatu: "tatu", piranha: "piranha", poraque: "eletrico", caranguejeira: "aranha",
@@ -139,7 +141,10 @@ const CRY_OF = {onca: "felino", jaguatirica: "felinoP", cotia: "roedor", cassaco
   tracaja: "tatu", garca: "ave", boto: "ariranha", jacaretinga: "jacare", sapo: "calango", pirarucu: "piranha", boto_encantado: "ariranha",
   caranguejo: "aranha", caranguejo_rei: "aranha", guaxinim: "roedor", macarico: "ave", matinta: "coruja",
   urubu: "ave", gaviao_real: "ave", cobra_cipo: "cobra", ourico: "fungada", curupira: "macaco",
-  bufalo: "anta", bufalo_touro: "anta", soco: "ave", jararaca: "cobra", mapinguari: "felino"};
+  bufalo: "anta", bufalo_touro: "anta", soco: "ave", jararaca: "cobra", mapinguari: "felino",
+  pombo: "ave", gato: "felinoP", iguana: "calango", iguana_rei: "calango", caramelo: "lobo", cachorro_bravo: "lobo", batedor: "gente", golpista: "gente", ladrao_bike: "gente",
+  mulher_branco: "visagem", visagem_mare: "visagem", ratazana: "roedor", ratao: "roedor", rato_dagua: "roedor", mucura: "roedor", urubu_porto: "ave", gaivota: "ave",
+  cobra_norato: "boitata", jacare_canal: "jacare"};
 // grito do bicho (chefe soma um rugido grave por baixo)
 function animalCry(id, boss = false, k = 1) {
   if (!AC) return;

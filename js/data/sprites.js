@@ -10,7 +10,9 @@ const WORKER = [
 ];
 // chefes que usam o desenho de outro bicho (com a cor trocada por "tint" em ANIMALS)
 const ART = {queixada_chefe: "queixada", cobra_grande: "sucuri", onca_rei: "onca", morcego_vampiro: "morcego", morcego_pescador: "morcego",
-  jacaretinga: "jacare", caranguejo_rei: "caranguejo", urubu: "harpia", gaviao_real: "harpia", bufalo_touro: "bufalo"};
+  jacaretinga: "jacare", caranguejo_rei: "caranguejo", urubu: "harpia", gaviao_real: "harpia", bufalo_touro: "bufalo",
+  gato: "jaguatirica", iguana: "calango", iguana_rei: "calango", caramelo: "lobo", cachorro_bravo: "lobo", urubu_porto: "harpia",
+  ratazana: "rato", ratao: "rato", rato_dagua: "rato", mucura: "cassaco", jacare_canal: "jacare"};
 const FLAME = ["...r....","..rr.r..","..rrrr..",".rroorr.",".rooyor.","rooyyyor","rooyyyor",".rooyor.","..rooor."], PAL_F = {r:"#d62828", o:"#f2740c", y:"#ffd23a"};
 const GL = {"0":"111101101101111","1":"010110010010111","2":"111001111100111","3":"111001111001111","4":"101101111001001","5":"111100111001111","6":"111100111101111","7":"111001001010010","8":"111101111101111","9":"111101111001111","+":"000010111010000","-":"000000111000000"};
 
@@ -31,5 +33,9 @@ const VILLAGER_LOOK = {
   peles:   {pal: {g: "#6d4329", G: "#46291a", r: "#ffffff", s: "#a86f40", S: "#7d4f2c"}, feather: "#e5001c", prop: "pelt"},
   comida:  {pal: {g: "#3f9a5c", G: "#25663a", r: "#ffd23a"}, longHair: true, top: "#ffd23a", prop: "basket"},
   artesao: {pal: {g: "#2a2230", G: "#17121c", r: "#19a8d8", t: "#26364a", T: "#18222f"}, feather: "#19a8d8", prop: "cloth"},
+  // gente de Belém: roupa da cidade nas cores de urucum (vermelho), jenipapo (preto), açafrão (amarelo) e folha (verde)
+  urbano1: {pal: {g: "#e5401c", G: "#a82a10", r: "#1a1426", s: "#b47a48", S: "#8a5a32"}, shirt: ["#e8c040", "#b8902a"], pants: ["#2a2a30", "#18181c"], longHair: true, prop: "basket"},
+  urbano2: {pal: {g: "#3f9a5c", G: "#25663a", r: "#e5401c", h: "#3a2a22"}, shirt: ["#3f9a5c", "#2a6a3e"], pants: ["#c8402a", "#8a2a1a"], longHair: true, prop: "basket"},
+  urbano3: {pal: {r: "#1a1426", s: "#9a6236", S: "#6e4424"}, shirt: ["#c8402a", "#8a2a1a"], pants: ["#26364a", "#18222f"], noBand: true, prop: "pelt"},
   armeiro: {pal: {h: "#3a2a22", g: "#e5741c", G: "#a8480e", r: "#2a2230", s: "#9a6236", S: "#6e4424", t: "#5a4a40", T: "#3a2e28"}, feather: "#ffffff", top: "#7d4f2c", prop: "spear"}
 };

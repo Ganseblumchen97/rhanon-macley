@@ -62,6 +62,26 @@ const ANIMALS = [
   {id:"jararaca", lv:17, name:"Jararaca", hp:104, xp:108, gold:[42,62], damage:[11,16], size:"médio", special:"picada", moves:MV("Mordida","Bote","Picada venenosa"), intro:"Um chiado no capim molhado: uma jararaca se arma, de cabeça triangular, pronta para o bote."},
   {id:"bufalo_touro", lv:20, boss:true, name:"Búfalo-touro", hp:235, xp:340, gold:[190,240], damage:[12,19], size:"chefe", tint:"brightness(.75) contrast(1.3) sepia(.3)", special:"estouro", moves:MV("Chifrada","Investida","Estouro da manada"), intro:"A lama treme. O touro da manada, de chifres do tamanho de um remo, abaixa a cabeça e raspa a pata no chão."},
   {id:"mapinguari", lv:22, boss:true, name:"Mapinguari", hp:265, xp:400, gold:[220,280], damage:[13,20], size:"chefe", special:["fedor", "estouro"], moves:MV("Garrada","Pisão","Bocarra"), intro:"Um cheiro horrível e passos pesados no escuro. O Mapinguari, gigante de um olho só, abre a boca que tem na barriga."},
+  // Belém (episódio 2): Cidade Velha (níveis 20-22), Porto e Docas (22-24) e Baixadas (24-26); "gente" = malandros e golpistas
+  {id:"pombo", lv:20, name:"Pombo", hp:130, xp:130, gold:[50,70], damage:[12,18], size:"pequeno", special:"mergulho", moves:MV("Bicada","Rasante","Revoada"), intro:"Um pombo gordo da praça estufa o peito. Ele não tem medo de ninguém, muito menos de você."},
+  {id:"gato", lv:21, name:"Gato de rua", hp:138, xp:136, gold:[52,74], damage:[13,19], size:"pequeno", tint:"grayscale(1) brightness(.8) contrast(1.2)", special:"frenesi", moves:MV("Arranhão","Pulo","Unhada sem parar"), intro:"Um gato de rua arqueia as costas em cima do muro do casarão e bufa."},
+  {id:"iguana", lv:21, name:"Iguana", hp:150, xp:140, gold:[54,76], damage:[13,19], size:"médio", tint:"hue-rotate(-25deg) saturate(1.3) brightness(1.1)", special:"salto", moves:MV("Mordida","Chicotada de cauda","Salto do galho"), intro:"Uma iguana enorme cai da mangueira da praça bem na sua frente. A cauda estala como chicote."},
+  {id:"caramelo", lv:22, name:"Vira-lata caramelo", hp:146, xp:144, gold:[56,78], damage:[14,20], size:"médio", tint:"saturate(.85) brightness(1.15) sepia(.25)", special:"uivo", moves:MV("Mordida","Investida","Latido"), intro:"Um vira-lata caramelo, dono da rua, rosna e chama a matilha com um latido."},
+  {id:"batedor", lv:21, name:"Batedor de carteira", hp:140, xp:150, gold:[60,84], damage:[13,19], size:"médio", special:["roubo", "dinheiro"], moves:MV("Empurrão","Rasteira","Mão leve"), intro:"Um rapaz de boné esbarra em você \"sem querer\". A mão dele já estava indo para a sua bolsa."},
+  {id:"iguana_rei", lv:24, boss:true, name:"Iguana-rei da praça", hp:290, xp:450, gold:[240,300], damage:[15,22], size:"chefe", tint:"hue-rotate(40deg) saturate(1.6)", special:["salto", "estouro"], moves:MV("Mordida","Chicotada de cauda","Queda do alto"), intro:"No alto da maior mangueira da praça, a iguana mais velha da Cidade Velha abre a papada. Ela manda nas árvores daqui."},
+  {id:"mulher_branco", lv:25, boss:true, name:"Mulher de Branco", hp:300, xp:480, gold:[250,310], damage:[15,23], size:"chefe", special:["encanto", "drenar"], moves:MV("Toque gelado","Vulto","Lamento"), intro:"O lampião da rua de pedra apaga. Uma moça de vestido branco flutua sem tocar o chão e chama o seu nome."},
+  {id:"ratazana", lv:22, name:"Ratazana do porto", hp:150, xp:150, gold:[58,80], damage:[14,20], size:"pequeno", special:"frenesi", moves:MV("Mordida","Corrida","Mordidas sem parar"), intro:"Do meio das cordas do cais sai uma ratazana do tamanho de um gato. Atrás dela, mais olhinhos brilhando."},
+  {id:"urubu_porto", lv:23, name:"Urubu do porto", hp:156, xp:156, gold:[60,82], damage:[14,21], size:"médio", tint:"grayscale(.6) brightness(.5) contrast(1.3)", special:"fedor", moves:MV("Bicada","Voo rasante","Vômito"), intro:"Os urubus do porto conhecem o cheiro de peixe de longe. Este acha que você tem peixe na bolsa."},
+  {id:"gaivota", lv:22, name:"Gaivota", hp:148, xp:152, gold:[58,80], damage:[14,20], size:"médio", special:"mergulho", moves:MV("Bicada","Grito","Mergulho"), intro:"Uma gaivota grita em cima do guindaste e mergulha direto em você."},
+  {id:"golpista", lv:23, name:"Golpista do cais", hp:154, xp:166, gold:[66,90], damage:[14,21], size:"médio", special:["dinheiro", "fedor"], moves:MV("Empurrão","Conversa fiada","Golpe do bilhete"), intro:"\"Psiu, parente! Tenho um bilhete premiado aqui, só preciso de uma ajudinha para trocar...\" É golpe."},
+  {id:"ratao", lv:26, boss:true, name:"Ratão do galpão", hp:320, xp:520, gold:[260,330], damage:[16,24], size:"chefe", tint:"brightness(.7) contrast(1.4) hue-rotate(-10deg)", special:["frenesi", "fedor"], moves:MV("Mordida","Investida","Mordidas sem parar"), intro:"O galpão inteiro range. O rei dos ratos do porto, grande como um cachorro, sai de trás dos sacos de castanha."},
+  {id:"cobra_norato", lv:27, boss:true, name:"Cobra Norato", hp:340, xp:560, gold:[280,350], damage:[16,25], size:"chefe", special:["constricao", "prender"], moves:MV("Mordida","Bote","Abraço do rio"), intro:"A baía fica lisa como espelho. Uma cobra enorme, de olhos de luz, sobe junto ao cais: é Honorato, a Cobra Norato."},
+  {id:"mucura", lv:24, name:"Mucura", hp:160, xp:166, gold:[62,86], damage:[15,22], size:"pequeno", tint:"sepia(.4) brightness(.9)", special:"fedor", moves:MV("Mordida","Investida","Fedor"), intro:"Uma mucura sai de baixo do assoalho da palafita, com cara de quem não vai dividir o lixo com ninguém."},
+  {id:"rato_dagua", lv:24, name:"Rato-d'água", hp:158, xp:164, gold:[62,86], damage:[15,22], size:"pequeno", tint:"sepia(.6) saturate(1.2) brightness(.8)", special:"frenesi", moves:MV("Mordida","Mergulho","Mordidas sem parar"), intro:"Um rato-d'água sobe pela estaca da palafita, todo molhado e de dente amarelo."},
+  {id:"cachorro_bravo", lv:25, name:"Cachorro bravo", hp:170, xp:172, gold:[66,90], damage:[16,23], size:"médio", tint:"grayscale(.8) brightness(.55) contrast(1.2)", special:"frenesi", moves:MV("Mordida","Bote","Mordida sem largar"), intro:"Um cachorro preto, de corrente arrebentada, guarda a ponte de tábua e não deixa ninguém passar."},
+  {id:"ladrao_bike", lv:25, name:"Ladrão de bicicleta", hp:166, xp:180, gold:[72,98], damage:[16,23], size:"médio", special:["dinheiro", "roubo"], moves:MV("Empurrão","Atropelo","Passada rápida"), intro:"Um rapaz numa bicicleta sem freio vem a toda pela ponte, de olho na sua bolsa."},
+  {id:"jacare_canal", lv:28, boss:true, name:"Jacaré do canal", hp:350, xp:600, gold:[290,360], damage:[17,26], size:"chefe", tint:"brightness(.6) saturate(.7) hue-rotate(20deg)", special:["estouro", "prender"], moves:MV("Mordida","Bote do jacaré","Caudada"), intro:"Debaixo das palafitas, o canal escuro se mexe. O jacaré mais velho das Baixadas, que ninguém consegue tirar de lá, abre a boca."},
+  {id:"visagem_mare", lv:29, boss:true, name:"Visagem da maré", hp:360, xp:640, gold:[300,380], damage:[17,27], size:"chefe", special:["assobio", "drenar"], moves:MV("Toque gelado","Vulto","Assobio da maré"), intro:"A maré sobe de noite, sem vento. Na ponte de tábua aparece um vulto molhado, que some e aparece mais perto."},
   {id:"onca_rei", lv:9, boss:true, name:"Onça-Rei", hp:140, xp:150, gold:[100,140], damage:[9,15], size:"chefe", tint:"hue-rotate(-20deg) saturate(1.5) brightness(.8)", moves:MV("Arranhão","Bote","Rugido"), intro:"A mata inteira fica em silêncio. A Onça-Rei desce da pedra, e ela não está de passagem."}
 ];
 // zonas de caça: nível mínimo, sorteio com peso [id, peso] e o chefe (aparece após 4 vitórias)
@@ -69,13 +89,16 @@ const ZONES = {
   mata:    {n: "Mata", lv: 1, pool: [["preguica",3],["cassaco",3],["calango",3],["tatu",3],["macaco",2],["cotia",3],["quati",2],["tamandua",1]], boss: "queixada_chefe"},
   rio:     {n: "Beira do rio", lv: 2, pool: [["jacare",3],["piranha",3],["sucuri",2],["capivara",3],["ariranha",2],["poraque",2]], boss: "cobra_grande"},
   igarape: {n: "Igarapé", lv: 10, pool: [["tracaja",3],["garca",3],["jacaretinga",2],["ariranha",2],["boto",3],["piranha",1]], boss: "pirarucu"},
+  cidadevelha: {n: "Cidade Velha", lv: 20, pool: [["pombo",3],["gato",3],["iguana",3],["caramelo",2],["batedor",3]], boss: "iguana_rei"},
+  porto: {n: "Porto e Docas", lv: 22, pool: [["ratazana",3],["urubu_porto",3],["gaivota",3],["golpista",3]], boss: "ratao"},
+  baixadas: {n: "Baixadas", lv: 24, pool: [["mucura",3],["rato_dagua",3],["cachorro_bravo",3],["ladrao_bike",3]], boss: "jacare_canal"},
   varzea: {n: "Várzea dos búfalos", lv: 16, pool: [["bufalo",3],["soco",3],["jararaca",3],["capivara",1],["jacaretinga",1]], boss: "bufalo_touro"},
   seringal: {n: "Seringal abandonado", lv: 14, pool: [["urubu",3],["cobra_cipo",3],["ourico",3],["guaxinim",1]], boss: "gaviao_real"},
   manguezal: {n: "Manguezal", lv: 12, pool: [["caranguejo",3],["guaxinim",3],["macarico",3],["garca",1],["jacaretinga",1],["piranha",2]], boss: "caranguejo_rei"},
   fechada: {n: "Mata fechada", lv: 3, pool: [["surucucu",3],["onca",2],["harpia",2],["queixada",2],["jaguatirica",3],["anta",1],["caranguejeira",3]], boss: "onca_rei"}
 };
 // na batalha, estes bichos ficam meio dentro de um laguinho (os outros, no chão de terra)
-const WATER_BATTLE = new Set(["piranha", "poraque", "jacare", "ariranha", "sucuri", "cobra_grande", "boitata", "boto", "jacaretinga", "pirarucu", "boto_encantado", "tracaja"]);
+const WATER_BATTLE = new Set(["cobra_norato", "jacare_canal", "piranha", "poraque", "jacare", "ariranha", "sucuri", "cobra_grande", "boitata", "boto", "jacaretinga", "pirarucu", "boto_encantado", "tracaja"]);
 // à noite (G.night) cada zona tem outros bichos e um chefe do folclore; o resto (mapa, passagem) é o mesmo
 const NIGHT_ZONES = {
   mata:    {pool: [["morcego",3],["coruja",3],["lobo",2],["cassaco",2],["tatu",1]], boss: "chupacabra"},
@@ -84,7 +107,10 @@ const NIGHT_ZONES = {
   igarape: {pool: [["sapo",3],["jacaretinga",3],["morcego_pescador",2],["boto",2],["poraque",1]], boss: "boto_encantado"},
   manguezal: {pool: [["guaxinim",3],["caranguejo",3],["morcego_vampiro",2],["coruja",2],["poraque",1]], boss: "matinta"},
   seringal: {pool: [["ourico",3],["cobra_cipo",3],["urubu",2],["morcego_vampiro",2]], boss: "curupira"},
-  varzea: {pool: [["bufalo",3],["jararaca",3],["morcego_vampiro",2],["sapo",2],["boto",1]], boss: "mapinguari"}
+  varzea: {pool: [["bufalo",3],["jararaca",3],["morcego_vampiro",2],["sapo",2],["boto",1]], boss: "mapinguari"},
+  cidadevelha: {pool: [["gato",3],["caramelo",3],["batedor",3],["morcego_vampiro",1]], boss: "mulher_branco"},
+  porto: {pool: [["ratazana",3],["golpista",3],["urubu_porto",2],["morcego_pescador",1]], boss: "cobra_norato"},
+  baixadas: {pool: [["rato_dagua",3],["cachorro_bravo",3],["ladrao_bike",3],["mucura",2]], boss: "visagem_mare"}
 };
 const zoneDef = z => G.night && NIGHT_ZONES[z] ? {...ZONES[z], ...NIGHT_ZONES[z], n: ZONES[z].n + " à noite"} : ZONES[z];
 // chefe vencido: de dia é a zona; à noite, "zona:noite" (os chefes do folclore não abrem passagens)
@@ -95,7 +121,11 @@ const PELT = {morcego: "Asas de morcego", coruja: "Penas de coruja", lobo: "Pelo
   tracaja: "Casco de tracajá", garca: "Penas de garça", boto: "Dente de boto", jacaretinga: "Couro de jacaretinga", sapo: "Pele de sapo-cururu", pirarucu: "Escamas de pirarucu", boto_encantado: "Chapéu do Boto",
   caranguejo: "Casco de caranguejo", guaxinim: "Pelo de mão-pelada", macarico: "Penas de maçarico", caranguejo_rei: "Garra do Caranguejo-rei", matinta: "Xale da Matinta",
   urubu: "Penas de urubu-rei", cobra_cipo: "Couro de cobra-cipó", ourico: "Espinhos de ouriço", gaviao_real: "Penas de gavião-real", curupira: "Mecha de fogo do Curupira",
-  bufalo: "Couro de búfalo", soco: "Penas de socó", jararaca: "Couro de jararaca", bufalo_touro: "Chifre do Búfalo-touro", mapinguari: "Pelo do Mapinguari"};
+  bufalo: "Couro de búfalo", soco: "Penas de socó", jararaca: "Couro de jararaca", bufalo_touro: "Chifre do Búfalo-touro", mapinguari: "Pelo do Mapinguari",
+  pombo: "Penas de pombo", gato: "Pelo de gato de rua", iguana: "Couro de iguana", caramelo: "Coleira de caramelo", batedor: "Relógio recuperado", iguana_rei: "Couro da Iguana-rei",
+  mulher_branco: "Véu da Mulher de Branco", ratazana: "Couro de ratazana", urubu_porto: "Penas de urubu do porto", gaivota: "Penas de gaivota", golpista: "Bilhete premiado falso",
+  ratao: "Rabo do Ratão", cobra_norato: "Escama da Cobra Norato", mucura: "Pelo de mucura", rato_dagua: "Couro de rato-d'água", cachorro_bravo: "Corrente arrebentada",
+  ladrao_bike: "Campainha de bicicleta", jacare_canal: "Couro do Jacaré do canal", visagem_mare: "Lenço molhado da visagem"};
 // curiosidades do caderno de bichos (fauna de verdade; os chefes do folclore ganham a lenda)
 const ANIMAL_FACTS = {
   onca: "Maior felino das Américas. Nada muito bem e tem a mordida mais forte entre os felinos.",
@@ -151,7 +181,26 @@ const ANIMAL_FACTS = {
   soco: "O socó-boi fica parado de bico para cima no meio do capim e o desenho das penas faz ele sumir na paisagem.",
   jararaca: "Causa a maioria das picadas de cobra no Brasil. Do veneno dela saiu um remédio de pressão usado no mundo todo.",
   bufalo_touro: "O mais velho da manada. Os vaqueiros da várzea contam que nenhuma cerca segura ele quando a água sobe.",
-  mapinguari: "Lenda da Amazônia: um gigante peludo de um olho só, com a boca na barriga e um fedor que se sente de longe. Só anda de noite e grita para assustar os caçadores."
+  mapinguari: "Lenda da Amazônia: um gigante peludo de um olho só, com a boca na barriga e um fedor que se sente de longe. Só anda de noite e grita para assustar os caçadores.",
+  pombo: "O pombo veio da Europa e se espalhou pelas cidades do mundo todo. Acha o caminho de casa de muito longe.",
+  gato: "Gato de rua dorme até 16 horas por dia e caça rato e lagartixa pelos telhados dos casarões.",
+  iguana: "As iguanas de Belém vivem nas mangueiras das praças. Descem para tomar sol e, se cair na água, nadam muito bem.",
+  caramelo: "O vira-lata caramelo virou quase um símbolo do Brasil: esperto, resistente e dono de todas as ruas.",
+  batedor: "Na multidão, a bolsa vai na frente do corpo. Batedor de carteira escolhe quem anda distraído olhando para cima.",
+  iguana_rei: "Os vendedores da praça juram que há uma iguana com mais de um metro e meio que nunca desce da árvore mais alta.",
+  mulher_branco: "Lenda de muitas cidades do Brasil: uma moça de branco que aparece de noite em ruas antigas. Em Belém, assombração se chama \"visagem\".",
+  ratazana: "A ratazana nada bem, sobe em corda e cabe em buracos do tamanho de uma moeda grande.",
+  urubu_porto: "Os urubus do Ver-o-Peso e do porto limpam os restos de peixe: sem eles, a beira da baía seria muito mais fedida.",
+  gaivota: "Gaivota come quase tudo: peixe, caranguejo... e o salgado de quem bobear no cais.",
+  golpista: "O golpe do bilhete premiado é velho: alguém diz que tem um bilhete ganhador e pede dinheiro para \"ajudar\". Desconfie de sorte fácil.",
+  ratao: "Os estivadores contam de um rato do tamanho de um cachorro que vive no galpão mais velho do porto.",
+  cobra_norato: "Lenda amazônica: Honorato nasceu encantado em cobra grande e nada pelos rios do Pará. Dizem que só um corajoso pode quebrar o encanto.",
+  mucura: "É o gambá, chamado de mucura no Pará. Come insetos, frutas e até cobra, e não é afetado pelo veneno de muitas delas.",
+  rato_dagua: "Vive na beira dos canais e nada muito bem, com os pés de trás meio de pato.",
+  cachorro_bravo: "Cachorro preso em corrente fica mais bravo. Bicho bem cuidado e solto no quintal costuma ser bem mais calmo.",
+  ladrao_bike: "Bicicleta boa merece cadeado bom, preso em coisa firme. Ladrão de bicicleta escolhe a que dá menos trabalho.",
+  jacare_canal: "Em alguns canais de Belém ainda aparecem jacarés: eles vêm pelos rios e se escondem embaixo das palafitas.",
+  visagem_mare: "Nas Baixadas contam de uma visagem que sobe com a maré cheia e anda pelas pontes de tábua. Quem é de lá não sai de casa nessa hora."
 };
 // jeito de cada bicho se mexer parado (ver makeBeastActor em gfx/actors.js) e brilho dos chefes
 const MOTION = {
@@ -162,8 +211,11 @@ const MOTION = {
   caranguejo: "jitter", caranguejo_rei: "jitter", macarico: "hop", matinta: "slow2",
   urubu: "hover", gaviao_real: "hover", cobra_cipo: "sway", ourico: "curl", curupira: "hop",
   bufalo: "snort", bufalo_touro: "snort", jararaca: "sway", mapinguari: "slow",
+  pombo: "hop", gaivota: "hover", urubu_porto: "hover", iguana: "slow2", iguana_rei: "slow2", cobra_norato: "sway",
+  batedor: "person", golpista: "person", ladrao_bike: "person", mulher_branco: "hover", visagem_mare: "hover",
 };
 const AURA = {queixada_chefe: ["#ff8a3a", "#ffd23a"], cobra_grande: ["#7cf2ff", "#b06ad6"], onca_rei: ["#e5001c", "#ffd23a"],
   chupacabra: ["#e5001c", "#7a1a2a"], mula: ["#ff8a3a", "#ffd23a"], boitata: ["#ffd23a", "#ff5a1c"],
   pirarucu: ["#e5001c", "#ff8a3a"], boto_encantado: ["#ff9fd0", "#ffffff"], caranguejo_rei: ["#7cf2ff", "#ffffff"], matinta: ["#b06ad6", "#2a2230"],
-  gaviao_real: ["#ffd23a", "#ffffff"], curupira: ["#ff5a1c", "#ffd23a"], bufalo_touro: ["#e5001c", "#ffffff"], mapinguari: ["#9bd34a", "#7a4a2a"]};
+  gaviao_real: ["#ffd23a", "#ffffff"], curupira: ["#ff5a1c", "#ffd23a"], bufalo_touro: ["#e5001c", "#ffffff"], mapinguari: ["#9bd34a", "#7a4a2a"],
+  iguana_rei: ["#7dff9a", "#ffd23a"], mulher_branco: ["#ffffff", "#bfe8ff"], ratao: ["#9a9aa0", "#e5001c"], cobra_norato: ["#7cf2ff", "#ffffff"], jacare_canal: ["#7a8a4a", "#ffd23a"], visagem_mare: ["#9ad8d0", "#ffffff"]};

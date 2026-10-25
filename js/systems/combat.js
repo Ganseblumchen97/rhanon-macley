@@ -8,7 +8,10 @@ function setBattleDecor(zone) {
   if (!stage.querySelector(".night-shade")) decor.insertAdjacentHTML("afterend", '<div class="night-shade" aria-hidden="true"></div>');
   stage.classList.toggle("night", !!G.night);
   decor.innerHTML = "";
-  if (zone === "rio" || zone === "igarape" || zone === "manguezal" || zone === "varzea") {   // água: juncos e vitória-régia
+  if (["cidadevelha", "porto", "baixadas"].includes(zone)) {   // cidade: casarões/galpões ao fundo (e água nas Baixadas)
+    for (let i = 1; i <= 4; i++) { const p = document.createElement("div"); p.className = "predio p" + i; decor.appendChild(p); }
+    if (zone === "baixadas") { const reeds = document.createElement("div"); reeds.className = "reeds"; for (let i = 0; i < 10; i++) { const r = document.createElement("div"); r.className = "reed"; r.style.height = `calc(${7 + Math.random() * 5} * var(--px))`; reeds.appendChild(r); } decor.appendChild(reeds); }
+  } else if (zone === "rio" || zone === "igarape" || zone === "manguezal" || zone === "varzea") {   // água: juncos e vitória-régia
     const reeds = document.createElement("div"); reeds.className = "reeds";
     for (let i=0;i<12;i++){ const r=document.createElement("div"); r.className="reed"; r.style.height=`calc(${8 + Math.random()*6} * var(--px))`; reeds.appendChild(r); }
     decor.appendChild(reeds);
@@ -273,7 +276,8 @@ function finish(kind) {
   busy = true; battleResult = kind;
   musicStop(); keepVitals(kind); const rw = kind === "win" ? reward() : kind === "lose" ? " Rhanon desmaiou e acordou na aldeia, com metade das forças" + (G.lastLoss ? ` e R$ ${G.lastLoss} a menos.` : ".") : ""; if (kind === "win") $("beast").classList.add("dead"); fanfare(kind);
   const T = {
-    win:  ["Rhanon sobreviveu!", `${e.name} foi vencido ou afugentado. A mata guarda mais encontros e recompensas diferentes. Rhanon ainda não sabe, mas o futuro dele tem teclado, pendrive e uma lojinha de cópias.`],
+    win:  ["Rhanon sobreviveu!", cityOf(curZone) === "belem" ? `${e.name} foi vencido ou afugentado. A capital é grande, barulhenta e cheia de surpresas: cada rua tem um perigo e um trocado diferente.`
+      : `${e.name} foi vencido ou afugentado. A mata guarda mais encontros e recompensas diferentes. Rhanon ainda não sabe, mas o futuro dele tem teclado, pendrive e uma lojinha de cópias.`],
     flee: ["Fugiu com dignidade.", `Correr também é estratégia de sobrevivência. ${e.name} fica para a próxima, e Rhanon fica para contar a história.`],
     lose: ["Fim da trilha.", `${e.name} foi mais forte desta vez. Mas todo grande programador de Curitiba tem uma origem difícil: tente de novo.`]
   }[kind];
@@ -442,6 +446,10 @@ function special() {
   else if (s === "assobio") { const n = hit(Math.ceil(d * .7)); p.medo = 3; setTimeout(() => HERO_A.set("scared"), 400); say(`"Fiiit!" O assobio da ${e.name} gela o sangue: −${n} PV. Rhanon fica com medo, sem defesa por 3 turnos.`); }
   else if (s === "espinhos") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Espinhos"}; say(`${e.name} se sacode e crava espinhos em Rhanon! −${n} PV e −3 por turno até tirar todos.`); }
   else if (s === "confusao") { const n = hit(Math.ceil(d * .6)); p.weak = 3; say(`${e.name} corre para trás e deixa pegadas trocadas. −${n} PV, e Rhanon fica perdido: golpes mais fracos por 3 turnos.`); }
+  else if (s === "dinheiro") {   // malandro: leva dinheiro de verdade; vencendo, ele devolve (reward)
+    const n = Math.min(G.money, rnd(20, 45)); G.money -= n; e.stolen = (e.stolen || 0) + n; foeAttack("roar", 0);
+    say(n ? `${e.name} passa a mão na sua carteira: −R$ ${n}! Vença para recuperar.` : `${e.name} enfia a mão na sua bolsa... e não acha nem uma moeda.`);
+  }
   else if (s === "casco") { e.hp = Math.min(e.max, e.hp + 12); foeAttack("roar", 0); say(`${e.name} se recolhe no casco e recupera 12 PV.`); }
   else if (s === "encanto") { const n = hit(Math.ceil(d * .6)); p.medo = 2; p.sp = Math.max(0, p.sp - 5); setTimeout(() => HERO_A.set("scared"), 400); say(`${e.name} assobia uma música encantada... −${n} PV e −5 PE. Rhanon fica tonto, sem defesa por 2 turnos.`); }
   else if (s === "salto") say(`${e.name} salta do galho em cima de Rhanon! −${hit(Math.ceil(d * 1.5))} PV.`);
@@ -468,6 +476,7 @@ function tick() {
 // drop = a pele fica no chão da exploração (golpe só) em vez de ir direto para a bolsa
 function reward(a = e, mult = 1, drop = false) {
   noteWin(a.id);   // caderno de bichos e pedido de "vencer"
+  const back = a.stolen || 0; if (back) { G.money += back; a.stolen = 0; }   // dinheiro que o malandro levou volta
   if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit(); if (!drop) G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }
@@ -475,11 +484,11 @@ function reward(a = e, mult = 1, drop = false) {
   drawXp();
   vit(); G.hp = Math.min(maxHP(G.lv), G.hp + maxHP(G.lv) - maxHP(L0)); G.sp = Math.min(maxSP(G.lv), G.sp + maxSP(G.lv) - maxSP(L0));
   save();
-  return (drop ? ` Ganhou ${xp} XP. ${peltName(a.id)} ficou no chão: passe por cima para pegar.` : ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).`) + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : a.boss && NEED.parada === curZone && !G.night ? " A trilha chegou ao fim: a BR-316 está liberada no mapa." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
+  return (back ? ` Recuperou os R$ ${back} que ele levou.` : "") + (drop ? ` Ganhou ${xp} XP. ${peltName(a.id)} ficou no chão: passe por cima para pegar.` : ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).`) + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : a.boss && NEED.parada === curZone && !G.night ? " A trilha chegou ao fim: a BR-316 está liberada no mapa." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
 }
 function keepVitals(kind) {
   vit();
-  if (kind === "lose") { G.hp = Math.ceil(maxHP(G.lv) / 2); G.sp = Math.ceil(maxSP(G.lv) / 2); G.lastLoss = Math.round(G.money * (.05 + Math.random() * .1)); G.money -= G.lastLoss; G.sub = "aldeia"; G.day++; }
+  if (kind === "lose") { G.hp = Math.ceil(maxHP(G.lv) / 2); G.sp = Math.ceil(maxSP(G.lv) / 2); G.lastLoss = Math.round(G.money * (.05 + Math.random() * .1)); G.money -= G.lastLoss; G.sub = CITY[curCity()].home; G.day++; }   // acorda na aldeia (ou no Ver-o-Peso, em Belém)
   else { G.hp = Math.max(1, p.hp); G.sp = p.sp; G.items = p.items; }
   save();
 }

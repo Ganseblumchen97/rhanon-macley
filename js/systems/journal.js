@@ -88,7 +88,7 @@ function villagerTalk(look, say, d) {
     if (questReady()) { say(name, act.thanks.split("!")[0] + "! Trouxe o que eu pedi?"); btn("Entregar", questDeliver, false, d); }
     else say(name, `${act.text} (${questGoal(act)}: ${questCount(act)} de ${act.need.n})`);
   } else if (off && off.giver === look) { say(name, off.text); lh(`Recompensa: ${rewardText(off.reward)}.`, d); btn("Aceitar o pedido", questAccept, false, d); }
-  else say(name, VILLAGER_TIPS[Math.floor(Math.random() * VILLAGER_TIPS.length)]);
+  else { const tips = look.startsWith("urbano") ? BELEM_TIPS : VILLAGER_TIPS; say(name, tips[Math.floor(Math.random() * tips.length)]); }
 }
 // linha do pedido na bolsa
 const questLine = () => { const q = G.quest && questById(G.quest.id); return q ? `<br>Pedido de ${VILLAGER_NAME[q.giver].toLowerCase()}: ${questGoal(q)} (${questCount(q)} de ${q.need.n})` : ""; };
