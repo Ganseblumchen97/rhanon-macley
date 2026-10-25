@@ -17,35 +17,39 @@ function localDone(where, msg) {
 }
 function drawLocal() {
   vit();
-  $("lhud").textContent = `Dia ${G.day} · Nv ${G.lv} · R$ ${G.money} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · DEF ${defense()} · Itens ×${itemCount(G.items)} · Peles ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
+  $("lhud").textContent = `Dia ${G.day}${G.night ? " (noite)" : ""} · Nv ${G.lv} · R$ ${G.money} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · DEF ${defense()} · Itens ×${itemCount(G.items)} · Peles ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
   Object.keys(SUB).forEach(k => $("ln-" + k).classList.toggle("locked", !unlocked(k)));
   const l = SUB[G.sub]; $("lmk").setAttribute("transform", `translate(${l.x} ${l.y})`);
 }
 function selectSub(id, msg) {
   sfx("blip"); vit(); markNode("local", id);
-  const l = SUB[id], z = ZONES[id], here = id === G.sub, i = $("linfo"), lock = z && !unlocked(id);
+  const l = SUB[id], z = ZONES[id] && zoneDef(id), here = id === G.sub, i = $("linfo"), lock = z && !unlocked(id);
   i.innerHTML = `<h2>${l.n}</h2><p>${l.txt}</p>` + (here ? '<p class="hint">Você está aqui.</p>' : "");
   if (!here) { btn(lock ? `${l.n} (vença o chefe: ${SUB[NEED[id]].n})` : "Ir até lá", () => goSub(id), lock, i); if (lock) lh(`Derrote o chefe de ${SUB[NEED[id]].n} para liberar este local.`); }
   else if (id === "aldeia" || id === "feira") {
     btn(id === "aldeia" ? "Entrar na aldeia" : "Entrar na feira", () => startExplore(id), false, i);
-    lh(id === "aldeia" ? "Lá dentro fica a fogueira: descanse ou durma até o amanhecer. Os aldeões dão dicas." : "Lá dentro o vendedor compra suas peles e vende comida e roupas.");
+    lh(id === "aldeia" ? "Lá dentro fica a fogueira: descanse até a noite ou durma até o dia seguinte. Os aldeões dão dicas." : "Lá dentro o vendedor compra suas peles e vende comida e roupas.");
   }
   else if (z) {
     btn("Explorar", () => startExplore(id), false, i);
-    lh(BS()[id] ? "Chefe derrotado ✓ · a passagem no fim da trilha está aberta." : `O chefe (${ANIMALS.find(a => a.id === z.boss).name}) espera no fim da trilha.`);
+    if (G.night) lh(BS()[bossKey(id)] ? `${ANIMALS.find(a => a.id === z.boss).name} derrotado ✓` : `É noite: os bichos são outros e o ${ANIMALS.find(a => a.id === z.boss).name} ronda o fim da trilha.`);
+    else lh(BS()[id] ? "Chefe derrotado ✓ · a passagem no fim da trilha está aberta." : `O chefe (${ANIMALS.find(a => a.id === z.boss).name}) espera no fim da trilha.`);
     if (G.hp < maxHP(G.lv) * .35) lh("Rhanon está muito ferido. Descanse na aldeia antes de caçar.");
   }
   if (msg) lh(msg);
   btn("Inventário", showInv, false, i);
   btn("Voltar ao mapa do " + MAP_REGIONS[MAP_REGION].n, closeLocal, false, i);
 }
+// kind: "dormir" (tudo, vira o dia seguinte), "noite" (metade, vira noite) ou "fogueira" (ponto de descanso da trilha: tudo, sem mudar a hora)
 // quiet = o galo já cantou na cena da fogueira (exploração)
 function rest(kind, quiet) {
-  vit(); const f = kind === "dormir" ? 1 : .5;
+  vit(); const f = kind === "noite" ? .5 : 1;
   G.hp = Math.min(maxHP(G.lv), G.hp + Math.ceil(maxHP(G.lv) * f)); G.sp = Math.min(maxSP(G.lv), G.sp + Math.ceil(maxSP(G.lv) * f));
-  if (kind === "dormir") { G.day++; if (!quiet) setTimeout(() => sfx("galo"), 450); }   // amanhece com o galo
+  if (kind === "dormir") { G.day++; G.night = false; if (!quiet) setTimeout(() => sfx("galo"), 450); }   // amanhece com o galo
+  if (kind === "noite") G.night = true;
   save(); sfx("heal");
-  localDone("aldeia", kind === "dormir" ? `Rhanon dormiu até o amanhecer. Dia ${G.day}.` : "Rhanon descansou junto à fogueira.");
+  localDone("aldeia", kind === "dormir" ? `Rhanon dormiu até o dia seguinte. Dia ${G.day}.` : kind === "noite" ? "Rhanon descansou até a noite. À noite a mata é outra: cuidado com o que ronda o escuro."
+    : "Rhanon recuperou toda a vida e a energia junto à fogueira.");
 }
 // compra um item da barraca de comida (vai para a bolsa)
 function buy(id) {

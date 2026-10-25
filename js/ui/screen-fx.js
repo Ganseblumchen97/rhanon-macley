@@ -71,20 +71,50 @@ function sunCanvas() {
   d.dots([[13, 22], [27, 22]], "#ff7a5a");
   return d.canvas();
 }
-// mid = chamado quando a faixa cobre a tela (troca a noite pelo dia); o galo canta no meio
-function dawnWipe(mid, label) {
+// lua do mal (estilo Majora's Mask): olhos arregalados, sobrancelhas bravas e um sorriso cheio de dentes
+function moonCanvas() {
+  const d = rigGrid(1, 40, 40);
+  d.part().ellipse(20, 20, 17, 17, "#e6d49a", "#b49a5c", .5).dots([[9, 10], [10, 10], [30, 28], [31, 29], [27, 9], [8, 27]], "#c8b47a");   // crateras
+  d.part().ellipse(13, 16, 4.5, 3.5, "#ffcc33").ellipse(27, 16, 4.5, 3.5, "#ffcc33");
+  d.ellipse(13, 16, 1.6, 2.4, "#1a1426").ellipse(27, 16, 1.6, 2.4, "#1a1426").dots([[12, 15], [26, 15]], "#ffffff");
+  d.limb(8, 10, 17, 13, 1.5, "#4a3420").limb(32, 10, 23, 13, 1.5, "#4a3420");   // sobrancelhas
+  d.part().poly([[8, 24], [32, 24], [26, 31], [14, 31]], "#3a1a1a");
+  for (let x = 10; x < 31; x += 3) d.rect(x, 24, 2, 2, "#f4ecd8");   // dentes de cima
+  for (let x = 15; x < 26; x += 3) d.rect(x, 29, 2, 2, "#f4ecd8");   // dentes de baixo
+  return d.canvas();
+}
+// lobo-guará sentado; howl = cabeça para cima, uivando
+function wolfCanvas(howl) {
+  const d = rigGrid(1, 44, 40), hx = howl ? -1 : 0, hy = howl ? -4 : 0;
+  d.part().limb(30, 28, 38, 22, 4, "#c8641c", "#8a3e10").limb(38, 22, 41, 18, 3, "#f4ecd8");   // rabo com ponta branca
+  d.part().limb(24, 28, 25, 38, 3, "#1a1414").limb(29, 29, 31, 38, 3, "#1a1414");   // patas de trás
+  d.part().ellipse(26, 27, 8, 7, "#c8641c", "#8a3e10", .5);
+  d.part().limb(18, 24, 17, 38, 3, "#1a1414").limb(21, 25, 21, 38, 3, "#1a1414");   // patas da frente
+  d.part().limb(22, 24, 16 + hx, 14 + hy, 6, "#c8641c", "#8a3e10").limb(20, 21, 18 + hx, 15 + hy, 3, "#1a1414");   // pescoço e crina
+  d.part().poly([[16 + hx, 9 + hy], [17 + hx, 3 + hy], [20 + hx, 9 + hy]], "#c8641c").poly([[13 + hx, 9 + hy], [13 + hx, 3 + hy], [16 + hx, 8 + hy]], "#c8641c");   // orelhas
+  d.part().ellipse(15 + hx, 12 + hy, 4.5, 3.5, "#c8641c", "#8a3e10", .6);
+  if (howl) d.part().poly([[12, 8], [6, 1], [9, 7]], "#1a1414").poly([[12, 10], [7, 9], [11, 12]], "#1a1414");   // focinho para cima, boca aberta
+  else d.part().poly([[12, 11], [6, 13], [12, 14]], "#1a1414");
+  d.dots([[15 + hx, 11 + hy]], "#ffd23a");
+  return d.canvas();
+}
+// mid = chamado quando a faixa cobre a tela (troca a noite pelo dia ou o dia pela noite);
+// de dia o galo canta com o sol no canto; night = anoitecer, com a lua do mal e um lobo uivando
+function dawnWipe(mid, label, night) {
   let w = $("dawnWipe");
   if (!w) {
     w = document.createElement("div"); w.id = "dawnWipe"; w.className = "wipe dawn";
     w.innerHTML = '<div class="dawn-sun"></div><div class="dawn-galo"></div><b class="dawn-txt"></b>';
     document.body.appendChild(w);
-    w.querySelector(".dawn-sun").appendChild(sunCanvas());
   }
-  const frames = [roosterCanvas(false), roosterCanvas(true)], g = w.querySelector(".dawn-galo");
-  g.replaceChildren(frames[0]); w.querySelector(".dawn-txt").textContent = label || "Amanheceu";
+  w.classList.toggle("dusk", !!night);
+  w.querySelector(".dawn-sun").replaceChildren(night ? moonCanvas() : sunCanvas());
+  const frames = night ? [wolfCanvas(false), wolfCanvas(true)] : [roosterCanvas(false), roosterCanvas(true)], g = w.querySelector(".dawn-galo");
+  g.replaceChildren(frames[0]); w.querySelector(".dawn-txt").textContent = label || (night ? "Anoiteceu" : "Amanheceu");
   w.classList.remove("go"); void w.offsetWidth; w.classList.add("go");
   setTimeout(mid, DAWN_MS * .22);
-  setTimeout(() => sfx("galo"), DAWN_MS * .3);
+  setTimeout(() => sfx(night ? "uivo" : "galo"), DAWN_MS * .3);
+  if (night) { setTimeout(() => g.replaceChildren(frames[1]), DAWN_MS * .3); setTimeout(() => g.replaceChildren(frames[0]), DAWN_MS * .72); return; }   // uivo longo
   [.3, .38, .44, .5, .58, .64].forEach((p, i) => setTimeout(() => g.replaceChildren(frames[(i + 1) % 2]), DAWN_MS * p));   // bico abrindo no "có-có-ri-cóóó"
 }
 function applyTheme() {

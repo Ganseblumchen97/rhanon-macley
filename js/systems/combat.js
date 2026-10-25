@@ -4,6 +4,9 @@ function setBattleDecor(zone) {
   if (!stage || !decor) return;
   stage.classList.remove("zone-mata","zone-rio","zone-fechada");
   stage.classList.add("zone-" + (zone || curZone || "mata"));
+  // à noite: um véu azul-escuro com a lua por cima do cenário (embaixo das plataformas e dos personagens)
+  if (!stage.querySelector(".night-shade")) decor.insertAdjacentHTML("afterend", '<div class="night-shade" aria-hidden="true"></div>');
+  stage.classList.toggle("night", !!G.night);
   decor.innerHTML = "";
   if (zone === "rio") {
     const reeds = document.createElement("div"); reeds.className = "reeds";
@@ -135,7 +138,7 @@ function render() {
   $("intent").className = "intent" + (e.known ? " known" : "");
   const st = [];
   if (p.atento) st.push("Atento: próximo ataque crítico");
-  if (p.def) st.push("Em guarda"); if (p.dot && p.dot.t > 0) st.push(p.dot.n); if (p.weak > 0) st.push("Fedor"); if (p.preso > 0) st.push("Preso");
+  if (p.def) st.push("Em guarda"); if (p.dot && p.dot.t > 0) st.push(p.dot.n); if (p.weak > 0) st.push("Fedor"); if (p.preso > 0) st.push("Preso"); if (p.medo > 0) st.push("Medo: sem defesa");
   if (e.assustada) st.push(`${e.name} assustado`);
   $("status").textContent = st.join(" · ");
   if (!subMenu) CMDS.forEach((c, i) => {
@@ -199,10 +202,10 @@ function act(id) {
 function enemyTurn() {
   const i = e.intent;
   if (i === "arranhao") {
-    let d = rnd(e.damage[0], Math.max(e.damage[0], Math.min(e.damage[1], e.damage[0]+3))); if (p.def) d = Math.ceil(d / 2); d = Math.max(1, d - defense());
+    let d = rnd(e.damage[0], Math.max(e.damage[0], Math.min(e.damage[1], e.damage[0]+3))); if (p.def) d = Math.ceil(d / 2); d = Math.max(1, d - pdef());
     p.hp -= d; foeAttack("claw", d); say(`${e.name} ataca Rhanon: −${d} PV.`);
   } else if (i === "bote") {
-    let d = rnd(Math.max(e.damage[0], e.damage[1]-4), e.damage[1]); d = Math.max(1, d - defense());
+    let d = rnd(Math.max(e.damage[0], e.damage[1]-4), e.damage[1]); d = Math.max(1, d - pdef());
     if (p.def) {
       d = Math.ceil(d * .35); e.hp = Math.max(0, e.hp - 4); hitBeast();
       say(`Rhanon se esquiva e o bote perde força: −${d} PV. Contra-ataque: −4 em ${e.name.toLowerCase()}.`);
@@ -240,14 +243,27 @@ function finish(kind) {
 }
 // golpe do bicho: anima, e o dano aparece na barra só quando o golpe "chega"
 function foeAttack(kind, d, sp0) {
-  BEAST_A.set(kind === "roar" ? "roar" : "windup");
+  BEAST_A.set(kind === "roar" || kind === "fire" ? "roar" : "windup");
   holdP = {hp: p.hp + d, sp: sp0 === undefined ? p.sp : sp0};
   if (kind === "roar") { animalCry(e.id, e.boss); anim($("beast"), "hit"); }
+  else if (kind === "fire") foeFlames();
   else { anim($("beast"), "lunge"); sfx("claw"); }
   setTimeout(() => {
     holdP = null; render();
     if (d) { anim($("hero"), "hurt"); sfx("hurt"); hurtFx(kind, d); pop("−" + d, $("hero"), "me"); if (HERO_A.state !== "defeat") HERO_A.set("hurt"); }
-  }, kind === "roar" ? 400 : 220);
+  }, kind === "roar" ? 400 : kind === "fire" ? 1000 : 220);
+}
+// labareda do bicho (Mula sem cabeça): chamas saem dele e atravessam até o Rhanon
+function foeFlames() {
+  const a = pos($("beast")), b = pos($("hero"));
+  animalCry(e.id, e.boss); sfx("fire");
+  for (let i = 0; i < 8; i++) setTimeout(() => {
+    const c = gridC(FLAME, PAL_F, 3 + (i % 3)), sx = a.x - 30, sy = a.y - 20, wob = (i % 2 ? -1 : 1) * (8 + i * 2);
+    c.style.left = sx + "px"; c.style.top = sy + "px"; $("fx").appendChild(c);
+    c.animate([{transform: "translate(-50%,-50%) scale(.4)"}, {transform: `translate(calc(-50% + ${(b.x - sx) / 2}px),calc(-50% + ${(b.y - sy) / 2 + wob}px)) scale(1)`, offset: .5},
+      {transform: `translate(calc(-50% + ${b.x - sx}px),calc(-50% + ${b.y - sy}px)) scale(1.3)`, opacity: .7}], {duration: 600, easing: "steps(10)", fill: "forwards"}).onfinish = () => c.remove();
+    if (i % 3 === 0) sfx("fire");
+  }, 150 + i * 60);
 }
 // golpe do Rhanon; cada ataque tem seu ritmo. msg vai para o registro no impacto. Devolve quanto dura (ms).
 function strike(d, cls, kind, msg) {
@@ -320,12 +336,19 @@ function strike(d, cls, kind, msg) {
 // barra de XP do painel do Rhanon (quanto falta para o próximo nível)
 function drawXp() { $("xpb").style.width = (100 * G.xp / need(G.lv)) + "%"; $("xpTxt").textContent = G.xp + " / " + need(G.lv); }
 function pickAnimal() {
-  if (bossFight && !BS()[curZone]) return ANIMALS.find(a => a.id === ZONES[curZone].boss);
+  if (bossFight && !BS()[bossKey(curZone)]) return ANIMALS.find(a => a.id === zoneDef(curZone).boss);
   return pickFromPool(curZone);
 }
+// defesa na hora do golpe: com medo (chocalho do Boitatá, uivo do lobo) ela some e o golpe ainda dói mais
+const pdef = () => p && p.medo > 0 ? -2 : defense();
 function special() {
-  const s = e.special, d = rnd(e.damage[0], e.damage[1]);
-  const hit = (n, k) => { if (p.def) n = Math.ceil(n / 2); n = Math.max(1, n - defense()); p.hp -= n; foeAttack(k || "claw", n); return n; };
+  const s = Array.isArray(e.special) ? e.special[Math.floor(Math.random() * e.special.length)] : e.special, d = rnd(e.damage[0], e.damage[1]);   // lista = sorteia um dos golpes
+  const hit = (n, k) => { if (p.def) n = Math.ceil(n / 2); n = Math.max(1, n - pdef()); p.hp -= n; foeAttack(k || "claw", n); return n; };
+  if (s === "drenar") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Drenagem"}; say(`${e.name} crava os dentes e começa a drenar a vida de Rhanon! −${n} PV, e vai sugar 3 PV por turno.`); return; }
+  if (s === "fogo") { const n = hit(Math.ceil(d * 1.4), "fire"); p.dot = {d: 3, t: 2, n: "Queimadura"}; say(`${e.name} solta uma labareda pelo pescoço! −${n} PV e queimadura por 2 turnos.`); return; }
+  if (s === "prender") { const n = hit(d); p.preso = 3; say(`${e.name} se enrola em Rhanon! −${n} PV. Rhanon fica preso por 3 turnos e não consegue fugir.`); return; }
+  if (s === "chocalho") { p.medo = 3; foeAttack("roar", 0); setTimeout(() => HERO_A.set("scared"), 400); say(`${e.name} balança o chocalho de fogo... Rhanon treme de medo! Sem defesa por 3 turnos.`); return; }
+  if (s === "uivo") { p.medo = 2; foeAttack("roar", 0); setTimeout(() => HERO_A.set("scared"), 400); say(`${e.name} solta um uivo longo no escuro. Rhanon se arrepia de medo! Sem defesa por 2 turnos.`); return; }
   if (s === "fedor") { p.weak = 3; foeAttack("roar", 0); say(`${e.name} solta um fedor horrível! Seus golpes enfraquecem por 3 turnos.`); }
   else if (s === "roubo") {
     const k = bagIds()[0];
@@ -344,14 +367,19 @@ function special() {
   else if (s === "picada") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Veneno"}; say(`${e.name} pica Rhanon! −${n} PV e veneno por 3 turnos.`); }
 }
 function tick() {
-  if (p.dot && p.dot.t > 0) { p.hp -= p.dot.d; say(`${p.dot.n}: −${p.dot.d} PV.`); p.dot.t--; }
+  if (p.dot && p.dot.t > 0) {
+    p.hp -= p.dot.d; p.dot.t--;
+    if (p.dot.n === "Drenagem") { e.hp = Math.min(e.max, e.hp + p.dot.d); say(`Drenagem: −${p.dot.d} PV, e ${e.name.toLowerCase()} recupera ${p.dot.d}.`); }
+    else say(`${p.dot.n}: −${p.dot.d} PV.`);
+  }
+  if (p.medo > 0) p.medo--;
   if (p.weak > 0) p.weak--;
   if (p.preso > 0) p.preso--;
 }
 // XP, pele e progresso por vencer o bicho a (na batalha, o bicho atual); mult reduz o XP (abate direto)
 // drop = a pele fica no chão da exploração (golpe só) em vez de ir direto para a bolsa
 function reward(a = e, mult = 1, drop = false) {
-  if (a.boss) BS()[curZone] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit(); if (!drop) G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
+  if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit(); if (!drop) G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }
   if (G.lv > L0) setTimeout(() => levelUpFx(G.lv), $("explore").hidden ? 1800 : 150);   // na batalha, espera o cartão de vitória

@@ -63,7 +63,9 @@ function slash(el) {
   });
 }
 function hurtFx(kind, d) {
-  if (kind === "roar") burst(pos($("hero")), ["#e03a2f", "#f4ecd8"], 8, 50); else slash($("hero"));
+  if (kind === "roar") burst(pos($("hero")), ["#e03a2f", "#f4ecd8"], 8, 50);
+  else if (kind === "fire") burst(pos($("hero")), ["#ffd23a", "#f2740c", "#d62828"], 12, 60);
+  else slash($("hero"));
   if (d >= 10) shake();
 }
 function pop(txt, el, cls) {

@@ -500,3 +500,11 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 @keyframes sunrise{0%,15%{translate:0 10vmin;opacity:0}45%{translate:0 0;opacity:1}}
 .dawn-galo{position:absolute;left:50%;top:50%;width:22vmin;translate:-50% -72%;z-index:1}
 .dawn-txt{position:absolute;left:50%;top:calc(50% + 7vmin);translate:-50% 0;z-index:1;font:2.6vmin/1 "Anton",sans-serif;letter-spacing:.12em;color:#1e1838;text-transform:uppercase;rotate:-4deg}
+/* batalha à noite: véu azul com a lua no alto */
+.stage .night-shade{position:absolute;inset:0;z-index:0;pointer-events:none;display:none;background:radial-gradient(circle at 86% 13%,#fff4c8 0 3.2%,rgba(255,236,170,.25) 4%,rgba(255,236,170,.06) 10%,transparent 18%),rgba(8,12,44,.66)}
+.stage.night .night-shade{display:block}
+/* anoitecer (dawnWipe com night): faixa azul-escura, lua do mal no canto e lobo uivando */
+.wipe.dusk{background:#0b0b24}
+.wipe.dusk::after{background:#3a4aa8}
+.wipe.dusk .dawn-txt{color:#f4ecd8}
+.wipe.dusk .dawn-sun{width:19vmin}

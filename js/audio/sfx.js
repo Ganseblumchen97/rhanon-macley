@@ -40,6 +40,7 @@ const SFX = {
   // golpe crítico: "ting!" agudo em duas notas e um impacto grave
   ronco: t => ronco(t),
   galo: t => galo(t),
+  uivo: t => uivo(t),
   critico: t => { tone(1568, t, .08, "square", .08); tone(2093, t + .07, .3, "triangle", .09); noise(t + .02, .3, .24, 300); tone(95, t + .02, .38, "sawtooth", .17, 40); }
 };
 function sfx(n) { if (AC) SFX[n](AC.currentTime); }
@@ -67,6 +68,11 @@ function ronco(t) {
   hum(t, .75, .22, 180, 3, .5); voice(62, t, .75, "sawtooth", .05, 75, 22, 8);
   voice(1500, t + .85, .45, "sine", .09, 2000);
 }
+// uivo de lobo: sobe devagar, segura tremendo e cai
+function uivo(t) {
+  voice(360, t, .55, "triangle", .13, 620, 5, 6); voice(620, t + .5, 1.1, "triangle", .14, 380, 6, 16);
+  voice(720, t + .5, 1.0, "sine", .05, 470, 6, 18); hum(t, 1.4, .03, 900, 1, .4);
+}
 // galo: "có-có-ri-cóóó"
 function galo(t) {
   [[560, .11], [640, .11], [820, .17]].forEach(([f, d], i) => voice(f, t + i * .15, d, "sawtooth", .1, f * 1.05, 7, 12));
@@ -91,11 +97,18 @@ const CRIES = {
   tatu: (t, k) => [0, .09, .18, .27].forEach(o => hum(t + o, .06, .1 * k, 950, 3)),
   piranha: (t, k) => { [0, .12].forEach(o => { hum(t + o, .05, .16 * k, 1300, 2); voice(320, t + o, .05, "square", .06 * k, 140); }); [800, 1150].forEach((f, i) => voice(f, t + .3 + i * .07, .05, "sine", .06 * k, f * 1.3)); },
   eletrico: (t, k) => { voice(60, t, .55, "square", .08 * k, 70, 45, 30); hum(t, .5, .12 * k, 4500, 1); },
-  aranha: (t, k) => { hum(t, .3, .1 * k, 2800, 1.5, .05); [.32, .38, .44].forEach(o => hum(t + o, .02, .14 * k, 4000, 4)); }
+  aranha: (t, k) => { hum(t, .3, .1 * k, 2800, 1.5, .05); [.32, .38, .44].forEach(o => hum(t + o, .02, .14 * k, 4000, 4)); },
+  morcego: (t, k) => [0, .06, .12, .2, .26].forEach((o, i) => voice(3200 - i * 150, t + o, .04, "square", .04 * k, 4200)),
+  coruja: (t, k) => [0, .45].forEach((o, i) => voice(i ? 330 : 380, t + o, .35, "sine", .12 * k, i ? 300 : 340, 4, 6)),
+  lobo: (t, k) => { voice(380, t, .4, "triangle", .1 * k, 560, 5, 6); voice(560, t + .38, .6, "triangle", .1 * k, 400, 6, 12); },
+  chupa: (t, k) => { voice(1800, t, .4, "sawtooth", .08 * k, 900, 40, 160); hum(t + .3, .6, .1 * k, 4500, .8, .1); },
+  mula: (t, k) => { voice(700, t, .5, "sawtooth", .08 * k, 450, 18, 60); voice(450, t + .45, .3, "sawtooth", .07 * k, 300, 14, 30); hum(t, .9, .08 * k, 1500, .7, .1); },
+  boitata: (t, k) => { hum(t, .8, .1 * k, 5000, .7, .2); [.4, .46, .52, .58, .64, .7].forEach(o => hum(t + o, .03, .12 * k, 3500, 5)); voice(70, t, .9, "sawtooth", .06 * k, 55, 10, 5); }
 };
 const CRY_OF = {onca: "felino", jaguatirica: "felinoP", cotia: "roedor", cassaco: "roedor", quati: "roedor", queixada: "porco", macaco: "macaco",
   harpia: "ave", sucuri: "cobra", surucucu: "cobra", jacare: "jacare", calango: "calango", anta: "anta", capivara: "capivara", ariranha: "ariranha",
-  preguica: "preguica", tamandua: "fungada", tatu: "tatu", piranha: "piranha", poraque: "eletrico", caranguejeira: "aranha"};
+  preguica: "preguica", tamandua: "fungada", tatu: "tatu", piranha: "piranha", poraque: "eletrico", caranguejeira: "aranha",
+  morcego: "morcego", coruja: "coruja", lobo: "lobo", chupacabra: "chupa", mula: "mula", boitata: "boitata"};
 // grito do bicho (chefe soma um rugido grave por baixo)
 function animalCry(id, boss = false, k = 1) {
   if (!AC) return;

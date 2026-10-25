@@ -47,7 +47,21 @@ function makeHeroActor() {
     switch (state) {
       case "idle":
         pose.dy = breathe;
-        if (p && battle) { if (p.def) { pose.dy = 1; if (weaponOn) pose.weapon = "guard"; } if (p.preso > 0) coil = true; }
+        if (p && battle) {
+          if (p.def) { pose.dy = 1; if (weaponOn) pose.weapon = "guard"; }
+          if (p.preso > 0) coil = true;
+          if (p.medo > 0) {   // com medo: joelhos juntos, encolhido, tremendo e suando
+            Object.assign(pose, {lf: [14, 40], rf: [18, 40], dy: 1, lean: -1}); if (weaponOn) pose.weapon = "guard";
+            ox = REDUCE ? 0 : Math.floor(t / 45) % 2 ? 1 : -1;
+            if (t - lastFx > 420 && !REDUCE) { lastFx = t; const [gx, gy] = grid(SX + (Math.random() < .5 ? 6 : 26), SY + 6); PFX.emit("drop", ["#86d6ff", "#ffffff"], gx, gy, (Math.random() - .5) * 6, -4, .8, {grav: 40}); }
+          }
+        }
+        break;
+      case "scared":   // levou um susto (chocalho, uivo): pula para trás com "!!" e fica tremendo
+        Object.assign(pose, {lf: [14, 40], rf: [18, 40], lean: -2}); if (weaponOn) pose.weapon = "guard";
+        lift = el < 200 ? Math.sin(el / 200 * Math.PI) * 4 : 0; ox = el < 300 ? -3 : Math.floor(t / 40) % 2 ? 1 : -1;
+        if (!lastFx) { lastFx = 1; const [gx, gy] = grid(SX + 22, SY - 4); PFX.emit("bang", ["#86d6ff"], gx, gy, 0, -6, .8); PFX.emit("bang", ["#86d6ff"], gx + 2, gy, 0, -6, .8); }
+        if (el > 800) set("idle");
         break;
       case "walk": walk(110); break;
       case "stab":    // lança de perto: recua, estoca para frente e volta à guarda

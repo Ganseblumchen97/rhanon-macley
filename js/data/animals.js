@@ -27,6 +27,15 @@ const ANIMALS = [
   {id:"ariranha", lv:9, name:"Ariranha", hp:56, xp:50, gold:[22,34], damage:[5,9], size:"médio", special:"frenesi", moves:MV("Mordida","Mergulho","Frenesi"), intro:"Uma ariranha sai da água guinchando. Elas nunca andam sozinhas por muito tempo."},
   {id:"poraque", lv:10, name:"Poraquê", hp:64, xp:62, gold:[26,40], damage:[6,10], size:"médio", special:"choque", moves:MV("Mordida","Bote","Choque"), intro:"A água da margem estala. Um poraquê se enrola, carregado de eletricidade."},  {id:"queixada_chefe", lv:5, boss:true, name:"Queixada-chefe", hp:95, xp:90, gold:[60,80], damage:[6,11], size:"chefe", emoji:"🐗", tint:"saturate(1.6) hue-rotate(-25deg)", special:"estouro", moves:MV("Mordida","Investida","Estouro do bando"), intro:"O maior macho do bando bloqueia a trilha. Os outros esperam atrás dele."},
   {id:"cobra_grande", lv:12, boss:true, name:"Cobra-Grande", hp:125, xp:120, gold:[80,110], damage:[7,12], size:"chefe", emoji:"🐍", tint:"hue-rotate(160deg) saturate(1.4)", special:"constricao", moves:MV("Mordida","Bote","Constrição"), intro:"As águas ficam paradas. Dizem que a Cobra-Grande dorme no fundo do rio... dizem."},
+  // bichos da noite (NIGHT_ZONES) e chefes do folclore
+  {id:"morcego", lv:2, name:"Morcego", hp:24, xp:18, gold:[5,10], damage:[2,5], size:"pequeno", special:"drenar", moves:MV("Mordida","Rasante","Chupar sangue"), intro:"Um guincho fino corta o escuro. Um morcego dá rasantes em volta da sua cabeça."},
+  {id:"coruja", lv:2, name:"Coruja", hp:26, xp:18, gold:[5,10], damage:[2,5], size:"pequeno", special:"mergulho", moves:MV("Bicada","Voo rasante","Mergulho"), intro:"Dois olhos amarelos se acendem num galho. A coruja gira a cabeça e te encara."},
+  {id:"lobo", lv:4, name:"Lobo-guará", hp:46, xp:32, gold:[12,22], damage:[4,8], size:"médio", special:"uivo", moves:MV("Mordida","Bote","Uivo"), intro:"Pernas compridas, pelo vermelho e um uivo longo: um lobo-guará fareja a trilha."},
+  {id:"morcego_vampiro", lv:7, name:"Morcego-vampiro", hp:40, xp:40, gold:[16,26], damage:[5,9], size:"pequeno", tint:"hue-rotate(-25deg) saturate(1.6) brightness(.8)", special:"drenar", moves:MV("Mordida","Rasante","Chupar sangue"), intro:"Uma nuvem de asas sai do oco de uma árvore. O maior deles mostra os dentes."},
+  {id:"morcego_pescador", lv:9, name:"Morcego-pescador", hp:48, xp:48, gold:[20,32], damage:[6,10], size:"médio", tint:"hue-rotate(160deg) saturate(.8)", special:"mergulho", moves:MV("Garras","Rasante","Mergulho"), intro:"Algo grande voa rente à água e arranca um peixe do lago. Agora ele olha para você."},
+  {id:"chupacabra", lv:6, boss:true, name:"Chupa-cabra", hp:110, xp:110, gold:[70,90], damage:[5,10], size:"chefe", special:"drenar", moves:MV("Garras","Salto","Chupar o sangue"), intro:"Algo secou as galinhas da aldeia. Os olhos vermelhos no escuro respondem quem foi: o Chupa-cabra."},
+  {id:"mula", lv:10, boss:true, name:"Mula sem cabeça", hp:140, xp:150, gold:[100,130], damage:[8,13], size:"chefe", special:"fogo", moves:MV("Coice","Galope","Labareda"), intro:"Ferraduras batendo no escuro e um pescoço em chamas: a Mula sem cabeça corta a mata fechada."},
+  {id:"boitata", lv:13, boss:true, name:"Boitatá", hp:160, xp:180, gold:[120,160], damage:[8,13], size:"chefe", special:["prender", "chocalho"], moves:MV("Mordida","Bote de fogo","Encantamento"), intro:"O lago se acende. Uma cobra de fogo de olhos enormes sobe da água: é o Boitatá, guardião da mata."},
   {id:"onca_rei", lv:9, boss:true, name:"Onça-Rei", hp:140, xp:150, gold:[100,140], damage:[9,15], size:"chefe", tint:"hue-rotate(-20deg) saturate(1.5) brightness(.8)", moves:MV("Arranhão","Bote","Rugido"), intro:"A mata inteira fica em silêncio. A Onça-Rei desce da pedra, e ela não está de passagem."}
 ];
 // zonas de caça: nível mínimo, sorteio com peso [id, peso] e o chefe (aparece após 4 vitórias)
@@ -35,11 +44,23 @@ const ZONES = {
   rio:     {n: "Beira do rio", lv: 2, pool: [["jacare",3],["piranha",3],["sucuri",2],["capivara",3],["ariranha",2],["poraque",2]], boss: "cobra_grande"},
   fechada: {n: "Mata fechada", lv: 3, pool: [["surucucu",3],["onca",2],["harpia",2],["queixada",2],["jaguatirica",3],["anta",1],["caranguejeira",3]], boss: "onca_rei"}
 };
+// à noite (G.night) cada zona tem outros bichos e um chefe do folclore; o resto (mapa, passagem) é o mesmo
+const NIGHT_ZONES = {
+  mata:    {pool: [["morcego",3],["coruja",3],["lobo",2],["cassaco",2],["tatu",1]], boss: "chupacabra"},
+  fechada: {pool: [["morcego_vampiro",3],["lobo",2],["onca",2],["jaguatirica",2],["caranguejeira",2],["surucucu",2]], boss: "mula"},
+  rio:     {pool: [["jacare",3],["sucuri",2],["poraque",2],["morcego_pescador",3],["capivara",1]], boss: "boitata"}
+};
+const zoneDef = z => G.night && NIGHT_ZONES[z] ? {...ZONES[z], ...NIGHT_ZONES[z], n: ZONES[z].n + " à noite"} : ZONES[z];
+// chefe vencido: de dia é a zona; à noite, "zona:noite" (os chefes do folclore não abrem passagens)
+const bossKey = z => G.night && NIGHT_ZONES[z] ? z + ":noite" : z;
 // nome do item que cada bicho deixa (os outros viram "Pele de <bicho>")
-const PELT = {piranha: "Escamas de piranha", jacare: "Couro de jacaré", sucuri: "Couro de sucuri", surucucu: "Couro de surucucu", cobra_grande: "Couro da Cobra-Grande", harpia: "Penas de harpia", tatu: "Casco de tatu", calango: "Couro de calango", poraque: "Couro de poraquê", caranguejeira: "Presas de caranguejeira", ariranha: "Pele de ariranha", tamandua: "Pelos de tamanduá"};
+const PELT = {morcego: "Asas de morcego", coruja: "Penas de coruja", lobo: "Pelo de lobo-guará", morcego_vampiro: "Asas de morcego-vampiro", morcego_pescador: "Asas de morcego-pescador",
+  chupacabra: "Presas do Chupa-cabra", mula: "Ferradura em brasa", boitata: "Escama de fogo do Boitatá", piranha: "Escamas de piranha", jacare: "Couro de jacaré", sucuri: "Couro de sucuri", surucucu: "Couro de surucucu", cobra_grande: "Couro da Cobra-Grande", harpia: "Penas de harpia", tatu: "Casco de tatu", calango: "Couro de calango", poraque: "Couro de poraquê", caranguejeira: "Presas de caranguejeira", ariranha: "Pele de ariranha", tamandua: "Pelos de tamanduá"};
 // jeito de cada bicho se mexer parado (ver makeBeastActor em gfx/actors.js) e brilho dos chefes
 const MOTION = {
   sucuri: "sway", surucucu: "sway", cobra_grande: "sway", piranha: "swim", harpia: "hover", macaco: "hop",
   preguica: "slow", tatu: "curl", calango: "jitter", queixada: "snort", queixada_chefe: "snort", jacare: "slow2",
+  morcego: "hover", morcego_vampiro: "hover", morcego_pescador: "hover", coruja: "hover", boitata: "sway", mula: "snort",
 };
-const AURA = {queixada_chefe: ["#ff8a3a", "#ffd23a"], cobra_grande: ["#7cf2ff", "#b06ad6"], onca_rei: ["#e5001c", "#ffd23a"]};
+const AURA = {queixada_chefe: ["#ff8a3a", "#ffd23a"], cobra_grande: ["#7cf2ff", "#b06ad6"], onca_rei: ["#e5001c", "#ffd23a"],
+  chupacabra: ["#e5001c", "#7a1a2a"], mula: ["#ff8a3a", "#ffd23a"], boitata: ["#ffd23a", "#ff5a1c"]};

@@ -44,7 +44,7 @@ function spearBlocked(px, py) {
 
 /* ---------- entrar, sair e trocar de fase ---------- */
 function pickFromPool(zone) {
-  const z = ZONES[zone]; let r = Math.random() * z.pool.reduce((s, [, w]) => s + w, 0);
+  const z = zoneDef(zone); let r = Math.random() * z.pool.reduce((s, [, w]) => s + w, 0);
   for (const [id, w] of z.pool) if ((r -= w) < 0) return ANIMALS.find(a => a.id === id);
   return ANIMALS.find(a => a.id === z.pool[0][0]);
 }
@@ -63,18 +63,18 @@ function startExplore(zone, after) {
   wipe(() => {
     const st = STAGES[zone];
     EX = {zone, st, rows: st.rows, map: drawStageMap(st.rows, zone), pal: TILE_PAL[zone] || TILE_PAL.mata,
-      ents: [], fx: [], loot: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
+      night: !!G.night, ents: [], fx: [], loot: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
     st.rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
       if (ch === "S") EX.hero = {x: tx * TILE + 8, y: ty * TILE + 12, hw: 5, hh: 3, dir: "down", aim: {x: 0, y: 1}, walk: 0, flip: false, movedT: 0};
       else if (ch === "a") EX.ents.push(makeAnimalEnt(pickFromPool(zone), tx, ty));
-      else if (ch === "B" && !BS()[zone]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === ZONES[zone].boss), tx, ty));
+      else if (ch === "B" && !BS()[bossKey(zone)]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === zoneDef(zone).boss), tx, ty));
       else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "aldeao" ? "aldeao" + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
     }));
     vit(); G.sub = zone; save();
     curZone = zone; fromLocal = false; exKeys.clear();
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
     musicStart("local"); exHud();
-    exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : ZONES[zone].n + (BS()[zone] ? "" : " · o chefe espera no fim da trilha"));
+    exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
     if (after) after();
   });
 }
@@ -92,7 +92,8 @@ function resumeExplore(result) {
   if (en && result === "flee") { en.stunUntil = now + 3500; EX.invulnUntil = now + 2500; }
   $("explore").hidden = false; $("homeButton").hidden = true;
   musicStart("local"); exHud();
-  if (en && result === "win" && en.boss) exToast(EX.st.next ? `Caminho liberado: ${ZONES[EX.st.next].n}! Siga a trilha até a passagem.` : "Você venceu o último chefe... por enquanto!");
+  if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? `${en.a.name} derrotado! A aldeia vai contar essa história por muitas noites.`
+    : EX.st.next ? `Caminho liberado: ${ZONES[EX.st.next].n}! Siga a trilha até a passagem.` : "Você venceu o último chefe... por enquanto!");
 }
 
 /* ---------- ações do Rhanon ---------- */
@@ -203,7 +204,8 @@ function exUpdate(dt, now) {
     if (campAsleep(c, el) && !c.dawned && now - (c.snoreT || 0) > 1700) { c.snoreT = now; sfx("ronco"); }   // o amanhecer interrompe o ronco
     if (CAMP_DAWN_AT[c.kind] && el > CAMP_DAWN_AT[c.kind] && !c.dawned) {   // passa a faixa do amanhecer (galo e sol); por trás dela vira dia
       c.dawned = true;
-      dawnWipe(() => { c.day = true; }, `Amanheceu · Dia ${G.day + 1}`);
+      const toNight = c.kind === "noite";   // atrás da faixa o mundo troca: noite (lua e lobo) ou dia (sol e galo)
+      dawnWipe(() => { c.day = true; G.night = toNight; EX.night = toNight; save(); exHud(); }, toNight ? "Anoiteceu" : `Amanheceu · Dia ${G.day + 1}`, toNight);
     }
   }
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
@@ -351,6 +353,7 @@ function exDraw(now) {
     lineP(x, sx - ux * 5, sy - uy * 5, sx + ux * 4, sy + uy * 4, "#c9a46a");   // flecha: haste, ponta e penas
     pxl(x, sx + ux * 5, sy + uy * 5, "#eef3f5"); pxl(x, sx - ux * 5 - uy, sy - uy * 5 + ux, "#e5001c"); pxl(x, sx - ux * 5 + uy, sy - uy * 5 - ux, "#e5001c");
   }
+  if (EX.night) drawNightShade(x, cx, cy, now);
   if (EX.camp && EX.camp.kind !== "fogueira") drawCampSky(x, cx, cy, now);
   for (const q of EX.fx) { x.fillStyle = q.col; x.fillRect(Math.round(q.x - cx) - 1, Math.round(q.y - cy) - 1, 2, 2); }
   alive.forEach(en => drawAnimalTags(x, en, cx, cy, now));
@@ -366,7 +369,7 @@ function exploreFrame(t, dt) {
 /* ---------- textos na tela ---------- */
 function exHud() {
   vit();
-  $("exHud").textContent = `${(ZONES[EX.zone] || SUB[EX.zone]).n} · Nv ${G.lv} · XP ${G.xp}/${need(G.lv)} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · R$ ${G.money}`;
+  $("exHud").textContent = `${ZONES[EX.zone] ? zoneDef(EX.zone).n : SUB[EX.zone].n + (G.night ? " à noite" : "")} · Nv ${G.lv} · XP ${G.xp}/${need(G.lv)} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · R$ ${G.money}`;
 }
 function exToast(msg) {
   const el = $("exMsg"); el.textContent = msg; el.classList.add("show");
@@ -408,7 +411,7 @@ function setupExploreInput() {
 /* ---------- aldeia e feira: pontos de conversa ---------- */
 const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", P: "aldeao"};
 const PEOPLE = ["peles", "comida", "artesao", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar ou dormir na fogueira", tenda: "dormir na tenda", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas e equipamentos", aldeao: "conversar"};
+const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir na tenda", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas e equipamentos", aldeao: "conversar"};
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã"};
 const VILLAGER_TIPS = [
   "Etiqueta verde em cima do bicho? Ele cai com um golpe só.",
@@ -417,7 +420,9 @@ const VILLAGER_TIPS = [
   "A tocha do artesão assusta os bichos: eles fraquejam e você ataca de novo na mesma hora.",
   "Sem arco? Jogue a lança (Especial): bate forte, mas às vezes erra.",
   "O chefe de cada mata fica no fim da trilha. Vencer ele abre o caminho para a próxima.",
-  "Na fogueira dá para descansar (metade) ou dormir (tudo, mas o dia passa). Dizem que tem fogueira até no meio das trilhas.",
+  "Na fogueira da aldeia dá para descansar até a noite ou dormir até o dia seguinte. As fogueiras das trilhas recuperam tudo.",
+  "À noite a mata muda: morcegos, corujas, lobos-guará... e dizem que o Chupa-cabra ronda a mata.",
+  "Contam que na mata fechada passa uma mula sem cabeça, cuspindo fogo pelo pescoço. E no lago... o Boitatá.",
   "O vendedor da feira paga bem por couro de jacaré. Dizem."
 ];
 // ponto de conversa colado no Rhanon (o mais perto)
@@ -447,10 +452,15 @@ function exOpenDialog(kind, msg, look) {
   look = look || EX.dialogLook; EX.dialogLook = look;
   const d = $("exDialog"); EX.dialog = kind; exKeys.clear(); sfx("blip");
   const say = (title, text) => { d.innerHTML = `<h2>${title}</h2><p>${text}</p>`; };
-  if (kind === "fogueira") {
-    say("Fogueira", "O fogo estala e esquenta. Descansar recupera metade de PV e PE; dormir aqui recupera tudo, mas o dia passa.");
+  if (kind === "fogueira" && EX.st.safe) {   // fogueira da aldeia: escolhe até quando descansar
+    say("Fogueira", G.night ? "A noite está alta. Dormir aqui recupera tudo, e o dia seguinte começa."
+      : "O fogo estala e esquenta. Descansar até a noite recupera metade de PV e PE, e à noite a mata muda. Dormir até o dia seguinte recupera tudo.");
+    if (!G.night) btn("Descansar até a noite", () => exCampRest("noite"), false, d);
+    btn("Dormir até o dia seguinte", () => exCampRest("dormir"), false, d);
+  }
+  else if (kind === "fogueira") {   // fogueira no meio da trilha: só um ponto para recuperar as forças
+    say("Fogueira", "Um ponto para recuperar o fôlego no meio da trilha. Descansar recupera toda a vida e a energia.");
     btn("Descansar", () => exCampRest("fogueira"), false, d);
-    btn("Dormir até o amanhecer", () => exCampRest("dormir"), false, d);
   }
   else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => wipe(() => rest("dormir")), false, d); }
   else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }
@@ -466,10 +476,10 @@ function exOpenDialog(kind, msg, look) {
 function exCampRest(kind) {
   const h = EX.hero, f = EX.spots.filter(s => s.kind === "fogueira").sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y))[0];
   $("exDialog").hidden = true; exKeys.clear();
-  EX.camp = {kind, t0: performance.now(), dur: campWake(kind) + 2600, x: f.x + (h.x < f.x ? -14 : 14), y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
+  EX.camp = {kind, startNight: EX.night, t0: performance.now(), dur: campWake(kind) + 2600, x: f.x + (h.x < f.x ? -14 : 14), y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
 }
 // cena de abertura: amanhece, Rhanon acorda do lado da fogueira da aldeia, se espreguiça e o jogo começa
-function startIntro() { startExplore("aldeia", exIntro); }
+function startIntro() { vit(); G.night = false; save(); startExplore("aldeia", exIntro); }   // a aventura sempre começa de manhã
 function exIntro() {
   const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), side = solidAt(f.x - 14, f.y + 5) ? 1 : -1;
   EX.camp = {kind: "intro", t0: performance.now(), dur: campWake("intro") + 2600, x: f.x + side * 14, y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
@@ -484,14 +494,16 @@ function exCampEnd() {
 }
 /* Linha do tempo das cenas que acordam (ms desde o começo):
    dormir: senta (0-900) e dorme enquanto a noite cai; em CAMP_DAWN_AT passa a faixa do amanhecer (dawnWipe: galo e sol).
+   noite: senta, cochila enquanto escurece e passa a faixa do anoitecer (lua e lobo); por trás dela vira noite.
    abertura: já é de manhã; ele cochila um pouco e acorda em CAMP_INTRO_WAKE (o galo só canta ao dormir).
    Ao acordar:
    "!" (W..W+400), sorri (W+500..W+1100), levanta e se espreguiça (W+1300..W+2000) e fica de pé. */
-const CAMP_DAWN_AT = {dormir: 2600}, CAMP_INTRO_WAKE = 1500;
+const CAMP_DAWN_AT = {dormir: 2600, noite: 2400}, CAMP_INTRO_WAKE = 1500;
 const campWake = kind => kind === "intro" ? CAMP_INTRO_WAKE : CAMP_DAWN_AT[kind] ? CAMP_DAWN_AT[kind] + DAWN_MS + 200 : 0;
-const campAsleep = (c, el) => c.kind === "intro" ? el < campWake("intro") : c.kind === "dormir" && el > 900 && el < campWake("dormir");
+const campAsleep = (c, el) => c.kind === "intro" ? el < campWake("intro") : !!CAMP_DAWN_AT[c.kind] && el > 900 && el < campWake(c.kind);
 // escuridão da noite (some quando a faixa do amanhecer cobre a tela)
-const campDark = (c, el) => !CAMP_DAWN_AT[c.kind] || c.day ? 0 : .65 * Math.max(0, Math.min(1, (el - 900) / 1700));
+// (dormir já de noite: o escuro da noite já está na tela; anoitecer: só escurece um pouco antes da faixa)
+const campDark = (c, el) => !CAMP_DAWN_AT[c.kind] || c.day || c.startNight ? 0 : (c.kind === "noite" ? .35 : .65) * Math.max(0, Math.min(1, (el - 900) / 1500));
 function drawCampHero(x, cx, cy, now) {
   const c = EX.camp, el = now - c.t0, W = campWake(c.kind), sx = snap(c.x - cx), sy = snap(c.y - cy);
   const sleep = campAsleep(c, el);
@@ -508,6 +520,22 @@ function drawCampHero(x, cx, cy, now) {
     if (p < .85 || Math.floor(now / 80) % 2) { x.fillStyle = i % 2 ? "#c9c4b8" : "#9e9a90"; x.fillRect(Math.round(c.fx - cx + Math.sin(p * 6 + i) * 2), Math.round(c.fy - cy - 6 - p * 20), 2, 2); }
   }
   if (sleep) for (let i = 0; i < 3; i++) { const p = (el / 1000 + i / 3) % 1; glyphP(x, "z", "#ffffff", sx + 5 + p * 7, sy - 24 - p * 12); }
+}
+// noite na fase: tudo escuro, com um círculo de luz em volta do Rhanon e de cada fogueira (o fogo tremula)
+let NIGHT_CV = null;
+function drawNightShade(x, cx, cy, now) {
+  const c = NIGHT_CV || (NIGHT_CV = document.createElement("canvas"));
+  c.width = VIEW_W; c.height = VIEW_H;
+  const g = c.getContext("2d");
+  g.fillStyle = "rgba(6,8,32,.7)"; g.fillRect(0, 0, VIEW_W, VIEW_H);
+  g.globalCompositeOperation = "destination-out";
+  const light = (px, py, r) => { const gr = g.createRadialGradient(px, py, r * .25, px, py, r); gr.addColorStop(0, "#000"); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(px - r, py - r, r * 2, r * 2); };
+  const h = EX.camp || EX.hero;
+  light(h.x - cx, h.y - cy - 12, 50);
+  const t0x = Math.floor(cx / TILE), t0y = Math.floor(cy / TILE);
+  for (let ty = t0y - 3; ty <= t0y + 14; ty++) for (let tx = t0x - 3; tx <= t0x + 18; tx++)
+    if (stageTile(tx, ty) === "F") light(tx * TILE + 8 - cx, ty * TILE + 8 - cy, 46 + Math.sin(now / 110 + tx) * 2.5);
+  x.drawImage(c, 0, 0);
 }
 // noite por cima da fase: escuro com estrelas; o fogo e o Rhanon são redesenhados por cima para continuarem acesos
 function drawCampSky(x, cx, cy, now) {
