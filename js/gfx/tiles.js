@@ -59,19 +59,67 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
     fillEllipse(x, ox + 6, oy + 4, 3, 2, P.leafHi);
   }
 }
-// pinta a fase inteira num canvas (o desenho não muda; a passagem e a água brilhando são desenhadas por cima)
+// oca de 2x2 quadrados: telhado de palha arredondado, parede de barro e porta escura
+function hutCanvas() {
+  const c = document.createElement("canvas"); c.width = c.height = 32; const x = c.getContext("2d");
+  x.fillStyle = OUTLINE; x.fillRect(5, 17, 22, 14);
+  x.fillStyle = "#9c6339"; x.fillRect(6, 18, 20, 12);
+  x.fillStyle = "#7a4a2e"; x.fillRect(6, 27, 20, 3);
+  x.fillStyle = OUTLINE; x.fillRect(13, 21, 6, 10); x.fillStyle = "#2a1a10"; x.fillRect(14, 22, 4, 9);
+  fillEllipse(x, 16, 13, 16, 11, OUTLINE); fillEllipse(x, 16, 13, 15, 10, "#b08a3a"); fillEllipse(x, 16, 12, 14, 9, "#d9b25a");
+  x.fillStyle = "#b08a3a"; for (let k = 0; k < 6; k++) x.fillRect(4 + k * 4, 8 + (k % 2) * 3, 1, 9 - (k % 2) * 3);
+  x.fillStyle = "#f0d68a"; x.fillRect(9, 6, 6, 1); x.fillRect(8, 7, 3, 1);
+  return c;
+}
+// barraca da feira: toldo listrado em cima, balcão com mercadoria embaixo (left/right = pontas)
+function drawStall(x, ox, oy, tx, left, right) {
+  const cols = ["#e5001c", "#f4ecd8"];
+  for (let k = 0; k < TILE; k += 4) { x.fillStyle = cols[((tx * 4 + k) / 4) % 2]; x.fillRect(ox + k, oy + 1, 4, 6); }
+  x.fillStyle = OUTLINE; x.fillRect(ox, oy, TILE, 1); x.fillRect(ox, oy + 7, TILE, 1);
+  for (let k = 0; k < TILE; k += 4) { x.fillStyle = cols[((tx * 4 + k) / 4) % 2]; x.fillRect(ox + k, oy + 8, 4, 1); x.fillRect(ox + k + 1, oy + 9, 2, 1); }
+  x.fillStyle = "#9c6339"; x.fillRect(ox, oy + 10, TILE, 6); x.fillStyle = "#6d4329"; x.fillRect(ox, oy + 14, TILE, 2);
+  x.fillStyle = OUTLINE; x.fillRect(ox, oy + 15, TILE, 1);
+  [["#ffd23a", 2], ["#7a2a8a", 7], ["#3f9a5c", 11]].forEach(([col, gx]) => { x.fillStyle = col; x.fillRect(ox + gx, oy + 11, 3, 2); });
+  x.fillStyle = OUTLINE;
+  if (left) x.fillRect(ox, oy, 1, TILE);
+  if (right) x.fillRect(ox + TILE - 1, oy, 1, TILE);
+}
+// pinta a fase inteira num canvas (o desenho não muda; passagem, fogo e água brilhando são desenhados por cima)
 function drawStageMap(rows, zone) {
   const P = TILE_PAL[zone] || TILE_PAL.mata, H = rows.length, W = rows[0].length;
   const c = document.createElement("canvas"); c.width = W * TILE; c.height = H * TILE;
-  const x = c.getContext("2d");
+  const x = c.getContext("2d"), hut = hutCanvas(), at = (tx, ty) => (rows[ty] || "")[tx];
   rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
-    drawTile(x, TILE_BASE[ch] || ch, tx * TILE, ty * TILE, P, tx, ty);
+    const ox = tx * TILE, oy = ty * TILE;
+    if ("HKFNVPCR".includes(ch)) {
+      drawTile(x, "KVCR".includes(ch) ? "-" : ".", ox, oy, P, tx, ty);
+      if (ch === "H") x.drawImage(hut, at(tx - 1, ty) === "H" ? 16 : 0, at(tx, ty - 1) === "H" ? 16 : 0, 16, 16, ox, oy, 16, 16);
+      else if (ch === "K") drawStall(x, ox, oy, tx, at(tx - 1, ty) !== "K", at(tx + 1, ty) !== "K");
+      else if (ch === "F") {   // pedras em volta e lenha (as chamas são animadas por cima)
+        fillEllipse(x, ox + 8, oy + 10, 7, 4, "#6a675e"); fillEllipse(x, ox + 8, oy + 10, 5, 2.5, "#2a1a10");
+        x.fillStyle = "#6d4329"; x.fillRect(ox + 4, oy + 9, 8, 2); x.fillStyle = "#9c6339"; x.fillRect(ox + 5, oy + 11, 7, 1);
+      } else if (ch === "N") {   // tenda triangular de couro
+        x.fillStyle = OUTLINE; for (let k = 0; k < 13; k++) x.fillRect(ox + 8 - Math.ceil(k * .6) - 1, oy + 2 + k, Math.ceil(k * 1.2) + 3, 1);
+        for (let k = 0; k < 12; k++) { x.fillStyle = "#e9e2cf"; x.fillRect(ox + 8 - Math.ceil(k * .6), oy + 3 + k, Math.ceil(k * .6), 1); x.fillStyle = "#c9bfa4"; x.fillRect(ox + 8, oy + 3 + k, Math.ceil(k * .6), 1); }
+        x.fillStyle = "#3a2a1a"; for (let k = 0; k < 6; k++) x.fillRect(ox + 8 - Math.ceil(k / 2), oy + 9 + k, Math.ceil(k / 2) * 2 + 1, 1);
+        x.fillStyle = "#7a4a1e"; x.fillRect(ox + 7, oy, 2, 3);
+      }
+      return;
+    }
+    drawTile(x, TILE_BASE[ch] || ch, ox, oy, P, tx, ty);
     if (ch === "E") {   // seta de saída apontando para a borda mais perto
-      const left = tx < W / 2, ax = tx * TILE + 8, ay = ty * TILE + 8;
-      x.fillStyle = OUTLINE; x.fillRect(ax - 5, ay - 2, 10, 5);
-      x.fillStyle = "#ffd23a";
-      for (let k = 0; k < 3; k++) x.fillRect(left ? ax - 4 + k : ax + 3 - k, ay - k + 1, 1, 2 * k + 1);
-      x.fillRect(left ? ax - 1 : ax - 4, ay + 1, 5, 1);
+      const sy = rows.findIndex(r => r.includes("S")), sx = rows[sy].indexOf("S");   // aponta do início (S) para a saída
+      const left = tx < sx, down = ty > sy, ax = tx * TILE + 8, ay = ty * TILE + 8;
+      if (down) {
+        x.fillStyle = OUTLINE; x.fillRect(ax - 3, ay - 5, 7, 10);
+        x.fillStyle = "#ffd23a"; x.fillRect(ax, ay - 4, 1, 5);
+        for (let k = 0; k < 3; k++) x.fillRect(ax - k, ay + 3 - k, 2 * k + 1, 1);
+      } else {
+        x.fillStyle = OUTLINE; x.fillRect(ax - 5, ay - 2, 10, 5);
+        x.fillStyle = "#ffd23a";
+        for (let k = 0; k < 3; k++) x.fillRect(left ? ax - 4 + k : ax + 3 - k, ay - k + 1, 1, 2 * k + 1);
+        x.fillRect(left ? ax - 1 : ax - 4, ay + 1, 5, 1);
+      }
     }
   }));
   return c;
@@ -87,23 +135,16 @@ function drawGate(x, sx, sy, P) {
 
 /* ---------- Rhanon visto de cima ---------- */
 const OW_CACHE = {};
-// dir: "down" (de frente), "up" (de costas) ou "side" (de lado, olhando para a direita)
+// dir: "down" (de frente) ou "up" (de costas)
 function heroOverworld(dir, legs, weapon) {
   const key = dir + legs + weapon + JSON.stringify(G?.equip || {}) + (G?.job ? 1 : 0) + (G?.betterJob ? 1 : 0);
   if (OW_CACHE[key]) return OW_CACHE[key];
-  const parts = heroParts(true);
-  if (dir === "up") parts.head = parts.head.map((r, i) => i >= 7 && i <= 14 ? r.replace(/[sewrmx]/g, "h") : r);
-  if (dir === "side") parts.head = parts.head.map((r, i) => {
-    if (i < 8 || i > 14) return r;
-    const a = [...r];   // cabelo cobre a metade de trás do rosto; um olho só, perto da frente
-    for (let k = 3; k < 9; k++) if ("sewrmx".includes(a[k])) a[k] = "h";
-    if (i === 11 || i === 12) { for (let k = 9; k < 16; k++) if ("ewx".includes(a[k])) a[k] = "s"; if (!parts.glasses) a[13] = i === 11 ? "e" : "w"; else a[13] = "x"; }
-    return a.join("");
-  });
+  const parts = dir === "up" ? heroBackParts(heroParts(true)) : heroParts(true);
   const c = document.createElement("canvas"); c.width = 20; c.height = 28;
   const x = c.getContext("2d");
   drawHero(x, parts, {legs});
   shadeCanvas(c);
+  if (dir === "up" && G?.equip?.ranged) drawBowOnBack(x);
   if (weapon) {
     x.fillStyle = "#7a4a1e";
     if (dir === "up") { x.fillRect(1, 2, 1, 26); x.fillStyle = "#cfd8dc"; x.fillRect(1, 0, 1, 2); }
@@ -115,4 +156,30 @@ function heroOverworld(dir, legs, weapon) {
 function drawTinyNumber(x, str, px, py, col) {
   x.fillStyle = col;
   [...str].forEach((ch, i) => { const g = GL[ch]; if (g) for (let k = 0; k < 15; k++) if (g[k] === "1") x.fillRect(px + i * 4 + k % 3, py + (k / 3 | 0), 1, 1); });
+}
+
+// chamas da fogueira, animadas a cada quadro
+function drawFire(x, sx, sy, t) {
+  const f = Math.floor(t / 90) % 3, fl = [["#ffd23a", "#f2740c", "#d62828"], ["#fff3a0", "#ffd23a", "#f2740c"], ["#ffd23a", "#d62828", "#f2740c"]][f];
+  x.fillStyle = fl[2]; x.fillRect(sx + 4, sy + 6, 8, 4);
+  x.fillStyle = fl[1]; x.fillRect(sx + 5, sy + 3 + (f === 1 ? 0 : 1), 6, 5);
+  x.fillStyle = fl[0]; x.fillRect(sx + 7 - (f % 2), sy + 1 + (f === 2 ? 1 : 0), 2, 5);
+  x.fillStyle = "#fffbe0"; x.fillRect(sx + 7, sy + 6, 2, 2);
+}
+// pessoa da aldeia/feira: corpo do Rhanon de tanga com as cores e enfeites de VILLAGER_LOOK[look]
+const VILLAGER_CACHE = {};
+function villagerSprite(look) {
+  if (VILLAGER_CACHE[look]) return VILLAGER_CACHE[look];
+  const L = VILLAGER_LOOK[look] || {}, pal = {...RH.base, ...(L.pal || {})};
+  for (const k in RH_OUT.tribo) pal[k] = pal[RH_OUT.tribo[k]] || RH_OUT.tribo[k];
+  const torso = RH.torso.map((r, i) => i >= 6 ? r.replace(/c/g, "t").replace(/C/g, "T") : r);
+  const c = document.createElement("canvas"); c.width = 20; c.height = 28; const x = c.getContext("2d");
+  drawHero(x, {head: RH.head.slice(), torso, pal, short: false, glasses: false}, {legs: "stand"});
+  if (L.longHair) for (let y = 7; y < 18; y++) { x.fillStyle = y > 15 ? pal.H : pal.h; x.fillRect(1, y, 2, 1); x.fillRect(17, y, 2, 1); }
+  if (L.top) { x.fillStyle = L.top; x.fillRect(4, 17, 12, 2); x.fillStyle = "#1b1a24"; x.fillRect(4, 19, 12, 1); }
+  if (L.feather) { x.fillStyle = "#1b1a24"; x.fillRect(14, 0, 3, 6); x.fillStyle = L.feather; x.fillRect(15, 1, 1, 5); x.fillStyle = "#ffffff"; x.fillRect(15, 1, 1, 1); }
+  if (L.prop === "pelt") { x.fillStyle = "#1b1a24"; x.fillRect(14, 18, 6, 7); x.fillStyle = "#9c6339"; x.fillRect(15, 19, 4, 5); x.fillStyle = "#d9b25a"; x.fillRect(16, 20, 1, 1); x.fillRect(17, 22, 1, 1); }
+  if (L.prop === "basket") { x.fillStyle = "#1b1a24"; x.fillRect(0, 19, 6, 6); x.fillStyle = "#d9b25a"; x.fillRect(1, 20, 4, 4); x.fillStyle = "#e5001c"; x.fillRect(2, 19, 1, 1); x.fillStyle = "#3f9a5c"; x.fillRect(3, 19, 2, 1); }
+  if (L.prop === "bow") { x.fillStyle = "#7a4a1e"; for (let y = 4; y < 26; y++) x.fillRect(18 - Math.round(Math.sin((y - 4) / 22 * Math.PI) * 2), y, 1, 1); x.fillStyle = "#f4ecd8"; x.fillRect(18, 4, 1, 22); }
+  return VILLAGER_CACHE[look] = shadeCanvas(c);
 }

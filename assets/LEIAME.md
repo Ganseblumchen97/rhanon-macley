@@ -16,11 +16,10 @@ o jogo usa o desenho feito em código, então dá para trocar a arte aos poucos.
 
 | Chave em art.js | Tamanho (escala 3) | Observações |
 |---|---|---|
-| `hero/battle` | 60 x 84 | Rhanon na batalha, de lado para a direita, com a lança. |
+| `hero/battle` | 60 x 84 | Rhanon na batalha, **de costas** (olhando para o bicho), com a lança. |
 | `hero/battle/<estado>` | 60 x 84 por quadro | Opcional: `throw`, `torch`, `guard`, `hurt`, `eat`, `observe`, `cheer`, `victory`, `defeat`, `flee`, `walk`, `idle`. Sem ele, usa `hero/battle`. |
 | `hero/walk/down` | 60 x 84 por quadro | Exploração, de frente. 4 quadros (parado, passo, parado, outro passo) = 240 x 84. |
 | `hero/walk/up` | 60 x 84 por quadro | De costas, 4 quadros. |
-| `hero/walk/side` | 60 x 84 por quadro | De lado olhando para a direita, 4 quadros. |
 | `animal/<id>` | até ~102 x 66 | Bicho na batalha. Pequenos ~60-70 de largura, médios ~70-85, grandes ~85-102. Chefe sem arte própria usa a do bicho base com outra cor. |
 | `animal/<id>/mapa` | até ~48 x 36 | Bicho na exploração (vista de cima, menor). |
 | `cutin/eyes` | 8:3, ex.: 768 x 288 | Close dos olhos para a cinemática. Pode ser mais detalhado que o resto; o jogo acende o brilho por cima. |

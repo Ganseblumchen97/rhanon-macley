@@ -9,10 +9,15 @@ function subPath(a, b) {
   const path = []; for (let c = b; c != null; c = prev[c]) path.unshift(c);
   return path[0] === a ? path : [a, b];
 }
-const lh = t => $("linfo").insertAdjacentHTML("beforeend", `<p class="hint">${t}</p>`);
+const lh = (t, host = $("linfo")) => host.insertAdjacentHTML("beforeend", `<p class="hint">${t}</p>`);
+// depois de descansar/comprar/vender: atualiza o painel de onde a ação veio (mapa de Ananindeua ou conversa na exploração)
+function localDone(where, msg) {
+  if (EX && EX.dialog && !$("explore").hidden) { exHud(); exOpenDialog(EX.dialog, msg); return; }
+  drawLocal(); selectSub(where, msg);
+}
 function drawLocal() {
   vit();
-  $("lhud").textContent = `Dia ${G.day} · Nv ${G.lv} · R$ ${G.money} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · DEF ${defense()} · Mandioca ×${G.man} · Peles ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
+  $("lhud").textContent = `Dia ${G.day} · Nv ${G.lv} · R$ ${G.money} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · DEF ${defense()} · Itens ×${itemCount(G.items)} · Peles ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
   Object.keys(SUB).forEach(k => $("ln-" + k).classList.toggle("locked", !unlocked(k)));
   const l = SUB[G.sub]; $("lmk").setAttribute("transform", `translate(${l.x} ${l.y})`);
 }
@@ -21,11 +26,10 @@ function selectSub(id, msg) {
   const l = SUB[id], z = ZONES[id], here = id === G.sub, i = $("linfo"), lock = z && !unlocked(id);
   i.innerHTML = `<h2>${l.n}</h2><p>${l.txt}</p>` + (here ? '<p class="hint">Você está aqui.</p>' : "");
   if (!here) { btn(lock ? `${l.n} (vença o chefe: ${SUB[NEED[id]].n})` : "Ir até lá", () => goSub(id), lock, i); if (lock) lh(`Derrote o chefe de ${SUB[NEED[id]].n} para liberar este local.`); }
-  else if (id === "aldeia") {
-    btn("Fogueira (descansar)", () => rest("fogueira"), false, i);
-    btn("Tenda (dormir)", () => rest("tenda"), false, i);
-    lh("Fogueira recupera metade de PV e PE. Dormir na tenda recupera tudo e passa o dia.");
-  } else if (id === "feira") feiraButtons(i);
+  else if (id === "aldeia" || id === "feira") {
+    btn(id === "aldeia" ? "Entrar na aldeia" : "Entrar na feira", () => startExplore(id), false, i);
+    lh(id === "aldeia" ? "Lá dentro ficam a fogueira (descansar) e a sua tenda (dormir)." : "Lá dentro o vendedor compra suas peles e vende comida e roupas.");
+  }
   else if (z) {
     btn("Explorar", () => startExplore(id), false, i);
     lh(BS()[id] ? "Chefe derrotado ✓ · a passagem no fim da trilha está aberta." : `O chefe (${ANIMALS.find(a => a.id === z.boss).name}) espera no fim da trilha.`);
@@ -39,12 +43,20 @@ function rest(kind) {
   vit(); const f = kind === "tenda" ? 1 : .5;
   G.hp = Math.min(maxHP(G.lv), G.hp + Math.ceil(maxHP(G.lv) * f)); G.sp = Math.min(maxSP(G.lv), G.sp + Math.ceil(maxSP(G.lv) * f));
   if (kind === "tenda") G.day++;
-  save(); sfx("heal"); drawLocal();
-  selectSub("aldeia", kind === "tenda" ? `Rhanon dormiu até o amanhecer. Dia ${G.day}.` : "Rhanon descansou junto à fogueira.");
+  save(); sfx("heal");
+  localDone("aldeia", kind === "tenda" ? `Rhanon dormiu até o amanhecer. Dia ${G.day}.` : "Rhanon descansou junto à fogueira.");
 }
-function buy(k) {
-  const [n, c, fn] = SHOP[k]; if (G.money < c) return;
-  G.money -= c; fn(); save(); sfx("heal"); drawLocal(); selectSub("feira", `Comprou: ${n}.`);
+// compra um item da barraca de comida (vai para a bolsa)
+function buy(id) {
+  const it = ITEMS[id]; if (G.money < it.price) return;
+  G.money -= it.price; G.items[id] = (G.items[id] || 0) + 1; save(); sfx("heal");
+  localDone("feira", `Comprou: ${it.n}. Na bolsa: ×${G.items[id]}.`);
+}
+// come um item fora da batalha (inventário)
+function eatItem(id) {
+  const it = ITEMS[id]; if (!G.items[id]) return;
+  G.items[id]--; G.hp = Math.min(maxHP(G.lv), G.hp + it.hp); G.sp = Math.min(maxSP(G.lv), G.sp + it.sp);
+  save(); sfx("heal"); invDone(`Rhanon comeu ${it.n.toLowerCase()}: ${itemEffect(it)}.`);
 }
 function goSub(id) {
   if (moving || id === G.sub) return;
@@ -67,42 +79,66 @@ const peltName = id => PELT[id] || "Pele de " + ANIMALS.find(a => a.id === id).n
 const peltValue = id => { const g = ANIMALS.find(a => a.id === id).gold; return Math.round((g[0] + g[1]) / 2); };
 const peltIds = () => Object.keys(G.pelts).filter(k => G.pelts[k] > 0);
 const peltsTotal = () => peltIds().reduce((a, k) => a + G.pelts[k] * peltValue(k), 0);
-function feiraButtons(i) {
+/* Lojas da feira, cada uma numa barraca: comprador de peles, comida e artesão (roupas e armas). */
+function peltButtons(i) {
   const ids = peltIds();
   if (ids.length > 1) btn(`Vender todas as peles · R$ ${peltsTotal()}`, sellAll, false, i);
   ids.forEach(k => btn(`Vender ${peltName(k)} ×${G.pelts[k]} · R$ ${G.pelts[k] * peltValue(k)}`, () => sell(k), false, i));
-  if (!ids.length) lh("Você não tem peles para vender. Cace na mata, no rio ou na mata fechada.");
-  clothesButtons(i);
-  SHOP.forEach(([n, c], k) => btn(`${n} · R$ ${c}`, () => buy(k), G.money < c, i));
+  if (!ids.length) lh("Você não tem peles para vender. Cace na mata, no rio ou na mata fechada.", i);
 }
+function foodButtons(i) { Object.entries(ITEMS).forEach(([id, it]) => btn(`${it.n} (${itemEffect(it)}) · R$ ${it.price}`, () => buy(id), G.money < it.price, i)); }
 function sell(k) {
   const n = G.pelts[k] || 0, v = n * peltValue(k); if (!n) return;
-  G.money += v; G.pelts[k] = 0; save(); sfx("more"); drawLocal(); selectSub("feira", `Vendeu ${peltName(k).toLowerCase()} ×${n} por R$ ${v}.`);
+  G.money += v; G.pelts[k] = 0; save(); sfx("more"); localDone("feira", `Vendeu ${peltName(k).toLowerCase()} ×${n} por R$ ${v}.`);
 }
 function sellAll() {
   const v = peltsTotal(); G.money += v; Object.keys(G.pelts).forEach(k => { G.pelts[k] = 0; });
-  save(); sfx("more"); drawLocal(); selectSub("feira", `Vendeu todas as peles por R$ ${v}.`);
+  save(); sfx("more"); localDone("feira", `Vendeu todas as peles por R$ ${v}.`);
 }
-function clothesButtons(i) {
-  vit();
-  ["torso", "legs"].forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => {
+const GEAR_SLOTS = ["weapon", "ranged", "torso", "legs"];
+const gearBonus = (slot, it) => slot === "ranged" ? "ataca de longe" : slot === "weapon" ? `ATQ +${it.atk || 0}` : `DEF +${it.def || 0}`;
+// tudo de EQUIP que tem preço e ainda não é seu (itens novos em EQUIP aparecem aqui sozinhos)
+function gearButtons(i) {
+  vit(); let any = false;
+  GEAR_SLOTS.forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => {
     if (!it.price || G.owned[id]) return;
-    const lock = G.lv < it.lv;
-    btn(lock ? `${it.n} (Nv ${it.lv})` : `Comprar ${it.n} · R$ ${it.price} · DEF +${it.def}`, () => buyGear(slot, id), lock || G.money < it.price, i);
+    const lock = G.lv < it.lv; any = true;
+    btn(lock ? `${it.n} (Nv ${it.lv})` : `Comprar ${it.n} · R$ ${it.price} · ${gearBonus(slot, it)}`, () => buyGear(slot, id), lock || G.money < it.price, i);
   }));
+  if (!any) lh("Você já tem tudo o que o artesão faz por enquanto.", i);
 }
 function buyGear(slot, id) {
   const it = EQUIP[slot][id]; if (G.money < it.price || G.lv < it.lv) return;
-  G.money -= it.price; G.owned[id] = true; G.equip[slot] = id; save(); sfx("heal"); drawLocal();
-  selectSub("feira", `Comprou e vestiu: ${it.n}. DEF total: ${defense()}.`);
+  G.money -= it.price; G.owned[id] = true; G.equip[slot] = id; save(); sfx("heal");
+  localDone("feira", slot === "ranged" ? `Comprou: ${it.n}. Na exploração, X atira flechas.` : slot === "weapon" ? `Comprou e equipou: ${it.n}.` : `Comprou e vestiu: ${it.n}. DEF total: ${defense()}.`);
 }
-function equip(slot, id) { G.equip[slot] = id; save(); sfx("blip"); drawLocal(); showInv(); }
-function showInv() {
-  sfx("blip"); vit();
-  const i = $("linfo"), ids = peltIds(), q = G.equip;
-  i.innerHTML = "<h2>Inventário</h2><p>Vestindo: " + (q.torso ? EQUIP.torso[q.torso].n : "sem camisa") + " e " + EQUIP.legs[q.legs].n + "<br>Arma: " + EQUIP.weapon[q.weapon].n + " · Defesa: " + defense() + "<br>Mandioca ×" + G.man + "<br>" + (ids.length ? ids.map(k => `${peltName(k)} ×${G.pelts[k]} (R$ ${peltValue(k)} cada)`).join("<br>") : "Nenhuma pele ainda. Vença bichos para conseguir peles.") + "</p>" + (ids.length ? `<p class="hint">Valor das peles: R$ ${peltsTotal()}. Venda na feira.</p>` : "");
-  ["torso", "legs"].forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => { if (G.owned[id] && q[slot] !== id) btn(`Vestir ${it.n}`, () => equip(slot, id), false, i); }));
+function equip(slot, id) { G.equip[slot] = id; save(); sfx("blip"); invDone(); }
+
+/* ---------- inventário (no mapa de Ananindeua e, com I, dentro das fases) ---------- */
+function invSummary() {
+  const q = G.equip, ids = peltIds();
+  return "Vestindo: " + (q.torso ? EQUIP.torso[q.torso].n : "sem camisa") + " e " + EQUIP.legs[q.legs].n +
+    "<br>Arma: " + EQUIP.weapon[q.weapon].n + (q.ranged ? " + " + EQUIP.ranged[q.ranged].n : "") + " · Defesa: " + defense() +
+    "<br>Bolsa: " + (Object.entries(G.items).filter(([, n]) => n > 0).map(([k, n]) => `${ITEMS[k].n} ×${n}`).join(", ") || "vazia") +
+    "<br>" + (ids.length ? ids.map(k => `${peltName(k)} ×${G.pelts[k]} (R$ ${peltValue(k)} cada)`).join("<br>") : "Nenhuma pele ainda. Vença bichos para conseguir peles.");
+}
+function invButtons(i) {
+  const q = G.equip;
+  Object.entries(G.items).forEach(([k, n]) => { if (n > 0) btn(`Comer ${ITEMS[k].n.toLowerCase()} ×${n} (${itemEffect(ITEMS[k])})`, () => eatItem(k), false, i); });
+  GEAR_SLOTS.forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => { if (G.owned[id] && q[slot] !== id) btn(`${slot === "torso" || slot === "legs" ? "Vestir" : "Usar"} ${it.n}`, () => equip(slot, id), false, i); }));
   if (q.torso) btn(`Tirar a ${EQUIP.torso[q.torso].n.toLowerCase()}`, () => equip("torso", null), false, i);
+}
+// depois de comer/trocar equipamento: atualiza o inventário de onde veio
+function invDone(msg) {
+  if (EX && EX.dialog === "inventario" && !$("explore").hidden) { exHud(); exOpenDialog("inventario", msg); return; }
+  drawLocal(); showInv(msg);
+}
+function showInv(msg) {
+  sfx("blip"); vit();
+  const i = $("linfo"), ids = peltIds();
+  i.innerHTML = `<h2>Inventário</h2><p>${invSummary()}</p>` + (ids.length ? `<p class="hint">Valor das peles: R$ ${peltsTotal()}. Venda na feira.</p>` : "");
+  invButtons(i);
+  if (msg) lh(msg, i);
   btn("Voltar", () => selectSub(G.sub), false, i);
 }
 function showLocal(zoom) {

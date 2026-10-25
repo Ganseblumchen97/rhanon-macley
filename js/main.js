@@ -33,6 +33,11 @@ document.addEventListener("keydown", ev => {
   const bs = [...$("cmds").children], cur = bs.indexOf(document.activeElement);
   if (ev.key === "ArrowDown") { ev.preventDefault(); bs[(cur + 1) % bs.length].focus(); }
   else if (ev.key === "ArrowUp") { ev.preventDefault(); bs[(cur - 1 + bs.length) % bs.length].focus(); }
+  else if (subMenu) {   // Especial/Itens abertos: números escolhem, Esc volta
+    const o = /^[1-9]$/.test(ev.key) && subMenu[+ev.key - 1];
+    if (o && !o.off) o.fn();
+    else if (ev.key === "Escape" || ev.key === "Backspace") closeSubMenu();
+  }
   else if (/^[1-6]$/.test(ev.key)) act(CMDS[+ev.key - 1].id);
 });
 document.addEventListener("keydown", ev => { if (ev.key === "m" || ev.key === "M") toggleMute(); });

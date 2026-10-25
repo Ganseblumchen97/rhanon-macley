@@ -31,18 +31,52 @@ function getBattleTrackFor(animal) {
   return "battleP3";
 }
 
+/* ---------- comandos: lista principal e submenus (Especial e Itens) ---------- */
+let subMenu = null, subFrom = 0;   // opções do submenu aberto no lugar dos comandos; subFrom = comando que o abriu
+function cmdButton(html, desc, fn, off) {
+  const b = document.createElement("button"); b.className = "cmd"; b.type = "button"; b.innerHTML = `<span>${html}</span>`;
+  if (off) b.setAttribute("aria-disabled", "true");
+  b.addEventListener("click", () => { if (!off) fn(); });
+  const showDesc = () => { $("desc").textContent = desc; sfx("blip"); }; b.addEventListener("focus", showDesc); b.addEventListener("mouseenter", showDesc);
+  $("cmds").appendChild(b);
+}
+function buildCmds() {
+  subMenu = null; $("cmds").innerHTML = "";
+  CMDS.forEach((c, n) => cmdButton(`<i class="key">${n + 1}</i>${c.n}<small></small>`, c.d, () => act(c.id)));   // o número é a tecla de atalho (1-6)
+}
+// opts: [{label, small, desc, fn, off}]; números escolhem, Esc volta sem gastar o turno
+function openSubMenu(opts, backDesc, from) {
+  subMenu = opts; subFrom = from; sfx("look"); $("cmds").innerHTML = "";
+  opts.forEach((o, n) => cmdButton(`<i class="key">${n + 1}</i>${o.label}<small>${o.small || ""}</small>`, o.desc, o.fn, o.off));
+  cmdButton(`<i class="key">Esc</i>Voltar`, backDesc, closeSubMenu);
+  $("cmds").firstChild.focus();
+}
+function closeSubMenu() { const from = subFrom; buildCmds(); render(); $("cmds").children[from].focus(); }
+const bagIds = () => Object.keys(ITEMS).filter(k => (p.items[k] || 0) > 0);
+function openItemMenu() {
+  openSubMenu(bagIds().map(k => ({label: ITEMS[k].n, small: "×" + p.items[k], desc: `${ITEMS[k].n}: ${itemEffect(ITEMS[k])}.`, fn: () => useItem(k)})), "Fecha a bolsa sem gastar o turno.", CMDS.findIndex(c => c.id === "item"));
+}
+function openSpecialMenu() {
+  openSubMenu(SPECIALS.map(s => ({label: s.n, small: s.id === "flecha" && !G.equip.ranged ? "sem arco" : s.cost + " PE", desc: s.d, off: !avail(s.id), fn: () => { buildCmds(); act(s.id); }})),
+    "Volta aos comandos sem gastar o turno.", CMDS.findIndex(c => c.id === "especial"));
+}// usa um item da bolsa: gasta o turno, como os outros comandos
+function useItem(k) {
+  const it = ITEMS[k]; if (busy || !(p.items[k] > 0)) return;
+  buildCmds(); busy = true; preE = e.hp; HERO_A.set("eat");
+  p.items[k]--; p.hp = Math.min(p.max, p.hp + it.hp); p.sp = Math.min(p.msp, p.sp + it.sp);
+  sfx("heal"); pop(it.hp ? "+" + it.hp : "+" + it.sp, $("hero"), "heal"); burst(pos($("hero")), it.hp ? ["#7dff9a", "#fff"] : ["#19a8d8", "#fff"], 8, 40);
+  say(`Rhanon come ${it.n.toLowerCase()}. ${itemEffect(it)}.`);
+  render(); $("cmds").firstChild.focus();
+  setTimeout(enemyTurn, 750);
+}
+
 // opts: animal (bicho escolhido), firstHit (dano do golpe de abertura na exploração), enemyFirst (o bicho começa)
 function init(opts = {}) {
   $("homeButton").hidden = true; $("map").hidden = true; $("local").hidden = true;
   $("game").classList.remove("working-mode"); $("stage").classList.remove("working"); $("workScene").hidden = true; $("beast").style.display = ""; $("hero").style.display = "";
   setBattleDecor(curZone);
   mode = "hunt";
-  $("cmds").innerHTML = "";
-  CMDS.forEach((c) => {
-    const b = document.createElement("button"); b.className = "cmd"; b.type = "button"; b.innerHTML = `<span>${c.n}<small></small></span>`;
-    b.addEventListener("click", () => act(c.id));
-    const showDesc = () => { $("desc").textContent = c.d; sfx("blip"); }; b.addEventListener("focus", showDesc); b.addEventListener("mouseenter", showDesc); $("cmds").appendChild(b);
-  });
+  buildCmds();
   const animal = opts.animal || pickAnimal();
   $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = "Nv " + (animal.lv || 1);
   $("beast").innerHTML = ""; $("beast").appendChild(animalSprite(animal)); refreshHero();
@@ -50,7 +84,7 @@ function init(opts = {}) {
   $("beast").style.top = `calc(46% - ${spr.height / (+spr.dataset.scale || 1) * (animal.boss ? 1.35 : 1)} * var(--px) + 12px)`; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", animal.name); $("hero").style.display = ""; $("intent").style.display = ""; $("ehp").parentElement.style.display = ""; $("spTxt").parentElement.style.display = ""; $("sp").parentElement.style.display = "";
   musicStop();
   vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = "Lutar de novo"; $("toMap").textContent = fromExplore ? "Continuar explorando" : "Voltar ao mapa";
-  p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, man:G.man};
+  p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, items:{...G.items}};
   e = { ...animal, hp:animal.hp, max:animal.hp, intent:null, known:false, assustada:false };
   busy = false;
   lines = [animal.intro];
@@ -80,7 +114,9 @@ function say(t) { lines.push(t); if (lines.length > 4) lines.shift(); }
 function avail(id) {
   if (busy) return false;
   if (id === "tocha") return p.sp >= 6;
-  if (id === "mandioca") return p.man > 0;
+  if (id === "flecha") return !!G.equip.ranged && p.sp >= 3;
+  if (id === "especial") return SPECIALS.some(s => avail(s.id));
+  if (id === "item") return bagIds().length > 0;
   return true;
 }
 function render() {
@@ -98,10 +134,10 @@ function render() {
   if (p.def) st.push("Em guarda"); if (p.dot && p.dot.t > 0) st.push(p.dot.n); if (p.weak > 0) st.push("Fedor"); if (p.preso > 0) st.push("Preso");
   if (e.assustada) st.push(`${e.name} assustado`);
   $("status").textContent = st.join(" · ");
-  CMDS.forEach((c, i) => {
+  if (!subMenu) CMDS.forEach((c, i) => {
     const b = $("cmds").children[i];
     b.setAttribute("aria-disabled", avail(c.id) ? "false" : "true");
-    b.querySelector("small").textContent = c.id === "mandioca" ? "×" + p.man : c.id === "tocha" ? "6 PE" : "";
+    b.querySelector("small").textContent = c.id === "item" ? "×" + itemCount(p.items) : c.id === "especial" ? "PE" : "";
   });
 }
 function hitBeast() {
@@ -111,7 +147,8 @@ function hitBeast() {
 function act(id) {
   if (!avail(id)) return;
   if (id === "defender") HERO_A.set("guard");
-  if (id === "mandioca") HERO_A.set("eat");
+  if (id === "item") return openItemMenu();
+  if (id === "especial") return openSpecialMenu();   // abre a bolsa; o turno só é gasto ao usar um item
   if (id === "observar") HERO_A.set("observe");
   busy = true; preE = e.hp;
   let extra = false;
@@ -126,15 +163,18 @@ function act(id) {
     e.hp = Math.max(0, e.hp - d); strike(d, "", "fire");
     sayLate(`Rhanon avança com a tocha contra ${e.name.toLowerCase()}: −${d}.`);
     if (!e.assustada && e.hp > 0) { e.assustada = true; extra = true; sayLate(`FRAQUEZA! ${e.name} recua assustado. Mais uma!`); setTimeout(() => { sfx("more"); pop("FRAQUEZA!", $("beast"), "crit"); }, 450); }
+  } else if (id === "flecha") {   // tiro com o arco: menos dano que a lança, mas 40% de chance de crítico
+    p.sp -= 3;
+    let d = rnd(5, 9) + G.lv - 1, crit = p.atento || Math.random() < .4;
+    if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
+    e.hp = Math.max(0, e.hp - d); strike(d, crit ? "crit" : "", "arrow");
+    sayLate(crit ? `Flechada certeira no ponto fraco: −${d}!` : `Rhanon dispara uma flecha: −${d}.`);
   } else if (id === "observar") {
     e.known = true; p.atento = true; sfx("look");
     say(`Rhanon observa ${e.name.toLowerCase()}. Próximo movimento: ${(e.moves || MOVES)[e.intent]}.`);
   } else if (id === "defender") {
     p.def = true; p.sp = Math.min(p.msp, p.sp + 3); sfx("guard");
     say("Rhanon firma os pés e levanta a guarda.");
-  } else if (id === "mandioca") {
-    p.man--; p.hp = Math.min(p.max, p.hp + 15); sfx("heal"); pop("+15", $("hero"), "heal"); burst(pos($("hero")), ["#7dff9a", "#fff"], 8, 40);
-    say("Rhanon come mandioca assada. +15 PV.");
   } else if (id === "fugir") {
     const chance = p.preso > 0 ? 0 : 35 + (e.hp < 30 ? 25 : 0) + (e.known ? 15 : 0);
     if (Math.random() * 100 < chance) { render(); return finish("flee"); }
@@ -201,12 +241,12 @@ function foeAttack(kind, d, sp0) {
 }
 // golpe do Rhanon: lança ou tocha voando até o bicho
 function strike(d, cls, kind) {
-  HERO_A.set(kind === "fire" ? "torch" : "throw");
+  HERO_A.set(kind === "fire" ? "torch" : kind === "arrow" ? "shoot" : "throw");
   holdE = preE; anim($("hero"), "lunge"); sfx(kind === "fire" ? "fire" : "spear");
   const a = pos($("hero")), b = pos($("beast")), fire = kind === "fire";
-  const c = fire ? gridC(FLAME, PAL_F, 5) : spearC(4);
+  const c = fire ? gridC(FLAME, PAL_F, 5) : kind === "arrow" ? arrowC(4) : spearC(4);
   c.style.left = a.x + "px"; c.style.top = a.y + "px"; $("fx").appendChild(c);
-  const ang = Math.atan2(b.y - a.y, b.x - a.x), arc = fire ? 0 : -50, rot = (k) => fire ? 0 : ang + k;
+  const ang = Math.atan2(b.y - a.y, b.x - a.x), arc = fire ? 0 : kind === "arrow" ? -18 : -50, rot = (k) => fire ? 0 : ang + k;
   const an = c.animate([
     {transform: `translate(-50%,-50%) rotate(${rot(0)}rad)`},
     {transform: `translate(calc(-50% + ${(b.x - a.x) / 2}px),calc(-50% + ${(b.y - a.y) / 2 + arc}px)) rotate(${rot(.25)}rad)`, offset: .5},
@@ -231,7 +271,8 @@ function special() {
   const hit = (n, k) => { if (p.def) n = Math.ceil(n / 2); n = Math.max(1, n - defense()); p.hp -= n; foeAttack(k || "claw", n); return n; };
   if (s === "fedor") { p.weak = 3; foeAttack("roar", 0); say(`${e.name} solta um fedor horrível! Seus golpes enfraquecem por 3 turnos.`); }
   else if (s === "roubo") {
-    if (p.man > 0) { p.man--; foeAttack("roar", 0); say(`${e.name} rouba uma mandioca e escapa pelas árvores!`); }
+    const k = bagIds()[0];
+    if (k) { p.items[k]--; foeAttack("roar", 0); say(`${e.name} rouba ${ITEMS[k].n.toLowerCase()} da sua bolsa e escapa pelas árvores!`); }
     else say(`${e.name} puxa seu cabelo: −${hit(3)} PV.`);
   }
   else if (s === "sono") { e.hp = Math.min(e.max, e.hp + 8); foeAttack("roar", 0); say(`${e.name} cochila no galho e recupera 8 PV.`); }
@@ -258,6 +299,6 @@ function reward(a = e) {
 function keepVitals(kind) {
   vit();
   if (kind === "lose") { G.hp = Math.ceil(maxHP(G.lv) / 2); G.sp = Math.ceil(maxSP(G.lv) / 2); G.lastLoss = Math.round(G.money * (.05 + Math.random() * .1)); G.money -= G.lastLoss; G.sub = "aldeia"; G.day++; }
-  else { G.hp = Math.max(1, p.hp); G.sp = p.sp; G.man = p.man; }
+  else { G.hp = Math.max(1, p.hp); G.sp = p.sp; G.items = p.items; }
   save();
 }

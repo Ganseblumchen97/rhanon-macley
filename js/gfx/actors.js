@@ -22,7 +22,7 @@ function makeHeroActor() {
   const og = off.getContext("2d", {willReadFrequently: true});
   const set = (s) => { state = s; since = performance.now(); lastFx = 0; };
   function mount(el, opts = {}) {
-    parts = heroParts(!opts.weapon);
+    parts = heroBackParts(heroParts(!opts.weapon));   // de costas para nós, de frente para o bicho
     mode = opts.mode || "battle";
     k = IMG["hero/battle"] ? IMG["hero/battle"].scale : 1;
     cv = document.createElement("canvas"); cv.width = W * k; cv.height = H * k;
@@ -68,6 +68,10 @@ function makeHeroActor() {
         if (el < 90) { o.lean = -1; weapon = "back"; }
         else if (el < 520) { o.lean = 1; weapon = null; extra = "arm"; }
         else set("idle");
+        break;
+      case "shoot":   // flecha: arco na mão, inclinado para frente
+        o.legs = "stance"; o.lean = el < 400 ? 1 : 0; weapon = "bow";
+        if (el > 600) set("idle");
         break;
       case "torch":
         o.legs = "stance"; o.lean = el < 420 ? 1 : 0; weapon = "torch";
@@ -135,9 +139,9 @@ function makeHeroActor() {
 
     const art = heroArt(t);
     og.clearRect(0, 0, 20, 28);
-    if (!art) { drawHero(og, parts, o); shadeCanvas(off); }
+    if (!art) { drawHero(og, parts, o); shadeCanvas(off); if (G?.equip?.ranged && weapon !== "bow") drawBowOnBack(og); }
     // braço estendido no arremesso, mão na testa ao observar, comida na boca
-    if (art) extra = null;
+    if (art || (parts.back && (extra === "brow" || extra === "food"))) extra = null;   // mão na testa e comida são coisas do rosto
     if (extra === "arm") { og.fillStyle = parts.pal.s; og.fillRect(18, 19, 2, 1); og.fillStyle = parts.pal.k; og.fillRect(18, 18, 2, 1); og.fillRect(18, 20, 2, 1); }
     if (extra === "brow") { og.fillStyle = parts.pal.s; og.fillRect(13 + o.lean, 9, 4, 1); og.fillStyle = parts.pal.k; og.fillRect(13 + o.lean, 8, 4, 1); }
     if (extra === "food") { og.fillStyle = "#7a4a1e"; og.fillRect(9, 13, 3, 2); og.fillStyle = "#f4ecd8"; og.fillRect(9, 13, 1, 2); }
@@ -157,6 +161,10 @@ function makeHeroActor() {
       else if (weapon === "back") spear(21, 1, 16, 27);
       else if (weapon === "raise") spear(19, -6, 19, 21);
       else if (weapon === "guard") spear(21, 18, -1, 21);
+      else if (weapon === "bow") {
+        for (let y = 12; y <= 26; y++) pxl(g, 21 + Math.round(Math.sin((y - 12) / 14 * Math.PI) * 2), y, "#9c6339");
+        lineP(g, 21, 12, 21, 26, "#f4ecd8");
+      }
       else if (weapon === "torch") {
         lineP(g, 18, 22, 21, 15, "#7a4a1e");
         const f = Math.floor(t / 70) % 3, fl = [["#ffd23a", "#f2740c", "#d62828"], ["#fff3a0", "#ffd23a", "#f2740c"], ["#ffd23a", "#d62828", "#f2740c"]][f];

@@ -14,15 +14,20 @@ const SUB = {
 };
 const EDGES = [["aldeia","mata"],["mata","fechada"],["aldeia","feira"],["feira","rio"],["fechada","rio"]];
 const NEED = {fechada: "mata", rio: "fechada"}, NEXT_Z = {mata: "fechada", fechada: "rio"};
-const SHOP = [
-  ["Mandioca (+1 item)", 10, () => { G.man++; }],
-  ["Peixe assado (+20 PV)", 18, () => { G.hp = Math.min(maxHP(G.lv), G.hp + 20); }],
-  ["Açaí (+10 PE)", 15, () => { G.sp = Math.min(maxSP(G.lv), G.sp + 10); }],
-  ["Maniçoba (+30 PV e +15 PE)", 45, () => { G.hp = Math.min(maxHP(G.lv), G.hp + 30); G.sp = Math.min(maxSP(G.lv), G.sp + 15); }]
-];
+/* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
+   Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
+const ITEMS = {
+  mandioca: {n: "Mandioca", price: 10, hp: 15, sp: 0},
+  peixe:    {n: "Peixe assado", price: 18, hp: 20, sp: 0},
+  acai:     {n: "Açaí", price: 15, hp: 0, sp: 10},
+  manicoba: {n: "Maniçoba", price: 45, hp: 30, sp: 15}
+};
+const itemEffect = it => [it.hp && `+${it.hp} PV`, it.sp && `+${it.sp} PE`].filter(Boolean).join(" e ");
 /* Equipamentos: para criar um item novo, basta acrescentar uma linha em legs, torso ou weapon. */
 const EQUIP = {
   legs:   {tanga: {n: "Tanga", def: 0, lv: 1, price: 0}, short: {n: "Short", def: 2, lv: 3, price: 60, color: "#3b6ea5", shade: "#27496e"}},
   torso:  {regata: {n: "Regata", def: 2, lv: 5, price: 90, color: "#e9e2cf", shade: "#c9bfa4"}},
-  weapon: {lanca: {n: "Lança", atk: 0, lv: 1, price: 0}}
+  weapon: {lanca: {n: "Lança", atk: 0, lv: 1, price: 0}},
+  // arma de longe (X na exploração); sem ela, o Rhanon só ataca de perto com a lança
+  ranged: {arco: {n: "Arco e flecha", atk: 0, lv: 3, price: 120}}
 };

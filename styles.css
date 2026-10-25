@@ -462,3 +462,12 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .info .cmd:hover .key,.info .cmd:focus-visible .key{background:var(--ink);color:var(--paper)}
 .nav-help{grid-column:1/-1;justify-self:center;margin:0;font:700 11px var(--mono);color:var(--paper);opacity:.85;text-align:center}
 @media (pointer:coarse){.nav-help,.cmd .key{display:none}}
+/* ===== aldeia e feira: aviso de interação e painel de conversa ===== */
+.ex-prompt{position:absolute;left:50%;bottom:12px;translate:-50% 8px;opacity:0;pointer-events:none;line-height:1.4;font:700 12px var(--mono);background:var(--ink);color:var(--paper);padding:5px 14px;border:2px solid var(--accent);transition:opacity .15s,translate .15s;white-space:nowrap}
+.ex-prompt.show{opacity:1;translate:-50% 0}
+.ex-dialog{position:absolute;left:4%;right:4%;bottom:4%;max-height:78%;overflow:auto;line-height:normal;z-index:3}
+.ex-dialog[hidden]{display:none}
+.ex-dialog h2{margin:0 0 4px}
+.ex-dialog p{margin:0 0 8px}
+.ex-dialog .cmd{font-size:clamp(18px,2.2vw,26px)}
+.ex-btns{display:flex;gap:8px}

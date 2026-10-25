@@ -13,6 +13,15 @@ function gridC(rows, pal, sc) {
   rows.forEach((r, y) => [...r].forEach((ch, i) => { if (pal[ch]) { x.fillStyle = pal[ch]; x.fillRect(i, y, 1, 1); } }));
   return px(c, sc);
 }
+// flecha voando: haste clara, ponta de pedra e penas vermelhas
+function arrowC(sc) {
+  const c = document.createElement("canvas"), x = c.getContext("2d");
+  c.width = 16; c.height = 5;
+  x.fillStyle = "#c9a46a"; x.fillRect(2, 2, 11, 1);
+  x.fillStyle = "#cfd8dc"; x.fillRect(13, 1, 2, 3); x.fillRect(15, 2, 1, 1);
+  x.fillStyle = "#e5001c"; x.fillRect(0, 1, 3, 1); x.fillRect(0, 3, 3, 1);
+  return px(c, sc);
+}
 function spearC(sc) {
   const c = document.createElement("canvas"), x = c.getContext("2d");
   c.width = 18; c.height = 5;

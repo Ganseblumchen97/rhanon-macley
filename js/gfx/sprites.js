@@ -82,6 +82,18 @@ function heroParts(noWeapon = false) {
   if (glasses) { head[11] = ".khhs" + "x".repeat(10) + "shhk."; head[12] = ".khhsxwxxxxxwxxshhk."; }
   return {head, torso, pal, short, glasses, weapon: !noWeapon};
 }
+// Rhanon de costas (batalha e exploração andando para cima): o rosto vira cabelo e a pintura/gravata do peito some
+function heroBackParts(parts) {
+  return {...parts, back: true,
+    head: parts.head.map((r, i) => i >= 7 && i <= 14 ? r.replace(/[sewrmx]/g, "h") : r),
+    torso: parts.torso.map((r, i) => i <= 5 ? r.replace(/r/g, "c") : r)};
+}
+// arco atravessado nas costas (sprite de 20x28 visto de trás)
+function drawBowOnBack(ctx) {
+  for (let k = 0; k <= 11; k++) { const b = Math.round(Math.sin(k / 11 * Math.PI) * 2); pxl(ctx, 4 + k - b, 14 + k + b, "#9c6339"); }
+  lineP(ctx, 4, 14, 15, 25, "#f4ecd8");
+  pxl(ctx, 4, 14, "#1b1a24"); pxl(ctx, 15, 25, "#1b1a24");
+}
 function legsFor(parts, pose) {
   const rows = LEGPOSE[pose] || LEGPOSE.stand;
   return parts.short ? rows.map((r, i) => i < 2 ? r.replace(/p/g, "q").replace(/P/g, "Q") : r) : rows;
@@ -99,7 +111,7 @@ function drawHero(ctx, parts, o, ox = 0, oy = 0) {
   put(legs, 28 - legs.length);
   const dy = o.legs === "sit" ? 2 : (o.dy || 0);
   put(parts.torso, 16 + dy);
-  const face = !parts.glasses && o.face && FACE[o.face];
+  const face = !parts.glasses && !parts.back && o.face && FACE[o.face];
   put(parts.head.map((r, i) => (face && face[i]) || r), dy, o.lean || 0);
 }
 // Rhanon parado, como imagem estática

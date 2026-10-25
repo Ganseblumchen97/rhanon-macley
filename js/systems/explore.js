@@ -60,23 +60,24 @@ function startExplore(zone) {
   wipe(() => {
     const st = STAGES[zone];
     EX = {zone, st, rows: st.rows, map: drawStageMap(st.rows, zone), pal: TILE_PAL[zone] || TILE_PAL.mata,
-      ents: [], fx: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0};
+      ents: [], fx: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
     st.rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
       if (ch === "S") EX.hero = {x: tx * TILE + 8, y: ty * TILE + 12, hw: 5, hh: 3, dir: "down", aim: {x: 0, y: 1}, walk: 0, flip: false, movedT: 0};
       else if (ch === "a") EX.ents.push(makeAnimalEnt(pickFromPool(zone), tx, ty));
       else if (ch === "B" && !BS()[zone]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === ZONES[zone].boss), tx, ty));
+      else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "aldeao" ? "aldeao" + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
     }));
     vit(); G.sub = zone; save();
     curZone = zone; fromLocal = false; exKeys.clear();
     $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
     musicStart("local"); exHud();
-    exToast(ZONES[zone].n + (BS()[zone] ? "" : " · o chefe espera no fim da trilha"));
+    exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira, da tenda ou do aldeão e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : ZONES[zone].n + (BS()[zone] ? "" : " · o chefe espera no fim da trilha"));
   });
 }
 function exitExplore() {
   if (!EX || EX.locked) return;
   EX.locked = true;
-  wipe(() => { $("explore").hidden = true; EX = null; exKeys.clear(); showLocal(); });
+  wipe(() => { $("explore").hidden = true; $("exDialog").hidden = true; EX = null; exKeys.clear(); showLocal(); });
 }
 // volta da batalha para a fase, no mesmo lugar
 function resumeExplore(result) {
@@ -93,16 +94,19 @@ function resumeExplore(result) {
 /* ---------- ações do Rhanon ---------- */
 const entH = en => Math.min(en.h, 20);
 function exStrike() {
-  if (!EX || EX.locked || EX.cool > 0) return;
+  if (!EX || EX.locked || EX.dialog || EX.cool > 0) return;
+  const spot = nearSpot(); if (spot) return exOpenDialog(spot.kind, null, spot.look);   // perto de alguém: conversa em vez de golpe
   const h = EX.hero; EX.cool = .35; EX.jab = .16; sfx("spear");
-  const px = h.x + h.aim.x * 13, py = h.y - 8 + h.aim.y * 13;
-  const target = EX.ents.find(en => en.alive && Math.hypot(en.x - px, en.y - entH(en) / 2 - py) < 11 + en.hw);
+  // a lança alcança uns 1,5 quadrado à frente: confere pontos ao longo dela
+  const target = EX.ents.find(en => en.alive && [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw));
   if (target) exHit(target);
 }
+// flecha: só com arco (EQUIP.ranged, comprado no artesão da feira)
 function exThrow() {
-  if (!EX || EX.locked || EX.cool > 0 || EX.spear) return;
-  const h = EX.hero; EX.cool = .5; sfx("spear");
-  EX.spear = {x: h.x + h.aim.x * 6, y: h.y - 10 + h.aim.y * 6, vx: h.aim.x * 230, vy: h.aim.y * 230, left: 96, stuck: 0};
+  if (!EX || EX.locked || EX.dialog || EX.cool > 0 || EX.spear) return;
+  if (!G.equip.ranged) { EX.cool = 1.2; sfx("blip"); return exToast("Para atacar de longe você precisa de um arco. O artesão da feira vende."); }
+  const h = EX.hero; EX.cool = .5; EX.shoot = .25; sfx("spear");
+  EX.spear = {x: h.x + h.aim.x * 6, y: h.y - 10 + h.aim.y * 6, vx: h.aim.x * 260, vy: h.aim.y * 260, left: 120, stuck: 0};
 }
 function exHit(en) {
   const a = en.a, d = rnd(6, 10) + G.lv - 1 + weaponAtk();
@@ -160,14 +164,13 @@ function exAnimal(en, dt, now) {
 }
 function exUpdate(dt, now) {
   const h = EX.hero;
-  EX.cool = Math.max(0, EX.cool - dt); EX.jab = Math.max(0, EX.jab - dt);
+  EX.cool = Math.max(0, EX.cool - dt); EX.jab = Math.max(0, EX.jab - dt); EX.shoot = Math.max(0, (EX.shoot || 0) - dt);
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
-  if (EX.locked) ix = iy = 0;
+  if (EX.locked || EX.dialog) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     h.aim = {x: ix / n, y: iy / n};
-    h.dir = iy && (!ix || h.dir !== "side") ? (iy < 0 ? "up" : "down") : "side";
-    if (ix) h.flip = ix < 0;
+    if (iy) h.dir = iy < 0 ? "up" : "down";   // só frente e costas: andando de lado, continua virado como estava
     if (slide(h, ix / n * sp, iy / n * sp) || nudge(h, ix, iy)) { h.walk += sp; h.movedT = now; }
   }
   if (!EX.locked) {
@@ -184,7 +187,7 @@ function exUpdate(dt, now) {
     else if (spearBlocked(s.x, s.y + 10)) { s.stuck = .35; sfx("guard"); }
     else if (s.left <= 0) s.stuck = .35;
   }
-  for (const en of EX.ents) if (en.alive && EX) exAnimal(en, dt, now);
+  if (!EX.dialog) for (const en of EX.ents) if (en.alive && EX) exAnimal(en, dt, now);   // bichos param com o painel aberto
   EX.fx = EX.fx.filter(q => (q.life -= dt) > 0);
   for (const q of EX.fx) { q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 60 * dt; }
 }
@@ -208,16 +211,20 @@ function drawHeroEnt(x, h, cx, cy, now) {
   const walking = now - h.movedT < 90, step = Math.floor(h.walk / 7);
   const art = IMG["hero/walk/" + h.dir];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
   const img = art ? overworldArt(h.dir, walking ? step % art.frames : 0)
-    : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", !EX.spear && EX.jab <= 0);
+    : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0);
   const iw = art ? art.w / art.scale : 20, ih = art ? art.h / art.scale : 28;
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
   drawShadow(x, sx, sy, 12);
-  if (h.dir === "side" && h.flip) { x.save(); x.translate(sx + ox, 0); x.scale(-1, 1); x.drawImage(img, -iw / 2, sy - ih + 1 + oy, iw, ih); x.restore(); }
-  else x.drawImage(img, sx - iw / 2 + ox, sy - ih + 1 + oy, iw, ih);
+  x.drawImage(img, sx - iw / 2 + ox, sy - ih + 1 + oy, iw, ih);
+  if (EX.shoot > 0) {   // arco na mão por um instante, virado para onde a flecha foi
+    const cx0 = sx + h.aim.x * 7, cy0 = sy - 12 + h.aim.y * 7, px = -h.aim.y, py = h.aim.x;
+    for (let k = -4; k <= 4; k++) { const b = 2.5 - k * k / 7; pxl(x, cx0 + px * k + h.aim.x * b, cy0 + py * k + h.aim.y * b, "#9c6339"); }
+    lineP(x, cx0 + px * 4, cy0 + py * 4, cx0 - px * 4, cy0 - py * 4, "#f4ecd8");
+  }
   if (EX.jab > 0) {   // estocada da lança
     const bx = sx + ox, by = sy - 12 + oy;
-    lineP(x, bx - h.aim.x * 4, by - h.aim.y * 4, bx + h.aim.x * 15, by + h.aim.y * 15, "#7a4a1e");
-    pxl(x, bx + h.aim.x * 16, by + h.aim.y * 16, "#eef3f5"); pxl(x, bx + h.aim.x * 15, by + h.aim.y * 15, "#cfd8dc");
+    lineP(x, bx - h.aim.x * 4, by - h.aim.y * 4, bx + h.aim.x * 21, by + h.aim.y * 21, "#7a4a1e");
+    pxl(x, bx + h.aim.x * 22, by + h.aim.y * 22, "#eef3f5"); pxl(x, bx + h.aim.x * 21, by + h.aim.y * 21, "#cfd8dc");
   }
   grassOver(x, h, cx, cy);
 }
@@ -260,19 +267,22 @@ function exDraw(now) {
     const ch = stageTile(tx, ty), sx = tx * TILE - cx, sy = ty * TILE - cy;
     if (ch === "~" && (tx * 7 + ty * 13 + Math.floor(now / 450)) % 9 === 0) { x.fillStyle = "#ffffffb0"; x.fillRect(sx + 4 + (tx % 3) * 3, sy + 6 + (ty % 2) * 4, 3, 1); }
     if (ch === "G" && !BS()[EX.zone]) drawGate(x, sx, sy, EX.pal);
+    if (ch === "F") drawFire(x, sx, sy, now);
   }
   const alive = EX.ents.filter(en => en.alive);
-  [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)}]
+  const people = EX.spots.filter(s => PEOPLE.includes(s.kind)).map(s => ({y: s.y + 5, draw: () => drawNpc(x, s, cx, cy, now)}));
+  [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...people, {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)}]
     .sort((a, b) => a.y - b.y).forEach(o => o.draw());
   const s = EX.spear;
   if (s) {
     const n = Math.hypot(s.vx, s.vy) || 1, ux = s.vx / n, uy = s.vy / n, sx = s.x - cx, sy = s.y - cy;
     x.fillStyle = "rgba(0,0,0,.25)"; x.fillRect(Math.round(sx) - 3, Math.round(sy + 10), 6, 1);
-    lineP(x, sx - ux * 6, sy - uy * 6, sx + ux * 5, sy + uy * 5, "#7a4a1e");
-    pxl(x, sx + ux * 6, sy + uy * 6, "#eef3f5"); pxl(x, sx + ux * 5, sy + uy * 5, "#cfd8dc");
+    lineP(x, sx - ux * 5, sy - uy * 5, sx + ux * 4, sy + uy * 4, "#c9a46a");   // flecha: haste, ponta e penas
+    pxl(x, sx + ux * 5, sy + uy * 5, "#eef3f5"); pxl(x, sx - ux * 5 - uy, sy - uy * 5 + ux, "#e5001c"); pxl(x, sx - ux * 5 + uy, sy - uy * 5 - ux, "#e5001c");
   }
   for (const q of EX.fx) { x.fillStyle = q.col; x.fillRect(Math.round(q.x - cx) - 1, Math.round(q.y - cy) - 1, 2, 2); }
   alive.forEach(en => drawAnimalTags(x, en, cx, cy, now));
+  drawSpotPrompt(x, cx, cy, now);
 }
 // chamado pelo laço de animação (gfx/actors.js) a cada quadro
 function exploreFrame(t, dt) {
@@ -284,7 +294,7 @@ function exploreFrame(t, dt) {
 /* ---------- textos na tela ---------- */
 function exHud() {
   vit();
-  $("exHud").textContent = `${ZONES[EX.zone].n} · Nv ${G.lv} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · R$ ${G.money}`;
+  $("exHud").textContent = `${(ZONES[EX.zone] || SUB[EX.zone]).n} · Nv ${G.lv} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · R$ ${G.money}`;
 }
 function exToast(msg) {
   const el = $("exMsg"); el.textContent = msg; el.classList.add("show");
@@ -296,12 +306,14 @@ function setupExploreInput() {
   const DIRS = {ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down", ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right"};
   document.addEventListener("keydown", ev => {
     if (!EX || $("explore").hidden) return;
+    if (EX.dialog) { dialogKey(ev); return; }
     const k = DIRS[ev.key];
     if (k) { exKeys.add(k); ev.preventDefault(); return; }
     if (ev.repeat) return;
     if ("zZjJ ".includes(ev.key)) { ev.preventDefault(); exStrike(); }
     else if ("xXkK".includes(ev.key)) { ev.preventDefault(); exThrow(); }
     else if (ev.key === "Escape") exitExplore();
+    else if ((ev.key === "i" || ev.key === "I") && !EX.locked) exOpenDialog("inventario");
   });
   document.addEventListener("keyup", ev => { const k = DIRS[ev.key]; if (k) exKeys.delete(k); });
   window.addEventListener("blur", () => exKeys.clear());
@@ -313,4 +325,66 @@ function setupExploreInput() {
   $("exA").addEventListener("pointerdown", ev => { ev.preventDefault(); exStrike(); });
   $("exB").addEventListener("pointerdown", ev => { ev.preventDefault(); exThrow(); });
   $("exExit").addEventListener("click", exitExplore);
+  $("exBag").addEventListener("click", () => { if (EX && !EX.locked) EX.dialog === "inventario" ? exCloseDialog() : exOpenDialog("inventario"); });
+}
+
+/* ---------- aldeia e feira: pontos de conversa ---------- */
+const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", P: "aldeao"};
+const PEOPLE = ["peles", "comida", "artesao", "aldeao"];
+const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir na tenda", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas e equipamentos", aldeao: "conversar"};
+const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã"};
+const VILLAGER_TIPS = [
+  "Etiqueta verde em cima do bicho? Ele cai com um golpe só.",
+  "Acertar o bicho de longe com a lança (X) te dá o primeiro turno da luta.",
+  "Se o bicho te alcançar antes, quem começa batendo é ele. Fique esperto com o \"!\".",
+  "A tocha assusta os bichos: eles fraquejam e você ataca de novo na mesma hora.",
+  "O chefe de cada mata fica no fim da trilha. Vencer ele abre o caminho para a próxima.",
+  "Dormir na tenda recupera tudo, mas o dia passa. A fogueira recupera metade.",
+  "O vendedor da feira paga bem por couro de jacaré. Dizem."
+];
+// ponto de conversa colado no Rhanon (o mais perto)
+function nearSpot() {
+  const h = EX.hero; let best = null, bd = 27;
+  for (const s of EX.spots) { const d = Math.hypot(s.x - h.x, s.y - (h.y - 6)); if (d < bd) { bd = d; best = s; } }
+  return best;
+}
+function drawNpc(x, s, cx, cy, now) {
+  const img = villagerSprite(s.look), sx = snap(s.x - cx), sy = snap(s.y + 5 - cy), bob = Math.floor(now / 600 + s.tx) % 2;
+  drawShadow(x, sx, sy, 10);
+  if (EX.hero.x > s.x + 4) { x.save(); x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -10, sy - 27 - bob); x.restore(); }
+  else x.drawImage(img, sx - 10, sy - 27 - bob);
+}
+// setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
+function drawSpotPrompt(x, cx, cy, now) {
+  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `Z / GOLPE: ${SPOT_LABEL[s.kind]}` : "";
+  if (el.textContent !== txt) { el.textContent = txt; el.classList.toggle("show", !!s); }
+  if (!s) return;
+  const px = Math.round(s.x - cx), py = Math.round(s.y - cy) - (PEOPLE.includes(s.kind) ? 30 : 10) - Math.floor(now / 250) % 2;
+  x.fillStyle = OUTLINE; x.fillRect(px - 4, py - 1, 9, 2); x.fillRect(px - 3, py + 1, 7, 1); x.fillRect(px - 2, py + 2, 5, 1); x.fillRect(px - 1, py + 3, 3, 1);
+  x.fillStyle = "#ffd23a"; x.fillRect(px - 3, py, 7, 1); x.fillRect(px - 2, py + 1, 5, 1); x.fillRect(px - 1, py + 2, 3, 1); x.fillRect(px, py + 3, 1, 1);
+}
+// painel do ponto de conversa; msg aparece em destaque (resultado da última ação)
+function exOpenDialog(kind, msg, look) {
+  look = look || EX.dialogLook; EX.dialogLook = look;
+  const d = $("exDialog"); EX.dialog = kind; exKeys.clear(); sfx("blip");
+  const say = (title, text) => { d.innerHTML = `<h2>${title}</h2><p>${text}</p>`; };
+  if (kind === "fogueira") { say("Fogueira", "O fogo estala e esquenta. Sentar um pouco recupera metade de PV e PE."); btn("Descansar", () => rest("fogueira"), false, d); }
+  else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => wipe(() => rest("tenda")), false, d); }
+  else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }
+  else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme."); foodButtons(d); }
+  else if (kind === "artesao") { say("Artesão", "Roupas e equipamentos feitos à mão, inclusive arco e flecha para caçar de longe. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
+  else if (kind === "inventario") { say("Bolsa", invSummary()); invButtons(d); }
+  else say(VILLAGER_NAME[look] || "Aldeão", VILLAGER_TIPS[Math.floor(Math.random() * VILLAGER_TIPS.length)]);
+  if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);
+  btn("Fechar", exCloseDialog, false, d);
+  d.hidden = false;
+}
+function exCloseDialog() { $("exDialog").hidden = true; if (EX) EX.dialog = null; sfx("blip"); }
+// teclado com o painel aberto: 1-9 botões, Enter o primeiro disponível, Esc/X/Z fecham
+function dialogKey(ev) {
+  const bs = [...$("exDialog").querySelectorAll(".cmd[data-key]")], onBtn = document.activeElement && document.activeElement.matches("#exDialog button");
+  if (/^[1-9]$/.test(ev.key)) { ev.preventDefault(); pressPanel(bs[+ev.key - 1]); }
+  else if (ev.key === "Enter" && !onBtn) { ev.preventDefault(); pressPanel(bs.find(b => b.getAttribute("aria-disabled") !== "true")); }
+  else if (["Escape", "x", "X", "z", "Z", "i", "I"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); exCloseDialog(); }
+  else if (ev.key.startsWith("Arrow") || ev.key === " ") ev.preventDefault();
 }

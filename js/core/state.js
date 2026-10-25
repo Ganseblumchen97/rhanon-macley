@@ -11,9 +11,11 @@ function save() { try { localStorage.setItem(KEY, JSON.stringify(G)); } catch (_
 // completa os campos que saves antigos não têm e limita PV/PE ao máximo do nível
 function vit() {
   G.hp = Math.min(G.hp ?? maxHP(G.lv), maxHP(G.lv)); G.sp = Math.min(G.sp ?? maxSP(G.lv), maxSP(G.lv));
-  G.man = G.man ?? 3; G.pelts = G.pelts || {}; G.day = G.day || 1; G.sub = G.sub || "aldeia";
+  if (!G.items) { G.items = {mandioca: G.man ?? 3}; delete G.man; }   // saves antigos guardavam só as mandiocas em G.man
+  G.pelts = G.pelts || {}; G.day = G.day || 1; G.sub = G.sub || "aldeia";
   G.owned = G.owned || {tanga: true, lanca: true}; G.equip = G.equip || {legs: "tanga", torso: null, weapon: "lanca"};
 }
+const itemCount = bag => Object.values(bag || {}).reduce((a, n) => a + n, 0);
 const K = () => G.kills || (G.kills = {}), BS = () => G.boss || (G.boss = {});   // vitórias e chefes por zona
 
 // tela atual: "hunt" (batalha), "interview", "betterInterview" ou "work"

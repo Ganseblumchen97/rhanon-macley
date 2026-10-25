@@ -6,9 +6,9 @@
    Chaves que o jogo procura:
      animal/<id>            bicho na batalha (ex.: animal/onca). Chefe sem arte própria usa a do bicho base com cor trocada.
      animal/<id>/mapa       bicho na exploração
-     hero/battle            Rhanon na batalha; opcional por estado: hero/battle/<estado>
-                            (idle, throw, torch, guard, hurt, eat, observe, cheer, victory, defeat, flee, walk)
-     hero/walk/down|up|side Rhanon na exploração (side = olhando para a direita); frames = quadros da caminhada
+     hero/battle            Rhanon na batalha, de costas; opcional por estado: hero/battle/<estado>
+                            (idle, throw, shoot, torch, guard, hurt, eat, observe, cheer, victory, defeat, flee, walk)
+     hero/walk/down|up      Rhanon na exploração (de frente / de costas); frames = quadros da caminhada
      cutin/eyes             close dos olhos na cinemática de abertura da batalha (largura:altura perto de 8:3)
    Tamanhos sugeridos com scale 3 estão em assets/LEIAME.md.
    Exemplo: "animal/onca": {src: "assets/bichos/onca.png", scale: 3}, */

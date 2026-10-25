@@ -43,3 +43,15 @@ const GLYPH = {
   drop: ["010", "111", "111"], leaf: ["01", "11", "10"], puff: ["11", "11"], q: ["0110", "1001", "0010", "0100", "0000", "0100"],
   wave: ["0110", "1001"], spark: ["101", "010", "101"]
 };
+/* Gente da aldeia e da feira: mesmo corpo do Rhanon (20x28, ver heroParts), com outras cores e enfeites.
+   pal troca cores de RH.base (s/S pele, h/H/l cabelo, g cocar, r pintura do rosto, t/T tanga);
+   feather = pena no cocar; longHair = cabelo até os ombros; top = faixa de tecido no peito;
+   prop = o que leva na mão ("pelt" pele, "basket" cesto, "bow" arco). */
+const VILLAGER_LOOK = {
+  aldeao1: {pal: {g: "#d62828", r: "#f2a20c", t: "#9c6339", T: "#6d4329"}, feather: "#ffd23a"},
+  aldeao2: {pal: {h: "#d8d2c8", H: "#a8a29a", l: "#f4ecd8", s: "#a86f40", S: "#7d4f2c", g: "#7a2a8a"}},
+  aldeao3: {pal: {g: "#19a8d8", r: "#e5001c", s: "#b47a48", S: "#8a5a32"}, longHair: true, top: "#e5741c"},
+  peles:   {pal: {g: "#6d4329", r: "#ffffff", s: "#a86f40", S: "#7d4f2c"}, feather: "#e5001c", prop: "pelt"},
+  comida:  {pal: {g: "#3f9a5c", r: "#ffd23a"}, longHair: true, top: "#ffd23a", prop: "basket"},
+  artesao: {pal: {g: "#2a2230", r: "#19a8d8", t: "#26364a", T: "#18222f"}, feather: "#19a8d8", prop: "bow"}
+};
