@@ -498,12 +498,20 @@ function nearSpot() {
   for (const s of EX.spots) { const d = Math.hypot(s.x - h.x, s.y - (h.y - 6)); if (d < bd) { bd = d; best = s; } }
   return best;
 }
+// de dia os aldeões gingam no ritmo da música; à noite os da aldeia dormem sentados e os da feira só ficam sentados
 function drawNpc(x, s, cx, cy, now) {
-  const img = villagerSprite(s.look), sx = snap(s.x - cx), sy = snap(s.y + 5 - cy), bob = Math.floor(now / 600 + s.tx) % 2;
-  const hw = img.width / 2, top = sy - img.height + 1 - bob;
-  drawShadow(x, sx, sy, 10);
+  const sx = snap(s.x - cx), sy = snap(s.y + 5 - cy), sleeping = EX.night && s.kind === "aldeao";
+  let pose, bob = 0;
+  if (EX.night) pose = {sit: true, face: sleeping || (now / 1000 + s.tx) % 4 < .15 ? "blink" : undefined, dy: sleeping ? 1 : 0};
+  else {
+    const b = MUS.beat() ?? now / 625, step = Math.floor(b);   // sem música tocando, segue um ritmo parecido (96 batidas por minuto)
+    pose = {...GINGA[step % 2], dy: b % 1 < .5 ? 1 : 0};
+  }
+  const img = villagerSprite(s.look, pose), hw = img.width / 2, top = sy - img.height + 1 - bob;
+  drawShadow(x, sx, sy, pose.sit ? 14 : 10);
   if (EX.hero.x > s.x + 4) { x.save(); x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -hw, top); x.restore(); }
   else x.drawImage(img, sx - hw, top);
+  if (sleeping && !REDUCE) { const p = (now / 1100 + s.tx * .37) % 1; glyphP(x, "z", "#ffffff", sx + 4 + p * 6, top + 6 - p * 10); }
 }
 // setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
 function drawSpotPrompt(x, cx, cy, now) {
@@ -529,7 +537,7 @@ function exOpenDialog(kind, msg, look) {
     say("Fogueira", "Um ponto para recuperar o fôlego no meio da trilha. Descansar recupera toda a vida e a energia.");
     btn("Descansar", () => exCampRest("fogueira"), false, d);
   }
-  else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => wipe(() => rest("dormir")), false, d); }
+  else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => { exCloseDialog(); wipe(() => { exToast(rest("dormir", false, true)); EX.night = false; exHud(); musicStart("local"); }); }, false, d); }
   else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }
   else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme."); foodButtons(d); }
   else if (kind === "artesao") { say("Artesão", "Roupas e equipamentos feitos à mão, inclusive arco e flecha para caçar de longe e tocha para assustar os bichos. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
@@ -542,7 +550,7 @@ function exOpenDialog(kind, msg, look) {
 // descansar/dormir na fogueira: Rhanon senta do lado do fogo (como na tela inicial) e só depois recupera
 function exCampRest(kind) {
   const h = EX.hero, f = EX.spots.filter(s => s.kind === "fogueira").sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y))[0];
-  $("exDialog").hidden = true; exKeys.clear();
+  $("exDialog").hidden = true; EX.dialog = null; exKeys.clear();
   EX.camp = {kind, startNight: EX.night, t0: performance.now(), dur: campWake(kind) + 2600, x: f.x + (h.x < f.x ? -14 : 14), y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
 }
 // cena de abertura: amanhece, Rhanon acorda do lado da fogueira da aldeia, se espreguiça e o jogo começa
@@ -553,11 +561,11 @@ function exIntro() {
   h.x = EX.camp.x; h.y = EX.camp.y; h.dir = "down"; h.aim = {x: 0, y: 1};
   exToast("Ananindeua (PA) · manhã na aldeia...");
 }
+// fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
-  const kind = EX.camp.kind; EX.camp = null;
+  const kind = EX.camp.kind; EX.camp = null; EX.dialog = null; exKeys.clear();
   if (kind === "intro") return exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A mata fica no caminho de saída.");
-  EX.dialog = "fogueira";   // o resultado volta no painel da fogueira (localDone)
-  rest(kind, true);   // dormir: o galo já cantou no amanhecer da cena
+  exToast(rest(kind, true, true)); exHud();   // dormir: o galo já cantou no amanhecer da cena
 }
 /* Linha do tempo das cenas que acordam (ms desde o começo):
    dormir: senta (0-900) e dorme enquanto a noite cai; em CAMP_DAWN_AT passa a faixa do amanhecer (dawnWipe: galo e sol).

@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.18.0 — visual da mata
+
+- Novo visual do HUD: painéis de pergaminho com moldura de cipó e folhas, placas e botões de madeira que viram folha
+  ao selecionar. O jeitão Persona continua nos destaques: letras recortadas, faixas preta e vermelha e a sombra vermelha.
+- Na batalha, os efeitos (veneno, preso, medo, queimadura, drenagem, atento, em guarda…) aparecem como ícones com os
+  turnos que faltam.
+- Depois de descansar na fogueira, o Rhanon já volta a andar; o resultado aparece no aviso do topo.
+- Aldeões gingam no ritmo da música durante o dia. À noite, os da aldeia dormem sentados e os da feira ficam sentados.
+
 ## 0.17.0 — primeira versão numerada
 
 Resume tudo o que entrou no jogo até aqui.

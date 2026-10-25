@@ -519,3 +519,55 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 #beast.submerged.shallow{translate:0 12%}
 #beast.submerged.shallow canvas{clip-path:inset(0 0 16% 0)}
 #beast.submerged.shallow::after{top:82%}
+
+/* ===== tema da mata (HUD): pergaminho com moldura de cipó e folhas (--moldura, desenhada em ui/theme.js), placas de madeira
+   e botões de madeira que viram folha. O Persona continua nos momentos de destaque: letras recortadas no logo, no resultado
+   e na subida de nível, as faixas preta e vermelha, os botões inclinados que pulam para o lado e a sombra vermelha. ===== */
+:root{--wood:#6b4126;--wood2:#4a2a16;--woodHi:#8a5a34;--parch:#f6e9c4;--parch2:#e8d29a;--brown:#3a2414;--leafB:#3f9a5c;--leafBD:#25663a;--red:#e2363d}
+/* painéis: pergaminho com o cipó em volta (as folhas de fora passam um pouco da borda do pergaminho) */
+:is(.info,.me){color:var(--brown);clip-path:none;border:18px solid transparent;border-image:var(--moldura) 18 round;image-rendering:pixelated;
+  background:linear-gradient(180deg,var(--parch),var(--parch2)) center/calc(100% - 16px) calc(100% - 16px) no-repeat border-box;
+  padding:6px 12px 10px;filter:drop-shadow(5px 7px 0 rgba(0,0,0,.35))}
+.info h2,.me h2{display:inline-block;margin:0 0 6px;padding:2px 12px 3px;background:linear-gradient(180deg,var(--woodHi),var(--wood));color:var(--parch);
+  rotate:-1.5deg;box-shadow:4px 4px 0 var(--red);font-size:clamp(20px,2.6vw,28px)}
+.info p{color:var(--brown)}
+.info .hint{color:var(--leafBD)}
+.me .row{color:var(--brown)}
+/* barras de vida/energia com borda de madeira */
+.bar{background:var(--parch2);border-color:var(--wood2)}
+/* botões de comando: placa de madeira inclinada; selecionado vira folha verde, com a sombra vermelha pulando atrás */
+.cmd{color:var(--parch)}
+.cmd::before{background:linear-gradient(180deg,var(--woodHi),var(--wood))}
+.cmd::after{background:var(--red)}
+.cmd:hover,.cmd:focus-visible,.cmd.sel{color:var(--parch)}
+.cmd:hover::before,.cmd:focus-visible::before,.cmd.sel::before{background:linear-gradient(180deg,#5fbe72,var(--leafB))}
+.info .cmd:hover,.info .cmd:focus-visible{color:var(--parch)}
+.info .cmd:hover::before,.info .cmd:focus-visible::before{background:linear-gradient(180deg,#5fbe72,var(--leafB))}
+.cmd small{background:#ffd23a;color:var(--brown)}
+.cmd .key{background:var(--parch);color:var(--brown)}
+/* placa do bicho, aviso do próximo golpe, registro da luta e descrição */
+.plate{background:linear-gradient(180deg,var(--woodHi),var(--wood));color:var(--parch);border:3px solid var(--wood2)}
+.plate .lv{background:var(--leafB);color:#fff}
+.intent{background:var(--wood2);color:var(--parch)}
+.intent.known{background:var(--leafB);color:#fff}
+.log{background:rgba(16,36,26,.92);color:var(--parch);clip-path:none;border:18px solid transparent;border-left-width:18px;border-image:var(--moldura) 18 round;image-rendering:pixelated;padding:4px 10px;
+  box-shadow:inset 6px 0 0 var(--red)}
+.desc{background:var(--leafBD);color:var(--parch)}
+/* faixas de informação no topo (mapas e exploração), botões soltos e rodapé da tela inicial: madeira */
+.hud{background:linear-gradient(180deg,var(--woodHi),var(--wood));color:var(--parch);box-shadow:4px 5px 0 rgba(0,0,0,.35)}
+.mute,.home-button,.ex-exit{background:linear-gradient(180deg,var(--woodHi),var(--wood));color:var(--parch)}
+.mute:hover,.home-button:hover,.ex-exit:hover,.ex-exit:focus-visible{background:var(--leafB);color:#fff}
+.title-bottom{background:linear-gradient(180deg,var(--woodHi),var(--wood));color:var(--parch)}
+/* avisos da exploração: pergaminho pequeno com borda de madeira e o "Z: ..." em folha */
+.ex-msg{background:var(--parch);color:var(--brown);border:3px solid var(--wood);clip-path:none;border-radius:2px;box-shadow:3px 3px 0 var(--red)}
+.ex-prompt{background:var(--leafBD);color:var(--parch);border-color:var(--parch)}
+/* ícones de estado (ui/theme.js) com os turnos que faltam */
+.status{display:flex;gap:8px;flex-wrap:wrap;min-height:30px;margin-top:6px}
+.st{position:relative;display:inline-block}
+.st img{display:block;width:27px;height:27px;image-rendering:pixelated}
+.st b{position:absolute;right:-6px;bottom:-5px;min-width:12px;text-align:center;background:var(--brown);color:var(--parch);font:700 10px/14px var(--mono);border-radius:3px;padding:0 2px}
+.me h2{font-size:clamp(18px,2.2vw,24px);white-space:nowrap}
+.me h2 small{font-size:.62em}
+/* dentro dos painéis os botões não escorregam para o lado (só pulam um pouco ao passar o mouse) e cabem no pergaminho */
+.info .cmd{--x:0px;font-size:clamp(16px,1.9vw,22px);max-width:100%;white-space:normal;margin-top:4px}
+.info .cmd:hover,.info .cmd:focus-visible{translate:8px 0}

@@ -133,11 +133,8 @@ function render() {
   $("log").innerHTML = lines.map(l => "<p>" + l + "</p>").join("");
   $("intentTxt").textContent = e.known ? "Próximo golpe: " + (e.moves || MOVES)[e.intent] : `${e.name} se prepara para atacar…`;
   $("intent").className = "intent" + (e.known ? " known" : "");
-  const st = [];
-  if (p.atento) st.push("Atento: próximo ataque crítico");
-  if (p.def) st.push("Em guarda"); if (p.dot && p.dot.t > 0) st.push(p.dot.n); if (p.weak > 0) st.push("Fedor"); if (p.preso > 0) st.push("Preso"); if (p.medo > 0) st.push("Medo: sem defesa");
-  if (e.assustada) st.push(`${e.name} assustado`);
-  $("status").textContent = st.join(" · ");
+  // estados como ícones (ui/theme.js), com os turnos que faltam; o nome aparece ao passar o mouse e para leitores de tela
+  $("status").innerHTML = statusList().map(([k, name, n]) => `<span class="st" title="${name}"><img src="${statusIconURL(k)}" alt="${name}">${n ? `<b>${n}</b>` : ""}</span>`).join("");
   if (!subMenu) CMDS.forEach((c, i) => {
     const b = $("cmds").children[i];
     b.setAttribute("aria-disabled", avail(c.id) ? "false" : "true");

@@ -583,7 +583,9 @@ const MUS = (() => {
     let peak = 0, sum = 0; for (let i = 0; i < a.length; i++) { const v = Math.abs(a[i]); if (v > peak) peak = v; sum += a[i] * a[i]; }
     return {peak: +peak.toFixed(3), rms: +Math.sqrt(sum / a.length).toFixed(4)};
   }
-  return {has: id => !!ALL[id], play, stop: (sec = .6) => { if (X) fadeOut(sec); }, measure, get current() { return trackId; }};
+  // tempo da música tocando agora, em batidas (para os aldeões dançarem no ritmo); null sem música
+  function beat() { if (!track || !X || X.state !== "running") return null; const d = 60 / track.bpm / 4; return (step - (nextTime - X.currentTime) / d) / 4; }
+  return {has: id => !!ALL[id], play, stop: (sec = .6) => { if (X) fadeOut(sec); }, measure, beat, get current() { return trackId; }};
 })();
 
 /* ----- motor antigo: só as faixas de entrevista e trabalho ----- */

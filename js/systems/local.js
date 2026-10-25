@@ -41,15 +41,17 @@ function selectSub(id, msg) {
   btn("Voltar ao mapa do " + MAP_REGIONS[MAP_REGION].n, closeLocal, false, i);
 }
 // kind: "dormir" (tudo, vira o dia seguinte), "noite" (metade, vira noite) ou "fogueira" (ponto de descanso da trilha: tudo, sem mudar a hora)
-// quiet = o galo já cantou na cena da fogueira (exploração)
-function rest(kind, quiet) {
+// quiet = o galo já cantou na cena da fogueira (exploração); toast = só devolve a mensagem (a exploração mostra no topo)
+function rest(kind, quiet, toast) {
   vit(); const f = kind === "noite" ? .5 : 1;
   G.hp = Math.min(maxHP(G.lv), G.hp + Math.ceil(maxHP(G.lv) * f)); G.sp = Math.min(maxSP(G.lv), G.sp + Math.ceil(maxSP(G.lv) * f));
   if (kind === "dormir") { G.day++; G.night = false; if (!quiet) setTimeout(() => sfx("galo"), 450); }   // amanhece com o galo
   if (kind === "noite") G.night = true;
   save(); sfx("heal");
-  localDone("aldeia", kind === "dormir" ? `Rhanon dormiu até o dia seguinte. Dia ${G.day}.` : kind === "noite" ? "Rhanon descansou até a noite. À noite a mata é outra: cuidado com o que ronda o escuro."
-    : "Rhanon recuperou toda a vida e a energia junto à fogueira.");
+  const msg = kind === "dormir" ? `Rhanon dormiu até o dia seguinte. Dia ${G.day}.` : kind === "noite" ? "Rhanon descansou até a noite. À noite a mata é outra: cuidado com o que ronda o escuro."
+    : "Rhanon recuperou toda a vida e a energia junto à fogueira.";
+  if (toast) return msg;
+  localDone("aldeia", msg);
 }
 // compra um item da barraca de comida (vai para a bolsa)
 function buy(id) {

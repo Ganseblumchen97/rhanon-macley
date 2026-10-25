@@ -160,6 +160,8 @@ function drawFire(x, sx, sy, t) {
   x.fillStyle = "#fffbe0"; x.fillRect(sx + 7, sy + 6, 2, 2);
 }
 // pessoa da aldeia/feira: o mesmo esqueleto do Rhanon, de tanga, com as cores e enfeites de VILLAGER_LOOK[look]
-function villagerSprite(look) {
-  return rigCanvas("front", {}, VILLAGER_LOOK[look] || {}, OW_SCALE);
+function villagerSprite(look, pose = {}) {
+  return rigCanvas("front", pose, VILLAGER_LOOK[look] || {}, OW_SCALE);
 }
+// passos da ginga (um por batida): pé que pisa para o lado, braços se alternando no alto
+const GINGA = [{lf: [9, 40], rf: [19, 38], lh: [4, 23], rh: [24, 32]}, {lf: [13, 38], rf: [23, 40], lh: [8, 32], rh: [28, 23]}];
