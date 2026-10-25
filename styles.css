@@ -260,6 +260,11 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .log p:last-child{opacity:1}
 /* interface */
 .ui{display:grid;grid-template-columns:1fr minmax(210px,300px);gap:14px;padding:14px 14px 18px;align-items:end}
+/* batalha com tamanho máximo: em tela muito grande o palco não estica (a investida da lança mede a distância até o bicho) */
+.game{align-content:center}
+.game>:is(.stage,.log,.ui){width:100%;max-width:1100px;justify-self:center;box-sizing:border-box}
+.game>.stage{max-height:560px}
+.game>.log{width:calc(100% - 28px)}
 .cmds{display:flex;flex-direction:column;gap:6px}
 .cmd{
   appearance:none;border:0;cursor:pointer;text-align:left;
@@ -484,18 +489,26 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 @media (prefers-reduced-motion:reduce){.enc-band,.enc-band::after,.enc-sub{animation:none}}
 
 /* ===== exploração vista de cima ===== */
-#explore{background:var(--ink);align-items:start;overflow:auto;padding:12px}
+#explore{position:fixed;inset:0;background:#0e1a12;overflow:hidden;padding:0;display:block}
+#explore[hidden]{display:none}
 .game:has(#explore:not([hidden])) :is(.stage,.log,.ui){visibility:hidden}
-.ex-wrap{display:grid;gap:10px;justify-items:center;max-width:980px;margin:auto}
-.ex-top{display:flex;gap:12px;align-items:center;justify-content:space-between;width:100%}
+/* exploração em tela cheia: o mapa ocupa a janela e o HUD (lugar, nível, PV, PE, XP, dinheiro e botões) fica por cima */
+.ex-wrap{position:relative;width:100%;height:100%}
+.ex-top{position:absolute;top:8px;left:8px;right:8px;z-index:6;display:flex;gap:12px;align-items:flex-start;justify-content:space-between;pointer-events:none}
+.ex-top>*{pointer-events:auto}
+#exHud{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;padding:5px 12px;font:700 12px var(--mono);max-width:70%}
+#exHud b{font:400 15px var(--display);text-transform:uppercase;letter-spacing:.04em}
+#exHud span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.hb{display:inline-block;width:42px;height:6px;background:rgba(0,0,0,.45);border:1px solid rgba(0,0,0,.6)}
+.hb u{display:block;height:100%;background:#7dff9a}.hb.pe u{background:#5ec8e5}.hb.xp u{background:#ffd23a}
 .ex-exit{all:unset;cursor:pointer;font-family:var(--display);font-size:16px;letter-spacing:.06em;padding:6px 18px;background:var(--paper);color:var(--ink);clip-path:polygon(6% 0,100% 0,94% 100%,0 100%)}
 .ex-exit:hover,.ex-exit:focus-visible{background:var(--accent);color:var(--on-accent)}
-.ex-view{position:relative;line-height:0}
-#exCanvas{width:min(94vw,960px,calc((100vh - 190px) * 1.3636));height:auto;image-rendering:pixelated;border:4px solid var(--paper);box-shadow:8px 8px 0 var(--accent);background:#000}
-.ex-msg{position:absolute;left:50%;top:10px;translate:-50% -12px;max-width:88%;opacity:0;pointer-events:none;line-height:1.4;font:700 13px var(--mono);background:var(--paper);color:var(--ink);padding:6px 14px;clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);transition:opacity .2s,translate .2s;text-align:center}
+.ex-view{position:absolute;inset:0;line-height:0;overflow:hidden}
+#exCanvas{display:block;image-rendering:pixelated;background:#000;cursor:crosshair}
+.ex-msg{position:absolute;left:50%;top:64px;z-index:5;translate:-50% -12px;max-width:88%;opacity:0;pointer-events:none;line-height:1.4;font:700 13px var(--mono);background:var(--paper);color:var(--ink);padding:6px 14px;clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);transition:opacity .2s,translate .2s;text-align:center}
 .ex-msg.show{opacity:1;translate:-50% 0}
-.ex-help{margin:0;font:700 11px/1.5 var(--mono);color:var(--paper);text-align:center;opacity:.85}
-.ex-pad{display:none;width:100%;justify-content:space-between;align-items:center;user-select:none;-webkit-user-select:none;touch-action:none}
+.ex-help{position:absolute;left:50%;bottom:6px;translate:-50% 0;z-index:5;margin:0;font:700 11px/1.5 var(--mono);color:var(--paper);text-align:center;background:rgba(14,26,18,.72);padding:3px 12px;pointer-events:none;width:max-content;max-width:96%}
+.ex-pad{display:none;position:absolute;left:12px;right:12px;bottom:12px;z-index:5;justify-content:space-between;align-items:center;user-select:none;-webkit-user-select:none;touch-action:none}
 .ex-pad button{all:unset;display:grid;place-items:center;background:var(--paper);color:var(--ink);font-family:var(--display);box-shadow:4px 4px 0 var(--ink);touch-action:none}
 .ex-pad button:active{background:var(--accent);color:var(--on-accent)}
 .ex-dpad{display:grid;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(3,54px);gap:4px}
@@ -503,8 +516,9 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .ex-dpad button{font-size:22px;border-radius:8px}
 .ex-ab{display:flex;gap:12px;align-items:center}
 .ex-ab button{width:78px;height:78px;border-radius:50%;font-size:15px}
+.ex-ab #exC{width:60px;height:60px;font-size:11px}
 #exA{translate:0 -18px}
-@media (pointer:coarse),(max-width:760px){.ex-pad{display:flex}.ex-help{display:none}#exCanvas{width:min(96vw,calc((100vh - 290px) * 1.3636))}}
+@media (pointer:coarse),(max-width:760px){.ex-pad{display:flex}.ex-help{display:none}#exHud{max-width:100%;font-size:11px}}
 /* ===== cinemática de abertura da batalha ===== */
 .cutin{position:fixed;inset:0;z-index:1900;pointer-events:none;overflow:hidden}
 .cutin[hidden]{display:none}
@@ -544,9 +558,9 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .nav-help{grid-column:1/-1;justify-self:center;margin:0;font:700 11px var(--mono);color:var(--paper);opacity:.85;text-align:center}
 @media (pointer:coarse){.nav-help,.cmd .key{display:none}}
 /* ===== aldeia e feira: aviso de interação e painel de conversa ===== */
-.ex-prompt{position:absolute;left:50%;bottom:12px;translate:-50% 8px;opacity:0;pointer-events:none;line-height:1.4;font:700 12px var(--mono);background:var(--ink);color:var(--paper);padding:5px 14px;border:2px solid var(--accent);transition:opacity .15s,translate .15s;white-space:nowrap}
+.ex-prompt{position:absolute;left:50%;bottom:40px;z-index:5;translate:-50% 8px;opacity:0;pointer-events:none;line-height:1.4;font:700 12px var(--mono);background:var(--ink);color:var(--paper);padding:5px 14px;border:2px solid var(--accent);transition:opacity .15s,translate .15s;white-space:nowrap}
 .ex-prompt.show{opacity:1;translate:-50% 0}
-.ex-dialog{position:absolute;left:4%;right:4%;bottom:4%;max-height:78%;overflow:auto;line-height:normal;z-index:3}
+.ex-dialog{position:absolute;left:50%;translate:-50% 0;width:min(92%,900px);bottom:5%;max-height:72%;overflow:auto;line-height:normal;z-index:7}
 .ex-dialog[hidden]{display:none}
 .ex-dialog h2{margin:0 0 4px}
 .ex-dialog p{margin:0 0 8px}

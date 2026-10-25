@@ -134,11 +134,11 @@ const peltsTotal = () => peltIds().reduce((a, k) => a + G.pelts[k] * peltValue(k
 /* Lojas da feira, cada uma numa barraca: comprador de peles, comida, artesão (roupas e tocha) e armeiro (armas e armaduras). */
 function peltButtons(i) {
   const ids = peltIds();
-  if (ids.length > 1) btn(`Vender todas as peles · R$ ${peltsTotal()}`, sellAll, false, i);
-  ids.forEach(k => btn(`Vender ${peltName(k)} ×${G.pelts[k]} · R$ ${G.pelts[k] * peltValue(k)}`, () => sell(k), false, i));
+  if (ids.length > 1) btn(`Vender todas as peles · R$ ${peltsTotal()}`, ask(`Vender todas as peles por R$ ${peltsTotal()}?`, sellAll), false, i);
+  ids.forEach(k => btn(`Vender ${peltName(k)} ×${G.pelts[k]} · R$ ${G.pelts[k] * peltValue(k)}`, ask(`Vender ${peltName(k).toLowerCase()} ×${G.pelts[k]} por R$ ${G.pelts[k] * peltValue(k)}?`, () => sell(k)), false, i));
   if (!ids.length) lh("Você não tem peles para vender. Cace na mata, no rio ou na mata fechada.", i);
 }
-function foodButtons(i) { Object.entries(ITEMS).forEach(([id, it]) => btn(`${it.n} (${itemEffect(it)}) · R$ ${it.price}`, () => buy(id), G.money < it.price, i)); }
+function foodButtons(i) { Object.entries(ITEMS).forEach(([id, it]) => btn(`${it.n} (${itemEffect(it)}) · R$ ${it.price}`, ask(`Comprar ${it.n.toLowerCase()} por R$ ${it.price}?`, () => buy(id)), G.money < it.price, i)); }
 function sell(k) {
   const n = G.pelts[k] || 0, v = n * peltValue(k); if (!n) return;
   G.money += v; G.pelts[k] = 0; save(); sfx("more"); localDone("feira", `Vendeu ${peltName(k).toLowerCase()} ×${n} por R$ ${v}.`);
@@ -156,13 +156,13 @@ function gearButtons(i) {
   GEAR_SLOTS.filter(slot => !SMITH_SLOTS.includes(slot)).forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => {
     if (!it.price || G.owned[id]) return;
     const lock = G.lv < it.lv; any = true;
-    btn(lock ? `${it.n} (Nv ${it.lv})` : `Comprar ${it.n} · R$ ${it.price} · ${gearBonus(slot, it)}`, () => buyGear(slot, id), lock || G.money < it.price, i);
+    btn(lock ? `${it.n} (Nv ${it.lv})` : `Comprar ${it.n} · R$ ${it.price} · ${gearBonus(slot, it)}`, ask(`Comprar ${it.n.toLowerCase()} por R$ ${it.price}?`, () => buyGear(slot, id)), lock || G.money < it.price, i);
   }));
   // especiais de batalha à venda (SPECIALS com price), como a tocha
   SPECIALS.forEach(s => {
     if (!s.price || G.owned[s.id]) return;
     const lock = G.lv < s.lv; any = true;
-    btn(lock ? `${s.n} (Nv ${s.lv})` : `Comprar ${s.n} · R$ ${s.price} · especial de batalha`, () => buySpecial(s.id), lock || G.money < s.price, i);
+    btn(lock ? `${s.n} (Nv ${s.lv})` : `Comprar ${s.n} · R$ ${s.price} · especial de batalha`, ask(`Comprar ${s.n.toLowerCase()} por R$ ${s.price}?`, () => buySpecial(s.id)), lock || G.money < s.price, i);
   });
   if (!any) lh("Você já tem tudo o que o artesão faz por enquanto.", i);
 }
@@ -191,18 +191,18 @@ function forgeSelect(id, quiet) {
   EX.forgeSel = id; if (!quiet) sfx("blip");
   $("exDialog").querySelectorAll(".forge-list .cmd").forEach((b, j) => b.classList.toggle("sel", j === k));
   const it = o.it, row = (name, have, need, txt) => `<li class="${have >= need ? "ok" : "falta"}"><span>${name}</span><b>${txt}</b></li>`;
-  card.innerHTML = `<h3>${it.n}</h3><p class="forge-bonus">${gearBonus(o.slot, it)}</p>` + (G.owned[id] ? '<p class="hint">Já é seu. Troque na bolsa (I).</p>' :
+  card.innerHTML = `<h3>${it.n}</h3><p class="forge-bonus">${gearBonus(o.slot, it)}</p>` + (G.owned[id] ? '<p class="hint">Já é seu. Troque no equipamento (E).</p>' :
     '<ul class="forge-need">' + (G.lv < it.lv ? row("Nível", G.lv, it.lv, `${G.lv}/${it.lv}`) : "") +
     Object.entries(it.craft || {}).map(([p, n]) => row(peltName(p), G.pelts[p] || 0, n, `${Math.min(n, G.pelts[p] || 0)}/${n}`)).join("") +
     row("Dinheiro", G.money, forgeCost(it), `R$ ${forgeCost(it)}`) + "</ul>");
   if (G.owned[id]) return;
   const b = document.createElement("button"), off = forgeLacks(it);
-  b.className = "cmd forge-make"; b.type = "button"; b.innerHTML = '<span><i class="key">Enter</i>Fabricar</span>';   // a tecla some em tela de toque, como nos outros botões
+  b.className = "cmd forge-make"; b.type = "button"; b.innerHTML = '<span><i class="key">Z</i>Fabricar</span>';   // a tecla some em tela de toque, como nos outros botões
   if (off) b.setAttribute("aria-disabled", "true");
-  b.addEventListener("click", () => { if (!forgeLacks(it)) forgeMake(o); });
+  b.addEventListener("click", () => { if (!forgeLacks(it)) ask(`Fabricar ${it.n.toLowerCase()}? Gasta R$ ${forgeCost(it)}` + (it.craft ? " e as peles da lista." : "."), () => forgeMake(o))(); });
   card.appendChild(b);
 }
-// teclado no armeiro: setas escolhem o item, Enter/Espaço fabricam (devolve true se usou a tecla)
+// teclado no armeiro: setas escolhem o item, Z/Enter/Espaço fabricam (devolve true se usou a tecla)
 function forgeKey(ev) {
   if (ev.key === "ArrowUp" || ev.key === "ArrowDown") {
     ev.preventDefault();
@@ -210,7 +210,7 @@ function forgeKey(ev) {
     forgeSelect(items[(k + (ev.key === "ArrowDown" ? 1 : items.length - 1)) % items.length].id);
     return true;
   }
-  if ((ev.key === "Enter" || ev.key === " ") && !ev.repeat) { ev.preventDefault(); pressPanel($("exDialog").querySelector(".forge-make")); return true; }
+  if (["Enter", " ", "z", "Z"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); pressPanel($("exDialog").querySelector(".forge-make")); return true; }
   return false;
 }
 // o armeiro gasta as peles e o dinheiro, e o Rhanon já sai usando/vestindo
@@ -308,7 +308,7 @@ function setupReveal() {
   document.addEventListener("keydown", ev => {
     if ($("revela").hidden) return;
     ev.stopImmediatePropagation(); ev.preventDefault();
-    if (["Enter", " ", "z", "Z", "Escape"].includes(ev.key) && !ev.repeat) closeReveal();
+    if (["Enter", " ", "z", "Z", "x", "X", "Escape"].includes(ev.key) && !ev.repeat) closeReveal();
   }, true);
   $("revela").addEventListener("click", ev => { if (ev.target === $("revela")) closeReveal(); });
 }

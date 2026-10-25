@@ -1,7 +1,17 @@
 /* Exploração das fases vista de cima. O Rhanon anda livre (8 direções), os bichos passeiam e perseguem.
    Quem acerta primeiro começa a batalha: golpe/arremesso do Rhanon = turno dele, com dano;
    bicho alcança ou o Rhanon esbarra nele = turno do bicho. Bem mais forte que o bicho = abate direto. */
-const VIEW_W = 240, VIEW_H = 176;            // tamanho da câmera em pixels do jogo (15 x 11 quadrados)
+// tamanho da câmera em pixels do jogo: acompanha a janela (exFit), com cada pixel do jogo virando VIEW_Z pixels da tela
+let VIEW_W = 240, VIEW_H = 176, VIEW_Z = 3;
+function exFit() {
+  const W = innerWidth, H = innerHeight, z = Math.max(2, Math.round(Math.min(W / 300, H / 190)));   // ~19 x 12 quadrados ou mais
+  VIEW_Z = z; VIEW_W = Math.ceil(W / z); VIEW_H = Math.ceil(H / z);
+  const cv = $("exCanvas"); cv.style.width = VIEW_W * z + "px"; cv.style.height = VIEW_H * z + "px";
+}
+addEventListener("resize", () => { if (EX && !$("explore").hidden) exFit(); });
+// câmera seguindo o Rhanon; fase menor que a tela (aldeia, feira) fica centralizada
+const camAxis = (map, view, want) => map <= view ? -Math.round((view - map) / 2) : Math.max(0, Math.min(map - view, want));
+const viewTiles = () => [Math.ceil(VIEW_W / TILE) + 1, Math.ceil(VIEW_H / TILE) + 1];
 const RS = 3;                                // resolução do canvas: cada pixel do jogo vira 3x3 (arte em imagem com scale 3 fica nítida)
 const snap = v => Math.round(v * RS) / RS;  // posição na grade da tela, para o movimento andar de 1/3 em 1/3 de pixel
 const HERO_SPEED = 74;                       // pixels por segundo
@@ -158,7 +168,7 @@ function startExplore(zone, after) {
     vit(); G.sub = zone; save();
     curZone = zone; fromLocal = false; exKeys.clear();
     $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
-    $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
+    $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false; exFit();
     musicStart("local"); exHud();
     exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida, artesão e armeiro: chegue perto de uma barraca e aperte Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
@@ -212,6 +222,27 @@ function exRelease() {
   EX.lastAim = a; EX.draw = null; EX.shoot = .3; sfx("spear");
   EX.spear = {x, y, vx: a.x * 260, vy: a.y * 260, left: 120, stuck: 0};
   exBurst(x + a.x * 4, y + a.y * 4, ["#ffffff", "#ffd23a"], 5);
+}
+/* mouse (para quem anda com WASD): a mira segue o cursor; botão esquerdo = golpe, direito = flecha, na direção da mira */
+function exAimAt(wx, wy) {
+  const h = EX.hero, dx = wx - h.x, dy = wy - (h.y - 8), n = Math.hypot(dx, dy);
+  if (n < 2) return;
+  h.aim = {x: dx / n, y: dy / n};
+  if (Math.abs(dx) > Math.abs(dy)) { h.dir = "side"; h.side = dx > 0 ? 1 : -1; } else h.dir = dy < 0 ? "up" : "down";
+}
+function exMouseWorld(ev) {
+  const r = $("exCanvas").getBoundingClientRect(), c = EX.cam || {cx: 0, cy: 0};
+  return {x: (ev.clientX - r.left) / VIEW_Z + c.cx, y: (ev.clientY - r.top) / VIEW_Z + c.cy};
+}
+/* esquiva: um rolamento rápido na direção em que anda (ou para onde mira), sem levar bote no caminho */
+const DODGE_TIME = .24, DODGE_SPEED = 3.2, DODGE_COOL = .75;
+function exDodge() {
+  if (!EX || EX.locked || EX.dialog || EX.camp || EX.draw || EX.dodge || (EX.dodgeCool || 0) > 0) return;
+  const h = EX.hero, ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0), n = Math.hypot(ix, iy);
+  const v = n ? {x: ix / n, y: iy / n} : h.aim;
+  EX.dodge = {t: DODGE_TIME, vx: v.x, vy: v.y}; EX.dodgeCool = DODGE_COOL;
+  EX.invulnUntil = Math.max(EX.invulnUntil, performance.now() + DODGE_TIME * 1000 + 120);
+  exBurst(h.x, h.y - 2, ["#d8c49a", "#a89a72", "#ffffff"], 6); sfx("esquiva");
 }
 // pega a pele do chão: vai para a bolsa (vende na feira)
 function pickLoot(l) {
@@ -310,7 +341,15 @@ function exUpdate(dt, now) {
   } else if (!sk.hidden) sk.hidden = true;
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
   for (const l of EX.loot) if (now - l.t0 > 500 && Math.hypot(l.x - h.x, l.y - h.y) < 11) pickLoot(l);
+  EX.dodgeCool = Math.max(0, (EX.dodgeCool || 0) - dt);
+  if (EX.dodge) {   // rolando: anda rápido na direção escolhida e deixa poeira
+    const dg = EX.dodge, sp = HERO_SPEED * DODGE_SPEED * dt;
+    slide(h, dg.vx * sp, dg.vy * sp); h.walk += sp; h.movedT = now;
+    if (Math.random() < .6) EX.fx.push({x: h.x + (Math.random() - .5) * 6, y: h.y, vx: -dg.vx * 20, vy: -8, life: .3, col: "#d8c49a", g: 8});
+    if ((dg.t -= dt) <= 0) EX.dodge = null;
+  }
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
+  if (EX.dodge) ix = iy = 0;
   if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden || !$("revela").hidden) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
@@ -451,11 +490,13 @@ function exDraw(now) {
   if (cv.width !== VIEW_W * RS) { cv.width = VIEW_W * RS; cv.height = VIEW_H * RS; }
   x.setTransform(RS, 0, 0, RS, 0, 0);
   x.imageSmoothingEnabled = false;
-  const cx = snap(Math.max(0, Math.min(EX.map.width - VIEW_W, h.x - VIEW_W / 2)));
-  const cy = snap(Math.max(0, Math.min(EX.map.height - VIEW_H, h.y - 12 - VIEW_H / 2)));
-  x.drawImage(EX.map, cx, cy, VIEW_W, VIEW_H, 0, 0, VIEW_W, VIEW_H);
-  const t0x = Math.floor(cx / TILE), t0y = Math.floor(cy / TILE);
-  for (let ty = t0y; ty <= t0y + 11; ty++) for (let tx = t0x; tx <= t0x + 15; tx++) {
+  const cx = snap(camAxis(EX.map.width, VIEW_W, h.x - VIEW_W / 2)), cy = snap(camAxis(EX.map.height, VIEW_H, h.y - 12 - VIEW_H / 2));
+  EX.cam = {cx, cy};
+  x.fillStyle = "#0e1a12"; x.fillRect(0, 0, VIEW_W, VIEW_H);   // borda em volta das fases pequenas
+  const sx0 = Math.max(0, cx), sy0 = Math.max(0, cy), sw = Math.min(VIEW_W, EX.map.width - sx0), sh = Math.min(VIEW_H, EX.map.height - sy0);
+  x.drawImage(EX.map, sx0, sy0, sw, sh, sx0 - cx, sy0 - cy, sw, sh);
+  const t0x = Math.floor(cx / TILE), t0y = Math.floor(cy / TILE), [nx, ny] = viewTiles();
+  for (let ty = t0y; ty <= t0y + ny; ty++) for (let tx = t0x; tx <= t0x + nx; tx++) {
     const ch = stageTile(tx, ty), sx = tx * TILE - cx, sy = ty * TILE - cy;
     if (ch === "~") {   // água: brilhos piscando e uma marolinha correndo
       if ((tx * 7 + ty * 13 + Math.floor(now / 450)) % 9 === 0) { x.fillStyle = "#ffffffb0"; x.fillRect(sx + 4 + (tx % 3) * 3, sy + 6 + (ty % 2) * 4, 3, 1); }
@@ -492,6 +533,11 @@ function exDraw(now) {
   for (const q of EX.fx) { x.fillStyle = q.col; x.fillRect(Math.round(q.x - cx) - 1, Math.round(q.y - cy) - 1, 2, 2); }
   alive.forEach(en => drawAnimalTags(x, en, cx, cy, now));
   drawSpotPrompt(x, cx, cy, now);
+  if (EX.mouse && now - EX.mouse.t < 2500 && !EX.dialog && !EX.camp) {   // mira no cursor: cruz com o centro aberto
+    const mx = Math.round(EX.mouse.x - cx), my = Math.round(EX.mouse.y - cy), col = G.equip.ranged ? "#ffd23a" : "#ffffff";
+    x.fillStyle = OUTLINE; for (const [a, b, w, hh] of [[-6, -1, 4, 3], [3, -1, 4, 3], [-1, -6, 3, 4], [-1, 3, 3, 4]]) x.fillRect(mx + a, my + b, w, hh);
+    x.fillStyle = col; for (const [a, b, w, hh] of [[-5, 0, 3, 1], [3, 0, 3, 1], [0, -5, 1, 3], [0, 3, 1, 3]]) x.fillRect(mx + a, my + b, w, hh);
+  }
 }
 // chamado pelo laço de animação (gfx/actors.js) a cada quadro
 function exploreFrame(t, dt) {
@@ -503,7 +549,10 @@ function exploreFrame(t, dt) {
 /* ---------- textos na tela ---------- */
 function exHud() {
   vit();
-  $("exHud").textContent = `${ZONES[EX.zone] ? zoneDef(EX.zone).n : SUB[EX.zone].n + (G.night ? " à noite" : "")} · Nv ${G.lv} · XP ${G.xp}/${need(G.lv)} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · R$ ${G.money}`;
+  const bar = (v, m, cls) => `<i class="hb ${cls}"><u style="width:${Math.round(100 * v / m)}%"></u></i>`;   // HUD: nome do lugar e chips com barrinhas
+  $("exHud").innerHTML = `<b>${ZONES[EX.zone] ? zoneDef(EX.zone).n : SUB[EX.zone].n + (G.night ? " à noite" : "")}</b><span>Nv ${G.lv}</span>`
+    + `<span>PV ${G.hp}/${maxHP(G.lv)}${bar(G.hp, maxHP(G.lv), "pv")}</span><span>PE ${G.sp}/${maxSP(G.lv)}${bar(G.sp, maxSP(G.lv), "pe")}</span>`
+    + `<span>XP ${G.xp}/${need(G.lv)}${bar(G.xp, need(G.lv), "xp")}</span><span>R$ ${G.money}</span>`;
 }
 function exToast(msg) {
   const el = $("exMsg"); el.textContent = msg; el.classList.add("show");
@@ -525,6 +574,7 @@ function setupExploreInput() {
     if (k) { exKeys.add(k); ev.preventDefault(); return; }
     if (ev.repeat) return;
     if ("zZjJ ".includes(ev.key)) { ev.preventDefault(); exStrike(); }
+    else if (ev.key === "Shift" || ev.key === "c" || ev.key === "C") { ev.preventDefault(); exDodge(); }
     else if ("xXkK".includes(ev.key)) { ev.preventDefault(); exThrow(); }
     else if (ev.key === "Escape") exitExplore();
     else if ((ev.key === "i" || ev.key === "I") && !EX.locked) exOpenDialog("inventario");
@@ -542,6 +592,16 @@ function setupExploreInput() {
     b.addEventListener("pointerup", off); b.addEventListener("pointercancel", off); b.addEventListener("lostpointercapture", off);
   });
   $("exA").addEventListener("pointerdown", ev => { ev.preventDefault(); exStrike(); });
+  $("exC").addEventListener("pointerdown", ev => { ev.preventDefault(); exDodge(); });
+  const cv = $("exCanvas");
+  cv.addEventListener("mousemove", ev => { if (EX && !EX.camp) { const w = exMouseWorld(ev); EX.mouse = {...w, t: performance.now()}; } });
+  cv.addEventListener("mousedown", ev => {
+    if (!EX || EX.locked || EX.dialog || EX.camp || (ev.button !== 0 && ev.button !== 2)) return;
+    ev.preventDefault();
+    const w = exMouseWorld(ev); EX.mouse = {...w, t: performance.now()}; exAimAt(w.x, w.y);
+    ev.button === 0 ? exStrike() : exThrow();
+  });
+  cv.addEventListener("contextmenu", ev => ev.preventDefault());
   $("exB").addEventListener("pointerdown", ev => { ev.preventDefault(); exThrow(); });
   $("exExit").addEventListener("click", exitExplore);
   $("exBag").addEventListener("click", () => { if (EX && !EX.locked && !EX.camp && EX.dialog !== "tutorial") EX.dialog === "inventario" ? exCloseDialog() : exOpenDialog("inventario"); });
@@ -639,8 +699,20 @@ function exOpenDialog(kind, msg, look) {
   else villagerTalk(look, say, d);   // pedido (oferta ou entrega) ou uma dica (systems/journal.js)
   if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);
   btn("Fechar", exCloseDialog, false, d);
-  d.hidden = false;
+  d.hidden = false; EX.confirming = null; EX.dialogT = performance.now();
+  if (kind !== "armeiro" && kind !== "tutorial") { menuSelect(d, EX.keepSel ?? menuFirst(d)); EX.keepSel = null; }   // já começa com uma opção escolhida
 }
+/* "Deseja vender...?": o painel vira a pergunta com Sim e Não (setas escolhem, Z confirma, X é o Não).
+   Depois de responder, a loja volta com a mesma opção escolhida. */
+function exConfirm(text, yes) {
+  const d = $("exDialog"), back = EX.dialog, bs = menuButtons(d);
+  EX.keepSel = Math.max(0, bs.findIndex(b => b.classList.contains("sel")));
+  d.innerHTML = `<h2>Confirmar</h2><p>${text}</p>`; sfx("look");
+  btn("Sim", yes, false, d); btn("Não", () => exOpenDialog(back), false, d);
+  EX.confirming = back; menuSelect(d, 0);
+}
+// nas lojas da exploração pergunta antes; no resto (testes, mapa) faz direto
+const ask = (text, fn) => () => EX && EX.dialog && !$("explore").hidden ? exConfirm(text, fn) : fn();
 // descansar/dormir na fogueira: Rhanon senta do lado do fogo (como na tela inicial) e só depois recupera
 function exCampRest(kind) {
   const h = EX.hero, f = EX.spots.filter(s => s.kind === "fogueira").sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y))[0];
@@ -658,10 +730,10 @@ function exIntro() {
 /* tutorial (jogo novo): depois de acordar, o caçador ensina os controles; só então o Rhanon anda e a ajuda aparece */
 const TUTORIAL = [
   "Bom dia, Rhanon! Dormiu bem aí do lado da fogueira? Antes de ir para a mata, deixa eu te lembrar do básico.",
-  "Para andar, use as setas ou W A S D.",
+  "Para andar, use as setas ou W A S D. Shift (ou C) dá uma esquiva rápida: um rolamento que passa pelo bote do bicho sem levar.",
   "Z (ou Espaço) é o golpe de lança. Também serve para conversar com o pessoal e usar a fogueira e as barracas.",
-  "X atira flechas, mas só depois que você comprar um arco com o armeiro da feira.",
-  "I abre a bolsa, com suas comidas e peles, e E abre o equipamento para trocar arma e roupa. Esc sai da fase.",
+  "X atira flechas, mas só depois que você comprar um arco com o armeiro da feira. Quem joga com o mouse mira no cursor: clique esquerdo golpeia, o direito atira.",
+  "I abre a bolsa, com suas comidas e peles, e E abre o equipamento para trocar arma e roupa. Nos menus, as setas escolhem, Z confirma e X volta. Esc sai da fase.",
   "Na luta, quando aparecer um anel com Z, aperte Z na hora em que ele ficar verde: seu golpe sai perfeito, ou você bloqueia metade do ataque do bicho.",
   "Bicho com etiqueta verde cai com um golpe só. E se você acertar primeiro, começa a luta com vantagem. Boa caçada!"
 ];
@@ -732,13 +804,13 @@ function drawNightShade(x, cx, cy, now) {
   const light = (px, py, r) => { const gr = g.createRadialGradient(px, py, r * .25, px, py, r); gr.addColorStop(0, "#000"); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(px - r, py - r, r * 2, r * 2); };
   const h = EX.camp || EX.hero;
   light(h.x - cx, h.y - cy - 12, 50);
-  const t0x = Math.floor(cx / TILE), t0y = Math.floor(cy / TILE);
-  for (let ty = t0y - 3; ty <= t0y + 14; ty++) for (let tx = t0x - 3; tx <= t0x + 18; tx++)
+  const t0x = Math.floor(cx / TILE), t0y = Math.floor(cy / TILE), [nx, ny] = viewTiles();
+  for (let ty = t0y - 3; ty <= t0y + ny + 3; ty++) for (let tx = t0x - 3; tx <= t0x + nx + 3; tx++)
     if (stageTile(tx, ty) === "F") light(tx * TILE + 8 - cx, ty * TILE + 8 - cy, 46 + Math.sin(now / 110 + tx) * 2.5);
   x.drawImage(c, 0, 0);
   // neblina: tufos claros e lentos sobre as árvores longe do Rhanon (só estética)
   const puff = FOG_PUFF || (FOG_PUFF = fogPuff());
-  for (let ty = t0y; ty <= t0y + 11; ty++) for (let tx = t0x; tx <= t0x + 15; tx++) {
+  for (let ty = t0y; ty <= t0y + ny; ty++) for (let tx = t0x; tx <= t0x + nx; tx++) {
     if (stageTile(tx, ty) !== "T" || (tx * 7 + ty * 13) % 4) continue;
     const px = tx * TILE + 8 - cx, py = ty * TILE + 8 - cy, far = Math.hypot(px - (h.x - cx), py - (h.y - cy - 12));
     if (far < 70) continue;
@@ -767,7 +839,7 @@ function drawCampSky(x, cx, cy, now) {
   drawFire(x, c.ftx * TILE - cx, c.fty * TILE - cy, now); drawCampHero(x, cx, cy, now);
 }
 function exCloseDialog() { $("exDialog").hidden = true; if (EX) EX.dialog = null; sfx("blip"); }
-// teclado com o painel aberto: 1-9 botões, Enter o primeiro disponível, Esc/X/Z fecham
+// teclado com o painel aberto: setas escolhem, Z/Enter/Espaço confirmam, 1-9 apertam direto, X/Esc voltam ou fecham
 function dialogKey(ev) {
   if (EX.dialog === "tutorial") {   // Z, Espaço ou Enter passam a página; Esc encerra a conversa
     if (["z", "Z", " ", "Enter"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); pressPanel($("exDialog").querySelector(".cmd")); }
@@ -775,10 +847,10 @@ function dialogKey(ev) {
     else if (ev.key.startsWith("Arrow")) ev.preventDefault();
     return;
   }
-  if (EX.dialog === "armeiro" && forgeKey(ev)) return;
-  const bs = [...$("exDialog").querySelectorAll(".cmd[data-key]")], onBtn = document.activeElement && document.activeElement.matches("#exDialog button");
-  if (/^[1-9]$/.test(ev.key)) { ev.preventDefault(); pressPanel(bs[+ev.key - 1]); }
-  else if (ev.key === "Enter" && !onBtn) { ev.preventDefault(); pressPanel(bs.find(b => b.getAttribute("aria-disabled") !== "true")); }
-  else if (["Escape", "x", "X", "z", "Z", "i", "I"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); exCloseDialog(); }
-  else if (ev.key.startsWith("Arrow") || ev.key === " ") ev.preventDefault();
+  const d = $("exDialog");
+  if (EX.dialog === "armeiro" && !EX.confirming && forgeKey(ev)) return;
+  if (/^[1-9]$/.test(ev.key)) { ev.preventDefault(); pressPanel(d.querySelectorAll(".cmd[data-key]")[+ev.key - 1]); }
+  else if (menuKey(ev, d)) return;   // setas escolhem, Z/Enter/Espaço confirmam
+  else if (["Escape", "x", "X", "i", "I"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); EX.confirming ? exOpenDialog(EX.confirming) : exCloseDialog(); }   // X volta (na pergunta, é o "Não")
+  else if (ev.key.startsWith("Arrow")) ev.preventDefault();
 }

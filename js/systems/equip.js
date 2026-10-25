@@ -1,6 +1,6 @@
 /* Tela de equipamento: o Rhanon no meio, de braços abertos como o Homem Vitruviano (círculo e quadrado atrás),
    e um espaço para cada parte (EQ_SLOTS) em volta. Abre pela bolsa ou com E na exploração; trocar já salva.
-   Setas escolhem o espaço, 1-9 equipam o item da lista, Enter passa para o próximo, Esc/E fecham. */
+   Setas escolhem o espaço, 1-9 equipam o item da lista, Z/Enter passam para o próximo, X/Esc/E fecham. */
 const EQ_SLOTS = [
   {slot: "weapon", n: "Arma"}, {slot: "ranged", n: "Arco", none: "Sem arco"},       // coluna da esquerda
   {slot: "torso", n: "Tronco", none: "Sem camisa"}, {slot: "legs", n: "Pernas"}      // coluna da direita
@@ -47,7 +47,7 @@ function openEquip(msg) {
   });
   if (!list.length) lh(s.slot === "ranged" ? "Você ainda não tem arco. O armeiro da feira faz um." : "Nada para trocar aqui ainda.", pick);
   if (msg) lh(msg, box);
-  box.insertAdjacentHTML("beforeend", '<p class="hint eq-keys">Setas escolhem o espaço · 1-9 equipam · Enter troca para o próximo · Esc fecha</p>');
+  box.insertAdjacentHTML("beforeend", '<p class="hint eq-keys">Setas escolhem o espaço · Z troca para o próximo · 1-9 equipam direto · X fecha</p>');
   btn("Fechar", closeEquip, false, box);
   if (o.hidden) { o.hidden = false; sfx("blip"); }
 }
@@ -71,11 +71,11 @@ function setupEquip() {
     const k = ev.key, flip = {ArrowUp: 1, ArrowDown: 1, ArrowLeft: 2, ArrowRight: 2}[k];   // cima/baixo: mesma coluna; lados: troca de coluna
     if (flip) { ev.preventDefault(); EQ_SEL ^= flip; sfx("blip"); openEquip(); }
     else if (/^[1-9]$/.test(k)) pressPanel($("equipar").querySelectorAll(".eq-pick .cmd")[+k - 1]);
-    else if ((k === "Enter" || k === " ") && !ev.repeat) {
+    else if ((k === "Enter" || k === " " || k === "z" || k === "Z") && !ev.repeat) {   // Z troca para o próximo item
       ev.preventDefault();
       const s = EQ_SLOTS[EQ_SEL], list = eqChoices(s), at = list.findIndex(c => c.id === G.equip[s.slot]);
       if (list.length > 1) eqSet(s.slot, list[(at + 1) % list.length].id);
     }
-    else if (["Escape", "e", "E", "i", "I"].includes(k) && !ev.repeat) { ev.preventDefault(); closeEquip(); }
+    else if (["Escape", "x", "X", "e", "E", "i", "I"].includes(k) && !ev.repeat) { ev.preventDefault(); closeEquip(); }   // X volta
   }, true);
 }

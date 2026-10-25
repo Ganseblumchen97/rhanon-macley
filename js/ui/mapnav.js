@@ -26,11 +26,28 @@ function navMove(which, dx, dy) {
 }
 const panelButtons = which => [...$(NAV[which].panel).querySelectorAll(".cmd[data-key]")];
 function pressPanel(btn) { if (btn && btn.getAttribute("aria-disabled") !== "true") btn.click(); }
+/* listas de botões só no teclado (painéis da exploração, confirmações): setas sobem e descem, Z/Enter/Espaço
+   confirmam o escolhido. O escolhido ganha "sel" e o foco e a lista rola até ele (listas maiores que 1-9) */
+const menuButtons = host => [...host.querySelectorAll(".cmd")].filter(b => b.offsetParent !== null);
+function menuSelect(host, i) {
+  const bs = menuButtons(host); if (!bs.length) return;
+  i = (i + bs.length) % bs.length;
+  bs.forEach((b, j) => b.classList.toggle("sel", j === i));
+  bs[i].focus({preventScroll: true}); bs[i].scrollIntoView({block: "nearest"});
+}
+const menuFirst = host => Math.max(0, menuButtons(host).findIndex(b => b.getAttribute("aria-disabled") !== "true"));
+function menuKey(ev, host) {   // devolve true se usou a tecla
+  const bs = menuButtons(host); if (!bs.length) return false;
+  let i = bs.findIndex(b => b.classList.contains("sel")); if (i < 0) i = bs.indexOf(document.activeElement);
+  if (ev.key === "ArrowDown" || ev.key === "ArrowUp") { ev.preventDefault(); menuSelect(host, i < 0 ? 0 : i + (ev.key === "ArrowDown" ? 1 : -1)); sfx("blip"); return true; }
+  if (["z", "Z", "Enter", " "].includes(ev.key)) { ev.preventDefault(); if (!ev.repeat) pressPanel(bs[i < 0 ? menuFirst(host) : i]); return true; }
+  return false;
+}
 
 function setupMapNav() {
   document.addEventListener("keydown", ev => {
     if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
-    if (!$("titleScreen").hidden) { if (ev.key === "Enter" && document.activeElement !== $("startAdventure")) $("startAdventure").click(); return; }
+    if (!$("titleScreen").hidden) { if ((ev.key === "Enter" || ev.key === "z" || ev.key === "Z") && document.activeElement !== $("startAdventure")) $("startAdventure").click(); return; }
     // entrevistas e missões de trabalho
     if (["interview", "betterInterview", "work"].includes(mode) && $("over").hidden && $("map").hidden) {
       const i = "123".indexOf(ev.key) >= 0 ? "123".indexOf(ev.key) : "abc".indexOf(ev.key.toLowerCase());
@@ -42,8 +59,8 @@ function setupMapNav() {
     const dir = {ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0]}[ev.key];
     const onControl = document.activeElement && document.activeElement.matches("button, .node");
     if (dir) { ev.preventDefault(); navMove(which, ...dir); }
-    else if (ev.key === "Enter" && !onControl) { ev.preventDefault(); pressPanel(panelButtons(which).find(b => b.getAttribute("aria-disabled") !== "true")); }
+    else if ((ev.key === "Enter" && !onControl) || ev.key === "z" || ev.key === "Z") { ev.preventDefault(); pressPanel(panelButtons(which).find(b => b.getAttribute("aria-disabled") !== "true")); }   // Z = Enter
     else if (/^[1-9]$/.test(ev.key)) pressPanel(panelButtons(which)[+ev.key - 1]);
-    else if (ev.key === "Escape" && which === "local") closeLocal();
+    else if ((ev.key === "Escape" || ev.key === "x" || ev.key === "X") && which === "local") closeLocal();   // X = voltar
   });
 }

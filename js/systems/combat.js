@@ -50,7 +50,7 @@ function buildCmds() {
 function openSubMenu(opts, backDesc, from) {
   subMenu = opts; subFrom = from; sfx("look"); $("cmds").innerHTML = "";
   opts.forEach((o, n) => cmdButton(`<i class="key">${n + 1}</i>${o.label}<small>${o.small || ""}</small>`, o.desc, o.fn, o.off));
-  cmdButton(`<i class="key">Esc</i>Voltar`, backDesc, closeSubMenu);
+  cmdButton(`<i class="key">X</i>Voltar`, backDesc, closeSubMenu);
   $("cmds").firstChild.focus();
 }
 function closeSubMenu() { const from = subFrom; buildCmds(); render(); $("cmds").children[from].focus(); }

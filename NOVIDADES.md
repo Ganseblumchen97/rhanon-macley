@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.24.1 — controles e tela
+
+- A exploração agora ocupa a tela inteira, com um painel no alto mostrando o lugar, o nível, PV, PE e XP (com
+  barrinhas), o dinheiro e os botões de bolsa, equipamento, opções e sair.
+- A batalha tem um tamanho máximo: em telas muito grandes ela fica centralizada e a estocada da lança não fica esquisita.
+- Dá para jogar tudo só no teclado: nos menus, as setas escolhem, Z confirma e X volta (na batalha, X sai do Especial
+  e dos Itens; nos mapas, Z entra e X volta).
+- Nas barracas da feira, listas grandes podem ser navegadas com as setas, e comprar, vender ou fabricar pergunta
+  antes ("Deseja vender...?" com Sim e Não).
+- Mouse na exploração: uma mira segue o cursor; o botão esquerdo dá o golpe e o direito atira a flecha para onde
+  ela aponta.
+- Esquiva: Shift (ou C) dá um rolamento rápido que passa pelo bote do bicho sem levar. No celular, botão ESQUIVA.
+
 ## 0.24.0 — Belém, a capital
 
 - O ônibus da BR-316 está rodando! Depois de vencer o chefe da Várzea, compre a passagem na cabine do cobrador

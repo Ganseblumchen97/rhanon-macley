@@ -34,7 +34,7 @@ function setupOptions() {
   $("exOpt").addEventListener("click", () => { if (!EX || !EX.camp) openOptions(); });   // na exploração (fora das cenas)
   $("opcoes").addEventListener("click", ev => { if (ev.target === $("opcoes")) closeOptions(); });   // clicar fora fecha
   document.addEventListener("keydown", ev => {
-    if (ev.key !== "Escape") return;
+    if (ev.key !== "Escape" && !(ev.key === "x" || ev.key === "X") ) return;   // X volta, como Esc
     if (!$("opcoes").hidden) { ev.stopImmediatePropagation(); closeOptions(); }
     else if (!$("caderno").hidden) { ev.stopImmediatePropagation(); closeJournal(); }
   }, true);

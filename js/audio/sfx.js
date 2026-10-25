@@ -40,6 +40,8 @@ const SFX = {
   bloqueio: t => { tone(880, t, .2, "square", .06, 820); tone(1320, t, .16, "triangle", .07, 1250); noise(t, .06, .14, 3000); tone(120, t, .1, "sine", .14, 70); },
   // o anel ficou verde: tique discreto marcando a janela do tempo certo
   janela: t => tone(1568, t, .03, "triangle", .035),
+  // esquiva: um "fuup" de ar (ruído agudo descendo) e um toque leve no chão
+  esquiva: t => { noise(t, .16, .1, 2200); tone(900, t, .12, "triangle", .04, 300); tone(140, t + .1, .06, "sine", .06, 90); },
   // fúria pronta / golpe da fúria: subida rápida e um acorde forte
   furia: t => { [392, 523, 659, 784].forEach((f, i) => tone(f, t + i * .04, .12, "square", .06)); [523, 659, 784].forEach(f => tone(f, t + .18, .35, "sawtooth", .045)); noise(t + .18, .25, .12, 1200); },
   crit:  t => { noise(t, .18, .25, 400); tone(440, t, .25, "square", .14, 80); tone(880, t + .05, .2, "square", .08, 160); },

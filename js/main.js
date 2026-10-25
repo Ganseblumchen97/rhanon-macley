@@ -38,10 +38,14 @@ new MutationObserver(() => { const t = $("overTitle"); if (t.childNodes.length =
 
 /* ----- teclado ----- */
 document.addEventListener("keydown", ev => {
+  // cartão do resultado: Z aperta o botão escolhido (como Enter)
+  if (!$("over").hidden && (ev.key === "z" || ev.key === "Z") && document.activeElement && document.activeElement.closest("#over")) { ev.preventDefault(); document.activeElement.click(); return; }
   // setas e 1-6 só durante a batalha
   if (mode !== "hunt" || !p || !$("over").hidden || !$("map").hidden || !$("local").hidden || !$("explore").hidden || !$("titleScreen").hidden) return;
   if (qte && ["z", "Z", " "].includes(ev.key)) { ev.preventDefault(); if (!ev.repeat) qtePress(); return; }   // golpe/bloqueio no tempo certo
   const bs = [...$("cmds").children], cur = bs.indexOf(document.activeElement);
+  if (["z", "Z", " "].includes(ev.key) && cur >= 0) { ev.preventDefault(); if (!ev.repeat) bs[cur].click(); return; }   // Z confirma o comando escolhido nas setas
+  if ((ev.key === "x" || ev.key === "X") && subMenu) { ev.preventDefault(); closeSubMenu(); return; }   // X volta do Especial/Itens
   if (ev.key === "ArrowDown") { ev.preventDefault(); bs[(cur + 1) % bs.length].focus(); }
   else if (ev.key === "ArrowUp") { ev.preventDefault(); bs[(cur - 1 + bs.length) % bs.length].focus(); }
   else if (subMenu) {   // Especial/Itens abertos: números escolhem, Esc volta
@@ -52,6 +56,8 @@ document.addEventListener("keydown", ev => {
   else if (/^[1-6]$/.test(ev.key)) act(CMDS[+ev.key - 1].id);
 });
 document.addEventListener("keydown", ev => { if (ev.key === "m" || ev.key === "M") toggleMute(); });
+// Espaço já confirma ao apertar (painéis, comandos da batalha, equipamento): soltar não pode apertar o botão de novo
+document.addEventListener("keyup", ev => { if (ev.key === " " && ev.target.closest && ev.target.closest("#exDialog, #cmds, #equipar")) ev.preventDefault(); });
 
 /* ----- áudio ----- */
 // o áudio começa no primeiro gesto do jogador, respeitando a política de autoplay dos navegadores
