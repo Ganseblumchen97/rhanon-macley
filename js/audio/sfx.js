@@ -13,8 +13,12 @@ function tone(f, t, d, type, v, f2) {
   g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
   o.connect(g); g.connect(master); o.start(t); o.stop(t + d + .02);
 }
-function noise(t, d, v, hp) {
+// 1 segundo de ruído branco, criado uma vez
+function noiseBuffer() {
   if (!NB) { NB = AC.createBuffer(1, AC.sampleRate, AC.sampleRate); const a = NB.getChannelData(0); for (let i = 0; i < a.length; i++) a[i] = Math.random() * 2 - 1; }
+}
+function noise(t, d, v, hp) {
+  noiseBuffer();
   const s = AC.createBufferSource(), g = AC.createGain(), f = AC.createBiquadFilter();
   f.type = "highpass"; f.frequency.value = hp; s.buffer = NB;
   g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
@@ -34,9 +38,70 @@ const SFX = {
   hurt:  t => { tone(300, t, .2, "square", .12, 90); noise(t, .1, .18, 600); },
   more:  t => [784, 988, 1175, 1568].forEach((f, i) => tone(f, t + i * .06, .08, "square", .08)),
   // golpe crítico: "ting!" agudo em duas notas e um impacto grave
+  ronco: t => ronco(t),
+  galo: t => galo(t),
   critico: t => { tone(1568, t, .08, "square", .08); tone(2093, t + .07, .3, "triangle", .09); noise(t + .02, .3, .24, 300); tone(95, t + .02, .38, "sawtooth", .17, 40); }
 };
 function sfx(n) { if (AC) SFX[n](AC.currentTime); }
+/* ---------- vozes: ronco, galo e os bichos ---------- */
+// oscilador com entrada suave, deslize de f até f2 e vibrato opcional (vib Hz, depth Hz)
+function voice(f, t, d, type, v, f2, vib = 0, depth = 0) {
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t);
+  if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+  if (vib) { const l = AC.createOscillator(), lg = AC.createGain(); l.frequency.value = vib; lg.gain.value = depth; l.connect(lg); lg.connect(o.frequency); l.start(t); l.stop(t + d + .05); }
+  g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + Math.min(.04, d / 4)); g.gain.exponentialRampToValueAtTime(.001, t + d);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + d + .05);
+}
+// ruído filtrado numa faixa (sopro, chiado, fungada); rise = segundos subindo antes de cair
+function hum(t, d, v, freq, q = 2, rise = .02) {
+  noiseBuffer();
+  const s = AC.createBufferSource(), g = AC.createGain(), f = AC.createBiquadFilter();
+  f.type = "bandpass"; f.frequency.value = freq; f.Q.value = q; s.buffer = NB; s.loop = true;
+  v *= 2.5;   // o filtro de faixa tira muito volume do ruído
+  g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + rise); g.gain.exponentialRampToValueAtTime(.001, t + d);
+  s.connect(f); f.connect(g); g.connect(master); s.start(t, Math.random() * .5); s.stop(t + d + .05);
+}
+// ronco: puxa o ar arranhando e solta num assobio
+function ronco(t) {
+  hum(t, .75, .22, 180, 3, .5); voice(62, t, .75, "sawtooth", .05, 75, 22, 8);
+  voice(1500, t + .85, .45, "sine", .09, 2000);
+}
+// galo: "có-có-ri-cóóó"
+function galo(t) {
+  [[560, .11], [640, .11], [820, .17]].forEach(([f, d], i) => voice(f, t + i * .15, d, "sawtooth", .1, f * 1.05, 7, 12));
+  voice(980, t + .5, .75, "sawtooth", .12, 640, 7, 25); hum(t + .5, .6, .04, 1800, 1);
+}
+// cada família de bicho tem um grito; k = volume (exploração mais baixo que a batalha)
+const CRIES = {
+  felino: (t, k) => { voice(95, t, .75, "sawtooth", .16 * k, 62, 26, 14); hum(t, .65, .14 * k, 380, 1.5, .1); },
+  felinoP: (t, k) => { voice(170, t, .5, "sawtooth", .12 * k, 110, 30, 18); hum(t, .4, .1 * k, 700, 1.5, .06); },
+  roedor: (t, k) => [0, .11, .24].forEach((o, i) => voice(1800 + i * 200, t + o, .07, "triangle", .08 * k, 2500 - i * 300)),
+  porco: (t, k) => [0, .16, .3].forEach(o => { voice(130, t + o, .12, "sawtooth", .12 * k, 85); hum(t + o, .1, .1 * k, 300, 2); }),
+  macaco: (t, k) => { voice(380, t, .12, "triangle", .1 * k, 420); voice(420, t + .16, .12, "triangle", .1 * k, 470); voice(650, t + .34, .32, "triangle", .12 * k, 950, 9, 30); },
+  ave: (t, k) => { voice(2600, t, .55, "sawtooth", .07 * k, 1300, 32, 120); voice(1300, t, .5, "triangle", .06 * k, 900); },
+  cobra: (t, k) => hum(t, .9, .09 * k, 5000, .7, .25),
+  jacare: (t, k) => { voice(55, t, .9, "sawtooth", .16 * k, 48, 9, 6); hum(t, .8, .14 * k, 140, 2, .2); },
+  calango: (t, k) => [0, .07, .14].forEach(o => hum(t + o, .03, .14 * k, 3000, 3)),
+  anta: (t, k) => voice(1200, t, .55, "sine", .1 * k, 1750, 6, 40),
+  capivara: (t, k) => [0, .14].forEach(o => { voice(520, t + o, .08, "square", .07 * k, 300); hum(t + o, .06, .08 * k, 900, 2); }),
+  ariranha: (t, k) => [0, .08, .16, .26].forEach((o, i) => voice(1400 + (i % 2) * 400, t + o, .06, "square", .05 * k, 1100)),
+  preguica: (t, k) => voice(1550, t, .9, "sine", .08 * k, 1150, 5, 25),
+  fungada: (t, k) => [0, .2].forEach(o => hum(t + o, .18, .14 * k, 650, 2.5, .05)),
+  tatu: (t, k) => [0, .09, .18, .27].forEach(o => hum(t + o, .06, .1 * k, 950, 3)),
+  piranha: (t, k) => { [0, .12].forEach(o => { hum(t + o, .05, .16 * k, 1300, 2); voice(320, t + o, .05, "square", .06 * k, 140); }); [800, 1150].forEach((f, i) => voice(f, t + .3 + i * .07, .05, "sine", .06 * k, f * 1.3)); },
+  eletrico: (t, k) => { voice(60, t, .55, "square", .08 * k, 70, 45, 30); hum(t, .5, .12 * k, 4500, 1); },
+  aranha: (t, k) => { hum(t, .3, .1 * k, 2800, 1.5, .05); [.32, .38, .44].forEach(o => hum(t + o, .02, .14 * k, 4000, 4)); }
+};
+const CRY_OF = {onca: "felino", jaguatirica: "felinoP", cotia: "roedor", cassaco: "roedor", quati: "roedor", queixada: "porco", macaco: "macaco",
+  harpia: "ave", sucuri: "cobra", surucucu: "cobra", jacare: "jacare", calango: "calango", anta: "anta", capivara: "capivara", ariranha: "ariranha",
+  preguica: "preguica", tamandua: "fungada", tatu: "tatu", piranha: "piranha", poraque: "eletrico", caranguejeira: "aranha"};
+// grito do bicho (chefe soma um rugido grave por baixo)
+function animalCry(id, boss = false, k = 1) {
+  if (!AC) return;
+  const t = AC.currentTime, c = CRIES[CRY_OF[ART[id] || id]] || CRIES.porco;
+  c(t, k * 1.6); if (boss) SFX.roar(t);
+}
 function toggleMute() {
   muted = !muted; if (master) master.gain.value = muted ? 0 : .5;
   $("mute").setAttribute("aria-pressed", muted);

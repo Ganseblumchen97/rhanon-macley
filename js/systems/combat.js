@@ -104,7 +104,7 @@ function init(opts = {}) {
   BEAST_A.mount($("beast"), $("beast").querySelector("canvas") || animalSprite(e), {id: e.id, boss, state: "enter", fit: true});
   busy = true; render();
   HERO_A.slide("-38vw", "0px", 650, () => HERO_A.set("idle"));
-  BEAST_A.slide("42vw", "0px", 600, () => { BEAST_A.set("idle"); BEAST_A.dust(); BEAST_A.bang(); sfx(boss ? "roar" : "guard"); });
+  BEAST_A.slide("42vw", "0px", 600, () => { BEAST_A.set("idle"); BEAST_A.dust(); BEAST_A.bang(); animalCry(e.id, boss); });
   setTimeout(() => encounterBanner(e.name), 380);
   setTimeout(() => { if (opts.enemyFirst) return enemyTurn(); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus(); }, REDUCE ? 300 : 1350);
 }
@@ -242,7 +242,7 @@ function finish(kind) {
 function foeAttack(kind, d, sp0) {
   BEAST_A.set(kind === "roar" ? "roar" : "windup");
   holdP = {hp: p.hp + d, sp: sp0 === undefined ? p.sp : sp0};
-  if (kind === "roar") { sfx("roar"); anim($("beast"), "hit"); }
+  if (kind === "roar") { animalCry(e.id, e.boss); anim($("beast"), "hit"); }
   else { anim($("beast"), "lunge"); sfx("claw"); }
   setTimeout(() => {
     holdP = null; render();

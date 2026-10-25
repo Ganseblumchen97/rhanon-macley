@@ -181,7 +181,7 @@ function exAnimal(en, dt, now) {
   if (now < en.stunUntil) { exMove(en, -dx / dist, -dy / dist, en.speed * .8 * dt); return; }   // assustado, foge
   if (en.state === "windup") { if (now > en.until) en.state = "chase"; else return; }
   if (dist < CHASE_RANGE && !safe) {
-    if (en.state !== "chase") { en.state = "windup"; en.until = now + 450; en.face = dx > 0 ? 1 : -1; return; }   // "!" antes de correr
+    if (en.state !== "chase") { en.state = "windup"; en.until = now + 450; en.face = dx > 0 ? 1 : -1; animalCry(en.a.id, en.boss, .55); return; }   // "!" (e o grito) antes de correr
     exMove(en, dx / dist, dy / dist, en.speed * 1.3 * dt);
     return;
   }
@@ -198,6 +198,11 @@ function exUpdate(dt, now) {
   const h = EX.hero;
   EX.cool = Math.max(0, EX.cool - dt); EX.jab = Math.max(0, EX.jab - dt); EX.shoot = Math.max(0, (EX.shoot || 0) - dt);
   if (EX.draw && (EX.draw.t += dt) >= BOW_DRAW) exRelease();
+  if (EX.camp) {   // sons da fogueira: ronco com assobio enquanto dorme; na abertura, o galo canta e ele acorda
+    const c = EX.camp, el = now - c.t0;
+    if (campAsleep(c, el) && !c.crowed && now - (c.snoreT || 0) > 1700) { c.snoreT = now; sfx("ronco"); }   // o galo interrompe o ronco
+    if (c.kind === "intro" && el > 1500 && !c.crowed) { c.crowed = true; sfx("galo"); }
+  }
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
   for (const l of EX.loot) if (now - l.t0 > 500 && Math.hypot(l.x - h.x, l.y - h.y) < 11) pickLoot(l);
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
@@ -341,7 +346,7 @@ function exDraw(now) {
     pxl(x, sx + ux * 5, sy + uy * 5, "#eef3f5"); pxl(x, sx - ux * 5 - uy, sy - uy * 5 + ux, "#e5001c"); pxl(x, sx - ux * 5 + uy, sy - uy * 5 - ux, "#e5001c");
   }
   if (EX.camp && EX.camp.kind !== "fogueira") {   // dormir: a noite cai; abertura: amanhece. O fogo fica aceso por cima
-    const c = EX.camp, el = now - c.t0, a = c.kind === "intro" ? .55 * Math.max(0, 1 - el / 2200) : Math.min(.6, Math.max(0, (el - 500) / 2400) * .6);
+    const c = EX.camp, el = now - c.t0, a = c.kind === "intro" ? .55 * Math.max(0, 1 - el / 2600) : Math.min(.6, Math.max(0, (el - 500) / 2400) * .6);
     x.fillStyle = `rgba(8,10,40,${a})`; x.fillRect(0, 0, VIEW_W, VIEW_H);
     drawFire(x, c.ftx * TILE - cx, c.fty * TILE - cy, now); drawCampHero(x, cx, cy, now);
   }
@@ -465,7 +470,7 @@ function exCampRest(kind) {
 function startIntro() { startExplore("aldeia", exIntro); }
 function exIntro() {
   const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), side = solidAt(f.x - 14, f.y + 5) ? 1 : -1;
-  EX.camp = {kind: "intro", t0: performance.now(), dur: 4300, x: f.x + side * 14, y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
+  EX.camp = {kind: "intro", t0: performance.now(), dur: 4900, x: f.x + side * 14, y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
   h.x = EX.camp.x; h.y = EX.camp.y; h.dir = "down"; h.aim = {x: 0, y: 1};
   exToast("Ananindeua (PA) · amanhece na aldeia...");
 }
@@ -475,17 +480,19 @@ function exCampEnd() {
   EX.dialog = "fogueira";   // o resultado volta no painel da fogueira (localDone)
   if (kind === "dormir") wipe(() => rest("dormir")); else rest("fogueira");
 }
+// dormindo agora? (abertura: até o galo acordar ele; dormir na fogueira: depois de sentar)
+const campAsleep = (c, el) => c.kind === "intro" ? el < 2300 : c.kind === "dormir" && el > 1100;
 function drawCampHero(x, cx, cy, now) {
   const c = EX.camp, el = now - c.t0, intro = c.kind === "intro", sx = snap(c.x - cx), sy = snap(c.y - cy);
-  const sleep = intro ? el < 1700 : c.kind === "dormir" && el > 1100;
-  let face = sleep || el % 1700 < 140 ? "blink" : (intro ? el > 2200 && el < 2800 : el > 800 && el < 1250) ? "happy" : undefined;
-  const up = intro && el > 3000;   // na abertura: levanta e se espreguiça com a lança para o alto
-  const img = up ? rigCanvas("front", {weapon: el < 3700 ? "raise" : "diag", face: el < 3700 ? "happy" : undefined, dy: el < 3700 ? 0 : 1}, rhanonLook(), OW_SCALE)
+  const sleep = campAsleep(c, el);
+  let face = sleep || el % 1700 < 140 ? "blink" : (intro ? el > 2800 && el < 3400 : el > 800 && el < 1250) ? "happy" : undefined;
+  const up = intro && el > 3600;   // na abertura: levanta e se espreguiça com a lança para o alto
+  const img = up ? rigCanvas("front", {weapon: el < 4300 ? "raise" : "diag", face: el < 4300 ? "happy" : undefined, dy: el < 4300 ? 0 : 1}, rhanonLook(), OW_SCALE)
     : rigCanvas("front", {sit: true, face, dy: sleep ? 1 : 0}, {...rhanonLook(), bowBack: false}, OW_SCALE);
   drawShadow(x, sx, sy, up ? 12 : 18);
   if (!up) { spearShaft(x, sx - 11, sy, sx + 9, sy); pxl(x, sx + 10, sy, "#eef3f5"); }   // lança deitada no chão
   x.drawImage(img, sx - img.width / 2, sy - img.height + 1);
-  if (intro && el > 1700 && el < 2100) glyphP(x, "bang", "#ffd23a", sx + 7, sy - 30);   // acordou!
+  if (intro && el > 2300 && el < 2700) glyphP(x, "bang", "#ffd23a", sx + 7, sy - 30);   // acordou com o galo!
   for (let i = 0; i < 4; i++) {   // fumaça subindo do fogo
     const p = (now / 1700 + i / 4) % 1;
     if (p < .85 || Math.floor(now / 80) % 2) { x.fillStyle = i % 2 ? "#c9c4b8" : "#9e9a90"; x.fillRect(Math.round(c.fx - cx + Math.sin(p * 6 + i) * 2), Math.round(c.fy - cy - 6 - p * 20), 2, 2); }

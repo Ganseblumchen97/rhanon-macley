@@ -42,7 +42,7 @@ function selectSub(id, msg) {
 function rest(kind) {
   vit(); const f = kind === "dormir" ? 1 : .5;
   G.hp = Math.min(maxHP(G.lv), G.hp + Math.ceil(maxHP(G.lv) * f)); G.sp = Math.min(maxSP(G.lv), G.sp + Math.ceil(maxSP(G.lv) * f));
-  if (kind === "dormir") G.day++;
+  if (kind === "dormir") { G.day++; setTimeout(() => sfx("galo"), 450); }   // amanhece com o galo
   save(); sfx("heal");
   localDone("aldeia", kind === "dormir" ? `Rhanon dormiu até o amanhecer. Dia ${G.day}.` : "Rhanon descansou junto à fogueira.");
 }
