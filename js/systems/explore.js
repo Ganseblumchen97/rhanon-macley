@@ -43,6 +43,43 @@ function spearBlocked(px, py) {
 }
 
 /* ---------- entrar, sair e trocar de fase ---------- */
+// vida no cenário (só enfeite): borboletas e folhas caindo de dia, vaga-lumes à noite, sempre perto da câmera
+function exAmbient(dt, now) {
+  const h = EX.hero, want = EX.night ? 10 : 6;
+  EX.amb = EX.amb || [];
+  if (EX.amb.length < want && Math.random() < dt * 3) {
+    const kind = EX.night ? "vagalume" : Math.random() < .5 ? "borboleta" : "folha";
+    let x = h.x + (Math.random() - .5) * VIEW_W, y = h.y - 12 + (Math.random() - .5) * VIEW_H;
+    if (kind === "folha") {   // folha só cai de árvore
+      const tx = Math.floor(x / TILE), ty = Math.floor(y / TILE);
+      if (stageTile(tx, ty) !== "T") return;
+      x = tx * TILE + 4 + Math.random() * 8; y = ty * TILE + 4;
+    }
+    EX.amb.push({kind, x, y, t: 0, life: kind === "folha" ? 3.5 : 7 + Math.random() * 6, ph: Math.random() * 6,
+      col: kind === "borboleta" ? ["#ffd23a", "#ff8ac8", "#86d6ff", "#ffffff"][Math.floor(Math.random() * 4)] : ["#6fbf4a", "#a6d65a", "#c9a040"][Math.floor(Math.random() * 3)]});
+  }
+  for (const a of EX.amb) {
+    a.t += dt;
+    if (a.kind === "borboleta") { a.x += Math.cos(a.ph + a.t * .7) * 18 * dt; a.y += Math.sin(a.ph * 1.3 + a.t * 1.1) * 14 * dt; }
+    else if (a.kind === "vagalume") { a.x += Math.cos(a.ph + a.t * .5) * 8 * dt; a.y += Math.sin(a.ph + a.t * .8) * 6 * dt; }
+    else { a.x += Math.sin(a.t * 2.2 + a.ph) * 16 * dt; a.y += 11 * dt; }
+  }
+  EX.amb = EX.amb.filter(a => a.t < a.life && Math.abs(a.x - h.x) < VIEW_W && Math.abs(a.y - h.y) < VIEW_H);
+}
+function drawAmbient(x, cx, cy, now, night) {
+  for (const a of EX.amb || []) {
+    if ((a.kind === "vagalume") !== night) continue;
+    const px = Math.round(a.x - cx), py = Math.round(a.y - cy);
+    x.globalAlpha = Math.max(0, Math.min(1, a.t, a.life - a.t));
+    if (a.kind === "borboleta") {   // asas abrindo e fechando
+      x.fillStyle = a.col;
+      if (Math.floor(now / 110 + a.ph * 3) % 2) { x.fillRect(px - 2, py - 1, 2, 2); x.fillRect(px + 1, py - 1, 2, 2); } else { x.fillRect(px - 1, py - 1, 1, 2); x.fillRect(px + 1, py - 1, 1, 2); }
+      x.fillStyle = "#2a1a14"; x.fillRect(px, py - 1, 1, 2);
+    } else if (a.kind === "folha") { x.fillStyle = a.col; x.fillRect(px, py, 2, 1); x.fillRect(px + Math.floor(a.t * 4) % 2, py + 1, 1, 1); }
+    else if (Math.sin(now / 300 + a.ph * 5) > -.2) { x.fillStyle = "rgba(220,255,120,.35)"; x.fillRect(px - 1, py - 1, 3, 3); x.fillStyle = "#e8ff7a"; x.fillRect(px, py, 1, 1); }   // vaga-lume piscando
+  }
+  x.globalAlpha = 1;
+}
 // peixes vivem só na água: nadam de um lado para o outro, cospem água quando veem o Rhanon e só a flecha alcança
 const AQUATIC = new Set(["piranha", "poraque"]);
 // where: "terra" (sem peixes, para os "a" do mapa), "agua" (só peixes) ou nada (qualquer um, usado na batalha)
@@ -98,8 +135,8 @@ function exSpits(dt, now) {
 function makeAnimalEnt(a, tx, ty) {
   const img = artCanvas("animal/" + a.id + "/mapa") || codeAnimalSprite(a), k = +img.dataset.scale || 1, x = tx * TILE + 8, y = ty * TILE + 12;
   // traço novo: segundo quadro (respirando/andando) e o desmaiado, para quando cai com um golpe só
-  const rig = img.dataset.rig, img2 = rig && beastFrame(a.id, "idle", 1), ko = rig && beastFrame(a.id, "ko");
-  return {a, img, img2, ko, w: img.width / k, h: img.height / k, x, y, homeX: x, homeY: y, hw: Math.min(7, Math.round(img.width / k / 3)), hh: 3,
+  const rig = img.dataset.rig, img2 = rig && beastFrame(a.id, "idle", 1), ko = rig && beastFrame(a.id, "ko"), blink = rig && beastFrame(a.id, "blink");
+  return {a, img, img2, ko, blink, w: img.width / k, h: img.height / k, x, y, homeX: x, homeY: y, hw: Math.min(7, Math.round(img.width / k / 3)), hh: 3,
     speed: a.id === "preguica" ? 18 : (ANIMAL_SPEED[a.size] ?? 40), boss: !!a.boss, alive: true,
     state: "wander", vx: 0, vy: 0, until: 0, face: -1, walk: 0, stunUntil: 0};
 }
@@ -120,6 +157,7 @@ function startExplore(zone, after) {
     if (!st.safe) spawnFish(zone, st.rows);
     vit(); G.sub = zone; save();
     curZone = zone; fromLocal = false; exKeys.clear();
+    $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
     musicStart("local"); exHud();
     exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
@@ -129,7 +167,7 @@ function startExplore(zone, after) {
 function exitExplore() {
   if (!EX || EX.locked) return;
   EX.locked = true;
-  wipe(() => { $("explore").hidden = true; $("exDialog").hidden = true; EX = null; exKeys.clear(); showLocal(); });
+  wipe(() => { $("explore").hidden = true; $("exDialog").hidden = true; $("exSkip").hidden = true; EX = null; exKeys.clear(); showLocal(); });
 }
 // volta da batalha para a fase, no mesmo lugar
 function resumeExplore(result) {
@@ -260,16 +298,32 @@ function exUpdate(dt, now) {
       dawnWipe(() => { c.day = true; G.night = toNight; EX.night = toNight; save(); exHud(); musicStart("local"); }, toNight ? "Anoiteceu" : `Amanheceu · Dia ${G.day + 1}`, toNight);
     }
   }
+  // aviso "segure C para pular" com a barrinha enchendo (0,7 s segurando pula a cena)
+  const sk = $("exSkip");
+  if (EX.camp) {
+    sk.hidden = false;
+    const p = EX.skipHold ? Math.min(1, (now - EX.skipHold) / 700) : 0;
+    sk.style.setProperty("--p", p * 100 + "%");
+    if (p >= 1) { EX.skipHold = 0; return campSkip(); }
+  } else if (!sk.hidden) sk.hidden = true;
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
   for (const l of EX.loot) if (now - l.t0 > 500 && Math.hypot(l.x - h.x, l.y - h.y) < 11) pickLoot(l);
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
-  if (EX.locked || EX.dialog || EX.draw || EX.camp) ix = iy = 0;
+  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     h.aim = {x: ix / n, y: iy / n};
     if (ix) { h.side = ix; h.dir = "side"; }   // andando para os lados (ou na diagonal): de perfil
     else h.dir = iy < 0 ? "up" : "down";
-    if (slide(h, ix / n * sp, iy / n * sp) || nudge(h, ix, iy)) { h.walk += sp; h.movedT = now; }
+    if (slide(h, ix / n * sp, iy / n * sp) || nudge(h, ix, iy)) {
+      h.walk += sp; h.movedT = now;
+      if ((h.dust = (h.dust || 0) + sp) > 13) {   // a cada passo: poeirinha na trilha ou folhinhas no mato alto
+        h.dust = 0;
+        const ch = stageTile(Math.floor(h.x / TILE), Math.floor(h.y / TILE)), grass = ch === ",";
+        for (let k = 0; k < (grass ? 3 : 2); k++) EX.fx.push({x: h.x + (Math.random() - .5) * 6, y: h.y - (grass ? 4 : 0), vx: (Math.random() - .5) * 16 - ix * 6, vy: grass ? -18 - Math.random() * 10 : -6,
+          life: grass ? .45 : .3, col: grass ? (k % 2 ? "#5fae52" : "#8fd06a") : ch === "-" || ch === "=" ? "#d8c49a" : "#a89a72", g: grass ? 70 : 8});
+      }
+    }
   }
   if (!EX.locked) {
     const ch = stageTile(Math.floor(h.x / TILE), Math.floor(h.y / TILE));
@@ -287,7 +341,8 @@ function exUpdate(dt, now) {
   }
   if (!EX.dialog && !EX.camp) for (const en of EX.ents) if (en.alive && EX) exAnimal(en, dt, now);   // bichos param com o painel aberto
   EX.fx = EX.fx.filter(q => (q.life -= dt) > 0);
-  for (const q of EX.fx) { q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 60 * dt; }
+  for (const q of EX.fx) { q.x += q.vx * dt; q.y += q.vy * dt; q.vy += (q.g ?? 60) * dt; }
+  exAmbient(dt, now);
 }
 function exBurst(x, y, cols, n) {
   for (let i = 0; i < n; i++) { const t = Math.random() * Math.PI * 2, v = 30 + Math.random() * 40; EX.fx.push({x, y, vx: Math.cos(t) * v, vy: Math.sin(t) * v - 20, life: .4 + Math.random() * .3, col: cols[i % cols.length]}); }
@@ -316,10 +371,11 @@ function drawHeroEnt(x, h, cx, cy, now) {
     img = rigCanvas(bowAim.y < -.35 ? "back" : "front", {lh: r(left ? B : N), rh: r(left ? N : B)}, {...rhanonLook(), bowBack: false}, OW_SCALE);
   } else if (h.dir === "side" && !art) {   // de perfil: 4 passos; na estocada, braços para frente (a lança vem por fora)
     const sideJab = EX.jab > 0 && Math.abs(h.aim.y) < .5;
-    img = rigSideCanvas({step: walking ? "walk" + step % 4 : "stand", dy: walking && step % 2 === 0 ? 1 : 0, weapon: sideJab ? "jab" : EX.jab > 0 ? null : "diag", lean: sideJab ? 2 : 0, side: h.side || 1},
+    img = rigSideCanvas({step: walking ? "walk" + step % 4 : "stand", dy: walking ? (step % 2 === 0 ? 1 : 0) : Math.floor(now / 700) % 2, face: now % 3300 < 130 ? "blink" : undefined, weapon: sideJab ? "jab" : EX.jab > 0 ? null : "diag", lean: sideJab ? 2 : 0, side: h.side || 1},
       {...rhanonLook(), bowBack: !!G.equip.ranged && !(EX.shoot > 0)}, OW_SCALE);
   } else img = art ? overworldArt(h.dir === "side" ? "down" : h.dir, walking ? step % art.frames : 0)
-    : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0), h.side || 1);
+    : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0), h.side || 1,
+        walking ? {} : {dy: Math.floor(now / 700) % 2, face: now % 3300 < 130 ? "blink" : undefined});   // parado: respira e pisca
   const iw = art ? art.w / art.scale : img.width, ih = art ? art.h / art.scale : img.height;
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
   // estocada da lança; de costas (golpe para cima) ela vai atrás do corpo e só a ponta aparece acima da cabeça
@@ -355,7 +411,7 @@ function drawAnimalEnt(x, en, cx, cy, now) {
   if (sx < -40 || sx > VIEW_W + 40 || sy < -8 || sy > VIEW_H + 40) return;
   let bob = (en.vx || en.vy || en.state === "chase") ? Math.floor(en.walk / 5) % 2 : Math.floor(now / 500) % 2, img = en.img;
   if (!en.alive) { img = en.ko; bob = 0; if (en.koUntil - now < 400 && Math.floor(now / 80) % 2) return; }   // desmaiado, pisca e some
-  else if (en.img2) { if (bob) img = en.img2; bob = 0; }   // traço novo: troca de quadro em vez de pular
+  else if (en.img2) { if (bob) img = en.img2; bob = 0; if (en.blink && (now + en.homeX * 7) % 3600 < 140) img = en.blink; }   // traço novo: troca de quadro e pisca
   if (en.aquatic && en.alive) {   // na água: só a parte de cima aparece, com marolinhas em volta
     const vis = Math.round(hg * .6), top = sy - vis + 2 + (Math.floor(now / 400 + en.x) % 2), sh = img.height * .6;
     x.save(); if (en.a.tint) x.filter = en.a.tint;
@@ -399,7 +455,14 @@ function exDraw(now) {
   const t0x = Math.floor(cx / TILE), t0y = Math.floor(cy / TILE);
   for (let ty = t0y; ty <= t0y + 11; ty++) for (let tx = t0x; tx <= t0x + 15; tx++) {
     const ch = stageTile(tx, ty), sx = tx * TILE - cx, sy = ty * TILE - cy;
-    if (ch === "~" && (tx * 7 + ty * 13 + Math.floor(now / 450)) % 9 === 0) { x.fillStyle = "#ffffffb0"; x.fillRect(sx + 4 + (tx % 3) * 3, sy + 6 + (ty % 2) * 4, 3, 1); }
+    if (ch === "~") {   // água: brilhos piscando e uma marolinha correndo
+      if ((tx * 7 + ty * 13 + Math.floor(now / 450)) % 9 === 0) { x.fillStyle = "#ffffffb0"; x.fillRect(sx + 4 + (tx % 3) * 3, sy + 6 + (ty % 2) * 4, 3, 1); }
+      const off = Math.floor(now / 90 + tx * 5 + ty * 3) % 16; x.fillStyle = "#bff3ff70"; x.fillRect(sx + off, sy + 3 + (tx * 5 + ty * 7) % 10, Math.min(4, 16 - off), 1);
+    }
+    if (ch === "T" && (tx * 3 + ty * 5) % 3 === 0) {   // copa balançando com o vento: dois pontinhos de luz indo e voltando
+      const sw = Math.round(Math.sin(now / 650 + tx * .9 + ty * .4) * 1.4); x.fillStyle = EX.night ? "#5a8a6a90" : "#9ad87a";
+      x.fillRect(sx + 5 + sw, sy + 3, 2, 1); x.fillRect(sx + 9 + sw, sy + 5, 1, 1);
+    }
     if (ch === "G" && !BS()[EX.zone]) drawGate(x, sx, sy, EX.pal);
     if (ch === "F") drawFire(x, sx, sy, now);
   }
@@ -415,7 +478,9 @@ function exDraw(now) {
     lineP(x, sx - ux * 5, sy - uy * 5, sx + ux * 4, sy + uy * 4, "#c9a46a");   // flecha: haste, ponta e penas
     pxl(x, sx + ux * 5, sy + uy * 5, "#eef3f5"); pxl(x, sx - ux * 5 - uy, sy - uy * 5 + ux, "#e5001c"); pxl(x, sx - ux * 5 + uy, sy - uy * 5 - ux, "#e5001c");
   }
+  drawAmbient(x, cx, cy, now, false);
   if (EX.night) drawNightShade(x, cx, cy, now);
+  drawAmbient(x, cx, cy, now, true);
   if (EX.camp && EX.camp.kind !== "fogueira") drawCampSky(x, cx, cy, now);
   for (const s of EX.spits) {   // jato d'água: gota com rastro
     const n = Math.hypot(s.vx, s.vy) || 1, px = Math.round(s.x - cx), py = Math.round(s.y - cy);
@@ -447,11 +512,11 @@ function exToast(msg) {
 function setupExploreInput() {
   const DIRS = {ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down", ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right"};
   document.addEventListener("keydown", ev => {
-    if (!EX || $("explore").hidden) return;
+    if (!EX || $("explore").hidden || !$("opcoes").hidden) return;   // com as opções abertas, o teclado é delas
     if (EX.dialog) { dialogKey(ev); return; }
-    if (EX.camp) {   // sentado na fogueira: espera terminar (a cena de abertura dá para pular)
+    if (EX.camp) {   // cena (abertura, fogueira): só segurar C pula
       ev.preventDefault();
-      if (EX.camp.kind === "intro" && ["z", "Z", "Enter", " ", "Escape"].includes(ev.key)) Object.assign(EX.camp, {t0: -1e9, dawned: true, day: true});
+      if ((ev.key === "c" || ev.key === "C") && !ev.repeat) EX.skipHold = performance.now();
       return;
     }
     const k = DIRS[ev.key];
@@ -462,7 +527,11 @@ function setupExploreInput() {
     else if (ev.key === "Escape") exitExplore();
     else if ((ev.key === "i" || ev.key === "I") && !EX.locked) exOpenDialog("inventario");
   });
-  document.addEventListener("keyup", ev => { const k = DIRS[ev.key]; if (k) exKeys.delete(k); });
+  document.addEventListener("keyup", ev => { const k = DIRS[ev.key]; if (k) exKeys.delete(k); if ((ev.key === "c" || ev.key === "C") && EX) EX.skipHold = 0; });
+  // no celular: segurar o próprio aviso "segure C para pular"
+  const sk = $("exSkip"), stop = () => { if (EX) EX.skipHold = 0; };
+  sk.addEventListener("pointerdown", ev => { ev.preventDefault(); if (EX && EX.camp) EX.skipHold = performance.now(); });
+  sk.addEventListener("pointerup", stop); sk.addEventListener("pointerleave", stop); sk.addEventListener("pointercancel", stop);
   window.addEventListener("blur", () => exKeys.clear());
   document.querySelectorAll("#exPad [data-dir]").forEach(b => {
     const k = b.dataset.dir, off = () => exKeys.delete(k);
@@ -472,7 +541,7 @@ function setupExploreInput() {
   $("exA").addEventListener("pointerdown", ev => { ev.preventDefault(); exStrike(); });
   $("exB").addEventListener("pointerdown", ev => { ev.preventDefault(); exThrow(); });
   $("exExit").addEventListener("click", exitExplore);
-  $("exBag").addEventListener("click", () => { if (EX && !EX.locked && !EX.camp) EX.dialog === "inventario" ? exCloseDialog() : exOpenDialog("inventario"); });
+  $("exBag").addEventListener("click", () => { if (EX && !EX.locked && !EX.camp && EX.dialog !== "tutorial") EX.dialog === "inventario" ? exCloseDialog() : exOpenDialog("inventario"); });
 }
 
 /* ---------- aldeia e feira: pontos de conversa ---------- */
@@ -561,10 +630,39 @@ function exIntro() {
   h.x = EX.camp.x; h.y = EX.camp.y; h.dir = "down"; h.aim = {x: 0, y: 1};
   exToast("Ananindeua (PA) · manhã na aldeia...");
 }
+/* tutorial (jogo novo): depois de acordar, o caçador ensina os controles; só então o Rhanon anda e a ajuda aparece */
+const TUTORIAL = [
+  "Bom dia, Rhanon! Dormiu bem aí do lado da fogueira? Antes de ir para a mata, deixa eu te lembrar do básico.",
+  "Para andar, use as setas ou W A S D.",
+  "Z (ou Espaço) é o golpe de lança. Também serve para conversar com o pessoal e usar a fogueira e as barracas.",
+  "X atira flechas, mas só depois que você comprar um arco com o artesão da feira.",
+  "I abre a bolsa, com suas comidas e equipamentos. Esc sai da fase.",
+  "Bicho com etiqueta verde cai com um golpe só. E se você acertar primeiro, começa a luta com vantagem. Boa caçada!"
+];
+function startTutorial() { EX.tutPage = 0; showTutorial(); }
+function showTutorial() {
+  const d = $("exDialog"), i = EX.tutPage, last = i === TUTORIAL.length - 1;
+  EX.dialog = "tutorial"; exKeys.clear();
+  d.innerHTML = `<h2>Caçador</h2><div class="tut"><canvas width="24" height="33"></canvas><p>${TUTORIAL[i]}</p></div>`;
+  d.querySelector("canvas").getContext("2d").drawImage(villagerSprite("aldeao1"), 0, 0);   // retratinho de quem fala
+  btn(last ? "Vamos lá!" : "Próximo", () => { if (last) endTutorial(); else { EX.tutPage++; sfx("blip"); showTutorial(); } }, false, d);
+  d.hidden = false;
+}
+function endTutorial() {
+  G.tutorial = false; save();
+  $("exDialog").hidden = true; EX.dialog = null; $("explore").classList.remove("no-help"); sfx("more");
+  exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A mata fica no caminho de saída.");
+}
+// pular a cena: aplica na hora o que ela faria (noite ou dia) e termina
+function campSkip() {
+  const c = EX.camp; if (!c) return;
+  if (c.kind === "noite" || c.kind === "dormir") { G.night = c.kind === "noite"; EX.night = G.night; musicStart("local"); }
+  c.dawned = c.day = true; exCampEnd();
+}
 // fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
   const kind = EX.camp.kind; EX.camp = null; EX.dialog = null; exKeys.clear();
-  if (kind === "intro") return exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A mata fica no caminho de saída.");
+  if (kind === "intro") return G.tutorial ? startTutorial() : exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A mata fica no caminho de saída.");
   exToast(rest(kind, true, true)); exHud();   // dormir: o galo já cantou no amanhecer da cena
 }
 /* Linha do tempo das cenas que acordam (ms desde o começo):
@@ -644,6 +742,12 @@ function drawCampSky(x, cx, cy, now) {
 function exCloseDialog() { $("exDialog").hidden = true; if (EX) EX.dialog = null; sfx("blip"); }
 // teclado com o painel aberto: 1-9 botões, Enter o primeiro disponível, Esc/X/Z fecham
 function dialogKey(ev) {
+  if (EX.dialog === "tutorial") {   // Z, Espaço ou Enter passam a página; Esc encerra a conversa
+    if (["z", "Z", " ", "Enter"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); pressPanel($("exDialog").querySelector(".cmd")); }
+    else if (ev.key === "Escape") endTutorial();
+    else if (ev.key.startsWith("Arrow")) ev.preventDefault();
+    return;
+  }
   const bs = [...$("exDialog").querySelectorAll(".cmd[data-key]")], onBtn = document.activeElement && document.activeElement.matches("#exDialog button");
   if (/^[1-9]$/.test(ev.key)) { ev.preventDefault(); pressPanel(bs[+ev.key - 1]); }
   else if (ev.key === "Enter" && !onBtn) { ev.preventDefault(); pressPanel(bs.find(b => b.getAttribute("aria-disabled") !== "true")); }

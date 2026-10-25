@@ -32,7 +32,8 @@ function bChain(d, pts, wd, c, dark) {
 
 /* ---------- quadrúpedes: um esqueleto para todos, cada espécie muda medidas, cabeça, rabo e desenho do pelo ---------- */
 function quadPose(S, pose, f) {
-  const G = S.H - 3, L = S.leg, o = {eye: "open"};
+  const G = S.H - 3, L = S.leg, o = {eye: pose === "blink" ? "shut" : "open"};
+  if (pose === "blink") pose = "idle";   // piscar = parado de olho fechado
   let cx = S.cx, ry = S.ry, rx = S.rx, cy = G - L - ry * .45, hdx = 0, hdy = 0;
   if (pose === "idle") cy += f;
   if (pose === "crouch") { cy += L * .4; cx += 1; hdy = 2; o.eye = "angry"; }
@@ -361,7 +362,7 @@ function caranguejeira(pose, f) {
 /* ---------- cobras (sucuri, surucucu; a Cobra-Grande usa a sucuri) ---------- */
 function cobra(C, tri) {
   return (pose, f) => {
-    const d = rigGrid(1, 56, 36), o = {eye: "open"}, coil = [[53, 31], [44, 33], [34, 33], [24, 32], [18, 29], [22, 25], [32, 25], [40, 27]];
+    const d = rigGrid(1, 56, 36), o = {eye: pose === "blink" ? "shut" : "open"}, coil = [[53, 31], [44, 33], [34, 33], [24, 32], [18, 29], [22, 25], [32, 25], [40, 27]];
     let neck, head;
     if (pose === "ko") { o.eye = "x"; o.tongue = true; neck = []; head = [9, 30]; }
     else if (pose === "attack") { o.eye = "angry"; o.mouth = true; neck = [[40, 22], [28, 17], [16, 15]]; head = [11, 15]; }
@@ -456,7 +457,7 @@ function chupacabra(pose, f) {
 
 /* ---------- peixes: piranha e poraquê ---------- */
 function piranha(pose, f) {
-  const d = rigGrid(1, 60, 32), C = {b: "#8a9aa0", B: "#5a6a70", r: "#e05a3a", R: "#b03a24", k: "#5a4a4a"}, o = {eye: pose === "ko" ? "x" : pose === "hurt" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  const d = rigGrid(1, 60, 32), C = {b: "#8a9aa0", B: "#5a6a70", r: "#e05a3a", R: "#b03a24", k: "#5a4a4a"}, o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
   const cx = pose === "attack" ? 27 : pose === "crouch" ? 33 : 30, cy = 15, fl = pose === "idle" ? f * 2 : 0;
   d.part().poly([[cx + 13, cy], [cx + 24, cy - 9 + fl], [cx + 22, cy], [cx + 24, cy + 9 - fl]], C.B);   // cauda
   d.part().poly([[cx - 2, cy - 9], [cx + 6, cy - 14], [cx + 10, cy - 7]], C.B);   // barbatana de cima

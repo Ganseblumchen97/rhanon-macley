@@ -139,11 +139,12 @@ const OW_SCALE = .75;   // desenho do esqueleto (gfx/rig.js) em 24x33 na explora
 // dir: "down" (de frente) ou "up" (de costas); legs: chave de RIG_LEGS
 // weapon: lança na diagonal com as duas mãos, ponta para o lado side (1 direita, -1 esquerda)
 // bowBack = false enquanto o arco está na mão (atirando), para não aparecer dois arcos
-function heroOverworld(dir, legs, weapon, bowBack = true, side = 1) {
+// extra: {dy, face} para respirar e piscar parado
+function heroOverworld(dir, legs, weapon, bowBack = true, side = 1, extra = {}) {
   const look = rhanonLook();
   if (!bowBack) look.bowBack = false;
   const walking = legs !== "stand";
-  return rigCanvas(dir === "up" ? "back" : "front", {...RIG_LEGS[legs], dy: walking ? 1 : 0, weapon: weapon ? "diag" : null, side}, look, OW_SCALE);
+  return rigCanvas(dir === "up" ? "back" : "front", {...RIG_LEGS[legs], dy: walking ? 1 : 0, weapon: weapon ? "diag" : null, side, ...extra}, look, OW_SCALE);
 }
 // número em pixels (glifos 3x5 de GL) para a etiqueta de nível dos bichos
 function drawTinyNumber(x, str, px, py, col) {

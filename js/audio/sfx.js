@@ -1,8 +1,13 @@
 /* Efeitos sonoros 8-bit, fanfarras e som de impacto. Tudo sai pelo ganho master, que o botão de som silencia. */
-let AC, master, muted = false, NB;
+let AC, master, muted = false, NB, musicOut = null, sfxOut = null;   // master = som ligado/desligado; musicOut/sfxOut = volumes das opções
 // o navegador só libera o áudio depois de um gesto do jogador; chamado em cada clique
 function audio() {
-  if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = muted ? 0 : .5; master.connect(AC.destination); }
+  if (!AC) {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = muted ? 0 : .5; master.connect(AC.destination);
+    musicOut = AC.createGain(); musicOut.connect(master); sfxOut = AC.createGain(); sfxOut.connect(master);
+    applyVolumes();
+  }
   if (AC.state === "suspended") AC.resume();
 }
 function tone(f, t, d, type, v, f2) {
@@ -11,7 +16,7 @@ function tone(f, t, d, type, v, f2) {
   o.frequency.setValueAtTime(f, t);
   if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
   g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
-  o.connect(g); g.connect(master); o.start(t); o.stop(t + d + .02);
+  o.connect(g); g.connect(sfxOut); o.start(t); o.stop(t + d + .02);
 }
 // 1 segundo de ruído branco, criado uma vez
 function noiseBuffer() {
@@ -22,7 +27,7 @@ function noise(t, d, v, hp) {
   const s = AC.createBufferSource(), g = AC.createGain(), f = AC.createBiquadFilter();
   f.type = "highpass"; f.frequency.value = hp; s.buffer = NB;
   g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
-  s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t + d + .02);
+  s.connect(f); f.connect(g); g.connect(sfxOut); s.start(t); s.stop(t + d + .02);
 }
 const SFX = {
   blip:  t => tone(660, t, .05, "square", .05),
@@ -52,7 +57,7 @@ function voice(f, t, d, type, v, f2, vib = 0, depth = 0) {
   if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
   if (vib) { const l = AC.createOscillator(), lg = AC.createGain(); l.frequency.value = vib; lg.gain.value = depth; l.connect(lg); lg.connect(o.frequency); l.start(t); l.stop(t + d + .05); }
   g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + Math.min(.04, d / 4)); g.gain.exponentialRampToValueAtTime(.001, t + d);
-  o.connect(g); g.connect(master); o.start(t); o.stop(t + d + .05);
+  o.connect(g); g.connect(sfxOut); o.start(t); o.stop(t + d + .05);
 }
 // ruído filtrado numa faixa (sopro, chiado, fungada); rise = segundos subindo antes de cair
 function hum(t, d, v, freq, q = 2, rise = .02) {
@@ -61,7 +66,7 @@ function hum(t, d, v, freq, q = 2, rise = .02) {
   f.type = "bandpass"; f.frequency.value = freq; f.Q.value = q; s.buffer = NB; s.loop = true;
   v *= 2.5;   // o filtro de faixa tira muito volume do ruído
   g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + rise); g.gain.exponentialRampToValueAtTime(.001, t + d);
-  s.connect(f); f.connect(g); g.connect(master); s.start(t, Math.random() * .5); s.stop(t + d + .05);
+  s.connect(f); f.connect(g); g.connect(sfxOut); s.start(t, Math.random() * .5); s.stop(t + d + .05);
 }
 // ronco: puxa o ar arranhando e solta num assobio
 function ronco(t) {
@@ -123,7 +128,7 @@ function toggleMute() {
 function fanfare(kind) {
   if (!AC) return;
   const t = AC.currentTime + .05, out = AC.createGain(), lp = AC.createBiquadFilter();
-  out.gain.value = .9; lp.type = "lowpass"; lp.frequency.value = 3800; lp.connect(out).connect(master);
+  out.gain.value = .9; lp.type = "lowpass"; lp.frequency.value = 3800; lp.connect(out).connect(sfxOut);
   const mf = m => 440 * 2 ** ((m - 69) / 12);
   const note = (m, at, dur, vol, timbre, vibrato) => {
     const when = t + at, o = AC.createOscillator(), g = AC.createGain();
@@ -150,7 +155,7 @@ function impactSound() {
   if (!AC || muted) return;
   try {
     const t = AC.currentTime, out = AC.createDynamicsCompressor(), m = AC.createGain();
-    m.gain.value = .5; out.connect(m).connect(master);
+    m.gain.value = .5; out.connect(m).connect(sfxOut);
     const notes = [330, 392, 440, 523, 587, 659, 784], stp = .026;
     notes.forEach((freq, i) => {
       const when = t + i * stp, o = AC.createOscillator(), og = AC.createGain();
@@ -178,7 +183,7 @@ function cutinSound(kind) {
   n.buffer = NB; n.loop = true; f.type = "bandpass"; f.Q.value = 3;
   f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(6000, t + .3);
   g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .28); g.gain.exponentialRampToValueAtTime(.0001, t + .34);
-  n.connect(f).connect(g).connect(master); n.start(t); n.stop(t + .36);
+  n.connect(f).connect(g).connect(sfxOut); n.start(t); n.stop(t + .36);
   tone(140, t + .3, .6, "sine", .35, 38); noise(t + .3, .25, .2, 120);
   tone(1320, t + .3, .25, "square", .04, 1320); tone(1980, t + .32, .3, "triangle", .03);
 }

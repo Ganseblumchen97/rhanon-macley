@@ -293,6 +293,7 @@ function makeBeastActor() {
     if (rig) {
       sx = sy = scale = 1;
       rp = state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" ? "attack" : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
+      if (rp === "idle" && t % 3400 < 140) rp = "blink";   // pisca de vez em quando
     }
     g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;
     g.clearRect(0, 0, CW, CH);
@@ -303,7 +304,7 @@ function makeBeastActor() {
     const img = flash ? white : base;
     if (shake) ox += Math.floor(t / 40) % 2 ? 1 : -1;
     if (rp) {
-      const fr = beastFrame(rig, rp, rp === "idle" ? o.dy % 2 : 0), x0 = MX + ox, y0 = MT - lift;
+      const fr = beastFrame(rig, rp, rp === "idle" || rp === "blink" ? o.dy % 2 : 0), x0 = MX + ox, y0 = MT - lift;
       g.drawImage(flash ? whiteFrame(fr) : fr, x0, y0, w, h);
       if (state === "defeat" && rp === "ko" && !REDUCE) {
         const [hx, hy] = fr.dataset.head.split(",").map(n => n / k);

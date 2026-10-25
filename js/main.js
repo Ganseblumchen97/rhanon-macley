@@ -7,6 +7,7 @@ buildMapNodes();
 buildLocalNodes();
 setupExploreInput();
 setupMapNav();
+setupOptions();
 loadArt();   // imagens de data/art.js (carregam enquanto a tela inicial está aberta)
 
 /* ----- botões fixos ----- */

@@ -571,3 +571,22 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 /* dentro dos painéis os botões não escorregam para o lado (só pulam um pouco ao passar o mouse) e cabem no pergaminho */
 .info .cmd{--x:0px;font-size:clamp(16px,1.9vw,22px);max-width:100%;white-space:normal;margin-top:4px}
 .info .cmd:hover,.info .cmd:focus-visible{translate:8px 0}
+/* opções: janela por cima de tudo (também na tela inicial) */
+.opcoes-wrap{position:fixed;inset:0;z-index:1500;display:grid;place-items:center;background:rgba(10,20,14,.55)}
+.opcoes-wrap[hidden]{display:none}
+.opcoes{width:min(420px,90vw)}
+.opt-row{display:grid;grid-template-columns:80px 1fr 48px;align-items:center;gap:10px;margin:10px 0;font:700 14px var(--mono);color:var(--brown)}
+.opt-row input{accent-color:var(--leafB)}
+.opt-row output{text-align:right}
+.mute.opt-btn{right:60px}
+#titleOptions{margin-top:10px}
+/* "segure C para pular" nas cenas, com a barrinha enchendo enquanto segura */
+.ex-skip{position:absolute;right:8px;bottom:8px;z-index:4;font:700 11px var(--mono);background:rgba(16,36,26,.85);color:var(--parch);padding:4px 10px 6px;border:2px solid var(--wood);cursor:pointer;user-select:none;touch-action:none}
+.ex-skip[hidden]{display:none}
+.ex-skip i{position:absolute;left:0;bottom:0;height:3px;width:var(--p,0%);background:#ffd23a}
+/* tutorial: retratinho do caçador ao lado da fala; ajuda escondida até o fim da conversa */
+.tut{display:flex;gap:12px;align-items:center}
+.tut canvas{width:48px;height:66px;image-rendering:pixelated;flex:none}
+.tut p{margin:0}
+#explore.no-help .ex-help{visibility:hidden}
+

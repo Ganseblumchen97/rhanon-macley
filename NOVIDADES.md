@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.19.0 — mata viva
+
+- Cenário mais vivo: copas balançando com o vento, água correndo, borboletas e folhas caindo de dia, vaga-lumes à noite,
+  poeirinha nos passos e o mato alto mexendo quando o Rhanon passa.
+- Rhanon respira e pisca parado na exploração; os bichos piscam de vez em quando, na exploração e na batalha.
+- Menu de opções (na tela inicial, na engrenagem do canto e na exploração): volume da música e dos efeitos.
+- Nas cenas aparece "Segure C para pular" (no celular, segure o próprio aviso).
+- Jogo novo: ao acordar, o caçador ensina os controles antes do Rhanon sair andando; a ajuda dos comandos aparece
+  depois dessa conversa.
+
 ## 0.18.0 — visual da mata
 
 - Novo visual do HUD: painéis de pergaminho com moldura de cipó e folhas, placas e botões de madeira que viram folha

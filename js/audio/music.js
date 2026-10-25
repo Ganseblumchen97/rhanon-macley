@@ -557,7 +557,7 @@ const MUS = (() => {
   }
   function play(id, fadeIn) {
     if (!AC) return;
-    X = AC; DEST = master;
+    X = AC; DEST = musicOut;   // canal da música (volume nas opções)
     const next = ALL[id];
     if (bus && next === track) return;
     const wasBattle = trackId && trackId.startsWith("battle");
