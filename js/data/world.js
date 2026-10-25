@@ -36,6 +36,27 @@ const ITEMS = {
   acai:     {n: "Açaí", price: 15, hp: 0, sp: 10},
   manicoba: {n: "Maniçoba", price: 45, hp: 30, sp: 15}
 };
+/* Pedidos dos aldeões (um por vez). giver = aldeão que pede (aldeao1 Caçador, aldeao2 Ancião, aldeao3 Aldeã);
+   need: {kill: bicho, n} (vencer, conta a partir do aceite) ou {pelt: bicho, n} (entregar peles);
+   night = só aparece à noite; reward: dinheiro e itens da bolsa. */
+const QUESTS = [
+  {id: "cotias", giver: "aldeao1", need: {pelt: "cotia", n: 3}, reward: {money: 40, items: {mandioca: 2}},
+    text: "As cotias estão roendo a mandioca da roça. Me traga 3 peles de cotia que eu te pago.", thanks: "Isso! Agora a roça descansa. Toma, é seu."},
+  {id: "chocalho", giver: "aldeao2", need: {pelt: "tatu", n: 2}, reward: {money: 55},
+    text: "Quero fazer um chocalho novo para a roda. Preciso de 2 cascos de tatu.", thanks: "Que cascos bonitos! Esse chocalho vai soar longe."},
+  {id: "cesta", giver: "aldeao3", need: {kill: "macaco", n: 2}, reward: {money: 30, items: {manicoba: 1}},
+    text: "Um macaco-prego roubou minha cesta de novo! Dá um susto em 2 macacos lá na mata, por favor.", thanks: "Eles vão pensar duas vezes antes de voltar. Obrigada!"},
+  {id: "queixadas", giver: "aldeao1", lv: 5, need: {kill: "queixada", n: 3}, reward: {money: 90},
+    text: "Um bando de queixadas está passando perto da aldeia. Vença 3 deles na mata fechada.", thanks: "Bom trabalho, caçador. A aldeia dorme mais tranquila."},
+  {id: "piranhas", giver: "aldeao3", lv: 7, need: {kill: "piranha", n: 2}, reward: {money: 70, items: {peixe: 2}},
+    text: "As piranhas não deixam ninguém lavar roupa no rio. Acerte 2 delas com flechas.", thanks: "O rio é nosso de novo! Leva esses peixes assados."},
+  {id: "morcegos", giver: "aldeao2", night: true, need: {kill: "morcego", n: 3}, reward: {money: 50, items: {acai: 2}},
+    text: "Esses morcegos não me deixam dormir. Afaste 3 deles da mata esta noite.", thanks: "Silêncio, finalmente. Toma um açaí para a viagem."},
+  {id: "penas", giver: "aldeao3", night: true, need: {pelt: "coruja", n: 2}, reward: {money: 45},
+    text: "Dizem que pena de coruja traz sonho bom. Me traz 2 penas de coruja?", thanks: "Vou pendurar na rede. Obrigada, Rhanon!"},
+  {id: "galinhas", giver: "aldeao1", night: true, lv: 5, need: {kill: "chupacabra", n: 1}, reward: {money: 150},
+    text: "Alguma coisa está secando as galinhas de noite... Vá até o fim da mata e acabe com isso.", thanks: "Era o Chupa-cabra mesmo?! Você é corajoso. Merece isso."}
+];
 const itemEffect = it => [it.hp && `+${it.hp} PV`, it.sp && `+${it.sp} PE`].filter(Boolean).join(" e ");
 /* Equipamentos: para criar um item novo, basta acrescentar uma linha em legs, torso ou weapon. */
 const EQUIP = {
@@ -45,3 +66,13 @@ const EQUIP = {
   // arma de longe (X na exploração); sem ela, o Rhanon só ataca de perto com a lança
   ranged: {arco: {n: "Arco e flecha", atk: 0, lv: 3, price: 120}}
 };
+/* Feitos pelo artesão com peles (craft: {bicho: quantas peles}) mais um pouco de dinheiro (cost). Entram no mesmo
+   EQUIP do slot e depois aparecem no inventário para vestir/usar como os outros. */
+const CRAFT = {
+  weapon: {lanca_dente: {n: "Lança de dente de jacaré", atk: 3, lv: 6, craft: {jacare: 2}, cost: 60},
+           lanca_presa: {n: "Lança com presa de onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120}},
+  torso:  {colete_sucuri: {n: "Colete de couro de sucuri", def: 4, lv: 8, craft: {sucuri: 2}, cost: 90, color: "#5a7a3a", shade: "#3a5a24"}},
+  legs:   {calca_anta: {n: "Calça de couro de anta", def: 3, lv: 7, craft: {anta: 1, capivara: 1}, cost: 70, color: "#5a4a40", shade: "#3a2e28"}},
+  ranged: {arco_harpia: {n: "Arco com penas de harpia", atk: 3, lv: 7, craft: {harpia: 1}, cost: 60}}
+};
+for (const s in CRAFT) Object.assign(EQUIP[s], CRAFT[s]);

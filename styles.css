@@ -600,4 +600,13 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .qte.acertou b{color:#ffd23a}
 .qte.errou{opacity:.25;filter:grayscale(1)}
 @keyframes qteHit{to{scale:1.6;opacity:0}}
+/* caderno de bichos: cartões com desenho, nível, onde vive e a curiosidade; os não vistos ficam só na silhueta */
+.caderno{width:min(860px,94vw);max-height:86vh;overflow:auto}
+.cad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:8px 0}
+.cad-card{background:rgba(255,255,255,.35);border:2px solid var(--wood);padding:8px;display:flex;flex-direction:column;gap:3px;font:12px/1.35 var(--mono);color:var(--brown)}
+.cad-card canvas{align-self:center;height:56px;width:auto;max-width:100%;image-rendering:pixelated}
+.cad-card b{font:400 16px var(--display);text-transform:uppercase;color:var(--brown)}
+.cad-card small{opacity:.8}
+.cad-card p{margin:2px 0 0;font-size:11px}
+.cad-card.nao-visto{opacity:.7}
 

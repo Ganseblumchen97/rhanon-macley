@@ -161,6 +161,7 @@ function startExplore(zone, after) {
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
     musicStart("local"); exHud();
     exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
+    if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
   });
 }
@@ -309,7 +310,7 @@ function exUpdate(dt, now) {
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
   for (const l of EX.loot) if (now - l.t0 > 500 && Math.hypot(l.x - h.x, l.y - h.y) < 11) pickLoot(l);
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
-  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden) ix = iy = 0;
+  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     h.aim = {x: ix / n, y: iy / n};
@@ -512,7 +513,7 @@ function exToast(msg) {
 function setupExploreInput() {
   const DIRS = {ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down", ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right"};
   document.addEventListener("keydown", ev => {
-    if (!EX || $("explore").hidden || !$("opcoes").hidden) return;   // com as opções abertas, o teclado é delas
+    if (!EX || $("explore").hidden || !$("opcoes").hidden || !$("caderno").hidden) return;   // com opções ou caderno abertos, o teclado é deles
     if (EX.dialog) { dialogKey(ev); return; }
     if (EX.camp) {   // cena (abertura, fogueira): só segurar C pula
       ev.preventDefault();
@@ -570,7 +571,8 @@ function nearSpot() {
 }
 // de dia os aldeões gingam no ritmo da música; à noite os da aldeia dormem sentados e os da feira só ficam sentados
 function drawNpc(x, s, cx, cy, now) {
-  const sx = snap(s.x - cx), sy = snap(s.y + 5 - cy), sleeping = EX.night && s.kind === "aldeao";
+  const mark = s.kind === "aldeao" && questMark(s.look);   // quem tem pedido fica acordado e com a folha sobre a cabeça
+  const sx = snap(s.x - cx), sy = snap(s.y + 5 - cy), sleeping = EX.night && s.kind === "aldeao" && !mark;
   let pose, bob = 0;
   if (EX.night) pose = {sit: true, face: sleeping || (now / 1000 + s.tx) % 4 < .15 ? "blink" : undefined, dy: sleeping ? 1 : 0};
   else {
@@ -581,6 +583,7 @@ function drawNpc(x, s, cx, cy, now) {
   drawShadow(x, sx, sy, pose.sit ? 14 : 10);
   if (EX.hero.x > s.x + 4) { x.save(); x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -hw, top); x.restore(); }
   else x.drawImage(img, sx - hw, top);
+  if (mark) drawQuestMark(x, sx, top - 4, mark, now);
   if (sleeping && !REDUCE) { const p = (now / 1100 + s.tx * .37) % 1; glyphP(x, "z", "#ffffff", sx + 4 + p * 6, top + 6 - p * 10); }
 }
 // setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
@@ -612,7 +615,7 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme."); foodButtons(d); }
   else if (kind === "artesao") { say("Artesão", "Roupas e equipamentos feitos à mão, inclusive arco e flecha para caçar de longe e tocha para assustar os bichos. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
   else if (kind === "inventario") { say("Bolsa", invSummary()); invButtons(d); }
-  else say(VILLAGER_NAME[look] || "Aldeão", VILLAGER_TIPS[Math.floor(Math.random() * VILLAGER_TIPS.length)]);
+  else villagerTalk(look, say, d);   // pedido (oferta ou entrega) ou uma dica (systems/journal.js)
   if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);
   btn("Fechar", exCloseDialog, false, d);
   d.hidden = false;
@@ -664,8 +667,9 @@ function campSkip() {
 // fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
   const kind = EX.camp.kind; EX.camp = null; EX.dialog = null; exKeys.clear();
-  if (kind === "intro") return G.tutorial ? startTutorial() : exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A mata fica no caminho de saída.");
-  exToast(rest(kind, true, true)); exHud();   // dormir: o galo já cantou no amanhecer da cena
+  if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A mata fica no caminho de saída.");
+  exToast(rest(kind, true, true)); exHud();
+  if (EX.zone === "aldeia" && kind !== "fogueira") setTimeout(() => EX && announceOffer(), 2400);   // novo dia ou noite: pode ter pedido novo   // dormir: o galo já cantou no amanhecer da cena
 }
 /* Linha do tempo das cenas que acordam (ms desde o começo):
    dormir: senta (0-900) e dorme enquanto a noite cai; em CAMP_DAWN_AT passa a faixa do amanhecer (dawnWipe: galo e sol).

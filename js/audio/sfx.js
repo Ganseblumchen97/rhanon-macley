@@ -45,6 +45,7 @@ const SFX = {
   // golpe crítico: "ting!" agudo em duas notas e um impacto grave
   ronco: t => ronco(t),
   galo: t => galo(t),
+  missao: t => { tone(880, t, .12, "triangle", .08); tone(1320, t + .12, .22, "triangle", .08); tone(1760, t + .26, .18, "sine", .04); },
   uivo: t => uivo(t),
   critico: t => { tone(1568, t, .08, "square", .08); tone(2093, t + .07, .3, "triangle", .09); noise(t + .02, .3, .24, 300); tone(95, t + .02, .38, "sawtooth", .17, 40); }
 };

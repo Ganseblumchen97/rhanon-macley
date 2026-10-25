@@ -103,7 +103,7 @@ function sellAll() {
   save(); sfx("more"); localDone("feira", `Vendeu todas as peles por R$ ${v}.`);
 }
 const GEAR_SLOTS = ["weapon", "ranged", "torso", "legs"];
-const gearBonus = (slot, it) => slot === "ranged" ? "ataca de longe" : slot === "weapon" ? `ATQ +${it.atk || 0}` : `DEF +${it.def || 0}`;
+const gearBonus = (slot, it) => slot === "ranged" ? (it.atk ? `flecha +${it.atk}` : "ataca de longe") : slot === "weapon" ? `ATQ +${it.atk || 0}` : `DEF +${it.def || 0}`;
 // tudo de EQUIP que tem preço e ainda não é seu (itens novos em EQUIP aparecem aqui sozinhos)
 function gearButtons(i) {
   vit(); let any = false;
@@ -112,6 +112,14 @@ function gearButtons(i) {
     const lock = G.lv < it.lv; any = true;
     btn(lock ? `${it.n} (Nv ${it.lv})` : `Comprar ${it.n} · R$ ${it.price} · ${gearBonus(slot, it)}`, () => buyGear(slot, id), lock || G.money < it.price, i);
   }));
+  // feitos com peles (CRAFT em data/world.js): mostra o que precisa e quanto você já tem
+  GEAR_SLOTS.forEach(slot => Object.entries(CRAFT[slot] || {}).forEach(([id, it]) => {
+    if (G.owned[id]) return;
+    any = true;
+    const mats = Object.entries(it.craft).map(([k, n]) => `${peltName(k).toLowerCase()} ${Math.min(n, G.pelts[k] || 0)}/${n}`).join(", ");
+    const lacks = G.lv < it.lv || G.money < it.cost || Object.entries(it.craft).some(([k, n]) => (G.pelts[k] || 0) < n);
+    btn(G.lv < it.lv ? `${it.n} (Nv ${it.lv})` : `Fazer ${it.n} · ${mats} + R$ ${it.cost} · ${gearBonus(slot, it)}`, () => craftGear(slot, id), lacks, i);
+  }));
   // especiais de batalha à venda (SPECIALS com price), como a tocha
   SPECIALS.forEach(s => {
     if (!s.price || G.owned[s.id]) return;
@@ -119,6 +127,14 @@ function gearButtons(i) {
     btn(lock ? `${s.n} (Nv ${s.lv})` : `Comprar ${s.n} · R$ ${s.price} · especial de batalha`, () => buySpecial(s.id), lock || G.money < s.price, i);
   });
   if (!any) lh("Você já tem tudo o que o artesão faz por enquanto.", i);
+}
+// o artesão faz com as peles: gasta as peles e o dinheiro, e o Rhanon já sai vestindo/usando
+function craftGear(slot, id) {
+  const it = CRAFT[slot][id];
+  if (G.lv < it.lv || G.money < it.cost || Object.entries(it.craft).some(([k, n]) => (G.pelts[k] || 0) < n)) return;
+  Object.entries(it.craft).forEach(([k, n]) => { G.pelts[k] -= n; });
+  G.money -= it.cost; G.owned[id] = true; G.equip[slot] = id; save(); sfx("heal");
+  localDone("feira", `O artesão fez: ${it.n}. Já está ${slot === "torso" || slot === "legs" ? "vestindo" : "com você"}. ${gearBonus(slot, it)}.`);
 }
 function buySpecial(id) {
   const s = SPECIALS.find(q => q.id === id); if (G.money < s.price || G.lv < s.lv) return;
@@ -137,6 +153,7 @@ function invSummary() {
   const q = G.equip, ids = peltIds();
   return "Vestindo: " + (q.torso ? EQUIP.torso[q.torso].n : "sem camisa") + " e " + EQUIP.legs[q.legs].n +
     "<br>Arma: " + EQUIP.weapon[q.weapon].n + (q.ranged ? " + " + EQUIP.ranged[q.ranged].n : "") + " · Defesa: " + defense() +
+    questLine() +
     "<br>Bolsa: " + (Object.entries(G.items).filter(([, n]) => n > 0).map(([k, n]) => `${ITEMS[k].n} ×${n}`).join(", ") || "vazia") +
     "<br>" + (ids.length ? ids.map(k => `${peltName(k)} ×${G.pelts[k]} (R$ ${peltValue(k)} cada)`).join("<br>") : "Nenhuma pele ainda. Vença bichos para conseguir peles.");
 }
@@ -145,6 +162,7 @@ function invButtons(i) {
   Object.entries(G.items).forEach(([k, n]) => { if (n > 0) btn(`Comer ${ITEMS[k].n.toLowerCase()} ×${n} (${itemEffect(ITEMS[k])})`, () => eatItem(k), false, i); });
   GEAR_SLOTS.forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => { if (G.owned[id] && q[slot] !== id) btn(`${slot === "torso" || slot === "legs" ? "Vestir" : "Usar"} ${it.n}`, () => equip(slot, id), false, i); }));
   if (q.torso) btn(`Tirar a ${EQUIP.torso[q.torso].n.toLowerCase()}`, () => equip("torso", null), false, i);
+  btn("Caderno de bichos", openJournal, false, i);
 }
 // depois de comer/trocar equipamento: atualiza o inventário de onde veio
 function invDone(msg) {

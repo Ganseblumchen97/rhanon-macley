@@ -79,6 +79,7 @@ function init(opts = {}) {
   mode = "hunt";
   buildCmds();
   const animal = opts.animal || pickAnimal();
+  noteSeen(animal.id);   // entra no caderno de bichos
   $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = "Nv " + (animal.lv || 1);
   $("beast").innerHTML = ""; $("beast").appendChild(animalSprite(animal)); refreshHero();
   const spr = $("beast").firstChild;
@@ -196,7 +197,7 @@ function act(id) {
     if (!e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(`FRAQUEZA! ${e.name} recua assustado. Mais uma!`); render(); sfx("more"); pop("FRAQUEZA!", $("beast"), "crit"); }, wait + 200); }
   } else if (id === "flecha") {   // tiro com o arco: menos dano que a lança, mas 40% de chance de crítico
     p.sp -= 3;
-    let d = rnd(5, 9) + G.lv - 1, crit = p.atento || Math.random() < .4;
+    let d = rnd(5, 9) + G.lv - 1 + ((EQUIP.ranged[G.equip.ranged] || {}).atk || 0), crit = p.atento || Math.random() < .4;   // arco melhor = flecha mais forte
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
     wait = strike(d, crit ? "crit" : "", "arrow", crit ? `Flechada certeira no ponto fraco: −${d}!` : `Rhanon dispara uma flecha: −${d}.`);
@@ -414,6 +415,7 @@ function tick() {
 // XP, pele e progresso por vencer o bicho a (na batalha, o bicho atual); mult reduz o XP (abate direto)
 // drop = a pele fica no chão da exploração (golpe só) em vez de ir direto para a bolsa
 function reward(a = e, mult = 1, drop = false) {
+  noteWin(a.id);   // caderno de bichos e pedido de "vencer"
   if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit(); if (!drop) G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }

@@ -58,6 +58,41 @@ const bossKey = z => G.night && NIGHT_ZONES[z] ? z + ":noite" : z;
 // nome do item que cada bicho deixa (os outros viram "Pele de <bicho>")
 const PELT = {morcego: "Asas de morcego", coruja: "Penas de coruja", lobo: "Pelo de lobo-guará", morcego_vampiro: "Asas de morcego-vampiro", morcego_pescador: "Asas de morcego-pescador",
   chupacabra: "Presas do Chupa-cabra", mula: "Ferradura em brasa", boitata: "Escama de fogo do Boitatá", piranha: "Escamas de piranha", jacare: "Couro de jacaré", sucuri: "Couro de sucuri", surucucu: "Couro de surucucu", cobra_grande: "Couro da Cobra-Grande", harpia: "Penas de harpia", tatu: "Casco de tatu", calango: "Couro de calango", poraque: "Couro de poraquê", caranguejeira: "Presas de caranguejeira", ariranha: "Pele de ariranha", tamandua: "Pelos de tamanduá"};
+// curiosidades do caderno de bichos (fauna de verdade; os chefes do folclore ganham a lenda)
+const ANIMAL_FACTS = {
+  onca: "Maior felino das Américas. Nada muito bem e tem a mordida mais forte entre os felinos.",
+  calango: "Lagarto rápido que adora tomar sol nas pedras para esquentar o corpo.",
+  tatu: "Cava tocas com as garras fortes e, quando se assusta, corre para dentro delas.",
+  jacare: "Pode passar mais de uma hora debaixo d'água sem respirar.",
+  preguica: "Desce da árvore só uma vez por semana, mais ou menos, para fazer cocô.",
+  cassaco: "É o gambá: carrega os filhotes nas costas e se finge de morto quando está em perigo.",
+  macaco: "Usa pedras como ferramenta para quebrar cocos e castanhas.",
+  queixada: "Anda em bandos de dezenas e bate os dentes para assustar quem chega perto.",
+  piranha: "Os dentes se encaixam como os de uma tesoura. Mas a maioria come mais frutas e restos do que gente acha.",
+  sucuri: "Uma das maiores cobras do mundo. Não tem veneno: aperta a presa até ela parar de respirar.",
+  surucucu: "A maior cobra venenosa das Américas. Sente o calor dos bichos no escuro.",
+  harpia: "Uma das águias mais fortes do mundo. Caça macacos e preguiças no alto das árvores.",
+  cotia: "Enterra castanhas para comer depois, esquece algumas e acaba plantando árvores.",
+  quati: "Usa o focinho comprido para fuçar insetos e frutas no chão e nas árvores.",
+  tamandua: "Come até 30 mil formigas e cupins por dia com a língua comprida e pegajosa.",
+  jaguatirica: "Cada uma tem um desenho de pintas único, como uma impressão digital.",
+  anta: "Maior mamífero terrestre do Brasil. Planta florestas espalhando sementes pelas fezes.",
+  caranguejeira: "Apesar do tamanho, o veneno é fraco para gente. Os pelos das costas é que coçam.",
+  capivara: "Maior roedor do mundo. Fica bem à vontade dentro d'água e tem os dedos com membrana.",
+  ariranha: "Lontra gigante que vive em família e conversa com vários tipos de guinchos.",
+  poraque: "Não é enguia de verdade, mas solta descargas elétricas de mais de 600 volts.",
+  morcego: "Acha o caminho no escuro ouvindo o eco dos próprios guinchos.",
+  coruja: "Consegue girar a cabeça quase uma volta inteira, sem mexer o corpo.",
+  lobo: "O lobo-guará tem pernas longas para ver por cima do capim. Adora comer a fruta-do-lobo.",
+  morcego_vampiro: "Só bebe sangue, mas tão pouquinho que o bicho mordido quase nem percebe.",
+  morcego_pescador: "Pesca com as garras dos pés, voando rente à água de noite.",
+  queixada_chefe: "O mais velho do bando. Onde ele vai, os outros queixadas vão atrás.",
+  cobra_grande: "Lenda da Amazônia: uma cobra enorme que dorme no fundo dos rios e faz as águas mudarem de lugar.",
+  onca_rei: "Dizem os mais velhos que ela é a dona da mata fechada e que nenhum caçador volta igual depois de vê-la.",
+  chupacabra: "Lenda das Américas: um bicho de olhos vermelhos que aparece de noite e seca as criações.",
+  mula: "Lenda brasileira: uma mula sem cabeça que solta fogo pelo pescoço e galopa nas noites de quinta para sexta.",
+  boitata: "Lenda tupi: uma cobra de fogo de olhos enormes que protege a mata de quem a queima."
+};
 // jeito de cada bicho se mexer parado (ver makeBeastActor em gfx/actors.js) e brilho dos chefes
 const MOTION = {
   sucuri: "sway", surucucu: "sway", cobra_grande: "sway", piranha: "swim", harpia: "hover", macaco: "hop",

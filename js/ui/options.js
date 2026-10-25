@@ -33,5 +33,10 @@ function setupOptions() {
   $("titleOptions").addEventListener("click", openOptions);
   $("exOpt").addEventListener("click", () => { if (!EX || !EX.camp) openOptions(); });   // na exploração (fora das cenas)
   $("opcoes").addEventListener("click", ev => { if (ev.target === $("opcoes")) closeOptions(); });   // clicar fora fecha
-  document.addEventListener("keydown", ev => { if (!$("opcoes").hidden && ev.key === "Escape") { ev.stopImmediatePropagation(); closeOptions(); } }, true);
+  document.addEventListener("keydown", ev => {
+    if (ev.key !== "Escape") return;
+    if (!$("opcoes").hidden) { ev.stopImmediatePropagation(); closeOptions(); }
+    else if (!$("caderno").hidden) { ev.stopImmediatePropagation(); closeJournal(); }
+  }, true);
+  $("caderno").addEventListener("click", ev => { if (ev.target === $("caderno")) closeJournal(); });
 }

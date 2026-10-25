@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.21.0 — caderno, pedidos e artesão
+
+- Caderno de bichos (botão na bolsa): cada bicho encontrado aparece com desenho, nível, onde vive, quantos você venceu
+  e uma curiosidade de verdade sobre ele (os chefes do folclore trazem a lenda). Os que faltam ficam só na silhueta.
+- Pedidos dos aldeões: em alguns dias (e em algumas noites) um aldeão aparece com uma folha anotada sobre a cabeça e
+  avisa com um somzinho. Converse para aceitar; volte com o que ele pediu para receber a recompensa (um pedido por vez).
+- O artesão agora faz equipamentos com peles: lança de dente de jacaré, lança com presa de onça, colete de couro de
+  sucuri, calça de couro de anta e arco com penas de harpia (este deixa a flecha mais forte).
+
 ## 0.20.0 — golpe no tempo certo
 
 - Na batalha aparece um anel discreto com "Z" que fecha até a hora do golpe e fica verde no momento certo.
