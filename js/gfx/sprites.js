@@ -82,6 +82,13 @@ function heroParts(noWeapon = false) {
   if (glasses) { head[11] = ".khhs" + "x".repeat(10) + "shhk."; head[12] = ".khhsxwxxxxxwxxshhk."; }
   return {head, torso, pal, short, glasses, weapon: !noWeapon};
 }
+// haste da lança: madeira clara com contorno escuro ao lado (a mesma em exploração, batalha e tela inicial)
+const SPEAR_WOOD = "#d9b25a";
+function spearShaft(ctx, x0, y0, x1, y1) {
+  const steep = Math.abs(x1 - x0) < Math.abs(y1 - y0), ox = steep ? 1 : 0, oy = steep ? 0 : 1;
+  lineP(ctx, x0 + ox, y0 + oy, x1 + ox, y1 + oy, "#1a2418");
+  lineP(ctx, x0, y0, x1, y1, SPEAR_WOOD);
+}
 // Rhanon de costas (batalha e exploração andando para cima): o rosto vira cabelo e a pintura/gravata do peito some
 function heroBackParts(parts) {
   return {...parts, back: true,
@@ -120,7 +127,7 @@ function heroSprite(noWeapon = false) {
   c.width = 20; c.height = 28; c.className = "spr"; c.style.setProperty("--n", 20);
   drawHero(x, parts, {legs: "stand"});
   shadeCanvas(c);
-  if (!noWeapon) { x.fillStyle = "#7a4a1e"; x.fillRect(19, 2, 1, 26); x.fillStyle = "#cfd8dc"; x.fillRect(19, 0, 1, 2); }
+  if (!noWeapon) { spearShaft(x, 18, 2, 18, 27); x.fillStyle = "#cfd8dc"; x.fillRect(18, 0, 1, 2); }
   return c;
 }
 

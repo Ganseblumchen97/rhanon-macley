@@ -22,14 +22,6 @@ function arrowC(sc) {
   x.fillStyle = "#e5001c"; x.fillRect(0, 1, 3, 1); x.fillRect(0, 3, 3, 1);
   return px(c, sc);
 }
-function spearC(sc) {
-  const c = document.createElement("canvas"), x = c.getContext("2d");
-  c.width = 18; c.height = 5;
-  x.fillStyle = "#7a4a1e"; x.fillRect(2, 2, 12, 1);
-  x.fillStyle = "#cfd8dc"; x.fillRect(13, 1, 3, 3); x.fillRect(16, 2, 2, 1);
-  x.fillStyle = "#d62828"; x.fillRect(0, 1, 3, 1); x.fillRect(0, 3, 3, 1);
-  return px(c, sc);
-}
 function numC(str, col, sc) {
   const g = [...str].map(ch => GL[ch === "\u2212" ? "-" : ch]).filter(Boolean), c = document.createElement("canvas"), x = c.getContext("2d");
   c.width = g.length * 4 + 1; c.height = 7;

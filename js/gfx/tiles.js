@@ -138,8 +138,9 @@ function drawGate(x, sx, sy, P) {
 const OW_CACHE = {};
 // dir: "down" (de frente) ou "up" (de costas)
 // bowBack = false enquanto o arco está na mão (atirando), para não aparecer dois arcos
-function heroOverworld(dir, legs, weapon, bowBack = true) {
-  const key = dir + legs + weapon + bowBack + JSON.stringify(G?.equip || {}) + (G?.job ? 1 : 0) + (G?.betterJob ? 1 : 0);
+// side = 1 (andando para a direita) ou -1 (esquerda): a ponta da lança aponta para esse lado
+function heroOverworld(dir, legs, weapon, bowBack = true, side = 1) {
+  const key = dir + legs + weapon + bowBack + side + JSON.stringify(G?.equip || {}) + (G?.job ? 1 : 0) + (G?.betterJob ? 1 : 0);
   if (OW_CACHE[key]) return OW_CACHE[key];
   const parts = dir === "up" ? heroBackParts(heroParts(true)) : heroParts(true);
   const c = document.createElement("canvas"); c.width = 20; c.height = 28;
@@ -147,10 +148,23 @@ function heroOverworld(dir, legs, weapon, bowBack = true) {
   drawHero(x, parts, {legs});
   shadeCanvas(c);
   if (dir === "up" && bowBack && G?.equip?.ranged) drawBowOnBack(x);
-  if (weapon) {
-    x.fillStyle = "#7a4a1e";
-    if (dir === "up") { x.fillRect(1, 2, 1, 26); x.fillStyle = "#cfd8dc"; x.fillRect(1, 0, 1, 2); }
-    else { x.fillRect(19, 2, 1, 26); x.fillStyle = "#cfd8dc"; x.fillRect(19, 0, 1, 2); }
+  if (weapon) {   // lança segura com as duas mãos na frente do corpo, ponta para o lado em que ele anda
+    const X = v => side > 0 ? v : 19 - v;
+    const tip = () => { pxl(x, X(19), 13, "#eef3f5"); pxl(x, X(19), 12, "#cfd8dc"); pxl(x, X(18), 13, "#cfd8dc"); };
+    if (dir === "up") {   // de costas: o corpo esconde o meio da lança; só aparecem a ponta em cima e o cabo embaixo
+      x.globalCompositeOperation = "destination-over";   // pinta só onde ainda não tem nada (atrás do corpo)
+      tip(); lineP(x, X(1), 27, X(18), 14, SPEAR_WOOD); lineP(x, X(1), 28, X(18), 15, OUTLINE);
+      x.globalCompositeOperation = "source-over";
+    } else {
+      spearShaft(x, X(1), 27, X(18), 14); tip();
+      // antebraços saindo dos lados do corpo até a lança, e as mãos fechadas por cima da haste
+      for (const [sx, sy, hx, hy] of [[2, 21, 7, 22], [17, 20, 12, 18]]) {
+        lineP(x, X(sx), sy + 1, X(hx), hy + 1, OUTLINE); lineP(x, X(sx), sy, X(hx), hy, parts.pal.s);
+        const cx = side > 0 ? hx : 18 - hx;
+        x.fillStyle = OUTLINE; x.fillRect(cx - 1, hy - 2, 4, 4);
+        x.fillStyle = parts.pal.s; x.fillRect(cx, hy - 1, 2, 2); x.fillStyle = parts.pal.S; x.fillRect(cx, hy, 2, 1);
+      }
+    }
   }
   return OW_CACHE[key] = c;
 }

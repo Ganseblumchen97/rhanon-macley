@@ -155,4 +155,5 @@ const STAGES = {
   }
 };
 const SOLID = "To~GHKFNVPCR";      // G deixa de bloquear quando o chefe da fase cai
-const ONE_HIT_LEVELS = 2;        // níveis acima do bicho para abatê-lo só com o golpe de abertura
+const ONE_HIT_LEVELS = 3;        // níveis acima do bicho para abatê-lo só com o golpe de abertura
+const ONE_HIT_XP = .5;           // abate direto dá só parte do XP (a batalha vale mais)

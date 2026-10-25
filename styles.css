@@ -474,3 +474,15 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 
 /* barra de vida do inimigo em vermelho */
 #ehp{background:#e5001c}
+
+/* barra de XP do Rhanon (painel da batalha) */
+.bar.xp{height:8px}
+.bar.xp i{background:#7fd8ff}
+.game.challenge-mode :is(.xp-row,.bar.xp){display:none}
+
+/* faixa de subir de nível */
+.lvup{position:fixed;left:-10vw;right:-10vw;top:16vh;z-index:1950;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;background:#0a2c80;border-block:5px solid #7fd8ff;padding:10px 0 12px;rotate:-3deg;box-shadow:0 8px 0 rgba(0,0,0,.35);animation:lvIn .3s var(--snap) backwards,lvOut .35s ease-in 1.85s forwards}
+.lvup span{font-family:'Luckiest Guy',var(--display);font-size:clamp(34px,6vw,64px);color:#fff;-webkit-text-stroke:6px #0a2c80;paint-order:stroke fill;letter-spacing:.04em;animation:rpop .4s var(--pop) .1s backwards}
+.lvup small{font:700 13px var(--mono);color:#7fd8ff}
+@keyframes lvIn{from{translate:-120vw 0}}
+@keyframes lvOut{to{translate:120vw 0;opacity:0}}

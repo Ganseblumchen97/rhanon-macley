@@ -74,7 +74,7 @@ function useItem(k) {
 // opts: animal (bicho escolhido), firstHit (dano do golpe de abertura na exploração), enemyFirst (o bicho começa)
 function init(opts = {}) {
   $("homeButton").hidden = true; $("map").hidden = true; $("local").hidden = true;
-  $("game").classList.remove("working-mode"); $("stage").classList.remove("working"); $("workScene").hidden = true; $("beast").style.display = ""; $("hero").style.display = "";
+  $("game").classList.remove("working-mode", "challenge-mode"); $("stage").classList.remove("working"); $("workScene").hidden = true; $("beast").style.display = ""; $("hero").style.display = "";
   setBattleDecor(curZone);
   mode = "hunt";
   buildCmds();
@@ -127,6 +127,7 @@ function render() {
   $("sp").style.width = (100 * ps / p.msp) + "%";
   $("pvTxt").textContent = ph + " / " + p.max;
   $("spTxt").textContent = ps + " / " + p.msp;
+  drawXp();
   $("log").innerHTML = lines.map(l => "<p>" + l + "</p>").join("");
   $("intentTxt").textContent = e.known ? "Próximo golpe: " + (e.moves || MOVES)[e.intent] : `${e.name} se prepara para atacar…`;
   $("intent").className = "intent" + (e.known ? " known" : "");
@@ -244,9 +245,10 @@ function strike(d, cls, kind, msg) {
   holdE = preE;
   const a = pos($("hero")), b = pos($("beast"));
   const hit = colors => {   // impacto: barra desce, número salta, registro recebe a mensagem
-    holdE = null; if (msg) say(msg); render(); hitBeast(); sfx(cls === "crit" ? "crit" : "hit");
+    holdE = null; if (msg) say(msg); render(); hitBeast(); sfx(cls === "crit" ? "critico" : "hit");
     burst(b, colors, cls === "crit" ? 16 : 9, cls === "crit" ? 90 : 60);
     pop(String(d), $("beast"), cls); if (cls === "crit" || d >= 14) shake();
+    if (cls === "crit") setTimeout(() => pop("CRÍTICO!", $("beast"), "crit"), 220);
   };
   if (kind === "spear") {   // lança: corre até o bicho, estoca e volta (rápido)
     HERO_A.set("stab"); sfx("spear");
@@ -291,6 +293,8 @@ function strike(d, cls, kind, msg) {
   setTimeout(() => hit(["#ffd23a", "#f2740c", "#d62828"]), start + (N - 1) * 70 + fly);
   return start + (N - 1) * 70 + fly;   // ~2,1 s
 }
+// barra de XP do painel do Rhanon (quanto falta para o próximo nível)
+function drawXp() { $("xpb").style.width = (100 * G.xp / need(G.lv)) + "%"; $("xpTxt").textContent = G.xp + " / " + need(G.lv); }
 function pickAnimal() {
   if (bossFight && !BS()[curZone]) return ANIMALS.find(a => a.id === ZONES[curZone].boss);
   return pickFromPool(curZone);
@@ -320,11 +324,13 @@ function tick() {
   if (p.weak > 0) p.weak--;
   if (p.preso > 0) p.preso--;
 }
-// XP, pele e progresso por vencer o bicho a (na batalha, o bicho atual)
-function reward(a = e) {
-  if (a.boss) BS()[curZone] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = a.xp, L0 = G.lv; vit(); G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
+// XP, pele e progresso por vencer o bicho a (na batalha, o bicho atual); mult reduz o XP (abate direto)
+function reward(a = e, mult = 1) {
+  if (a.boss) BS()[curZone] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit(); G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }
+  if (G.lv > L0) setTimeout(() => levelUpFx(G.lv), $("explore").hidden ? 1800 : 150);   // na batalha, espera o cartão de vitória
+  drawXp();
   vit(); G.hp = Math.min(maxHP(G.lv), G.hp + maxHP(G.lv) - maxHP(L0)); G.sp = Math.min(maxSP(G.lv), G.sp + maxSP(G.lv) - maxSP(L0));
   save();
   return ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).` + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");

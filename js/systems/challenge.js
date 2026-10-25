@@ -9,7 +9,7 @@ function startChallenge(kind) {
   $("map").hidden = true; $("over").hidden = true; $("cmds").innerHTML = ""; $("cmds").style.minHeight = "";
   const title = kind === "work" ? "Missão de trabalho" : kind === "betterInterview" ? "Entrevista sênior" : "Entrevista";
   $("plate").querySelector("b").textContent = title; $("plate").querySelector(".lv").textContent = kind === "work" ? "Tarefa 1/3" : `Pergunta 1/${activeQuestions.length}`;
-  const isWork = kind === "work"; $("game").classList.toggle("working-mode", isWork);
+  const isWork = kind === "work"; $("game").classList.toggle("working-mode", isWork); $("game").classList.add("challenge-mode");
   $("stage").classList.toggle("working", isWork);
   $("workScene").hidden = !isWork;
   $("beast").innerHTML = "";
@@ -63,7 +63,7 @@ function finishChallenge(success) {
   else if (success && challengeKind === "betterInterview") { G.betterJob=true; save(); fanfare("win"); }
   else if (success && challengeKind === "work") {
     const xp=60, cash=G.betterJob?140:85; G.jobXp=(G.jobXp||0)+xp; G.jobMissions=(G.jobMissions||0)+1; G.xp+=xp; G.money+=cash;
-    while(G.xp>=need(G.lv)){G.xp-=need(G.lv);G.lv++;}
+    const L0=G.lv; while(G.xp>=need(G.lv)){G.xp-=need(G.lv);G.lv++;} if (G.lv>L0) setTimeout(()=>levelUpFx(G.lv), 900);
     save(); fanfare("win");
   } else fanfare("lose");
   if (success && challengeKind === "work") { $("overTitle").textContent="Missão concluída!"; $("overTxt").textContent=`Boa entrega! Você ganhou 60 XP de programador, R$ ${G.betterJob?140:85} e agora tem ${G.jobXp} XP profissional. ${!G.betterJob && G.jobXp>=150 ? "Uma entrevista para uma empresa melhor foi desbloqueada!" : "Continue trabalhando para evoluir."}`; }

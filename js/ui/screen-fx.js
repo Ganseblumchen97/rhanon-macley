@@ -60,3 +60,12 @@ function encounterBanner(name) {
   setTimeout(() => b.classList.add("out"), REDUCE ? 600 : 1050);
   setTimeout(() => b.remove(), REDUCE ? 700 : 1450);
 }
+
+// faixa "NÍVEL X!" atravessando a tela + fanfarra (batalha, exploração ou missão)
+function levelUpFx(lv) {
+  levelUpJingle();
+  const b = document.createElement("div"); b.className = "lvup"; b.setAttribute("aria-live", "polite");
+  b.innerHTML = `<span>NÍVEL ${lv}!</span><small>Rhanon ficou mais forte</small>`;
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), REDUCE ? 1200 : 2200);
+}

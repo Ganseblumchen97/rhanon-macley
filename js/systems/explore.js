@@ -115,7 +115,7 @@ function exHit(en) {
     en.alive = false; sfx("crit");
     exBurst(en.x, en.y - 6, ["#d8d2c0", "#a89f8a", "#ffffff"], 14);
     curZone = EX.zone;
-    exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a));
+    exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a, ONE_HIT_XP));
     exHud();
     return;
   }
@@ -171,6 +171,7 @@ function exUpdate(dt, now) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     h.aim = {x: ix / n, y: iy / n};
     if (iy) h.dir = iy < 0 ? "up" : "down";   // só frente e costas: andando de lado, continua virado como estava
+    if (ix) h.side = ix;                      // ...mas a lança aponta para o lado em que ele anda
     if (slide(h, ix / n * sp, iy / n * sp) || nudge(h, ix, iy)) { h.walk += sp; h.movedT = now; }
   }
   if (!EX.locked) {
@@ -211,7 +212,7 @@ function drawHeroEnt(x, h, cx, cy, now) {
   const walking = now - h.movedT < 90, step = Math.floor(h.walk / 7);
   const art = IMG["hero/walk/" + h.dir];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
   const img = art ? overworldArt(h.dir, walking ? step % art.frames : 0)
-    : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0));
+    : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0), h.side || 1);
   const iw = art ? art.w / art.scale : 20, ih = art ? art.h / art.scale : 28;
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
   drawShadow(x, sx, sy, 12);
@@ -223,7 +224,7 @@ function drawHeroEnt(x, h, cx, cy, now) {
   }
   if (EX.jab > 0) {   // estocada da lança
     const bx = sx + ox, by = sy - 12 + oy;
-    lineP(x, bx - h.aim.x * 4, by - h.aim.y * 4, bx + h.aim.x * 21, by + h.aim.y * 21, "#7a4a1e");
+    spearShaft(x, bx - h.aim.x * 4, by - h.aim.y * 4, bx + h.aim.x * 21, by + h.aim.y * 21);
     pxl(x, bx + h.aim.x * 22, by + h.aim.y * 22, "#eef3f5"); pxl(x, bx + h.aim.x * 21, by + h.aim.y * 21, "#cfd8dc");
   }
   grassOver(x, h, cx, cy);
@@ -294,7 +295,7 @@ function exploreFrame(t, dt) {
 /* ---------- textos na tela ---------- */
 function exHud() {
   vit();
-  $("exHud").textContent = `${(ZONES[EX.zone] || SUB[EX.zone]).n} · Nv ${G.lv} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · R$ ${G.money}`;
+  $("exHud").textContent = `${(ZONES[EX.zone] || SUB[EX.zone]).n} · Nv ${G.lv} · XP ${G.xp}/${need(G.lv)} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · R$ ${G.money}`;
 }
 function exToast(msg) {
   const el = $("exMsg"); el.textContent = msg; el.classList.add("show");

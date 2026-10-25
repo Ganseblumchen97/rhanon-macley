@@ -39,7 +39,7 @@ function makeHeroActor() {
   }
   // lança de (x0, y0), a ponta, até (x1, y1)
   function spear(x0, y0, x1, y1) {
-    lineP(g, x0, y0, x1, y1, "#7a4a1e");
+    spearShaft(g, x0, y0, x1, y1);
     const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) || 1;
     for (let i = 0; i < 2; i++) pxl(g, x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, i ? "#cfd8dc" : "#eef3f5");
   }
@@ -403,10 +403,10 @@ const TITLE_A = (() => {
     drawHero(og, parts, o); shadeCanvas(off);
     const by = H - 29 - Math.round(lift);
     g.drawImage(off, 10, by);
-    if (!fire) { lineP(g, 29, by + o.dy, 29, by + 27, "#7a4a1e"); pxl(g, 29, by + o.dy, "#eef3f5"); pxl(g, 29, by + o.dy + 1, "#cfd8dc"); }
+    if (!fire) { spearShaft(g, 29, by + o.dy, 29, by + 27); pxl(g, 29, by + o.dy, "#eef3f5"); pxl(g, 29, by + o.dy + 1, "#cfd8dc"); }
     else {
       // lança deitada, fogueira e fumaça
-      lineP(g, 2, H - 2, 12, H - 2, "#7a4a1e"); pxl(g, 1, H - 2, "#cfd8dc");
+      spearShaft(g, 2, H - 2, 12, H - 2); pxl(g, 1, H - 2, "#cfd8dc");
       const fx = 34, fy = H - 2, k = Math.floor(t / 90) % 3;
       lineP(g, fx - 3, fy, fx + 3, fy - 1, "#5a3a1c"); lineP(g, fx - 3, fy - 1, fx + 3, fy, "#7a4a1e");
       const fl = [["#ffd23a", "#f2740c", "#d62828"], ["#fff3a0", "#ffd23a", "#f2740c"], ["#ffd23a", "#d62828", "#f2740c"]][k];

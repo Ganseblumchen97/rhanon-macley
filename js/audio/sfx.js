@@ -32,7 +32,9 @@ const SFX = {
   roar:  t => { noise(t, .5, .2, 200); tone(110, t, .5, "sawtooth", .14, 55); },
   claw:  t => { noise(t, .1, .2, 3000); tone(1200, t, .12, "square", .06, 300); },
   hurt:  t => { tone(300, t, .2, "square", .12, 90); noise(t, .1, .18, 600); },
-  more:  t => [784, 988, 1175, 1568].forEach((f, i) => tone(f, t + i * .06, .08, "square", .08))
+  more:  t => [784, 988, 1175, 1568].forEach((f, i) => tone(f, t + i * .06, .08, "square", .08)),
+  // golpe crítico: "ting!" agudo em duas notas e um impacto grave
+  critico: t => { tone(1568, t, .08, "square", .08); tone(2093, t + .07, .3, "triangle", .09); noise(t + .02, .3, .24, 300); tone(95, t + .02, .38, "sawtooth", .17, 40); }
 };
 function sfx(n) { if (AC) SFX[n](AC.currentTime); }
 function toggleMute() {
@@ -101,4 +103,13 @@ function cutinSound(kind) {
   n.connect(f).connect(g).connect(master); n.start(t); n.stop(t + .36);
   tone(140, t + .3, .6, "sine", .35, 38); noise(t + .3, .25, .2, 120);
   tone(1320, t + .3, .25, "square", .04, 1320); tone(1980, t + .32, .3, "triangle", .03);
+}
+// subir de nível: fanfarra curta e triunfante (melodia original no espírito dos RPGs clássicos)
+function levelUpJingle() {
+  if (!AC || muted) return;
+  const t = AC.currentTime + .05, S = .1;
+  [[67, 0, .09], [72, 1, .09], [76, 2, .09], [79, 3, .36], [77, 6.6, .12], [76, 7.8, .12], [74, 9, .12], [76, 10.2, .65]]   // [nota, início (x S), duração]
+    .forEach(([m, at, d]) => { tone(hz(m), t + at * S, d + .05, "square", .07); tone(hz(m + 12), t + at * S, d, "triangle", .025); });
+  [[48, 0], [55, 3], [53, 6.6], [48, 10.2]].forEach(([m, at]) => tone(hz(m), t + at * S, .5, "triangle", .12));
+  [60, 64, 67, 72].forEach((m, i) => tone(hz(m), t + 10.2 * S + i * .02, .9, "triangle", .03));
 }
