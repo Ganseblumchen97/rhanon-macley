@@ -62,7 +62,7 @@ function startExplore(zone) {
   wipe(() => {
     const st = STAGES[zone];
     EX = {zone, st, rows: st.rows, map: drawStageMap(st.rows, zone), pal: TILE_PAL[zone] || TILE_PAL.mata,
-      ents: [], fx: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
+      ents: [], fx: [], loot: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
     st.rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
       if (ch === "S") EX.hero = {x: tx * TILE + 8, y: ty * TILE + 12, hw: 5, hh: 3, dir: "down", aim: {x: 0, y: 1}, walk: 0, flip: false, movedT: 0};
       else if (ch === "a") EX.ents.push(makeAnimalEnt(pickFromPool(zone), tx, ty));
@@ -96,7 +96,7 @@ function resumeExplore(result) {
 /* ---------- ações do Rhanon ---------- */
 const entH = en => Math.min(en.h, 20);
 function exStrike() {
-  if (!EX || EX.locked || EX.dialog || EX.cool > 0) return;
+  if (!EX || EX.locked || EX.dialog || EX.camp || EX.cool > 0) return;
   const spot = nearSpot(); if (spot) return exOpenDialog(spot.kind, null, spot.look);   // perto de alguém: conversa em vez de golpe
   const h = EX.hero; EX.cool = .35; EX.jab = .16; sfx("spear");
   // a lança alcança uns 1,5 quadrado à frente: confere pontos ao longo dela
@@ -104,11 +104,38 @@ function exStrike() {
   if (target) exHit(target);
 }
 // flecha: só com arco (EQUIP.ranged, comprado no artesão da feira)
+const BOW_DRAW = .32;   // segundos puxando a corda antes da flecha sair (ele para de andar nesse tempo)
+// mão do arco (em pixels do desenho 32x44 do Rhanon): esticada na direção da mira, na altura do peito
+const bowHand = a => [16 + a.x * 13, 25 + a.y * 9];
 function exThrow() {
-  if (!EX || EX.locked || EX.dialog || EX.cool > 0 || EX.spear) return;
+  if (!EX || EX.locked || EX.dialog || EX.camp || EX.cool > 0 || EX.spear || EX.draw) return;
   if (!G.equip.ranged) { EX.cool = 1.2; sfx("blip"); return exToast("Para atacar de longe você precisa de um arco. O artesão da feira vende."); }
-  const h = EX.hero; EX.cool = .5; EX.shoot = .25; sfx("spear");
-  EX.spear = {x: h.x + h.aim.x * 6, y: h.y - 10 + h.aim.y * 6, vx: h.aim.x * 260, vy: h.aim.y * 260, left: 120, stuck: 0};
+  const h = EX.hero; EX.cool = BOW_DRAW + .45; sfx("guard");
+  EX.draw = {t: 0, aim: {x: h.aim.x, y: h.aim.y}};
+}
+// solta a corda: a flecha sai da mão do arco, com um brilho, e a corda fica vibrando um instante
+function exRelease() {
+  const h = EX.hero, a = EX.draw.aim, [bx, by] = bowHand(a), x = h.x + (bx - 16) * OW_SCALE, y = h.y - 32 + by * OW_SCALE;
+  EX.lastAim = a; EX.draw = null; EX.shoot = .3; sfx("spear");
+  EX.spear = {x, y, vx: a.x * 260, vy: a.y * 260, left: 120, stuck: 0};
+  exBurst(x + a.x * 4, y + a.y * 4, ["#ffffff", "#ffd23a"], 5);
+}
+// pega a pele do chão: vai para a bolsa (vende na feira)
+function pickLoot(l) {
+  EX.loot = EX.loot.filter(q => q !== l); vit();
+  G.pelts[l.id] = (G.pelts[l.id] || 0) + 1; save(); sfx("heal");
+  exBurst(l.x, l.y - 4, ["#ffffff", "#ffd23a"], 8);
+  exToast(`Pegou: ${peltName(l.id).toLowerCase()} (vale R$ ${peltValue(l.id)} na feira).`); exHud();
+}
+// pele no chão: trouxinha com a cor do tipo (couro, escamas, penas, casco, presas), pulando e brilhando
+function drawLoot(x, l, cx, cy, now) {
+  const n = peltName(l.id), col = /Escamas/.test(n) ? ["#b8c4c8", "#7e8c92"] : /Penas/.test(n) ? ["#ececf0", "#a8a8b4"] : /Casco/.test(n) ? ["#9a8a7a", "#6a5c4e"] : /Presas/.test(n) ? ["#f4ecd8", "#c8bca0"] : ["#a86f40", "#7a4a2a"];
+  const sx = Math.round(l.x - cx), sy = Math.round(l.y - cy) - (Math.floor(now / 300) % 2);
+  x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(sx - 4, Math.round(l.y - cy), 8, 1);
+  x.fillStyle = OUTLINE; x.fillRect(sx - 4, sy - 6, 8, 6); x.fillRect(sx - 3, sy - 7, 6, 8);
+  x.fillStyle = col[0]; x.fillRect(sx - 3, sy - 6, 6, 5); x.fillStyle = col[1]; x.fillRect(sx - 3, sy - 2, 6, 1);
+  x.fillStyle = "#e5001c"; x.fillRect(sx - 1, sy - 6, 1, 5);   // amarração
+  if (Math.floor(now / 160) % 6 === 0) { x.fillStyle = "#ffffff"; x.fillRect(sx + 3, sy - 9, 1, 1); x.fillRect(sx + 2, sy - 8, 3, 1); x.fillRect(sx + 3, sy - 7, 1, 1); }
 }
 function exHit(en) {
   const a = en.a, d = rnd(6, 10) + G.lv - 1 + weaponAtk();
@@ -117,7 +144,8 @@ function exHit(en) {
     en.alive = false; en.koUntil = performance.now() + 1100; sfx("crit");
     exBurst(en.x, en.y - 6, ["#d8d2c0", "#a89f8a", "#ffffff"], 14);
     curZone = EX.zone;
-    exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a, ONE_HIT_XP));
+    exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a, ONE_HIT_XP, true));
+    EX.loot.push({id: a.id, x: en.x, y: en.y, t0: performance.now()});   // a pele fica no chão até ele passar por cima
     exHud();
     return;
   }
@@ -167,8 +195,11 @@ function exAnimal(en, dt, now) {
 function exUpdate(dt, now) {
   const h = EX.hero;
   EX.cool = Math.max(0, EX.cool - dt); EX.jab = Math.max(0, EX.jab - dt); EX.shoot = Math.max(0, (EX.shoot || 0) - dt);
+  if (EX.draw && (EX.draw.t += dt) >= BOW_DRAW) exRelease();
+  if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
+  for (const l of EX.loot) if (now - l.t0 > 500 && Math.hypot(l.x - h.x, l.y - h.y) < 11) pickLoot(l);
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
-  if (EX.locked || EX.dialog) ix = iy = 0;
+  if (EX.locked || EX.dialog || EX.draw || EX.camp) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     h.aim = {x: ix / n, y: iy / n};
@@ -190,7 +221,7 @@ function exUpdate(dt, now) {
     else if (spearBlocked(s.x, s.y + 10)) { s.stuck = .35; sfx("guard"); }
     else if (s.left <= 0) s.stuck = .35;
   }
-  if (!EX.dialog) for (const en of EX.ents) if (en.alive && EX) exAnimal(en, dt, now);   // bichos param com o painel aberto
+  if (!EX.dialog && !EX.camp) for (const en of EX.ents) if (en.alive && EX) exAnimal(en, dt, now);   // bichos param com o painel aberto
   EX.fx = EX.fx.filter(q => (q.life -= dt) > 0);
   for (const q of EX.fx) { q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 60 * dt; }
 }
@@ -213,23 +244,40 @@ function drawHeroEnt(x, h, cx, cy, now) {
   if (now < EX.invulnUntil && Math.floor(now / 100) % 2) return;
   const walking = now - h.movedT < 90, step = Math.floor(h.walk / 7);
   const art = IMG["hero/walk/" + h.dir];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
-  const img = art ? overworldArt(h.dir, walking ? step % art.frames : 0)
+  const bowAim = EX.draw ? EX.draw.aim : EX.shoot > 0 && EX.lastAim, pull = EX.draw ? Math.min(1, EX.draw.t / BOW_DRAW) : 0;
+  let img, B;
+  if (bowAim && !art) {   // atirando: braços apontados para a mira, uma mão no arco e a outra puxando a corda
+    B = bowHand(bowAim);
+    const N = [B[0] - bowAim.x * (4 + pull * 3), B[1] - bowAim.y * (4 + pull * 3)], r = v => v.map(Math.round), left = bowAim.x < -.1;
+    img = rigCanvas(bowAim.y < -.35 ? "back" : "front", {lh: r(left ? B : N), rh: r(left ? N : B)}, {...rhanonLook(), bowBack: false}, OW_SCALE);
+  } else img = art ? overworldArt(h.dir, walking ? step % art.frames : 0)
     : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0), h.side || 1);
   const iw = art ? art.w / art.scale : img.width, ih = art ? art.h / art.scale : img.height;
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
   drawShadow(x, sx, sy, 12);
   x.drawImage(img, sx - iw / 2 + ox, sy - ih + 1 + oy, iw, ih);
-  if (EX.shoot > 0) {   // arco na mão por um instante, virado para onde a flecha foi
-    const cx0 = sx + h.aim.x * 7, cy0 = sy - 12 + h.aim.y * 7, px = -h.aim.y, py = h.aim.x;
-    for (let k = -4; k <= 4; k++) { const b = 2.5 - k * k / 7; pxl(x, cx0 + px * k + h.aim.x * b, cy0 + py * k + h.aim.y * b, "#9c6339"); }
-    lineP(x, cx0 + px * 4, cy0 + py * 4, cx0 - px * 4, cy0 - py * 4, "#f4ecd8");
-  }
+  if (B) drawAimBow(x, sx - iw / 2 + B[0] * OW_SCALE, sy - ih + 1 + B[1] * OW_SCALE, bowAim, pull, !!EX.draw, now);
   if (EX.jab > 0) {   // estocada da lança
     const bx = sx + ox, by = sy - 12 + oy;
     spearShaft(x, bx - h.aim.x * 4, by - h.aim.y * 4, bx + h.aim.x * 21, by + h.aim.y * 21);
     pxl(x, bx + h.aim.x * 22, by + h.aim.y * 22, "#eef3f5"); pxl(x, bx + h.aim.x * 21, by + h.aim.y * 21, "#cfd8dc");
   }
   grassOver(x, h, cx, cy);
+}
+// arco virado para a mira: a corda vai até o ponto puxado e, enquanto puxa, a flecha fica encaixada
+function drawAimBow(x, X, Y, a, pull, nocked, now) {
+  const px = -a.y, py = a.x, L = 5;
+  for (let k = -L; k <= L; k++) {
+    const b = 2.2 * (1 - k * k / (L * L)), bx = X + px * k + a.x * b, by = Y + py * k + a.y * b;
+    pxl(x, bx, by + 1, OUTLINE); pxl(x, bx, by, "#9c6339");
+  }
+  const vib = !nocked && Math.floor(now / 40) % 2 ? 1 : 0;   // corda vibrando depois de soltar
+  const nx = X - a.x * (pull * 4 + vib), ny = Y - a.y * (pull * 4 + vib);
+  lineP(x, X + px * L, Y + py * L, nx, ny, "#f4ecd8"); lineP(x, nx, ny, X - px * L, Y - py * L, "#f4ecd8");
+  if (nocked) {
+    lineP(x, nx, ny, X + a.x * 5, Y + a.y * 5, "#c9a46a"); pxl(x, X + a.x * 6, Y + a.y * 6, "#eef3f5");
+    pxl(x, nx - a.y, ny + a.x, "#e5001c"); pxl(x, nx + a.y, ny - a.x, "#e5001c");
+  }
 }
 function drawAnimalEnt(x, en, cx, cy, now) {
   const sx = snap(en.x - cx), sy = snap(en.y - cy), w = en.w, hg = en.h;
@@ -274,9 +322,10 @@ function exDraw(now) {
     if (ch === "G" && !BS()[EX.zone]) drawGate(x, sx, sy, EX.pal);
     if (ch === "F") drawFire(x, sx, sy, now);
   }
+  EX.loot.forEach(l => drawLoot(x, l, cx, cy, now));   // no chão, embaixo de todo mundo
   const alive = EX.ents.filter(en => en.alive), knocked = EX.ents.filter(en => !en.alive && en.ko && en.koUntil > now);
   const people = EX.spots.filter(s => PEOPLE.includes(s.kind)).map(s => ({y: s.y + 5, draw: () => drawNpc(x, s, cx, cy, now)}));
-  [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...knocked.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...people, {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)}]
+  [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...knocked.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...people, (EX.camp ? {y: EX.camp.y, draw: () => drawCampHero(x, cx, cy, now)} : {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)})]
     .sort((a, b) => a.y - b.y).forEach(o => o.draw());
   const s = EX.spear;
   if (s) {
@@ -284,6 +333,11 @@ function exDraw(now) {
     x.fillStyle = "rgba(0,0,0,.25)"; x.fillRect(Math.round(sx) - 3, Math.round(sy + 10), 6, 1);
     lineP(x, sx - ux * 5, sy - uy * 5, sx + ux * 4, sy + uy * 4, "#c9a46a");   // flecha: haste, ponta e penas
     pxl(x, sx + ux * 5, sy + uy * 5, "#eef3f5"); pxl(x, sx - ux * 5 - uy, sy - uy * 5 + ux, "#e5001c"); pxl(x, sx - ux * 5 + uy, sy - uy * 5 - ux, "#e5001c");
+  }
+  if (EX.camp && EX.camp.kind === "dormir") {   // a noite cai enquanto ele dorme; o fogo continua aceso por cima
+    const c = EX.camp, a = Math.min(.6, Math.max(0, (now - c.t0 - 500) / 2400) * .6);
+    x.fillStyle = `rgba(8,10,40,${a})`; x.fillRect(0, 0, VIEW_W, VIEW_H);
+    drawFire(x, c.ftx * TILE - cx, c.fty * TILE - cy, now); drawCampHero(x, cx, cy, now);
   }
   for (const q of EX.fx) { x.fillStyle = q.col; x.fillRect(Math.round(q.x - cx) - 1, Math.round(q.y - cy) - 1, 2, 2); }
   alive.forEach(en => drawAnimalTags(x, en, cx, cy, now));
@@ -312,6 +366,7 @@ function setupExploreInput() {
   document.addEventListener("keydown", ev => {
     if (!EX || $("explore").hidden) return;
     if (EX.dialog) { dialogKey(ev); return; }
+    if (EX.camp) { ev.preventDefault(); return; }   // sentado na fogueira: espera terminar
     const k = DIRS[ev.key];
     if (k) { exKeys.add(k); ev.preventDefault(); return; }
     if (ev.repeat) return;
@@ -330,7 +385,7 @@ function setupExploreInput() {
   $("exA").addEventListener("pointerdown", ev => { ev.preventDefault(); exStrike(); });
   $("exB").addEventListener("pointerdown", ev => { ev.preventDefault(); exThrow(); });
   $("exExit").addEventListener("click", exitExplore);
-  $("exBag").addEventListener("click", () => { if (EX && !EX.locked) EX.dialog === "inventario" ? exCloseDialog() : exOpenDialog("inventario"); });
+  $("exBag").addEventListener("click", () => { if (EX && !EX.locked && !EX.camp) EX.dialog === "inventario" ? exCloseDialog() : exOpenDialog("inventario"); });
 }
 
 /* ---------- aldeia e feira: pontos de conversa ---------- */
@@ -377,8 +432,8 @@ function exOpenDialog(kind, msg, look) {
   const say = (title, text) => { d.innerHTML = `<h2>${title}</h2><p>${text}</p>`; };
   if (kind === "fogueira") {
     say("Fogueira", "O fogo estala e esquenta. Descansar recupera metade de PV e PE; dormir aqui recupera tudo, mas o dia passa.");
-    btn("Descansar", () => rest("fogueira"), false, d);
-    btn("Dormir até o amanhecer", () => wipe(() => rest("dormir")), false, d);
+    btn("Descansar", () => exCampRest("fogueira"), false, d);
+    btn("Dormir até o amanhecer", () => exCampRest("dormir"), false, d);
   }
   else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => wipe(() => rest("dormir")), false, d); }
   else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }
@@ -389,6 +444,30 @@ function exOpenDialog(kind, msg, look) {
   if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);
   btn("Fechar", exCloseDialog, false, d);
   d.hidden = false;
+}
+// descansar/dormir na fogueira: Rhanon senta do lado do fogo (como na tela inicial) e só depois recupera
+function exCampRest(kind) {
+  const h = EX.hero, f = EX.spots.filter(s => s.kind === "fogueira").sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y))[0];
+  $("exDialog").hidden = true; exKeys.clear();
+  EX.camp = {kind, t0: performance.now(), dur: kind === "dormir" ? 3400 : 2600, x: f.x + (h.x < f.x ? -14 : 14), y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
+}
+function exCampEnd() {
+  const kind = EX.camp.kind; EX.camp = null;
+  EX.dialog = "fogueira";   // o resultado volta no painel da fogueira (localDone)
+  if (kind === "dormir") wipe(() => rest("dormir")); else rest("fogueira");
+}
+function drawCampHero(x, cx, cy, now) {
+  const c = EX.camp, el = now - c.t0, sleep = c.kind === "dormir" && el > 1100, sx = snap(c.x - cx), sy = snap(c.y - cy);
+  const face = sleep || el % 1700 < 140 ? "blink" : el > 800 && el < 1250 ? "happy" : undefined;
+  const img = rigCanvas("front", {sit: true, face, dy: sleep ? 1 : 0}, {...rhanonLook(), bowBack: false}, OW_SCALE);
+  drawShadow(x, sx, sy, 18);
+  spearShaft(x, sx - 11, sy, sx + 9, sy); pxl(x, sx + 10, sy, "#eef3f5");   // lança deitada no chão
+  x.drawImage(img, sx - img.width / 2, sy - img.height + 1);
+  for (let i = 0; i < 4; i++) {   // fumaça subindo do fogo
+    const p = (now / 1700 + i / 4) % 1;
+    if (p < .85 || Math.floor(now / 80) % 2) { x.fillStyle = i % 2 ? "#c9c4b8" : "#9e9a90"; x.fillRect(Math.round(c.fx - cx + Math.sin(p * 6 + i) * 2), Math.round(c.fy - cy - 6 - p * 20), 2, 2); }
+  }
+  if (sleep) for (let i = 0; i < 3; i++) { const p = ((el - 1100) / 1000 + i / 3) % 1; glyphP(x, "z", "#ffffff", sx + 5 + p * 7, sy - 24 - p * 12); }
 }
 function exCloseDialog() { $("exDialog").hidden = true; if (EX) EX.dialog = null; sfx("blip"); }
 // teclado com o painel aberto: 1-9 botões, Enter o primeiro disponível, Esc/X/Z fecham

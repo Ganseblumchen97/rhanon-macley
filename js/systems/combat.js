@@ -349,15 +349,16 @@ function tick() {
   if (p.preso > 0) p.preso--;
 }
 // XP, pele e progresso por vencer o bicho a (na batalha, o bicho atual); mult reduz o XP (abate direto)
-function reward(a = e, mult = 1) {
-  if (a.boss) BS()[curZone] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit(); G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
+// drop = a pele fica no chão da exploração (golpe só) em vez de ir direto para a bolsa
+function reward(a = e, mult = 1, drop = false) {
+  if (a.boss) BS()[curZone] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit(); if (!drop) G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }
   if (G.lv > L0) setTimeout(() => levelUpFx(G.lv), $("explore").hidden ? 1800 : 150);   // na batalha, espera o cartão de vitória
   drawXp();
   vit(); G.hp = Math.min(maxHP(G.lv), G.hp + maxHP(G.lv) - maxHP(L0)); G.sp = Math.min(maxSP(G.lv), G.sp + maxSP(G.lv) - maxSP(L0));
   save();
-  return ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).` + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
+  return (drop ? ` Ganhou ${xp} XP. ${peltName(a.id)} ficou no chão: passe por cima para pegar.` : ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).`) + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
 }
 function keepVitals(kind) {
   vit();
