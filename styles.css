@@ -471,3 +471,6 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .ex-dialog p{margin:0 0 8px}
 .ex-dialog .cmd{font-size:clamp(18px,2.2vw,26px)}
 .ex-btns{display:flex;gap:8px}
+
+/* barra de vida do inimigo em vermelho */
+#ehp{background:#e5001c}

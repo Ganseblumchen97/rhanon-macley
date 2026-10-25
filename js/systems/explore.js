@@ -71,7 +71,7 @@ function startExplore(zone) {
     curZone = zone; fromLocal = false; exKeys.clear();
     $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
     musicStart("local"); exHud();
-    exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira, da tenda ou do aldeão e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : ZONES[zone].n + (BS()[zone] ? "" : " · o chefe espera no fim da trilha"));
+    exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : ZONES[zone].n + (BS()[zone] ? "" : " · o chefe espera no fim da trilha"));
   });
 }
 function exitExplore() {
@@ -211,7 +211,7 @@ function drawHeroEnt(x, h, cx, cy, now) {
   const walking = now - h.movedT < 90, step = Math.floor(h.walk / 7);
   const art = IMG["hero/walk/" + h.dir];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
   const img = art ? overworldArt(h.dir, walking ? step % art.frames : 0)
-    : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0);
+    : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0));
   const iw = art ? art.w / art.scale : 20, ih = art ? art.h / art.scale : 28;
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
   drawShadow(x, sx, sy, 12);
@@ -331,7 +331,7 @@ function setupExploreInput() {
 /* ---------- aldeia e feira: pontos de conversa ---------- */
 const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", P: "aldeao"};
 const PEOPLE = ["peles", "comida", "artesao", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir na tenda", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas e equipamentos", aldeao: "conversar"};
+const SPOT_LABEL = {fogueira: "descansar ou dormir na fogueira", tenda: "dormir na tenda", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas e equipamentos", aldeao: "conversar"};
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã"};
 const VILLAGER_TIPS = [
   "Etiqueta verde em cima do bicho? Ele cai com um golpe só.",
@@ -339,7 +339,7 @@ const VILLAGER_TIPS = [
   "Se o bicho te alcançar antes, quem começa batendo é ele. Fique esperto com o \"!\".",
   "A tocha assusta os bichos: eles fraquejam e você ataca de novo na mesma hora.",
   "O chefe de cada mata fica no fim da trilha. Vencer ele abre o caminho para a próxima.",
-  "Dormir na tenda recupera tudo, mas o dia passa. A fogueira recupera metade.",
+  "Na fogueira dá para descansar (metade) ou dormir (tudo, mas o dia passa). Dizem que tem fogueira até no meio das trilhas.",
   "O vendedor da feira paga bem por couro de jacaré. Dizem."
 ];
 // ponto de conversa colado no Rhanon (o mais perto)
@@ -368,8 +368,12 @@ function exOpenDialog(kind, msg, look) {
   look = look || EX.dialogLook; EX.dialogLook = look;
   const d = $("exDialog"); EX.dialog = kind; exKeys.clear(); sfx("blip");
   const say = (title, text) => { d.innerHTML = `<h2>${title}</h2><p>${text}</p>`; };
-  if (kind === "fogueira") { say("Fogueira", "O fogo estala e esquenta. Sentar um pouco recupera metade de PV e PE."); btn("Descansar", () => rest("fogueira"), false, d); }
-  else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => wipe(() => rest("tenda")), false, d); }
+  if (kind === "fogueira") {
+    say("Fogueira", "O fogo estala e esquenta. Descansar recupera metade de PV e PE; dormir aqui recupera tudo, mas o dia passa.");
+    btn("Descansar", () => rest("fogueira"), false, d);
+    btn("Dormir até o amanhecer", () => wipe(() => rest("dormir")), false, d);
+  }
+  else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => wipe(() => rest("dormir")), false, d); }
   else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }
   else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme."); foodButtons(d); }
   else if (kind === "artesao") { say("Artesão", "Roupas e equipamentos feitos à mão, inclusive arco e flecha para caçar de longe. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }

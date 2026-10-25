@@ -46,7 +46,7 @@ function makeHeroActor() {
   function draw(t) {
     if (!cv || !cv.isConnected || !cv.offsetParent) return;
     const el = t - since, o = {legs: mode === "battle" ? "stance" : "stand", dy: 0, lean: 0, face: null};
-    let lift = 0, ox = 0, flash = false, rot = 0, flip = false, weapon = parts.weapon ? "up" : null, extra = null;
+    let lift = 0, ox = 0, flash = false, rot = 0, flip = false, weapon = parts.weapon ? "up" : null, extra = null, pull = 0;
     if (t > nextBlink) { blinkUntil = t + 140; nextBlink = t + 2000 + Math.random() * 3500; }
     if (t < blinkUntil) o.face = "blink";
     const breathe = Math.floor(t / (mode === "battle" ? 420 : 650)) % 2;
@@ -72,6 +72,20 @@ function makeHeroActor() {
       case "shoot":   // flecha: arco na mão, inclinado para frente
         o.legs = "stance"; o.lean = el < 400 ? 1 : 0; weapon = "bow";
         if (el > 600) set("idle");
+        break;
+      case "stab":    // lança de perto: recua, estoca para frente e volta à guarda
+        o.legs = "stance"; o.lean = el < 100 ? -1 : 1;
+        weapon = el < 100 ? "back" : el < 380 ? "stab" : "guard"; if (el >= 100 && el < 380) extra = "arm";
+        if (el > 560) set("idle");
+        break;
+      case "aim":     // flecha com calma: puxa a corda aos poucos (até 1,7 s), solta e segura o arco
+        o.legs = "stance"; o.lean = el < 1700 ? 0 : 1;
+        weapon = el < 1700 ? "bowdraw" : "bow"; pull = Math.min(4, Math.floor(el / 350));
+        if (el > 2300) set("idle");
+        break;
+      case "blow":    // tocha: ergue perto do rosto e assopra o fogo
+        o.legs = "stance"; o.lean = el > 450 && el < 1100 ? 1 : 0; weapon = "torchup";
+        if (el > 2100) set("idle");
         break;
       case "torch":
         o.legs = "stance"; o.lean = el < 420 ? 1 : 0; weapon = "torch";
@@ -139,7 +153,8 @@ function makeHeroActor() {
 
     const art = heroArt(t);
     og.clearRect(0, 0, 20, 28);
-    if (!art) { drawHero(og, parts, o); shadeCanvas(off); if (G?.equip?.ranged && weapon !== "bow") drawBowOnBack(og); }
+    // arco nas costas, a não ser quando está na mão
+    if (!art) { drawHero(og, parts, o); shadeCanvas(off); if (G?.equip?.ranged && weapon !== "bow" && weapon !== "bowdraw") drawBowOnBack(og); }
     // braço estendido no arremesso, mão na testa ao observar, comida na boca
     if (art || (parts.back && (extra === "brow" || extra === "food"))) extra = null;   // mão na testa e comida são coisas do rosto
     if (extra === "arm") { og.fillStyle = parts.pal.s; og.fillRect(18, 19, 2, 1); og.fillStyle = parts.pal.k; og.fillRect(18, 18, 2, 1); og.fillRect(18, 20, 2, 1); }
@@ -161,14 +176,21 @@ function makeHeroActor() {
       else if (weapon === "back") spear(21, 1, 16, 27);
       else if (weapon === "raise") spear(19, -6, 19, 21);
       else if (weapon === "guard") spear(21, 18, -1, 21);
-      else if (weapon === "bow") {
+      else if (weapon === "stab") spear(25, 18, 5, 19);
+      else if (weapon === "bow" || weapon === "bowdraw") {
         for (let y = 12; y <= 26; y++) pxl(g, 21 + Math.round(Math.sin((y - 12) / 14 * Math.PI) * 2), y, "#9c6339");
-        lineP(g, 21, 12, 21, 26, "#f4ecd8");
+        if (weapon === "bow") lineP(g, 21, 12, 21, 26, "#f4ecd8");
+        else {   // corda puxada até a mão, com a flecha encaixada
+          const hx = 21 - pull;
+          lineP(g, 21, 12, hx, 19, "#f4ecd8"); lineP(g, hx, 19, 21, 26, "#f4ecd8");
+          lineP(g, hx, 19, 25, 19, "#c9a46a"); pxl(g, 25, 19, "#eef3f5"); pxl(g, hx, 18, "#e5001c"); pxl(g, hx, 20, "#e5001c");
+        }
       }
-      else if (weapon === "torch") {
-        lineP(g, 18, 22, 21, 15, "#7a4a1e");
+      else if (weapon === "torch" || weapon === "torchup") {
+        const dx = weapon === "torchup" ? -3 : 0, dy = weapon === "torchup" ? -3 : 0;
+        lineP(g, 18 + dx, 22 + dy, 21 + dx, 15 + dy, "#7a4a1e");
         const f = Math.floor(t / 70) % 3, fl = [["#ffd23a", "#f2740c", "#d62828"], ["#fff3a0", "#ffd23a", "#f2740c"], ["#ffd23a", "#d62828", "#f2740c"]][f];
-        pxl(g, 21, 14, fl[0]); pxl(g, 22, 14, fl[1]); pxl(g, 21, 13, fl[1]); pxl(g, 22, 13, fl[0]); pxl(g, 21 + (f % 2), 12, fl[2]); pxl(g, 22, 15, fl[2]);
+        pxl(g, 21 + dx, 14 + dy, fl[0]); pxl(g, 22 + dx, 14 + dy, fl[1]); pxl(g, 21 + dx, 13 + dy, fl[1]); pxl(g, 22 + dx, 13 + dy, fl[0]); pxl(g, 21 + dx + (f % 2), 12 + dy, fl[2]); pxl(g, 22 + dx, 15 + dy, fl[2]);
       }
     }
     g.restore();
@@ -190,7 +212,8 @@ function makeHeroActor() {
       if (p.dot && p.dot.t > 0) PFX.emit(p.dot.n === "Veneno" ? "ring" : "drop", p.dot.n === "Veneno" ? ["#b06ad6", "#d6a6ff"] : ["#e03a2f", "#ff6b6b"], gx, gy + 10, 0, p.dot.n === "Veneno" ? -6 : 8, .7);
     }
   }
-  return {mount, draw, set, get state() { return state; }, get canvas() { return cv; }, unit() { return cv && cv.isConnected ? cv.getBoundingClientRect().width / W : 0; },
+  return {mount, draw, set, get state() { return state; }, get canvas() { return cv; }, // tamanho de 1 pixel do desenho; offsetWidth ignora as animações de escala (investida), senão as partículas do palco "grudam" no herói
+    unit() { return cv && cv.isConnected ? cv.offsetWidth / W : 0; },
     // anima o canvas inteiro (entrar e fugir de cena), sem mexer na posição do contêiner
     slide(fromX, toX, ms, after) {
       if (!cv) return;

@@ -6,7 +6,7 @@ function startChallenge(kind) {
   activeQuestions = kind === "work" ? WORK_QUESTIONS.slice((G.jobMissions||0)%3).concat(WORK_QUESTIONS.slice(0,(G.jobMissions||0)%3)).slice(0,3) : kind === "betterInterview" ? BETTER_INTERVIEW : INTERVIEW;
   interviewIndex = 0; busy = false; musicStop();
   const mh = 40 + 6 * (G.lv - 1); p = {hp:mh, max:mh, sp:20, msp:20, def:false, atento:false, items:{}};
-  $("map").hidden = true; $("over").hidden = true; $("cmds").innerHTML = "";
+  $("map").hidden = true; $("over").hidden = true; $("cmds").innerHTML = ""; $("cmds").style.minHeight = "";
   const title = kind === "work" ? "Missão de trabalho" : kind === "betterInterview" ? "Entrevista sênior" : "Entrevista";
   $("plate").querySelector("b").textContent = title; $("plate").querySelector(".lv").textContent = kind === "work" ? "Tarefa 1/3" : `Pergunta 1/${activeQuestions.length}`;
   const isWork = kind === "work"; $("game").classList.toggle("working-mode", isWork);

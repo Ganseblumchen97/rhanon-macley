@@ -60,15 +60,16 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
   }
 }
 // oca de 2x2 quadrados: telhado de palha arredondado, parede de barro e porta escura
+// oca de 3x2 quadrados (48x32): a porta fica no meio do quadrado central, onde a trilha chega
 function hutCanvas() {
-  const c = document.createElement("canvas"); c.width = c.height = 32; const x = c.getContext("2d");
-  x.fillStyle = OUTLINE; x.fillRect(5, 17, 22, 14);
-  x.fillStyle = "#9c6339"; x.fillRect(6, 18, 20, 12);
-  x.fillStyle = "#7a4a2e"; x.fillRect(6, 27, 20, 3);
-  x.fillStyle = OUTLINE; x.fillRect(13, 21, 6, 10); x.fillStyle = "#2a1a10"; x.fillRect(14, 22, 4, 9);
-  fillEllipse(x, 16, 13, 16, 11, OUTLINE); fillEllipse(x, 16, 13, 15, 10, "#b08a3a"); fillEllipse(x, 16, 12, 14, 9, "#d9b25a");
-  x.fillStyle = "#b08a3a"; for (let k = 0; k < 6; k++) x.fillRect(4 + k * 4, 8 + (k % 2) * 3, 1, 9 - (k % 2) * 3);
-  x.fillStyle = "#f0d68a"; x.fillRect(9, 6, 6, 1); x.fillRect(8, 7, 3, 1);
+  const c = document.createElement("canvas"); c.width = 48; c.height = 32; const x = c.getContext("2d");
+  x.fillStyle = OUTLINE; x.fillRect(7, 17, 34, 14);
+  x.fillStyle = "#9c6339"; x.fillRect(8, 18, 32, 12);
+  x.fillStyle = "#7a4a2e"; x.fillRect(8, 27, 32, 3);
+  x.fillStyle = OUTLINE; x.fillRect(20, 20, 8, 11); x.fillStyle = "#2a1a10"; x.fillRect(21, 21, 6, 10);
+  fillEllipse(x, 24, 13, 23, 11, OUTLINE); fillEllipse(x, 24, 13, 22, 10, "#b08a3a"); fillEllipse(x, 24, 12, 21, 9, "#d9b25a");
+  x.fillStyle = "#b08a3a"; for (let k = 0; k < 10; k++) x.fillRect(5 + k * 4, 8 + (k % 2) * 3, 1, 9 - (k % 2) * 3);
+  x.fillStyle = "#f0d68a"; x.fillRect(13, 6, 8, 1); x.fillRect(11, 7, 4, 1);
   return c;
 }
 // barraca da feira: toldo listrado em cima, balcão com mercadoria embaixo (left/right = pontas)
@@ -93,7 +94,7 @@ function drawStageMap(rows, zone) {
     const ox = tx * TILE, oy = ty * TILE;
     if ("HKFNVPCR".includes(ch)) {
       drawTile(x, "KVCR".includes(ch) ? "-" : ".", ox, oy, P, tx, ty);
-      if (ch === "H") x.drawImage(hut, at(tx - 1, ty) === "H" ? 16 : 0, at(tx, ty - 1) === "H" ? 16 : 0, 16, 16, ox, oy, 16, 16);
+      if (ch === "H") x.drawImage(hut, (at(tx - 1, ty) === "H" ? (at(tx - 2, ty) === "H" ? 2 : 1) : 0) * 16, at(tx, ty - 1) === "H" ? 16 : 0, 16, 16, ox, oy, 16, 16);
       else if (ch === "K") drawStall(x, ox, oy, tx, at(tx - 1, ty) !== "K", at(tx + 1, ty) !== "K");
       else if (ch === "F") {   // pedras em volta e lenha (as chamas são animadas por cima)
         fillEllipse(x, ox + 8, oy + 10, 7, 4, "#6a675e"); fillEllipse(x, ox + 8, oy + 10, 5, 2.5, "#2a1a10");
@@ -136,15 +137,16 @@ function drawGate(x, sx, sy, P) {
 /* ---------- Rhanon visto de cima ---------- */
 const OW_CACHE = {};
 // dir: "down" (de frente) ou "up" (de costas)
-function heroOverworld(dir, legs, weapon) {
-  const key = dir + legs + weapon + JSON.stringify(G?.equip || {}) + (G?.job ? 1 : 0) + (G?.betterJob ? 1 : 0);
+// bowBack = false enquanto o arco está na mão (atirando), para não aparecer dois arcos
+function heroOverworld(dir, legs, weapon, bowBack = true) {
+  const key = dir + legs + weapon + bowBack + JSON.stringify(G?.equip || {}) + (G?.job ? 1 : 0) + (G?.betterJob ? 1 : 0);
   if (OW_CACHE[key]) return OW_CACHE[key];
   const parts = dir === "up" ? heroBackParts(heroParts(true)) : heroParts(true);
   const c = document.createElement("canvas"); c.width = 20; c.height = 28;
   const x = c.getContext("2d");
   drawHero(x, parts, {legs});
   shadeCanvas(c);
-  if (dir === "up" && G?.equip?.ranged) drawBowOnBack(x);
+  if (dir === "up" && bowBack && G?.equip?.ranged) drawBowOnBack(x);
   if (weapon) {
     x.fillStyle = "#7a4a1e";
     if (dir === "up") { x.fillRect(1, 2, 1, 26); x.fillStyle = "#cfd8dc"; x.fillRect(1, 0, 1, 2); }

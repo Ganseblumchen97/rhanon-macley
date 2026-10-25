@@ -28,7 +28,7 @@ function selectSub(id, msg) {
   if (!here) { btn(lock ? `${l.n} (vença o chefe: ${SUB[NEED[id]].n})` : "Ir até lá", () => goSub(id), lock, i); if (lock) lh(`Derrote o chefe de ${SUB[NEED[id]].n} para liberar este local.`); }
   else if (id === "aldeia" || id === "feira") {
     btn(id === "aldeia" ? "Entrar na aldeia" : "Entrar na feira", () => startExplore(id), false, i);
-    lh(id === "aldeia" ? "Lá dentro ficam a fogueira (descansar) e a sua tenda (dormir)." : "Lá dentro o vendedor compra suas peles e vende comida e roupas.");
+    lh(id === "aldeia" ? "Lá dentro fica a fogueira: descanse ou durma até o amanhecer. Os aldeões dão dicas." : "Lá dentro o vendedor compra suas peles e vende comida e roupas.");
   }
   else if (z) {
     btn("Explorar", () => startExplore(id), false, i);
@@ -40,11 +40,11 @@ function selectSub(id, msg) {
   btn("Voltar ao mapa do Brasil", closeLocal, false, i);
 }
 function rest(kind) {
-  vit(); const f = kind === "tenda" ? 1 : .5;
+  vit(); const f = kind === "dormir" ? 1 : .5;
   G.hp = Math.min(maxHP(G.lv), G.hp + Math.ceil(maxHP(G.lv) * f)); G.sp = Math.min(maxSP(G.lv), G.sp + Math.ceil(maxSP(G.lv) * f));
-  if (kind === "tenda") G.day++;
+  if (kind === "dormir") G.day++;
   save(); sfx("heal");
-  localDone("aldeia", kind === "tenda" ? `Rhanon dormiu até o amanhecer. Dia ${G.day}.` : "Rhanon descansou junto à fogueira.");
+  localDone("aldeia", kind === "dormir" ? `Rhanon dormiu até o amanhecer. Dia ${G.day}.` : "Rhanon descansou junto à fogueira.");
 }
 // compra um item da barraca de comida (vai para a bolsa)
 function buy(id) {
