@@ -92,7 +92,9 @@ function init(opts = {}) {
   if (opts.firstHit) { e.hp = Math.max(1, e.hp - opts.firstHit); lines.push(`Rhanon acertou primeiro: −${opts.firstHit}. Sua vez!`); }
   if (opts.enemyFirst) lines.push(`${animal.name} pegou Rhanon desprevenido!`);
   $("over").hidden = true;
-  $("beast").className = "beast"; $("hero").className = "hero"; holdE = null; holdP = null; $("lvTxt").textContent = "Nv " + G.lv + (defense() ? " · DEF " + defense() : "");
+  const wet = WATER_BATTLE.has(animal.id);   // bicho de água: laguinho no lugar do chão e ele meio submerso
+  // peixes afundam mais; jacaré, ariranha e cobras só um pouco
+  $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : ""); $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("lvTxt").textContent = "Nv " + G.lv + (defense() ? " · DEF " + defense() : "");
   pick(); render();
   $("cmds").firstChild.focus(); musicStart(getBattleTrackFor(animal));
   // abertura: o Rhanon entra pela esquerda, o bicho chega pela direita e o nome dele aparece numa faixa
@@ -217,7 +219,7 @@ function enemyTurn() {
   pick(); busy = false; render();
 }
 function finish(kind) {
-  if (kind === "win") { BEAST_A.set("defeat"); setTimeout(() => HERO_A.set("victory"), 250); }
+  if (kind === "win") { $("beast").classList.remove("submerged"); BEAST_A.set("defeat"); setTimeout(() => HERO_A.set("victory"), 250); }
   else if (kind === "lose") HERO_A.set("defeat");
   else if (kind === "flee") { HERO_A.set("flee"); HERO_A.slide("0px", "-60vw", 1000); }
   // depois da fanfarra, a música do lugar volta baixinho enquanto o cartão de resultado está na tela

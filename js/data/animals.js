@@ -44,6 +44,8 @@ const ZONES = {
   rio:     {n: "Beira do rio", lv: 2, pool: [["jacare",3],["piranha",3],["sucuri",2],["capivara",3],["ariranha",2],["poraque",2]], boss: "cobra_grande"},
   fechada: {n: "Mata fechada", lv: 3, pool: [["surucucu",3],["onca",2],["harpia",2],["queixada",2],["jaguatirica",3],["anta",1],["caranguejeira",3]], boss: "onca_rei"}
 };
+// na batalha, estes bichos ficam meio dentro de um laguinho (os outros, no chão de terra)
+const WATER_BATTLE = new Set(["piranha", "poraque", "jacare", "ariranha", "sucuri", "cobra_grande", "boitata"]);
 // à noite (G.night) cada zona tem outros bichos e um chefe do folclore; o resto (mapa, passagem) é o mesmo
 const NIGHT_ZONES = {
   mata:    {pool: [["morcego",3],["coruja",3],["lobo",2],["cassaco",2],["tatu",1]], boss: "chupacabra"},
