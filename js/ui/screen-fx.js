@@ -44,6 +44,49 @@ function wipe(cb) {
   const w = $("wipe"); w.classList.remove("go"); void w.offsetWidth; w.classList.add("go");
   setTimeout(cb, 330);
 }
+/* ---------- amanhecer: a faixa da transição passa devagar, com um galo cantando e um solzinho no canto ---------- */
+const DAWN_MS = 2200;
+function roosterCanvas(crow) {
+  const d = rigGrid(1, 44, 40), hy = crow ? -2 : 0, hx = crow ? -1 : 0;
+  d.part();   // rabo de penas escuras
+  [[26, 20, 38, 7, "#1e3a2a"], [27, 22, 42, 13, "#2a5a3a"], [27, 24, 41, 22, "#1a1a1a"]].forEach(([a, b, c, e, col]) => d.limb(a, b, c, e, 3, col));
+  d.part().limb(20, 31, 19, 37, 2, "#f2c230").limb(24, 31, 25, 37, 2, "#f2c230").dots([[17, 38], [18, 38], [26, 38], [27, 38]], "#f2c230");   // pernas
+  d.part().ellipse(22, 24, 10, 8, "#c8482a", "#8a2a18", .5);
+  d.part().ellipse(24, 23, 6, 4, "#e0a040", "#b07020", .5);   // asa
+  d.part().limb(17, 20, 13 + hx, 12 + hy, 5, "#e8a040", "#b87a28");
+  d.part().ellipse(12 + hx, 10 + hy, 4.5, 4, "#e8a040", "#b87a28", .6);
+  d.part().poly([[8 + hx, 7 + hy], [9 + hx, 3 + hy], [11 + hx, 5 + hy], [12 + hx, 2 + hy], [14 + hx, 5 + hy], [16 + hx, 4 + hy], [15 + hx, 8 + hy]], "#e5001c");   // crista
+  d.part().ellipse(10 + hx, 15 + hy, 1.5, 2, "#e5001c");   // barbela
+  if (crow) d.part().poly([[8 + hx, 8 + hy], [3 + hx, 6 + hy], [8 + hx, 10 + hy]], "#f2c230").poly([[8 + hx, 11 + hy], [4 + hx, 13 + hy], [8 + hx, 12 + hy]], "#f2c230");
+  else d.part().poly([[8, 9], [4, 10], [8, 11]], "#f2c230");
+  d.dots([[11 + hx, 9 + hy]], "#1a1426");
+  return d.canvas();
+}
+function sunCanvas() {
+  const d = rigGrid(1, 40, 40);
+  d.part();
+  for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; d.limb(20 + Math.cos(a) * 14, 20 + Math.sin(a) * 14, 20 + Math.cos(a) * 19, 20 + Math.sin(a) * 19, 2.5, "#ffd23a"); }
+  d.part().ellipse(20, 20, 11, 11, "#ffb52e", "#f2860c", .55).ellipse(17, 17, 5, 5, "#ffe27a");
+  d.limb(14, 19, 17, 19, 1, "#1a1426").limb(23, 19, 26, 19, 1, "#1a1426").dots([[16, 24], [17, 25], [18, 25], [19, 25], [20, 25], [21, 25], [22, 25], [23, 24]], "#1a1426");   // olhos fechados e sorriso
+  d.dots([[13, 22], [27, 22]], "#ff7a5a");
+  return d.canvas();
+}
+// mid = chamado quando a faixa cobre a tela (troca a noite pelo dia); o galo canta no meio
+function dawnWipe(mid, label) {
+  let w = $("dawnWipe");
+  if (!w) {
+    w = document.createElement("div"); w.id = "dawnWipe"; w.className = "wipe dawn";
+    w.innerHTML = '<div class="dawn-sun"></div><div class="dawn-galo"></div><b class="dawn-txt"></b>';
+    document.body.appendChild(w);
+    w.querySelector(".dawn-sun").appendChild(sunCanvas());
+  }
+  const frames = [roosterCanvas(false), roosterCanvas(true)], g = w.querySelector(".dawn-galo");
+  g.replaceChildren(frames[0]); w.querySelector(".dawn-txt").textContent = label || "Amanheceu";
+  w.classList.remove("go"); void w.offsetWidth; w.classList.add("go");
+  setTimeout(mid, DAWN_MS * .22);
+  setTimeout(() => sfx("galo"), DAWN_MS * .3);
+  [.3, .38, .44, .5, .58, .64].forEach((p, i) => setTimeout(() => g.replaceChildren(frames[(i + 1) % 2]), DAWN_MS * p));   // bico abrindo no "có-có-ri-cóóó"
+}
 function applyTheme() {
   const t = G.loc === "curitiba" ? "p4" : "mata", r = document.documentElement;
   if (r.dataset.theme === t) return;

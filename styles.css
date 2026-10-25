@@ -490,3 +490,13 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 #mapsvg .land .river{fill:none;stroke:#19a8d8;stroke-width:6;stroke-linecap:round}
 #nodes .node.soon{opacity:.55}
 #nodes .node.soon circle{stroke-dasharray:3 3}
+/* amanhecer (dawnWipe): a faixa da transição fica mais tempo, com o sol no canto e o galo cantando na listra */
+.wipe.dawn{background:#1e1838}
+.wipe.dawn::after{background:#ffb52e}
+.wipe.dawn.go{animation:dawnwipe 2.2s cubic-bezier(.6,0,.4,1)}
+@keyframes dawnwipe{22%,78%{translate:0 0}100%{translate:150vw 0}}
+.dawn-sun{position:absolute;right:calc(30vw + 6vmin);top:calc(10vh + 4vmin);width:16vmin;z-index:1;animation:sunrise 2.2s ease-out}
+.dawn-sun canvas,.dawn-galo canvas{width:100%;display:block;image-rendering:pixelated}
+@keyframes sunrise{0%,15%{translate:0 10vmin;opacity:0}45%{translate:0 0;opacity:1}}
+.dawn-galo{position:absolute;left:50%;top:50%;width:22vmin;translate:-50% -72%;z-index:1}
+.dawn-txt{position:absolute;left:50%;top:calc(50% + 7vmin);translate:-50% 0;z-index:1;font:2.6vmin/1 "Anton",sans-serif;letter-spacing:.12em;color:#1e1838;text-transform:uppercase;rotate:-4deg}
