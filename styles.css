@@ -589,4 +589,15 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .tut canvas{width:48px;height:66px;image-rendering:pixelated;flex:none}
 .tut p{margin:0}
 #explore.no-help .ex-help{visibility:hidden}
+/* golpe no tempo certo: anel com "Z" fechando; verde = é agora; dourado = acertou; apagado = errou */
+.fxi.qte{width:30px;height:30px;translate:-50% -50%;display:grid;place-items:center;opacity:.8;z-index:6;pointer-events:none}
+.qte b{position:relative;font:400 16px var(--display);color:var(--parch);text-shadow:2px 2px 0 #1a1426}
+.qte i{position:absolute;inset:0;border:3px solid rgba(246,233,196,.85);border-radius:50%;box-shadow:0 0 0 2px rgba(26,20,38,.5);animation:qteRing var(--dur) linear forwards}
+@keyframes qteRing{from{scale:2.6;opacity:.25}to{scale:1;opacity:1}}
+.qte.agora i{border-color:#7dff9a;box-shadow:0 0 10px #7dff9a}
+.qte.agora b{color:#7dff9a}
+.qte.acertou i{border-color:#ffd23a;box-shadow:0 0 14px #ffd23a;animation:qteHit .3s ease-out forwards}
+.qte.acertou b{color:#ffd23a}
+.qte.errou{opacity:.25;filter:grayscale(1)}
+@keyframes qteHit{to{scale:1.6;opacity:0}}
 

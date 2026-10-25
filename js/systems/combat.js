@@ -141,6 +141,29 @@ function render() {
     b.querySelector("small").textContent = c.id === "item" ? "×" + itemCount(p.items) : c.id === "especial" ? "PE" : "";
   });
 }
+/* golpe no tempo certo: um anel discreto com "Z" fecha até a hora do impacto e fica verde na janela certa.
+   Apertar Z (ou Espaço, ou tocar no palco) nessa janela dá "Perfeito!" (+30% de dano) no golpe do Rhanon ou
+   "Bloqueio!" (metade do dano) no golpe do bicho. Uma tentativa por golpe: apertar fora da hora perde a chance. */
+const QTE_EARLY = 230, QTE_LATE = 100;   // janela, em ms, antes e depois do impacto
+let qte = null, foeImpact = 0;           // qte = {at, el, ok, tried}; foeImpact = quando o último golpe do bicho chega
+function qteArm(impactIn, target) {
+  qteClear();
+  const q = pos(target), el = el$("qte", {left: q.x + "px", top: q.y - 34 + "px"}), lead = Math.max(0, impactIn - QTE_EARLY);
+  el.innerHTML = "<i></i><b>Z</b>"; el.style.setProperty("--dur", lead + "ms");
+  qte = {at: performance.now() + impactIn, el, ok: false, tried: false};
+  setTimeout(() => el.isConnected && el.classList.add("agora"), lead);
+  setTimeout(() => el.remove(), impactIn + QTE_LATE + 260);
+}
+function qteClear() { if (qte && qte.el) qte.el.remove(); qte = null; }
+function qtePress() {
+  if (!qte || qte.tried || mode !== "hunt") return;
+  qte.tried = true;
+  const dt = performance.now() - qte.at;
+  qte.ok = dt >= -QTE_EARLY && dt <= QTE_LATE;
+  qte.el.classList.add(qte.ok ? "acertou" : "errou");
+}
+// no impacto: devolve se acertou o tempo (e encerra a janela)
+function qteTake() { const ok = !!(qte && qte.ok); qteClear(); return ok; }
 function hitBeast() {
   const b = $("beast"); b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit");
   if (BEAST_A.state !== "defeat") BEAST_A.set("hurt");
@@ -189,12 +212,14 @@ function act(id) {
     say(p.preso > 0 ? "Rhanon está preso e não consegue fugir!" : `Rhanon tenta fugir, mas ${e.name.toLowerCase()} corta o caminho.`);
   }
   render();
-  if (e.hp <= 0) return setTimeout(() => finish("win"), wait + 480);
-  if (extra) { setTimeout(() => { busy = false; render(); }, wait + 480); return; }
-  setTimeout(enemyTurn, wait + 750);
+  setTimeout(() => {
+    if (e.hp <= 0) return finish("win");
+    if (extra) { busy = false; render(); return; }
+    setTimeout(enemyTurn, 450);   // respiro antes do bicho reagir
+  }, wait + 550);
 }
 function enemyTurn() {
-  const i = e.intent;
+  const i = e.intent; foeImpact = 0;
   if (i === "arranhao") {
     let d = rnd(e.damage[0], Math.max(e.damage[0], Math.min(e.damage[1], e.damage[0]+3))); if (p.def) d = Math.ceil(d / 2); d = Math.max(1, d - pdef());
     p.hp -= d; foeAttack("claw", d); say(`${e.name} ataca Rhanon: −${d} PV.`);
@@ -209,11 +234,13 @@ function enemyTurn() {
     if (e.special) special(); else { const sp0 = p.sp; p.hp -= 3; p.sp = Math.max(0, p.sp - 4); foeAttack("roar", 3, sp0); }
     if (!e.special) say(`${e.name} usa um ataque intimidador. −3 PV, −4 PE.`);
   }
-  p.def = false; e.assustada = false; tick();
-  p.hp = Math.max(0, p.hp);
-  if (e.hp <= 0) { render(); return finish("win"); }
-  if (p.hp <= 0) { render(); return finish("lose"); }
-  pick(); busy = false; render();
+  p.def = false; e.assustada = false;
+  setTimeout(() => {
+    tick(); p.hp = Math.max(0, p.hp);
+    if (e.hp <= 0) { render(); return finish("win"); }
+    if (p.hp <= 0) { render(); return finish("lose"); }
+    pick(); busy = false; render();
+  }, foeImpact + 150);
 }
 function finish(kind) {
   if (kind === "win") { $("beast").classList.remove("submerged"); BEAST_A.set("defeat"); setTimeout(() => HERO_A.set("victory"), 250); }
@@ -236,16 +263,26 @@ function finish(kind) {
   }, kind === "win" ? 1700 : kind === "lose" ? 1900 : 1150);
 }
 // golpe do bicho: anima, e o dano aparece na barra só quando o golpe "chega"
+const FOE_PREP = 650;   // o bicho se prepara antes do golpe: tempo de reagir com o Z
 function foeAttack(kind, d, sp0) {
-  BEAST_A.set(kind === "roar" || kind === "fire" ? "roar" : "windup");
   holdP = {hp: p.hp + d, sp: sp0 === undefined ? p.sp : sp0};
-  if (kind === "roar") { animalCry(e.id, e.boss); anim($("beast"), "hit"); }
-  else if (kind === "fire") foeFlames();
-  else { anim($("beast"), "lunge"); sfx("claw"); }
+  const block = d > 0 && kind !== "roar", prep = block ? FOE_PREP : 0, impact = prep + (kind === "roar" ? 400 : kind === "fire" ? 1000 : 220);
+  foeImpact = Math.max(foeImpact, impact);
+  if (block) { BEAST_A.set("prep"); qteArm(impact, $("hero")); }
   setTimeout(() => {
+    BEAST_A.set(kind === "roar" || kind === "fire" ? "roar" : "windup");
+    if (kind === "roar") { animalCry(e.id, e.boss); anim($("beast"), "hit"); }
+    else if (kind === "fire") foeFlames();
+    else { anim($("beast"), "lunge"); sfx("claw"); }
+  }, prep);
+  setTimeout(() => {
+    if (block && qteTake()) {   // bloqueio na hora certa: metade do dano volta
+      const back = Math.floor(d / 2); p.hp += back; d -= back;
+      if (back) { say(`Bloqueio! Rhanon defendeu na hora certa e evitou ${back} de dano.`); pop("BLOQUEIO!", $("hero"), "heal"); sfx("guard"); HERO_A.set("guard"); }
+    }
     holdP = null; render();
     if (d) { anim($("hero"), "hurt"); sfx("hurt"); hurtFx(kind, d); pop("−" + d, $("hero"), "me"); if (HERO_A.state !== "defeat") HERO_A.set("hurt"); }
-  }, kind === "roar" ? 400 : kind === "fire" ? 1000 : 220);
+  }, impact);
 }
 // labareda do bicho (Mula sem cabeça): chamas saem dele e atravessam até o Rhanon
 function foeFlames() {
@@ -264,20 +301,24 @@ function strike(d, cls, kind, msg) {
   holdE = preE;
   const a = pos($("hero")), b = pos($("beast"));
   const hit = colors => {   // impacto: barra desce, número salta, registro recebe a mensagem
+    if (qteTake() && d > 0) {   // apertou Z na hora: golpe perfeito
+      const more = Math.max(2, Math.round(d * .3)); d += more; e.hp = Math.max(0, e.hp - more);
+      msg = (msg || "") + ` Perfeito! +${more}.`; setTimeout(() => pop("PERFEITO!", $("beast"), "crit"), 160);
+    }
     holdE = null; if (msg) say(msg); render(); hitBeast(); sfx(cls === "crit" ? "critico" : "hit");
     burst(b, colors, cls === "crit" ? 16 : 9, cls === "crit" ? 90 : 60);
     pop(String(d), $("beast"), cls); if (cls === "crit" || d >= 14) shake();
     if (cls === "crit") setTimeout(() => pop("CRÍTICO!", $("beast"), "crit"), 220);
   };
   if (kind === "spear") {   // lança: corre até o bicho, estoca e volta (rápido)
-    HERO_A.set("stab"); sfx("spear");
+    HERO_A.set("stab"); sfx("spear"); qteArm(REDUCE ? 0 : 450, $("beast"));
     const dx = Math.max(0, b.x - a.x - 70);
-    $("hero").animate([{transform: "translateX(0)"}, {transform: `translateX(${dx}px)`, offset: .35}, {transform: `translateX(${dx}px)`, offset: .6}, {transform: "translateX(0)"}], {duration: REDUCE ? 1 : 560, easing: "steps(12)"});
-    setTimeout(() => { hit(["#fff", "#cfd8dc", "#f2a20c"]); slash($("beast")); }, REDUCE ? 0 : 230);
-    return 560;
+    $("hero").animate([{transform: "translateX(0)"}, {transform: `translateX(${dx}px)`, offset: .5}, {transform: `translateX(${dx}px)`, offset: .7}, {transform: "translateX(0)"}], {duration: REDUCE ? 1 : 850, easing: "steps(14)"});
+    setTimeout(() => { hit(["#fff", "#cfd8dc", "#f2a20c"]); slash($("beast")); }, REDUCE ? 0 : 450);
+    return 850;
   }
   if (kind === "throw") {   // jogar a lança: toma impulso, arremessa e ela voa girando de leve até o bicho (ou passa por cima)
-    HERO_A.set("throw"); sfx("guard");
+    HERO_A.set("throw"); sfx("guard"); qteArm(590, $("beast"));
     setTimeout(() => {
       sfx("spear");
       const c = spearC(4), miss = d === 0, tx = b.x - a.x - 20, ty = miss ? b.y - a.y - 90 : b.y - a.y;
@@ -285,14 +326,14 @@ function strike(d, cls, kind, msg) {
       c.animate([{transform: "translate(-50%,-50%) rotate(-12deg)"}, {transform: `translate(calc(-50% + ${tx}px),calc(-50% + ${ty + 30}px)) rotate(${miss ? -20 : 8}deg)`}],
         {duration: 260, easing: "steps(7)", fill: "forwards"}).onfinish = () => {
         if (!miss) { c.remove(); hit(["#fff", "#d9b25a", "#f2a20c"]); return; }
-        holdE = null; if (msg) say(msg); render(); sfx("blip"); pop("ERROU!", $("beast"));
+        qteClear(); holdE = null; if (msg) say(msg); render(); sfx("blip"); pop("ERROU!", $("beast"));
         c.animate([{opacity: 1}, {transform: `translate(calc(-50% + ${tx + 160}px),calc(-50% + ${ty - 10}px)) rotate(-20deg)`, opacity: 0}], {duration: 300, easing: "steps(6)", fill: "forwards"}).onfinish = () => c.remove();
       };
     }, REDUCE ? 0 : 330);
     return 330 + 260 + 120;
   }
   if (kind === "arrow") {   // flecha: puxa o arco devagar, brilho na ponta, sai reta e rápida
-    HERO_A.set("aim"); sfx("guard");
+    HERO_A.set("aim"); sfx("guard"); qteArm(1930, $("beast"));
     setTimeout(() => {
       const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width * .82, r.top + r.height * .52);
       PFX.burst(7, "star", ["#ffffff", "#ffd23a"], gx, gy, 14, {life: .55, up: 0}); PFX.emit("spark", ["#ffffff"], gx, gy, 0, 0, .4); sfx("look");
@@ -307,7 +348,7 @@ function strike(d, cls, kind, msg) {
     return 1950;
   }
   // tocha: ergue, assopra (baforadas) e uma onda de chamas atravessa até o bicho
-  HERO_A.set("blow");
+  HERO_A.set("blow"); qteArm(900 + 8 * 70 + 650, $("beast"));
   setTimeout(() => {
     sfx("fire");
     for (let i = 0; i < 6; i++) setTimeout(() => {

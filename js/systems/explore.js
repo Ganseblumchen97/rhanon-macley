@@ -551,6 +551,7 @@ const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir na tenda",
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã"};
 const VILLAGER_TIPS = [
   "Etiqueta verde em cima do bicho? Ele cai com um golpe só.",
+  "Quando o bicho se encolhe tremendo, ele vai atacar: aperte Z quando o anel ficar verde e você bloqueia metade do golpe.",
   "Acertar o bicho primeiro, com a lança (Z) ou uma flecha (X), te dá o primeiro turno da luta.",
   "Se o bicho te alcançar antes, quem começa batendo é ele. Fique esperto com o \"!\".",
   "A tocha do artesão assusta os bichos: eles fraquejam e você ataca de novo na mesma hora.",
@@ -637,6 +638,7 @@ const TUTORIAL = [
   "Z (ou Espaço) é o golpe de lança. Também serve para conversar com o pessoal e usar a fogueira e as barracas.",
   "X atira flechas, mas só depois que você comprar um arco com o artesão da feira.",
   "I abre a bolsa, com suas comidas e equipamentos. Esc sai da fase.",
+  "Na luta, quando aparecer um anel com Z, aperte Z na hora em que ele ficar verde: seu golpe sai perfeito, ou você bloqueia metade do ataque do bicho.",
   "Bicho com etiqueta verde cai com um golpe só. E se você acertar primeiro, começa a luta com vantagem. Boa caçada!"
 ];
 function startTutorial() { EX.tutPage = 0; showTutorial(); }

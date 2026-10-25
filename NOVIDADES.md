@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.20.0 — golpe no tempo certo
+
+- Na batalha aparece um anel discreto com "Z" que fecha até a hora do golpe e fica verde no momento certo.
+  - No seu ataque: apertar Z (ou Espaço, ou tocar no palco) na hora dá um golpe "Perfeito!" com 30% a mais de dano.
+  - No ataque do bicho: ele se encolhe tremendo antes de atacar; apertar Z na hora dá "Bloqueio!" e corta metade do dano.
+  - Uma tentativa por golpe: apertar fora da hora perde a chance.
+- Luta um pouco mais calma: a lança demora mais, o bicho se prepara antes de atacar e espera um pouco antes de responder.
+- O caçador do tutorial e os aldeões explicam o anel.
+
 ## 0.19.0 — mata viva
 
 - Cenário mais vivo: copas balançando com o vento, água correndo, borboletas e folhas caindo de dia, vaga-lumes à noite,

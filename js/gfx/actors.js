@@ -65,8 +65,8 @@ function makeHeroActor() {
         break;
       case "walk": walk(110); break;
       case "stab":    // lança de perto: recua, estoca para frente e volta à guarda
-        pose.lean = el < 100 ? -1 : el < 380 ? 2 : 0; pose.weapon = el >= 100 && el < 380 ? "stab" : "guard";
-        if (el > 560) set("idle");
+        pose.lean = el < 180 ? -1 : el < 620 ? 2 : 0; pose.weapon = el >= 180 && el < 620 ? "stab" : "guard";
+        if (el > 850) set("idle");
         break;
       case "throw":   // jogar a lança: ergue para trás, arremessa (fica sem a lança) e pega outra de volta
         if (el < 330) { pose.weapon = "raise"; pose.lean = -1; pose.dy = 1; }
@@ -256,6 +256,9 @@ function makeBeastActor() {
       case "enter":
         o.dy = 0;
         break;
+      case "prep":     // vai atacar: fica agachado, tremendo (hora de se preparar para o Z)
+        sx = 1.05; sy = .88; ox = REDUCE ? 0 : Math.floor(t / 55) % 2 ? 1 : -1;
+        break;
       case "windup":   // ataque: agacha (encolhe), dá o bote esticado para frente e volta
         if (el < 170) { sx = 1.06; sy = .86; ox = 2; }
         else if (el < 330) {
@@ -292,7 +295,7 @@ function makeBeastActor() {
     let rp = null;
     if (rig) {
       sx = sy = scale = 1;
-      rp = state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" ? "attack" : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
+      rp = state === "prep" ? "crouch" : state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" ? "attack" : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
       if (rp === "idle" && t % 3400 < 140) rp = "blink";   // pisca de vez em quando
     }
     g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;

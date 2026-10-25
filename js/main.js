@@ -8,6 +8,7 @@ buildLocalNodes();
 setupExploreInput();
 setupMapNav();
 setupOptions();
+$("stage").addEventListener("pointerdown", () => qtePress());   // no celular: tocar no palco na hora certa
 loadArt();   // imagens de data/art.js (carregam enquanto a tela inicial está aberta)
 
 /* ----- botões fixos ----- */
@@ -37,6 +38,7 @@ new MutationObserver(() => { const t = $("overTitle"); if (t.childNodes.length =
 document.addEventListener("keydown", ev => {
   // setas e 1-6 só durante a batalha
   if (mode !== "hunt" || !p || !$("over").hidden || !$("map").hidden || !$("local").hidden || !$("explore").hidden || !$("titleScreen").hidden) return;
+  if (qte && ["z", "Z", " "].includes(ev.key)) { ev.preventDefault(); if (!ev.repeat) qtePress(); return; }   // golpe/bloqueio no tempo certo
   const bs = [...$("cmds").children], cur = bs.indexOf(document.activeElement);
   if (ev.key === "ArrowDown") { ev.preventDefault(); bs[(cur + 1) % bs.length].focus(); }
   else if (ev.key === "ArrowUp") { ev.preventDefault(); bs[(cur - 1 + bs.length) % bs.length].focus(); }
