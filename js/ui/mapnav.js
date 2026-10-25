@@ -1,6 +1,6 @@
 /* Teclado fora da batalha e da exploração.
    Mapas (Brasil e Ananindeua): setas escolhem o local na direção apertada, Enter faz a ação principal do painel,
-   1-9 apertam os botões numerados, Esc volta de Ananindeua para o mapa do Brasil.
+   1-9 apertam os botões numerados, Esc volta de Ananindeua para o mapa grande (Pará).
    Tela inicial: Enter começa. Entrevistas e missões: 1-3 (ou A-C) respondem. */
 const NAV = {map: {nodes: "nodes", panel: "info"}, local: {nodes: "lnodes", panel: "linfo"}};
 const navSel = {map: null, local: null};

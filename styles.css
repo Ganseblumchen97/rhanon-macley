@@ -486,3 +486,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .lvup small{font:700 13px var(--mono);color:#7fd8ff}
 @keyframes lvIn{from{translate:-120vw 0}}
 @keyframes lvOut{to{translate:120vw 0;opacity:0}}
+/* mapa do Pará: rio Amazonas e destino ainda fechado (Belém) */
+#mapsvg .land .river{fill:none;stroke:#19a8d8;stroke-width:6;stroke-linecap:round}
+#nodes .node.soon{opacity:.55}
+#nodes .node.soon circle{stroke-dasharray:3 3}

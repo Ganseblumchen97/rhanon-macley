@@ -207,3 +207,65 @@ function rhanonLook() {
 }
 // pés de cada passo (walkA/walkB levantam um pé) e pose de combate (pernas abertas)
 const RIG_LEGS = {stand: {}, walkA: {lf: [12, 38]}, walkB: {rf: [20, 38]}, stance: {lf: [10, 40], rf: [22, 40]}};
+
+/* ---------- Rhanon de perfil (exploração e mapa, andando para os lados) ---------- */
+// pose: {step: stand | walk0..walk3, dy, lean, weapon: "diag" | "stab" | "jab" | null, face, side: 1 (direita) | -1 (esquerda)}
+const RIG_SIDE_STEPS = {stand: [[14, 40], [18, 40]], walk0: [[10, 40], [22, 40]], walk1: [[15, 40], [18, 38]], walk2: [[22, 40], [10, 40]], walk3: [[18, 38], [15, 40]]};
+function rigSideCanvas(pose = {}, look = {}, scale = 1) {
+  const key = "side" + scale + JSON.stringify(pose) + JSON.stringify(look);
+  if (RIG_CACHE.has(key)) return RIG_CACHE.get(key);
+  if (pose.side < 0) {   // olhando para a esquerda: o mesmo desenho espelhado
+    const src = rigSideCanvas({...pose, side: 1}, look, scale), c = document.createElement("canvas"), x = c.getContext("2d");
+    c.width = src.width; c.height = src.height; x.translate(c.width, 0); x.scale(-1, 1); x.drawImage(src, 0, 0);
+    RIG_CACHE.set(key, c); return c;
+  }
+  const C = {...RIG_PAL, ...(look.pal || {})}, d = rigGrid(scale), lean = pose.lean || 0, hy = pose.dy || 0, W = pose.weapon;
+  const [farFoot, nearFoot] = RIG_SIDE_STEPS[pose.step || "stand"], hip = 30, hx = 16 + lean;
+  const skin = look.shirt ? look.shirt : [C.s, C.S], legs = look.pants || [C.s, C.S];
+  // mãos: segurando a lança (diagonal baixa ou estocada) ou balançando com o passo
+  const swing = {walk0: 1, walk1: 0, walk2: -1, walk3: 0}[pose.step] || 0;
+  const spearA = W === "stab" ? [1 + lean, 26 + hy] : [2, 40], spearB = W === "stab" ? [27 + lean, 26 + hy] : [28, 20 + hy];   // a ponta passa à frente do peito, não do rosto
+  const on = t => [spearA[0] + (spearB[0] - spearA[0]) * t, spearA[1] + (spearB[1] - spearA[1]) * t];
+  const stab = W === "stab" || W === "jab";   // jab = mãos da estocada, a lança é desenhada por fora (exploração)
+  const farHand = W ? (stab ? [13 + lean, 26 + hy] : on(.42)) : [16 - swing * 5 + lean, 31 + hy];
+  const nearHand = W ? (stab ? [20 + lean, 26 + hy] : on(.6)) : [16 + swing * 5 + lean, 31 + hy];
+  if (look.bowBack) {   // arco atravessado nas costas
+    d.part();
+    for (let k = 0; k < 6; k++) { const a = k / 6, b = (k + 1) / 6, bx = s => 13 - 6 * s - Math.sin(s * Math.PI) * 2.5 + lean, by = s => 18 + hy + 16 * s; d.limb(bx(a), by(a), bx(b), by(b), 1.5, C.b); }
+    d.part().limb(13 + lean, 18 + hy, 7 + lean, 34 + hy, 1, C.w);
+  }
+  // braço e perna de trás (mais escuros)
+  d.part().limb(16 + lean, 22 + hy, farHand[0], farHand[1], 3, look.shirt ? skin[1] : C.S);
+  d.part().limb(15, hip, farFoot[0], farFoot[1], 4, look.pants ? legs[1] : C.S).rect(farFoot[0] - 1, farFoot[1], 5, 2, "#7a4a2e");
+  d.part().ellipse(hx, 12 + hy, 8.5, 8.5, C.h);   // fundo da cabeça
+  d.part().limb(17, hip, nearFoot[0], nearFoot[1], 4, C.s, C.S).rect(nearFoot[0] - 1, nearFoot[1], 5, 2, C.S);
+  if (look.pants) d.part().limb(17, hip, (17 + nearFoot[0]) / 2, (hip + nearFoot[1]) / 2, 5, legs[0], legs[1]);
+  // tronco de perfil (pintura e colar só sem camisa)
+  d.part().poly([[12 + lean, 21 + hy], [20 + lean, 21 + hy], [21, hip], [12, hip]], skin[0], skin[1], 18 + lean / 2);
+  if (!look.shirt) d.dots([[19 + lean, 25 + hy], [19 + lean, 26 + hy], [19 + lean, 27 + hy]], C.r).dots([[15 + lean, 22 + hy], [17 + lean, 23 + hy], [19 + lean, 23 + hy]], C.w);
+  const band = look.pants || [C.t, C.T];
+  d.part().rect(12, hip - 1, 9, 2, band[0]).rect(12, hip, 9, 1, band[1]);
+  if (!look.pants) d.part().poly([[17, hip], [21, hip], [21, hip + 5], [19, hip + 6]], C.t, C.T, 20);
+  // rosto de perfil
+  d.part().ellipse(hx + 3, 14 + hy, 5.5, 6.5, C.s, C.S, .8);
+  d.poly([[hx + 7, 12 + hy], [hx + 10, 16 + hy], [hx + 7, 17 + hy]], C.s);   // nariz
+  if (look.glasses) d.rect(hx + 3, 13 + hy, 5, 2, RIG_K);
+  else if (pose.face === "blink") d.rect(hx + 5, 15 + hy, 2, 1, RIG_K);
+  else d.rect(hx + 5, 13 + hy, 2, 3, RIG_K).dots([[hx + 5, 13 + hy]], C.w);
+  d.dots([[hx + 5, 18 + hy], [hx + 6, 18 + hy], [hx + 5, 19 + hy]], C.r).dots([[hx + 7, 20 + hy], [hx + 8, 19 + hy]], C.S);
+  // cabelo por cima da parte de trás da cabeça, orelha e franja
+  d.part().poly([[hx - 8, 7 + hy], [hx - 2, 3 + hy], [hx + 2, 4 + hy], [hx + 2, 13 + hy], [hx, 18 + hy], [hx - 1, 23 + hy], [hx - 3, 19 + hy], [hx - 5, 23 + hy], [hx - 7, 18 + hy], [hx - 9, 21 + hy], [hx - 9, 12 + hy]], C.h)
+    .dots([[hx - 4, 5 + hy], [hx - 3, 5 + hy], [hx - 2, 4 + hy], [hx - 1, 4 + hy]], C.H);
+  d.part().ellipse(hx + 1, 15 + hy, 1.6, 2.2, C.s).dots([[hx + 1, 15 + hy]], C.S);
+  d.part().poly([[hx, 4 + hy], [hx + 5, 5 + hy], [hx + 8, 8 + hy], [hx + 9, 11 + hy], [hx + 7, 10 + hy], [hx + 6, 12 + hy], [hx + 4, 10 + hy], [hx + 2, 12 + hy], [hx, 10 + hy]], C.h);
+  if (!look.noBand) {   // faixa do cocar com as pontas soltas atrás
+    d.part().rect(hx - 8, 9 + hy, 18, 2, C.g).rect(hx - 8, 10 + hy, 18, 1, C.G);
+    d.part().limb(hx - 8, 11 + hy, hx - 11, 15 + hy + Math.abs(swing), 1, C.g).limb(hx - 8, 11 + hy, hx - 9, 16 + hy, 1, C.G);
+  }
+  if (W && W !== "jab") rigSpear(d, C, spearA[0], spearA[1], spearB[0], spearB[1]);
+  d.part().limb(17 + lean, 22 + hy, nearHand[0], nearHand[1], 3, skin[0], skin[1]);
+  d.part().ellipse(farHand[0], farHand[1], 1.6, 1.6, C.S).ellipse(nearHand[0], nearHand[1], 1.6, 1.6, C.s);
+  const c = d.canvas();
+  RIG_CACHE.set(key, c);
+  return c;
+}

@@ -37,7 +37,7 @@ function selectSub(id, msg) {
   }
   if (msg) lh(msg);
   btn("Inventário", showInv, false, i);
-  btn("Voltar ao mapa do Brasil", closeLocal, false, i);
+  btn("Voltar ao mapa do " + MAP_REGIONS[MAP_REGION].n, closeLocal, false, i);
 }
 function rest(kind) {
   vit(); const f = kind === "dormir" ? 1 : .5;

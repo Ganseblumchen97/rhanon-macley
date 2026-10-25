@@ -20,7 +20,7 @@ function stepWork(s, t) {
    Cada faixa passa por um barramento com reverb e compressor, entra e sai com transição suave
    e é composta por instrumentos sintetizados (sino, flauta, piano elétrico, pad, baixo, bateria,
    berimbau, atabaque, caxixi). As melodias são refeitas a cada trecho, então a música não fica igual.
-   Faixas: "title" (abertura), "map" (mapa do Brasil), "local" (Ananindeua, toque de capoeira com flauta),
+   Faixas: "title" (abertura), "map" (mapa grande: Pará/Brasil), "local" (Ananindeua, toque de capoeira com flauta),
    "battleP3/P4/P5" (bicho pequeno, médio e grande/chefe). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
   let X = null, DEST = null;              // contexto de áudio e saída (troca no teste offline)

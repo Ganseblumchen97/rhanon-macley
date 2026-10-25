@@ -56,7 +56,8 @@ function makeAnimalEnt(a, tx, ty) {
     speed: a.id === "preguica" ? 18 : (ANIMAL_SPEED[a.size] ?? 40), boss: !!a.boss, alive: true,
     state: "wander", vx: 0, vy: 0, until: 0, face: -1, walk: 0, stunUntil: 0};
 }
-function startExplore(zone) {
+// after: chamado depois de montar a fase (cena de abertura)
+function startExplore(zone, after) {
   if (moving || (EX && EX.starting)) return;
   if (EX) EX.starting = true;
   wipe(() => {
@@ -74,6 +75,7 @@ function startExplore(zone) {
     $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
     musicStart("local"); exHud();
     exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : ZONES[zone].n + (BS()[zone] ? "" : " · o chefe espera no fim da trilha"));
+    if (after) after();
   });
 }
 function exitExplore() {
@@ -203,8 +205,8 @@ function exUpdate(dt, now) {
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     h.aim = {x: ix / n, y: iy / n};
-    if (iy) h.dir = iy < 0 ? "up" : "down";   // só frente e costas: andando de lado, continua virado como estava
-    if (ix) h.side = ix;                      // ...mas a lança aponta para o lado em que ele anda
+    if (ix) { h.side = ix; h.dir = "side"; }   // andando para os lados (ou na diagonal): de perfil
+    else h.dir = iy < 0 ? "up" : "down";
     if (slide(h, ix / n * sp, iy / n * sp) || nudge(h, ix, iy)) { h.walk += sp; h.movedT = now; }
   }
   if (!EX.locked) {
@@ -243,14 +245,18 @@ function drawHeroEnt(x, h, cx, cy, now) {
   const sx = snap(h.x - cx), sy = snap(h.y - cy);
   if (now < EX.invulnUntil && Math.floor(now / 100) % 2) return;
   const walking = now - h.movedT < 90, step = Math.floor(h.walk / 7);
-  const art = IMG["hero/walk/" + h.dir];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
+  const art = IMG["hero/walk/" + (h.dir === "side" ? "down" : h.dir)];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
   const bowAim = EX.draw ? EX.draw.aim : EX.shoot > 0 && EX.lastAim, pull = EX.draw ? Math.min(1, EX.draw.t / BOW_DRAW) : 0;
   let img, B;
   if (bowAim && !art) {   // atirando: braços apontados para a mira, uma mão no arco e a outra puxando a corda
     B = bowHand(bowAim);
     const N = [B[0] - bowAim.x * (4 + pull * 3), B[1] - bowAim.y * (4 + pull * 3)], r = v => v.map(Math.round), left = bowAim.x < -.1;
     img = rigCanvas(bowAim.y < -.35 ? "back" : "front", {lh: r(left ? B : N), rh: r(left ? N : B)}, {...rhanonLook(), bowBack: false}, OW_SCALE);
-  } else img = art ? overworldArt(h.dir, walking ? step % art.frames : 0)
+  } else if (h.dir === "side" && !art) {   // de perfil: 4 passos; na estocada, braços para frente (a lança vem por fora)
+    const sideJab = EX.jab > 0 && Math.abs(h.aim.y) < .5;
+    img = rigSideCanvas({step: walking ? "walk" + step % 4 : "stand", dy: walking && step % 2 === 0 ? 1 : 0, weapon: sideJab ? "jab" : EX.jab > 0 ? null : "diag", lean: sideJab ? 2 : 0, side: h.side || 1},
+      {...rhanonLook(), bowBack: !!G.equip.ranged && !(EX.shoot > 0)}, OW_SCALE);
+  } else img = art ? overworldArt(h.dir === "side" ? "down" : h.dir, walking ? step % art.frames : 0)
     : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0), h.side || 1);
   const iw = art ? art.w / art.scale : img.width, ih = art ? art.h / art.scale : img.height;
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
@@ -334,8 +340,8 @@ function exDraw(now) {
     lineP(x, sx - ux * 5, sy - uy * 5, sx + ux * 4, sy + uy * 4, "#c9a46a");   // flecha: haste, ponta e penas
     pxl(x, sx + ux * 5, sy + uy * 5, "#eef3f5"); pxl(x, sx - ux * 5 - uy, sy - uy * 5 + ux, "#e5001c"); pxl(x, sx - ux * 5 + uy, sy - uy * 5 - ux, "#e5001c");
   }
-  if (EX.camp && EX.camp.kind === "dormir") {   // a noite cai enquanto ele dorme; o fogo continua aceso por cima
-    const c = EX.camp, a = Math.min(.6, Math.max(0, (now - c.t0 - 500) / 2400) * .6);
+  if (EX.camp && EX.camp.kind !== "fogueira") {   // dormir: a noite cai; abertura: amanhece. O fogo fica aceso por cima
+    const c = EX.camp, el = now - c.t0, a = c.kind === "intro" ? .55 * Math.max(0, 1 - el / 2200) : Math.min(.6, Math.max(0, (el - 500) / 2400) * .6);
     x.fillStyle = `rgba(8,10,40,${a})`; x.fillRect(0, 0, VIEW_W, VIEW_H);
     drawFire(x, c.ftx * TILE - cx, c.fty * TILE - cy, now); drawCampHero(x, cx, cy, now);
   }
@@ -366,7 +372,11 @@ function setupExploreInput() {
   document.addEventListener("keydown", ev => {
     if (!EX || $("explore").hidden) return;
     if (EX.dialog) { dialogKey(ev); return; }
-    if (EX.camp) { ev.preventDefault(); return; }   // sentado na fogueira: espera terminar
+    if (EX.camp) {   // sentado na fogueira: espera terminar (a cena de abertura dá para pular)
+      ev.preventDefault();
+      if (EX.camp.kind === "intro" && ["z", "Z", "Enter", " ", "Escape"].includes(ev.key)) EX.camp.t0 = -1e9;
+      return;
+    }
     const k = DIRS[ev.key];
     if (k) { exKeys.add(k); ev.preventDefault(); return; }
     if (ev.repeat) return;
@@ -451,18 +461,31 @@ function exCampRest(kind) {
   $("exDialog").hidden = true; exKeys.clear();
   EX.camp = {kind, t0: performance.now(), dur: kind === "dormir" ? 3400 : 2600, x: f.x + (h.x < f.x ? -14 : 14), y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
 }
+// cena de abertura: amanhece, Rhanon acorda do lado da fogueira da aldeia, se espreguiça e o jogo começa
+function startIntro() { startExplore("aldeia", exIntro); }
+function exIntro() {
+  const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), side = solidAt(f.x - 14, f.y + 5) ? 1 : -1;
+  EX.camp = {kind: "intro", t0: performance.now(), dur: 4300, x: f.x + side * 14, y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
+  h.x = EX.camp.x; h.y = EX.camp.y; h.dir = "down"; h.aim = {x: 0, y: 1};
+  exToast("Ananindeua (PA) · amanhece na aldeia...");
+}
 function exCampEnd() {
   const kind = EX.camp.kind; EX.camp = null;
+  if (kind === "intro") return exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A mata fica no caminho de saída.");
   EX.dialog = "fogueira";   // o resultado volta no painel da fogueira (localDone)
   if (kind === "dormir") wipe(() => rest("dormir")); else rest("fogueira");
 }
 function drawCampHero(x, cx, cy, now) {
-  const c = EX.camp, el = now - c.t0, sleep = c.kind === "dormir" && el > 1100, sx = snap(c.x - cx), sy = snap(c.y - cy);
-  const face = sleep || el % 1700 < 140 ? "blink" : el > 800 && el < 1250 ? "happy" : undefined;
-  const img = rigCanvas("front", {sit: true, face, dy: sleep ? 1 : 0}, {...rhanonLook(), bowBack: false}, OW_SCALE);
-  drawShadow(x, sx, sy, 18);
-  spearShaft(x, sx - 11, sy, sx + 9, sy); pxl(x, sx + 10, sy, "#eef3f5");   // lança deitada no chão
+  const c = EX.camp, el = now - c.t0, intro = c.kind === "intro", sx = snap(c.x - cx), sy = snap(c.y - cy);
+  const sleep = intro ? el < 1700 : c.kind === "dormir" && el > 1100;
+  let face = sleep || el % 1700 < 140 ? "blink" : (intro ? el > 2200 && el < 2800 : el > 800 && el < 1250) ? "happy" : undefined;
+  const up = intro && el > 3000;   // na abertura: levanta e se espreguiça com a lança para o alto
+  const img = up ? rigCanvas("front", {weapon: el < 3700 ? "raise" : "diag", face: el < 3700 ? "happy" : undefined, dy: el < 3700 ? 0 : 1}, rhanonLook(), OW_SCALE)
+    : rigCanvas("front", {sit: true, face, dy: sleep ? 1 : 0}, {...rhanonLook(), bowBack: false}, OW_SCALE);
+  drawShadow(x, sx, sy, up ? 12 : 18);
+  if (!up) { spearShaft(x, sx - 11, sy, sx + 9, sy); pxl(x, sx + 10, sy, "#eef3f5"); }   // lança deitada no chão
   x.drawImage(img, sx - img.width / 2, sy - img.height + 1);
+  if (intro && el > 1700 && el < 2100) glyphP(x, "bang", "#ffd23a", sx + 7, sy - 30);   // acordou!
   for (let i = 0; i < 4; i++) {   // fumaça subindo do fogo
     const p = (now / 1700 + i / 4) % 1;
     if (p < .85 || Math.floor(now / 80) % 2) { x.fillStyle = i % 2 ? "#c9c4b8" : "#9e9a90"; x.fillRect(Math.round(c.fx - cx + Math.sin(p * 6 + i) * 2), Math.round(c.fy - cy - 6 - p * 20), 2, 2); }

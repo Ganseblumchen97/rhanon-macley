@@ -1,8 +1,22 @@
-/* Locais do mapa do Brasil, sublocais de Ananindeua, loja e equipamentos. */
+/* Locais do mapa grande (Pará ou Brasil), sublocais de Ananindeua, loja e equipamentos. */
 const REQ = {lv: 4, money: 150};   // para Curitiba aparecer e a passagem
 const CURITIBA_OPEN = false;       // false = Curitiba fica escondida (foco em Ananindeua por enquanto)
+/* Mapa grande: "para" (por enquanto: Ananindeua aberta e Belém, a capital, em breve) ou "brasil" (Ananindeua e Curitiba).
+   Cada mapa tem o contorno (land), um rio opcional, a trilha tracejada (route) e onde fica cada local de LOC. */
+const MAP_REGION = "para";
+const MAP_REGIONS = {
+  para: {n: "Pará", aria: "Mapa estilizado do Pará, com Ananindeua e Belém",
+    land: ["M63 224 L97 167 L154 110 L211 91 L241 103 L306 179 L333 224 L382 259 L431 255 L458 236 L485 209 L530 221 L549 232 L530 285 L500 323 L466 384 L454 437 L428 490 L393 559 L287 544 L173 540 L127 502 L82 464 L127 357 L150 285 L97 262Z",
+      "M367 213 L401 194 L439 202 L447 221 L424 243 L386 247Z"],   // continente e a ilha de Marajó (a partir de longitude/latitude)
+    river: "M63 281 C130 286 190 282 230 276 S310 240 338 222",   // rio Amazonas
+    route: ["ananindeua", "belem"], pos: {ananindeua: [480, 262], belem: [452, 240, -16]}},
+  brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre Ananindeua e Curitiba",
+    land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
+    route: ["ananindeua", "curitiba"], pos: {ananindeua: [322, 168], curitiba: [315, 478]}}
+};
 const LOC = {
   ananindeua: {n: "Ananindeua (PA)", s: "Ananindeua", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor está cheia de perigo, e cada pele rende uns trocados."},
+  belem: {n: "Belém (PA)", s: "Belém", soon: true, txt: "A capital do Pará, do outro lado da baía. É de lá que saem os aviões para o resto do Brasil."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
 const SUB = {

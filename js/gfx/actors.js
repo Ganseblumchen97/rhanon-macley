@@ -381,8 +381,10 @@ const WALKER = (() => {
   function frame(key) {
     const sig = key + JSON.stringify(G?.equip || {}) + (G?.job ? 1 : 0) + (G?.betterJob ? 1 : 0);
     if (cache[sig]) return cache[sig];
-    const legs = key.startsWith("walkA") ? "walkA" : key.startsWith("walkB") ? "walkB" : "stand";
-    return cache[sig] = rigCanvas("front", {...RIG_LEGS[legs], dy: key.endsWith("1") ? 1 : 0}, rhanonLook(), OW_SCALE).toDataURL();
+    // andando: de perfil (o marcador espelha para a esquerda); parado: de frente, respirando
+    const c = /^walk\d$/.test(key) ? rigSideCanvas({step: key, dy: key === "walk0" || key === "walk2" ? 1 : 0}, rhanonLook(), OW_SCALE)
+      : rigCanvas("front", {dy: key.endsWith("1") ? 1 : 0}, rhanonLook(), OW_SCALE);
+    return cache[sig] = c.toDataURL();
   }
   const st = {mk: {x: null, face: 1, moveT: 0, key: ""}, lmk: {x: null, face: 1, moveT: 0, key: ""}};
   function setup(id, size) {
@@ -400,7 +402,7 @@ const WALKER = (() => {
       if (s.x !== null && (Math.abs(x - s.x) > .01 || Math.abs(y - s.y) > .01)) { s.moveT = t; if (Math.abs(x - s.x) > .01) s.face = x > s.x ? 1 : -1; }
       s.x = x; s.y = y;
       const walking = t - s.moveT < 140;
-      const key = walking ? ["walkA1", "stand0", "walkB1", "stand0"][Math.floor(t / 110) % 4] : "stand" + (REDUCE ? 0 : Math.floor(t / 650) % 2);
+      const key = walking ? "walk" + Math.floor(t / 110) % 4 : "stand" + (REDUCE ? 0 : Math.floor(t / 650) % 2);
       const k2 = key + s.face;
       if (k2 !== s.key) {
         s.key = k2;
