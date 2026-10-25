@@ -92,8 +92,8 @@ function drawStageMap(rows, zone) {
   const x = c.getContext("2d"), hut = hutCanvas(), at = (tx, ty) => (rows[ty] || "")[tx];
   rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
     const ox = tx * TILE, oy = ty * TILE;
-    if ("HKFNVPCR".includes(ch)) {
-      drawTile(x, "KVCR".includes(ch) ? "-" : ".", ox, oy, P, tx, ty);
+    if ("HKFNVPCRM".includes(ch)) {
+      drawTile(x, "KVCRM".includes(ch) ? "-" : ".", ox, oy, P, tx, ty);
       if (ch === "H") x.drawImage(hut, (at(tx - 1, ty) === "H" ? (at(tx - 2, ty) === "H" ? 2 : 1) : 0) * 16, at(tx, ty - 1) === "H" ? 16 : 0, 16, 16, ox, oy, 16, 16);
       else if (ch === "K") drawStall(x, ox, oy, tx, at(tx - 1, ty) !== "K", at(tx + 1, ty) !== "K");
       else if (ch === "F") {   // pedras em volta e lenha (as chamas são animadas por cima)

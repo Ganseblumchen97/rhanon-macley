@@ -160,7 +160,7 @@ function startExplore(zone, after) {
     $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false;
     musicStart("local"); exHud();
-    exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida e artesão: chegue perto de uma barraca e aperte Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
+    exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida, artesão e armeiro: chegue perto de uma barraca e aperte Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
   });
@@ -195,13 +195,13 @@ function exStrike() {
   const target = EX.ents.find(en => en.alive && !en.aquatic && [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw));
   if (target) exHit(target);
 }
-// flecha: só com arco (EQUIP.ranged, comprado no artesão da feira)
+// flecha: só com arco (EQUIP.ranged, comprado no armeiro da feira)
 const BOW_DRAW = .32;   // segundos puxando a corda antes da flecha sair (ele para de andar nesse tempo)
 // mão do arco (em pixels do desenho 32x44 do Rhanon): esticada na direção da mira, na altura do peito
 const bowHand = a => [16 + a.x * 13, 25 + a.y * 9];
 function exThrow() {
   if (!EX || EX.locked || EX.dialog || EX.camp || EX.cool > 0 || EX.spear || EX.draw) return;
-  if (!G.equip.ranged) { EX.cool = 1.2; sfx("blip"); return exToast("Para atacar de longe você precisa de um arco. O artesão da feira vende."); }
+  if (!G.equip.ranged) { EX.cool = 1.2; sfx("blip"); return exToast("Para atacar de longe você precisa de um arco. O armeiro da feira vende."); }
   const h = EX.hero; EX.cool = BOW_DRAW + .45; sfx("guard");
   EX.draw = {t: 0, aim: {x: h.aim.x, y: h.aim.y}};
 }
@@ -310,7 +310,7 @@ function exUpdate(dt, now) {
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
   for (const l of EX.loot) if (now - l.t0 > 500 && Math.hypot(l.x - h.x, l.y - h.y) < 11) pickLoot(l);
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
-  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden) ix = iy = 0;
+  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     h.aim = {x: ix / n, y: iy / n};
@@ -527,6 +527,7 @@ function setupExploreInput() {
     else if ("xXkK".includes(ev.key)) { ev.preventDefault(); exThrow(); }
     else if (ev.key === "Escape") exitExplore();
     else if ((ev.key === "i" || ev.key === "I") && !EX.locked) exOpenDialog("inventario");
+    else if ((ev.key === "e" || ev.key === "E") && !EX.locked) openEquip();
   });
   document.addEventListener("keyup", ev => { const k = DIRS[ev.key]; if (k) exKeys.delete(k); if ((ev.key === "c" || ev.key === "C") && EX) EX.skipHold = 0; });
   // no celular: segurar o próprio aviso "segure C para pular"
@@ -546,9 +547,9 @@ function setupExploreInput() {
 }
 
 /* ---------- aldeia e feira: pontos de conversa ---------- */
-const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", P: "aldeao"};
-const PEOPLE = ["peles", "comida", "artesao", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir na tenda", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas e equipamentos", aldeao: "conversar"};
+const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", P: "aldeao"};
+const PEOPLE = ["peles", "comida", "artesao", "armeiro", "aldeao"];
+const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir na tenda", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", aldeao: "conversar"};
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã"};
 const VILLAGER_TIPS = [
   "Etiqueta verde em cima do bicho? Ele cai com um golpe só.",
@@ -613,7 +614,8 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => { exCloseDialog(); wipe(() => { exToast(rest("dormir", false, true)); EX.night = false; exHud(); musicStart("local"); }); }, false, d); }
   else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }
   else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme."); foodButtons(d); }
-  else if (kind === "artesao") { say("Artesão", "Roupas e equipamentos feitos à mão, inclusive arco e flecha para caçar de longe e tocha para assustar os bichos. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
+  else if (kind === "artesao") { say("Artesão", "Roupas tecidas à mão e tocha para assustar os bichos. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
+  else if (kind === "armeiro") { say("Armeiro", "Lança, arco e flecha, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa boa. Escolha com as setas e aperte Enter para fabricar."); forgePanel(d); }
   else if (kind === "inventario") { say("Bolsa", invSummary()); invButtons(d); }
   else villagerTalk(look, say, d);   // pedido (oferta ou entrega) ou uma dica (systems/journal.js)
   if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);
@@ -639,8 +641,8 @@ const TUTORIAL = [
   "Bom dia, Rhanon! Dormiu bem aí do lado da fogueira? Antes de ir para a mata, deixa eu te lembrar do básico.",
   "Para andar, use as setas ou W A S D.",
   "Z (ou Espaço) é o golpe de lança. Também serve para conversar com o pessoal e usar a fogueira e as barracas.",
-  "X atira flechas, mas só depois que você comprar um arco com o artesão da feira.",
-  "I abre a bolsa, com suas comidas e equipamentos. Esc sai da fase.",
+  "X atira flechas, mas só depois que você comprar um arco com o armeiro da feira.",
+  "I abre a bolsa, com suas comidas e peles, e E abre o equipamento para trocar arma e roupa. Esc sai da fase.",
   "Na luta, quando aparecer um anel com Z, aperte Z na hora em que ele ficar verde: seu golpe sai perfeito, ou você bloqueia metade do ataque do bicho.",
   "Bicho com etiqueta verde cai com um golpe só. E se você acertar primeiro, começa a luta com vantagem. Boa caçada!"
 ];
@@ -754,6 +756,7 @@ function dialogKey(ev) {
     else if (ev.key.startsWith("Arrow")) ev.preventDefault();
     return;
   }
+  if (EX.dialog === "armeiro" && forgeKey(ev)) return;
   const bs = [...$("exDialog").querySelectorAll(".cmd[data-key]")], onBtn = document.activeElement && document.activeElement.matches("#exDialog button");
   if (/^[1-9]$/.test(ev.key)) { ev.preventDefault(); pressPanel(bs[+ev.key - 1]); }
   else if (ev.key === "Enter" && !onBtn) { ev.preventDefault(); pressPanel(bs.find(b => b.getAttribute("aria-disabled") !== "true")); }

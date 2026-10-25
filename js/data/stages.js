@@ -4,7 +4,7 @@
    S início do Rhanon   E saída para a aldeia   a bicho da zona (sorteado ao entrar)
    B chefe da zona   G passagem para a próxima fase (abre quando o chefe cai)
    Aldeia e feira (safe: sem bichos): H oca (3x2, porta no quadrado do meio)   K barraca   F fogueira   N tenda   P aldeão
-   V comprador de peles   C barraca de comida   R artesão (roupas e armas)
+   V comprador de peles   C barraca de comida   R artesão (roupas e tocha)   M armeiro (armas e armaduras)
    Fogueira, tenda, vendedores e aldeões são "pontos de conversa": chegando perto, Z abre o painel deles.
    Todas as linhas de uma fase precisam ter o mesmo tamanho. */
 const STAGES = {
@@ -38,7 +38,7 @@ const STAGES = {
       "T..----------------....T",
       "T..-..f.....,,....-....T",
       "T..-...KKK.....o..-....T",
-      "T..-...........,,.-....T",
+      "T..-....M......,,.-....T",
       "T..----------------....T",
       "T..........-...........T",
       "TTTTTTTTTTT-TTTTTTTTTTTT",
@@ -154,6 +154,6 @@ const STAGES = {
     ]
   }
 };
-const SOLID = "To~GHKFNVPCR";      // G deixa de bloquear quando o chefe da fase cai
+const SOLID = "To~GHKFNVPCRM";      // G deixa de bloquear quando o chefe da fase cai
 const ONE_HIT_LEVELS = 3;        // níveis acima do bicho para abatê-lo só com o golpe de abertura
 const ONE_HIT_XP = .5;           // abate direto dá só parte do XP (a batalha vale mais)

@@ -22,12 +22,13 @@ const GLYPH = {
 /* Gente da aldeia e da feira: mesmo esqueleto do Rhanon (gfx/rig.js), com outras cores e enfeites.
    pal troca cores de RIG_PAL (s/S pele, h cabelo, H brilho do cabelo, g/G cocar, r pintura, t/T tanga);
    feather = pena no cocar; longHair = cabelo até os ombros; top = faixa de tecido no peito;
-   prop = o que leva na mão ("pelt" pele, "basket" cesto, "bow" arco). */
+   prop = o que leva na mão ("pelt" pele, "basket" cesto, "bow" arco, "cloth" pano dobrado, "spear" lança em pé). */
 const VILLAGER_LOOK = {
   aldeao1: {pal: {g: "#d62828", G: "#8f1a1a", r: "#f2a20c", t: "#9c6339", T: "#6d4329"}, feather: "#ffd23a"},
   aldeao2: {pal: {h: "#bdb6ac", H: "#f4ecd8", s: "#a86f40", S: "#7d4f2c", g: "#7a2a8a", G: "#4e1a5a"}},
   aldeao3: {pal: {g: "#19a8d8", G: "#0f6f91", r: "#e5001c", s: "#b47a48", S: "#8a5a32"}, longHair: true, top: "#e5741c"},
   peles:   {pal: {g: "#6d4329", G: "#46291a", r: "#ffffff", s: "#a86f40", S: "#7d4f2c"}, feather: "#e5001c", prop: "pelt"},
   comida:  {pal: {g: "#3f9a5c", G: "#25663a", r: "#ffd23a"}, longHair: true, top: "#ffd23a", prop: "basket"},
-  artesao: {pal: {g: "#2a2230", G: "#17121c", r: "#19a8d8", t: "#26364a", T: "#18222f"}, feather: "#19a8d8", prop: "bow"}
+  artesao: {pal: {g: "#2a2230", G: "#17121c", r: "#19a8d8", t: "#26364a", T: "#18222f"}, feather: "#19a8d8", prop: "cloth"},
+  armeiro: {pal: {h: "#3a2a22", g: "#e5741c", G: "#a8480e", r: "#2a2230", s: "#9a6236", S: "#6e4424", t: "#5a4a40", T: "#3a2e28"}, feather: "#ffffff", top: "#7d4f2c", prop: "spear"}
 };

@@ -28,7 +28,7 @@ function selectSub(id, msg) {
   if (!here) { btn(lock ? `${l.n} (vença o chefe: ${SUB[NEED[id]].n})` : "Ir até lá", () => goSub(id), lock, i); if (lock) lh(`Derrote o chefe de ${SUB[NEED[id]].n} para liberar este local.`); }
   else if (id === "aldeia" || id === "feira") {
     btn(id === "aldeia" ? "Entrar na aldeia" : "Entrar na feira", () => startExplore(id), false, i);
-    lh(id === "aldeia" ? "Lá dentro fica a fogueira: descanse até a noite ou durma até o dia seguinte. Os aldeões dão dicas." : "Lá dentro o vendedor compra suas peles e vende comida e roupas.");
+    lh(id === "aldeia" ? "Lá dentro fica a fogueira: descanse até a noite ou durma até o dia seguinte. Os aldeões dão dicas." : "Lá dentro o vendedor compra suas peles, tem comida, o artesão vende roupas e o armeiro faz armas e armaduras.");
   }
   else if (z) {
     btn("Explorar", () => startExplore(id), false, i);
@@ -86,7 +86,7 @@ const peltName = id => PELT[id] || "Pele de " + ANIMALS.find(a => a.id === id).n
 const peltValue = id => { const g = ANIMALS.find(a => a.id === id).gold; return Math.round((g[0] + g[1]) / 2); };
 const peltIds = () => Object.keys(G.pelts).filter(k => G.pelts[k] > 0);
 const peltsTotal = () => peltIds().reduce((a, k) => a + G.pelts[k] * peltValue(k), 0);
-/* Lojas da feira, cada uma numa barraca: comprador de peles, comida e artesão (roupas e armas). */
+/* Lojas da feira, cada uma numa barraca: comprador de peles, comida, artesão (roupas e tocha) e armeiro (armas e armaduras). */
 function peltButtons(i) {
   const ids = peltIds();
   if (ids.length > 1) btn(`Vender todas as peles · R$ ${peltsTotal()}`, sellAll, false, i);
@@ -104,21 +104,14 @@ function sellAll() {
 }
 const GEAR_SLOTS = ["weapon", "ranged", "torso", "legs"];
 const gearBonus = (slot, it) => slot === "ranged" ? (it.atk ? `flecha +${it.atk}` : "ataca de longe") : slot === "weapon" ? `ATQ +${it.atk || 0}` : `DEF +${it.def || 0}`;
-// tudo de EQUIP que tem preço e ainda não é seu (itens novos em EQUIP aparecem aqui sozinhos)
+const SMITH_SLOTS = ["weapon", "ranged"];   // feitos pelo armeiro; roupas (torso, legs) ficam com o artesão
+// artesão: roupas de EQUIP com preço e especiais à venda (tocha); itens novos em EQUIP aparecem aqui sozinhos
 function gearButtons(i) {
   vit(); let any = false;
-  GEAR_SLOTS.forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => {
+  GEAR_SLOTS.filter(slot => !SMITH_SLOTS.includes(slot)).forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => {
     if (!it.price || G.owned[id]) return;
     const lock = G.lv < it.lv; any = true;
     btn(lock ? `${it.n} (Nv ${it.lv})` : `Comprar ${it.n} · R$ ${it.price} · ${gearBonus(slot, it)}`, () => buyGear(slot, id), lock || G.money < it.price, i);
-  }));
-  // feitos com peles (CRAFT em data/world.js): mostra o que precisa e quanto você já tem
-  GEAR_SLOTS.forEach(slot => Object.entries(CRAFT[slot] || {}).forEach(([id, it]) => {
-    if (G.owned[id]) return;
-    any = true;
-    const mats = Object.entries(it.craft).map(([k, n]) => `${peltName(k).toLowerCase()} ${Math.min(n, G.pelts[k] || 0)}/${n}`).join(", ");
-    const lacks = G.lv < it.lv || G.money < it.cost || Object.entries(it.craft).some(([k, n]) => (G.pelts[k] || 0) < n);
-    btn(G.lv < it.lv ? `${it.n} (Nv ${it.lv})` : `Fazer ${it.n} · ${mats} + R$ ${it.cost} · ${gearBonus(slot, it)}`, () => craftGear(slot, id), lacks, i);
   }));
   // especiais de batalha à venda (SPECIALS com price), como a tocha
   SPECIALS.forEach(s => {
@@ -128,13 +121,58 @@ function gearButtons(i) {
   });
   if (!any) lh("Você já tem tudo o que o artesão faz por enquanto.", i);
 }
-// o artesão faz com as peles: gasta as peles e o dinheiro, e o Rhanon já sai vestindo/usando
-function craftGear(slot, id) {
-  const it = CRAFT[slot][id];
-  if (G.lv < it.lv || G.money < it.cost || Object.entries(it.craft).some(([k, n]) => (G.pelts[k] || 0) < n)) return;
-  Object.entries(it.craft).forEach(([k, n]) => { G.pelts[k] -= n; });
-  G.money -= it.cost; G.owned[id] = true; G.equip[slot] = id; save(); sfx("heal");
-  localDone("feira", `O artesão fez: ${it.n}. Já está ${slot === "torso" || slot === "legs" ? "vestindo" : "com você"}. ${gearBonus(slot, it)}.`);
+/* ---------- armeiro: nomes à esquerda; o escolhido mostra à direita o que precisa, quanto você tem e "Fabricar" ---------- */
+// armas/arco com preço (só dinheiro) e tudo de CRAFT (peles + dinheiro), do menor nível para o maior
+function forgeItems() {
+  const out = [];
+  SMITH_SLOTS.forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => { if (it.price) out.push({slot, id, it}); }));
+  GEAR_SLOTS.forEach(slot => Object.entries(CRAFT[slot] || {}).forEach(([id, it]) => out.push({slot, id, it})));
+  return out.sort((a, b) => a.it.lv - b.it.lv);
+}
+const forgeCost = it => it.price || it.cost || 0;
+const forgeLacks = it => G.lv < it.lv || G.money < forgeCost(it) || Object.entries(it.craft || {}).some(([k, n]) => (G.pelts[k] || 0) < n);
+function forgePanel(d) {
+  vit();
+  const items = forgeItems(), box = document.createElement("div"), list = document.createElement("div"), card = document.createElement("div");
+  box.className = "forge"; list.className = "forge-list"; card.className = "forge-card";
+  box.append(list, card); d.appendChild(box);
+  if (!items.some(o => o.id === EX.forgeSel)) EX.forgeSel = (items.find(o => !G.owned[o.id]) || items[0]).id;
+  items.forEach(o => btn(o.it.n + (G.owned[o.id] ? " <small>feito</small>" : G.lv < o.it.lv ? ` <small>Nv ${o.it.lv}</small>` : ""), () => forgeSelect(o.id), false, list));
+  forgeSelect(EX.forgeSel, true);
+}
+function forgeSelect(id, quiet) {
+  const items = forgeItems(), k = items.findIndex(o => o.id === id), o = items[k], card = $("exDialog").querySelector(".forge-card");
+  if (!o || !card) return;
+  EX.forgeSel = id; if (!quiet) sfx("blip");
+  $("exDialog").querySelectorAll(".forge-list .cmd").forEach((b, j) => b.classList.toggle("sel", j === k));
+  const it = o.it, row = (name, have, need, txt) => `<li class="${have >= need ? "ok" : "falta"}"><span>${name}</span><b>${txt}</b></li>`;
+  card.innerHTML = `<h3>${it.n}</h3><p class="forge-bonus">${gearBonus(o.slot, it)}</p>` + (G.owned[id] ? '<p class="hint">Já é seu. Troque na bolsa (I).</p>' :
+    '<ul class="forge-need">' + (G.lv < it.lv ? row("Nível", G.lv, it.lv, `${G.lv}/${it.lv}`) : "") +
+    Object.entries(it.craft || {}).map(([p, n]) => row(peltName(p), G.pelts[p] || 0, n, `${Math.min(n, G.pelts[p] || 0)}/${n}`)).join("") +
+    row("Dinheiro", G.money, forgeCost(it), `R$ ${forgeCost(it)}`) + "</ul>");
+  if (G.owned[id]) return;
+  const b = document.createElement("button"), off = forgeLacks(it);
+  b.className = "cmd forge-make"; b.type = "button"; b.innerHTML = '<span><i class="key">Enter</i>Fabricar</span>';   // a tecla some em tela de toque, como nos outros botões
+  if (off) b.setAttribute("aria-disabled", "true");
+  b.addEventListener("click", () => { if (!forgeLacks(it)) forgeMake(o); });
+  card.appendChild(b);
+}
+// teclado no armeiro: setas escolhem o item, Enter/Espaço fabricam (devolve true se usou a tecla)
+function forgeKey(ev) {
+  if (ev.key === "ArrowUp" || ev.key === "ArrowDown") {
+    ev.preventDefault();
+    const items = forgeItems(), k = items.findIndex(o => o.id === EX.forgeSel);
+    forgeSelect(items[(k + (ev.key === "ArrowDown" ? 1 : items.length - 1)) % items.length].id);
+    return true;
+  }
+  if ((ev.key === "Enter" || ev.key === " ") && !ev.repeat) { ev.preventDefault(); pressPanel($("exDialog").querySelector(".forge-make")); return true; }
+  return false;
+}
+// o armeiro gasta as peles e o dinheiro, e o Rhanon já sai usando/vestindo
+function forgeMake({slot, id, it}) {
+  Object.entries(it.craft || {}).forEach(([k, n]) => { G.pelts[k] -= n; });
+  G.money -= forgeCost(it); G.owned[id] = true; G.equip[slot] = id; save(); sfx("forja");
+  localDone("feira", `O armeiro fez: ${it.n}. Já está ${slot === "torso" || slot === "legs" ? "vestindo" : "com você"}.` + (slot === "ranged" ? " Na exploração, X atira flechas." : ""));
 }
 function buySpecial(id) {
   const s = SPECIALS.find(q => q.id === id); if (G.money < s.price || G.lv < s.lv) return;
@@ -144,9 +182,8 @@ function buySpecial(id) {
 function buyGear(slot, id) {
   const it = EQUIP[slot][id]; if (G.money < it.price || G.lv < it.lv) return;
   G.money -= it.price; G.owned[id] = true; G.equip[slot] = id; save(); sfx("heal");
-  localDone("feira", slot === "ranged" ? `Comprou: ${it.n}. Na exploração, X atira flechas.` : slot === "weapon" ? `Comprou e equipou: ${it.n}.` : `Comprou e vestiu: ${it.n}. DEF total: ${defense()}.`);
+  localDone("feira", `Comprou e vestiu: ${it.n}. DEF total: ${defense()}.`);
 }
-function equip(slot, id) { G.equip[slot] = id; save(); sfx("blip"); invDone(); }
 
 /* ---------- inventário (no mapa de Ananindeua e, com I, dentro das fases) ---------- */
 function invSummary() {
@@ -158,10 +195,8 @@ function invSummary() {
     "<br>" + (ids.length ? ids.map(k => `${peltName(k)} ×${G.pelts[k]} (R$ ${peltValue(k)} cada)`).join("<br>") : "Nenhuma pele ainda. Vença bichos para conseguir peles.");
 }
 function invButtons(i) {
-  const q = G.equip;
   Object.entries(G.items).forEach(([k, n]) => { if (n > 0) btn(`Comer ${ITEMS[k].n.toLowerCase()} ×${n} (${itemEffect(ITEMS[k])})`, () => eatItem(k), false, i); });
-  GEAR_SLOTS.forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => { if (G.owned[id] && q[slot] !== id) btn(`${slot === "torso" || slot === "legs" ? "Vestir" : "Usar"} ${it.n}`, () => equip(slot, id), false, i); }));
-  if (q.torso) btn(`Tirar a ${EQUIP.torso[q.torso].n.toLowerCase()}`, () => equip("torso", null), false, i);
+  btn("Equipamento", () => openEquip(), false, i);   // trocar arma e roupa (systems/equip.js)
   btn("Caderno de bichos", openJournal, false, i);
 }
 // depois de comer/trocar equipamento: atualiza o inventário de onde veio

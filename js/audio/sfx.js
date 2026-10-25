@@ -42,6 +42,11 @@ const SFX = {
   claw:  t => { noise(t, .1, .2, 3000); tone(1200, t, .12, "square", .06, 300); },
   hurt:  t => { tone(300, t, .2, "square", .12, 90); noise(t, .1, .18, 600); },
   more:  t => [784, 988, 1175, 1568].forEach((f, i) => tone(f, t + i * .06, .08, "square", .08)),
+  // armeiro fabricando: três marteladas na bigorna e um brilho de "pronto!"
+  forja: t => {
+    [0, .2, .4].forEach((d, i) => { tone(1760 + i * 220, t + d, .16, "triangle", .1); tone(2640 + i * 330, t + d, .06, "square", .03); noise(t + d, .05, .16, 2500); tone(140, t + d, .08, "square", .08, 70); });
+    [1047, 1319, 1568, 2093].forEach((f, i) => tone(f, t + .62 + i * .06, .12, "square", .07));
+  },
   // golpe crítico: "ting!" agudo em duas notas e um impacto grave
   ronco: t => ronco(t),
   galo: t => galo(t),

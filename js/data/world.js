@@ -66,7 +66,7 @@ const EQUIP = {
   // arma de longe (X na exploração); sem ela, o Rhanon só ataca de perto com a lança
   ranged: {arco: {n: "Arco e flecha", atk: 0, lv: 3, price: 120}}
 };
-/* Feitos pelo artesão com peles (craft: {bicho: quantas peles}) mais um pouco de dinheiro (cost). Entram no mesmo
+/* Feitos pelo armeiro da feira com peles (craft: {bicho: quantas peles}) mais um pouco de dinheiro (cost). Entram no mesmo
    EQUIP do slot e depois aparecem no inventário para vestir/usar como os outros. */
 const CRAFT = {
   weapon: {lanca_dente: {n: "Lança de dente de jacaré", atk: 3, lv: 6, craft: {jacare: 2}, cost: 60},

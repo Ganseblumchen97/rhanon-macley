@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.22.0 — armeiro e equipamento
+
+- Novo vendedor na feira: o armeiro, na barraca do meio. Ele faz as armas, o arco e as armaduras de couro (com peles);
+  o artesão agora cuida só das roupas e da tocha.
+- O painel do armeiro mostra só os nomes à esquerda; escolhendo um (setas ou clique), aparece à direita o que ele
+  precisa, quanto você já tem de cada pele e o dinheiro, com o botão "Fabricar" (Enter). Fabricar tem som de martelo.
+- Nova tela de equipamento (tecla E, botão "Equipar" no alto ou pela bolsa): o Rhanon de braços abertos no círculo,
+  como o Homem Vitruviano, com espaços para arma, arco, tronco e pernas. Escolha o espaço com as setas e troque com
+  1-9 ou Enter; a roupa muda no desenho na hora. Trocar arma e roupa agora é só por essa tela.
+
 ## 0.21.0 — caderno, pedidos e artesão
 
 - Caderno de bichos (botão na bolsa): cada bicho encontrado aparece com desenho, nível, onde vive, quantos você venceu

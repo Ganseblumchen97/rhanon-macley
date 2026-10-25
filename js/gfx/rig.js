@@ -191,6 +191,8 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   if (look.prop === "pelt") d.part().rect(rh[0] - 2, rh[1] - 1, 5, 7, "#9c6339").dots([[rh[0], rh[1] + 1], [rh[0] + 1, rh[1] + 3]], "#d9b25a");
   if (look.prop === "basket") d.part().ellipse(lh[0], lh[1] - 1, 3, 2.5, "#d9b25a", "#b08a3a").dots([[lh[0] - 1, lh[1] - 3], [lh[0] + 1, lh[1] - 3]], "#e5001c");
   if (look.prop === "bow") rigBow(d, C, 27, 14 + hy, 34 + hy);
+  if (look.prop === "cloth") d.part().rect(lh[0] - 2, lh[1] - 1, 5, 6, "#e9e2cf").rect(lh[0] - 2, lh[1] + 1, 5, 1, "#19a8d8").rect(lh[0] - 2, lh[1] + 3, 5, 1, "#e5001c");
+  if (look.prop === "spear") rigSpear(d, C, rh[0], 42, rh[0], 7 + hy);
   // mãos por cima de tudo (segurando a haste/o arco)
   if (!(back && W === "diag")) d.part().ellipse(lh[0], lh[1], 1.6, 1.6, C.s).ellipse(rh[0], rh[1], 1.6, 1.6, C.s);
   const c = d.canvas();
