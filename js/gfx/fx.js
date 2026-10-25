@@ -43,7 +43,17 @@ function numC(str, col, sc) {
 }
 function el$(cls, css) { const d = document.createElement("div"); d.className = "fxi " + cls; Object.assign(d.style, css); $("fx").appendChild(d); return d; }
 function rm(a, ms, kf, ease, delay) { const an = a.animate(kf, {duration: ms, easing: ease || "steps(10)", delay: delay || 0, fill: "both"}); an.onfinish = () => a.remove(); return an; }
-function shake() { const g = $("game"); g.classList.remove("gshake"); void g.offsetWidth; g.classList.add("gshake"); }
+function shake(cls = "gshake") { const g = $("game"); g.classList.remove("gshake", "gshake-s"); void g.offsetWidth; g.classList.add(cls); }
+/* peso do golpe que acerta: "leve" (golpe comum), "forte" (crítico, perfeito, golpe grande) e "furia".
+   Pausa de impacto (hitStop), tremor da tela na medida e, nos fortes, um clarão e o palco "socando" para perto. */
+const IMPACT = {leve: {stop: 55, shake: "gshake-s"}, forte: {stop: 110, shake: "gshake", flash: .45, punch: true}, furia: {stop: 170, shake: "gshake", flash: .7, punch: true}};
+function hitImpact(level) {
+  const o = IMPACT[level] || IMPACT.leve;
+  hitStop(o.stop); shake(o.shake);
+  if (REDUCE) return;
+  if (o.flash) rm(el$("flash", {}), 160, [{opacity: o.flash}, {opacity: 0}], "steps(3)");
+  if (o.punch) anim($("stage"), "punch");
+}
 function burst(q, cols, n, r) {
   for (let i = 0; i < n; i++) {
     const a = Math.PI * 2 * i / n + Math.random() * .6, d = r * (.6 + Math.random() * .6), s = 6 + (Math.random() * 6 | 0);
@@ -121,7 +131,7 @@ const PFX = (() => {
     const W = cv.width, H = cv.height, z = curZone;
     // folhas caem só pela metade de cima do palco, longe da placa com o nome do bicho
     const lx = () => W * (.3 + Math.random() * .7);
-    if (z === "rio") { amb = .45; emit("ring", ["#bff3ff", "#86d6ff"], Math.random() * W, H * (.78 + Math.random() * .18), 0, -5 - Math.random() * 4, 3, {wob: 3}); }
+    if (z === "rio" || z === "igarape" || z === "manguezal" || z === "varzea") { amb = .45; emit("ring", ["#bff3ff", "#86d6ff"], Math.random() * W, H * (.78 + Math.random() * .18), 0, -5 - Math.random() * 4, 3, {wob: 3}); }
     else if (z === "fechada") {
       amb = .4;
       if (Math.random() < .3) emit("leaf", ["#1f5a32", "#2f7a3f", "#7a6a2a"], lx(), -3, 3 + Math.random() * 3, 6 + Math.random() * 4, 6, {wob: 6});

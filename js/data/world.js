@@ -19,15 +19,30 @@ const LOC = {
   belem: {n: "Belém (PA)", s: "Belém", soon: true, txt: "A capital do Pará, do outro lado da baía. É de lá que saem os aviões para o resto do Brasil."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
+/* Mapa de Ananindeua (viewBox 440x325): uma trilha só, em zigue-zague, na ordem de dificuldade (ROUTE).
+   Embaixo, da esquerda para a direita, até cruzar o rio; no meio, de volta para a esquerda, cruzando de novo;
+   e no fim, lá em cima, a cabine do cobrador na BR-316, de onde sai o ônibus para a capital. */
 const SUB = {
-  aldeia:  {n: "Aldeia", x: 120, y: 170, txt: "Sua casa. Fogueira para descansar, tenda para dormir e gente conhecida por perto."},
-  feira:   {n: "Feira", x: 205, y: 225, txt: "Barracas de mandioca, peixe assado, açaí e maniçoba. Aqui você vende suas peles e compra comida."},
-  mata:    {n: "Mata", x: 95, y: 80, txt: "Trilhas conhecidas. Bichos pequenos e médios, bons para começar."},
-  rio:     {n: "Beira do rio", x: 305, y: 135, txt: "Água, lama e dentes. Cuidado com o que se mexe na margem."},
-  fechada: {n: "Mata fechada", x: 215, y: 50, txt: "Folhas altas, pouca luz e predadores de verdade."}
+  aldeia:  {n: "Aldeia", x: 48, y: 242, txt: "Sua casa. Fogueira para descansar, tenda para dormir e gente conhecida por perto."},
+  feira:   {n: "Feira", x: 122, y: 262, txt: "Barracas de mandioca, peixe assado, açaí e maniçoba. Aqui você vende suas peles e compra comida."},
+  mata:    {n: "Mata", x: 188, y: 236, txt: "Trilhas conhecidas. Bichos pequenos e médios, bons para começar."},
+  fechada: {n: "Mata fechada", x: 254, y: 264, txt: "Folhas altas, pouca luz e predadores de verdade."},
+  rio:     {n: "Beira do rio", x: 376, y: 240, txt: "Do outro lado da ponte, água, lama e dentes. Cuidado com o que se mexe na margem."},
+  igarape: {n: "Igarapé", x: 402, y: 156, txt: "Rio acima, a água entra na mata em canais estreitos. Tracajás, garças, botos... e algo enorme lá no fundo."},
+  manguezal: {n: "Manguezal", x: 290, y: 128, txt: "De volta pela ponte de cima, a mata vira lama e raiz. Caranguejos, mão-peladas e, de noite, um assobio que ninguém quer ouvir."},
+  seringal: {n: "Seringal", x: 212, y: 160, txt: "Seringueiras velhas, ainda com as marcas da faca, e a casa do seringueiro caindo aos pedaços. Lá ninguém caça à noite."},
+  varzea: {n: "Várzea", x: 120, y: 134, txt: "Campo alagado de capim alto, como em Marajó. Manadas de búfalo, socós escondidos e, dizem os vaqueiros, um gigante que fede de longe."},
+  parada: {n: "Cabine da BR-316", s: "BR-316", x: 52, y: 62, txt: "No fim da trilha, a estrada. Uma cabine de madeira com um cobrador lá dentro: é daqui que sai o ônibus para Belém, a capital."}
 };
-const EDGES = [["aldeia","mata"],["mata","fechada"],["aldeia","feira"],["feira","rio"],["fechada","rio"]];
-const NEED = {fechada: "mata", rio: "fechada"}, NEXT_Z = {mata: "fechada", fechada: "rio"};
+const ROUTE = ["aldeia", "feira", "mata", "fechada", "rio", "igarape", "manguezal", "seringal", "varzea", "parada"];
+const EDGES = ROUTE.slice(1).map((k, i) => [ROUTE[i], k]);
+// rio do mapa (a trilha cruza ele duas vezes; as pontes são postas onde os dois se encontram) e a BR-316 saindo do mapa
+const LOCAL_RIVER = "M318,24 C305,70 358,96 346,140 C334,190 300,222 316,318", LOCAL_ROAD = "M52,62 C34,44 18,32 -4,26";
+/* ônibus para Belém (episódio 2): a passagem é comprada na Parada da BR-316 e fica em G.passagem.
+   open = false enquanto Belém não abre (a parada mostra o preço e avisa que o ônibus ainda não está rodando). */
+const BUS = {price: 800, open: false};
+// local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
+const NEED = {fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea"}, NEXT_Z = {mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {
@@ -70,9 +85,16 @@ const EQUIP = {
    EQUIP do slot e depois aparecem no inventário para vestir/usar como os outros. */
 const CRAFT = {
   weapon: {lanca_dente: {n: "Lança de dente de jacaré", atk: 3, lv: 6, craft: {jacare: 2}, cost: 60},
-           lanca_presa: {n: "Lança com presa de onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120}},
-  torso:  {colete_sucuri: {n: "Colete de couro de sucuri", def: 4, lv: 8, craft: {sucuri: 2}, cost: 90, color: "#5a7a3a", shade: "#3a5a24"}},
-  legs:   {calca_anta: {n: "Calça de couro de anta", def: 3, lv: 7, craft: {anta: 1, capivara: 1}, cost: 70, color: "#5a4a40", shade: "#3a2e28"}},
-  ranged: {arco_harpia: {n: "Arco com penas de harpia", atk: 3, lv: 7, craft: {harpia: 1}, cost: 60}}
+           lanca_presa: {n: "Lança com presa de onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120},
+           lanca_pirarucu: {n: "Lança de osso de pirarucu", atk: 8, lv: 13, craft: {pirarucu: 1, tracaja: 2}, cost: 160},
+           lanca_chifre: {n: "Lança com chifre de búfalo", atk: 11, lv: 18, craft: {bufalo_touro: 1, bufalo: 2}, cost: 260}},
+  torso:  {colete_sucuri: {n: "Colete de couro de sucuri", def: 4, lv: 8, craft: {sucuri: 2}, cost: 90, color: "#5a7a3a", shade: "#3a5a24"},
+           colete_tracaja: {n: "Colete de casco de tracajá", def: 6, lv: 12, craft: {tracaja: 3}, cost: 140, color: "#4a5a3a", shade: "#2e3a24"},
+           gibao_bufalo: {n: "Gibão de couro de búfalo", def: 9, lv: 17, craft: {bufalo: 3, jararaca: 1}, cost: 240, color: "#3a3234", shade: "#221c1e"}},
+  legs:   {calca_anta: {n: "Calça de couro de anta", def: 3, lv: 7, craft: {anta: 1, capivara: 1}, cost: 70, color: "#5a4a40", shade: "#3a2e28"},
+           calca_jacaretinga: {n: "Calça de couro de jacaretinga", def: 5, lv: 13, craft: {jacaretinga: 2, caranguejo: 1}, cost: 130, color: "#6a7a4a", shade: "#4a5632"},
+           perneira_jararaca: {n: "Perneira de couro de jararaca", def: 7, lv: 16, craft: {jararaca: 2, ourico: 1}, cost: 200, color: "#7a6a4a", shade: "#54482e"}},
+  ranged: {arco_harpia: {n: "Arco com penas de harpia", atk: 3, lv: 7, craft: {harpia: 1}, cost: 60},
+           arco_gaviao: {n: "Arco com penas de gavião-real", atk: 6, lv: 17, craft: {gaviao_real: 1, urubu: 2}, cost: 220}}
 };
 for (const s in CRAFT) Object.assign(EQUIP[s], CRAFT[s]);

@@ -4,7 +4,15 @@ const TILE = 16;
 const TILE_PAL = {
   mata:    {g1: "#5fa84c", g2: "#4f9441", tall: "#3f7f36", tallHi: "#78c45a", path: "#c9a46a", path2: "#b08a55", leaf: "#2f7a3f", leaf2: "#24633a", leafHi: "#4f9a4c", trunk: "#6d4329", rock: "#9a978a", rock2: "#6a675e", water: "#2f7fb8", water2: "#5ab3e3", wood: "#9c6339", wood2: "#6d4329"},
   fechada: {g1: "#3f7a3c", g2: "#336a33", tall: "#2a5a2e", tallHi: "#559048", path: "#a8875a", path2: "#8a6d45", leaf: "#1f5a32", leaf2: "#163f24", leafHi: "#2f7040", trunk: "#5a3a1c", rock: "#7f7c72", rock2: "#55524a", water: "#245f8a", water2: "#4a92c0", wood: "#8a5a32", wood2: "#5a3a1c"},
-  rio:     {g1: "#6ab04f", g2: "#58a045", tall: "#46893a", tallHi: "#86d064", path: "#d4b27a", path2: "#bb9763", leaf: "#3a8a45", leaf2: "#2b6a37", leafHi: "#5aaa55", trunk: "#6d4329", rock: "#a09d90", rock2: "#706d64", water: "#2a86c4", water2: "#6cc4f0", wood: "#a8703f", wood2: "#6d4329"}
+  rio:     {g1: "#6ab04f", g2: "#58a045", tall: "#46893a", tallHi: "#86d064", path: "#d4b27a", path2: "#bb9763", leaf: "#3a8a45", leaf2: "#2b6a37", leafHi: "#5aaa55", trunk: "#6d4329", rock: "#a09d90", rock2: "#706d64", water: "#2a86c4", water2: "#6cc4f0", wood: "#a8703f", wood2: "#6d4329"},
+  // igarapé: água escura cor de chá (folhas na água), mata úmida e passarelas de tábua clara
+  igarape: {g1: "#4f9a52", g2: "#438a48", tall: "#357a3e", tallHi: "#6ab85e", path: "#b89a66", path2: "#9a7e50", leaf: "#2a7a48", leaf2: "#1d5a36", leafHi: "#46a05a", trunk: "#5a3a22", rock: "#8a8a7e", rock2: "#5e5e54", water: "#4a5a2a", water2: "#8a9a4a", wood: "#c8a070", wood2: "#7a5a36"},
+  // manguezal: chão de lama cinza-marrom, mangue de folha escura, água salobra esverdeada
+  manguezal: {g1: "#7a7458", g2: "#6a6448", tall: "#5a5a3a", tallHi: "#8a8a5a", path: "#a08a62", path2: "#86704c", leaf: "#3a5a32", leaf2: "#2a4424", leafHi: "#5a7a44", trunk: "#5a4a3a", rock: "#8a8478", rock2: "#5e5a50", water: "#4a6a6a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30"},
+  // seringal: chão de folha seca, seringueiras de casca clara e copa verde-escura
+  seringal: {g1: "#7a9a4a", g2: "#8a8a42", tall: "#5a7a32", tallHi: "#a8b85a", path: "#b8925a", path2: "#9a7844", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#c8b89a", rock: "#9a948a", rock2: "#6a645a", water: "#3a6a8a", water2: "#6a9ab8", wood: "#9c6339", wood2: "#6d4329"},
+  // várzea: capim claro, água de cheia azul-esverdeada e poucas árvores
+  varzea: {g1: "#8ab04a", g2: "#7aa040", tall: "#5e8a34", tallHi: "#c0dc70", path: "#c8aa6a", path2: "#ac8e54", leaf: "#3f7f36", leaf2: "#2e6428", leafHi: "#5aa04a", trunk: "#6d4329", rock: "#a09d90", rock2: "#706d64", water: "#3a8aa0", water2: "#7ac4d0", wood: "#a8703f", wood2: "#6d4329"}
 };
 const OUTLINE = "#1a2418";
 // tipo de terreno desenhado embaixo das letras especiais
@@ -107,7 +115,8 @@ function drawStageMap(rows, zone) {
       }
       return;
     }
-    drawTile(x, TILE_BASE[ch] || ch, ox, oy, P, tx, ty);
+    // chefe de água (Pirarucu, Cobra-Grande...): fica numa poça em vez de na grama
+    drawTile(x, ch === "B" && ZONES[zone] && WATER_BATTLE.has(ZONES[zone].boss) ? "~" : TILE_BASE[ch] || ch, ox, oy, P, tx, ty);
     if (ch === "E") {   // seta de saída apontando para a borda mais perto
       const sy = rows.findIndex(r => r.includes("S")), sx = rows[sy].indexOf("S");   // aponta do início (S) para a saída
       const left = tx < sx, down = ty > sy, ax = tx * TILE + 8, ay = ty * TILE + 8;

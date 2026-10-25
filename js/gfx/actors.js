@@ -5,6 +5,18 @@
    respiração, movimento próprio de cada espécie, entrada em cena, ataque, dano e queda.
    Tudo é desenhado num canvas pequeno e ampliado, então o movimento anda "de pixel em pixel". */
 const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* relógio da batalha: igual a performance.now(), mas para durante a "pausa de impacto" (hitStop) do golpe que acerta,
+   assim Rhanon e o bicho congelam juntos por um instante e voltam do mesmo ponto */
+let ANIM_LAG = 0, HITSTOP_END = 0;
+const animNow = () => performance.now() - ANIM_LAG;
+function hitStop(ms) {
+  if (REDUCE) return;
+  HITSTOP_END = Math.max(HITSTOP_END, performance.now() + ms);
+  // a investida do Rhanon e o tremor do bicho (animações do navegador) também param
+  // (só as que estão rodando: play() numa animação já terminada, como a entrada em cena, recomeçaria ela do zero)
+  const an = ["hero", "beast"].flatMap(id => $(id).getAnimations({subtree: true})).filter(a => a.playState === "running");
+  an.forEach(a => a.pause()); setTimeout(() => an.forEach(a => a.playState === "paused" && a.play()), ms);
+}
 /* ---------- ator do Rhanon (batalha e desafios): visto de costas, montado pelo esqueleto (gfx/rig.js) ---------- */
 const HERO_FIT = .7;   // tamanho de 1 pixel do desenho em relação ao --px do palco (arte 32x44 mais fina que a antiga)
 function makeHeroActor() {
@@ -19,7 +31,7 @@ function makeHeroActor() {
     const f = Math.floor(t / 150) % a.frames;
     return artCache[key + f] || (artCache[key + f] = artCanvas(key, f));
   }
-  const set = (s) => { state = s; since = performance.now(); lastFx = 0; };
+  const set = (s) => { state = s; since = animNow(); lastFx = 0; };
   function mount(el, opts = {}) {
     look = rhanonLook(); weaponOn = !!opts.weapon;
     mode = opts.mode || "battle";
@@ -179,7 +191,7 @@ function makeBeastActor() {
   let cv = null, g = null, base = null, white = null, w = 0, h = 0, f = 1, k = 1, CW = 0, CH = 0, kind = "", motion = "", state = "idle", since = 0, lastFx = 0, nextHop = 0, info = {}, swT = 0, rig = null;
   const whites = new WeakMap(), whiteFrame = c => whites.get(c) || (whites.set(c, whiteOf(c)), whites.get(c));
   const MX = 6, MT = 8, MB = 2;
-  const set = (s) => { state = s; since = performance.now(); lastFx = 0; };
+  const set = (s) => { state = s; since = animNow(); lastFx = 0; };
   function mount(el, src, opts = {}) {
     // w/h em pixels do jogo; k = resolução extra da arte em imagem (data-scale)
     k = +src.dataset.scale || 1; base = src; w = src.width / k; h = src.height / k; f = opts.boss ? 1.35 : 1; kind = opts.id || ""; info = opts;
@@ -203,7 +215,7 @@ function makeBeastActor() {
     const u = n => `calc(var(--px) * -${(n * f).toFixed(2)})`;
     cv.style.margin = `${u(MT)} ${u(MX)} ${u(MB)} ${u(MX)}`;
     el.innerHTML = ""; el.appendChild(cv); g = cv.getContext("2d");
-    nextHop = performance.now() + 1500;
+    nextHop = animNow() + 1500;
     set(opts.state || "idle");
     return cv;
   }
@@ -440,8 +452,10 @@ function startAnimationLoop() {
   let last = performance.now();
   function loop(t) {
     requestAnimationFrame(loop);
-    const dt = Math.min((t - last) / 1000, .05); last = t;
-    HERO_A.draw(t); BEAST_A.draw(t); TITLE_A.draw(t, dt); WALKER.tick(t); exploreFrame(t, dt);
+    let dt = Math.min((t - last) / 1000, .05);
+    if (t < HITSTOP_END) { ANIM_LAG += t - last; dt = 0; }   // pausa de impacto: o relógio da batalha não anda
+    last = t;
+    HERO_A.draw(t - ANIM_LAG); BEAST_A.draw(t - ANIM_LAG); TITLE_A.draw(t, dt); WALKER.tick(t); exploreFrame(t, dt);
     const battleOn = !$("stage").closest(".game")?.classList.contains("working-mode") && $("map").hidden && $("local").hidden && $("explore").hidden && $("titleScreen").hidden && mode === "hunt";
     if ($("titleScreen").hidden) PFX.frame(dt, HERO_A.unit() || 4, battleOn && $("over").hidden);
   }

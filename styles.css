@@ -96,6 +96,26 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-rio::before{background:#8a7448;right:9%;top:44%}
 .stage.zone-rio::after{background:#8a7448;left:4%;bottom:7%}
 .stage.zone-fechada{background:linear-gradient(180deg,#264a32 0 54%,#142a1c 54% 100%)}
+/* igarapé: mata alta escura, faixa de água cor de chá e barranco */
+.stage.zone-igarape{background:linear-gradient(180deg,#24563a 0 24%,#6a7a3a 24% 25%,#4a5a2a 25% 33%,#3a4a22 33% 40%,#22462c 40% 100%)}
+.stage.zone-igarape::before{background:#6a5a36;right:9%;top:44%}
+.stage.zone-igarape::after{background:#6a5a36;left:4%;bottom:7%}
+.stage.zone-igarape .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px));opacity:.9}
+/* manguezal: mangue escuro, água salobra e lama */
+.stage.zone-manguezal{background:linear-gradient(180deg,#2e4a2c 0 22%,#7a9a8a 22% 23%,#4a6a6a 23% 31%,#3e5a58 31% 38%,#5a5440 38% 100%)}
+.stage.zone-manguezal::before{background:#6a6248;right:9%;top:44%}
+.stage.zone-manguezal::after{background:#6a6248;left:4%;bottom:7%}
+/* várzea: céu aberto, faixa de cheia e capim */
+.stage.zone-varzea{background:linear-gradient(180deg,#5a9a5a 0 26%,#7ac4d0 26% 27%,#3a8aa0 27% 34%,#4a8a6a 34% 40%,#6a9a3a 40% 100%)}
+.stage.zone-varzea::before{background:#7a9a3a;right:9%;top:44%}
+.stage.zone-varzea::after{background:#7a9a3a;left:4%;bottom:7%}
+.stage.zone-varzea .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px))}
+/* seringal: mata seca, troncos claros e chão de folhas */
+.stage.zone-seringal{background:linear-gradient(180deg,#3a5a2e 0 54%,#5a5a2e 54% 100%)}
+.stage.zone-seringal::before{background:#6a6a38;right:9%;top:44%}
+.stage.zone-seringal::after{background:#6a6a38;left:4%;bottom:7%}
+.stage.zone-seringal .trunk{background:#c8b89a}
+.stage.zone-manguezal .reeds{bottom:auto;top:calc(38% - 9*var(--px));height:calc(9*var(--px));opacity:.85;filter:sepia(.6) brightness(.8)}
 .stage.zone-fechada::before{background:#2f5a3a;right:12%;top:42%;width:38%;opacity:.9}
 .stage.zone-fechada::after{background:#2f5a3a;left:8%;bottom:8%;width:44%}
 /* Elementos decorativos de fundo */
@@ -162,13 +182,38 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .banner{font-family:var(--display);font-size:26px;color:var(--bone);background:var(--blood);padding:2px 14px;box-shadow:4px 4px 0 var(--ink);letter-spacing:1px;text-shadow:none}
 .gshake{animation:gshake .3s steps(6)}
 @keyframes gshake{25%{transform:translate(-6px,3px)}50%{transform:translate(6px,-3px)}75%{transform:translate(-4px,2px)}}
+/* impacto (gfx/fx.js hitImpact): tremor leve no golpe comum, clarão branco e o palco "socando" para perto nos fortes */
+.gshake-s{animation:gshakeS .18s steps(3)}
+@keyframes gshakeS{33%{transform:translate(-3px,1px)}66%{transform:translate(2px,-1px)}}
+.fxi.flash{position:absolute;inset:0;background:#fff;pointer-events:none;z-index:7}
+.stage.punch{animation:punch .22s steps(4)}
+@keyframes punch{0%{scale:1}30%{scale:1.035}100%{scale:1}}
 /* mapa local de Ananindeua */
 #local{background:none;align-items:start;overflow:auto}
 .game:has(#local:not([hidden])) :is(.stage,.log,.ui){visibility:hidden}
 #lsvg{width:100%;height:auto;display:block}
 #lsvg .land{fill:var(--ink);stroke:var(--paper);stroke-width:5;stroke-linejoin:miter}
 .river{fill:none;stroke:#19a8d8;stroke-width:14;stroke-linecap:round}
-.lroute{stroke:var(--accent);stroke-width:3;stroke-dasharray:6 8}
+.lroute{fill:none;stroke:var(--accent);stroke-width:3;stroke-dasharray:6 8;stroke-linecap:round}
+.lroute-base{fill:none;stroke:rgba(255,255,255,.08);stroke-width:11;stroke-linecap:round}
+/* pontes de tábua sobre o rio, a BR-316 saindo do mapa e a cabine do cobrador */
+.lbridge rect{fill:#9c6339;stroke:var(--paper);stroke-width:2}
+.lbridge path{fill:none;stroke:#6d4329;stroke-width:1.5}
+.lbridge .corda{stroke:var(--paper);stroke-width:1}
+.lroad{fill:none;stroke:#5a5a5e;stroke-width:10;stroke-linecap:round}
+.lroad-faixa{fill:none;stroke:#ffd23a;stroke-width:1.5;stroke-dasharray:5 6}
+.lroad-txt{font-family:var(--display);font-size:12px;fill:var(--paper);paint-order:stroke;stroke:var(--ink);stroke-width:3px}
+.cabin .hit{fill:transparent;stroke:none}
+.cabin rect{fill:#e2363d;stroke:var(--paper);stroke-width:2}
+.cabin path{fill:var(--paper);stroke:var(--ink);stroke-width:1}
+.cabin .win{fill:#ffd23a;stroke:var(--ink);stroke-width:1}
+.node.sel .cabin rect:not(.win){fill:var(--paper);stroke:var(--blood)}
+/* caminho aberto: cópia do mapa de Ananindeua num pergaminho, com a trilha nova se desenhando */
+.revela{width:min(640px,94vw);max-height:92vh;overflow:auto}
+.revela svg{width:100%;height:auto;display:block}
+.revela .land{fill:var(--ink);stroke:var(--paper);stroke-width:5;stroke-linejoin:miter}
+.lreveal{fill:none;stroke:#ffd23a;stroke-width:5;stroke-linecap:round;filter:drop-shadow(0 0 3px #ffd23a)}
+.lreveal-tip{fill:#fff;stroke:#ffd23a;stroke-width:3}
 .node.locked{opacity:.4}
 #lmk{pointer-events:none}
 #lmk path,#lmk circle{fill:var(--blood);stroke:var(--paper);stroke-width:2}
@@ -493,6 +538,16 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .bar.xp{height:8px}
 .bar.xp i{background:#7fd8ff}
 .game.challenge-mode :is(.xp-row,.bar.xp){display:none}
+/* fúria: três pontinhos que acendem a cada tempo certo seguido; cheia, piscam e a lança vira "Fúria!" */
+.game:is(.challenge-mode,.working-mode) .furia-row{display:none}
+.furia{display:flex;gap:5px;align-items:center}
+.furia i{width:14px;height:14px;rotate:45deg;border:2px solid var(--wood2);background:var(--parch2)}
+.furia i.on{background:linear-gradient(135deg,#ffd23a,#f2740c);border-color:#a8480e}
+.furia.cheia i{background:linear-gradient(135deg,#ffe98a,#e2363d);animation:furiaPisca .5s steps(2) infinite}
+@keyframes furiaPisca{50%{filter:brightness(1.5);scale:1.15}}
+.cmd.furia-cmd{color:#ffd23a}
+.cmd.furia-cmd::before{background:linear-gradient(180deg,#e2363d,#8f1a1a)}
+.cmd.furia-cmd:hover::before,.cmd.furia-cmd:focus-visible::before{background:linear-gradient(180deg,#ffd23a,#f2740c)}
 
 /* faixa de subir de nível */
 .lvup{position:fixed;left:-10vw;right:-10vw;top:16vh;z-index:1950;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;background:#0a2c80;border-block:5px solid #7fd8ff;padding:10px 0 12px;rotate:-3deg;box-shadow:0 8px 0 rgba(0,0,0,.35);animation:lvIn .3s var(--snap) backwards,lvOut .35s ease-in 1.85s forwards}

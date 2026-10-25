@@ -81,7 +81,7 @@ function drawAmbient(x, cx, cy, now, night) {
   x.globalAlpha = 1;
 }
 // peixes vivem só na água: nadam de um lado para o outro, cospem água quando veem o Rhanon e só a flecha alcança
-const AQUATIC = new Set(["piranha", "poraque"]);
+const AQUATIC = new Set(["piranha", "poraque", "boto"]);
 // where: "terra" (sem peixes, para os "a" do mapa), "agua" (só peixes) ou nada (qualquer um, usado na batalha)
 function pickFromPool(zone, where) {
   const z = zoneDef(zone), pool = where ? z.pool.filter(([id]) => (where === "agua") === AQUATIC.has(id)) : z.pool;
@@ -180,7 +180,8 @@ function resumeExplore(result) {
   $("explore").hidden = false; $("homeButton").hidden = true;
   musicStart("local"); exHud();
   if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? `${en.a.name} derrotado! A aldeia vai contar essa história por muitas noites.`
-    : EX.st.next ? `Caminho liberado: ${ZONES[EX.st.next].n}! Siga a trilha até a passagem.` : "Você venceu o último chefe... por enquanto!");
+    : EX.st.next ? `Caminho liberado: ${ZONES[EX.st.next].n}! Siga a trilha até a passagem.` : "Você venceu o último chefe de Ananindeua! A BR-316 está liberada no mapa.");
+  if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); }   // o mapa mostra o caminho novo
 }
 
 /* ---------- ações do Rhanon ---------- */
@@ -310,7 +311,7 @@ function exUpdate(dt, now) {
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
   for (const l of EX.loot) if (now - l.t0 > 500 && Math.hypot(l.x - h.x, l.y - h.y) < 11) pickLoot(l);
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
-  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden) ix = iy = 0;
+  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden || !$("revela").hidden) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     h.aim = {x: ix / n, y: iy / n};
@@ -555,6 +556,7 @@ const VILLAGER_TIPS = [
   "Etiqueta verde em cima do bicho? Ele cai com um golpe só.",
   "Quando o bicho se encolhe tremendo, ele vai atacar: aperte Z quando o anel ficar verde e você bloqueia metade do golpe.",
   "Acertar o bicho primeiro, com a lança (Z) ou uma flecha (X), te dá o primeiro turno da luta.",
+  "Três tempos certos seguidos na luta, golpe perfeito ou bloqueio, enchem a Fúria: aí a lança vira três estocadas de uma vez.",
   "Se o bicho te alcançar antes, quem começa batendo é ele. Fique esperto com o \"!\".",
   "A tocha do artesão assusta os bichos: eles fraquejam e você ataca de novo na mesma hora.",
   "Sem arco? Jogue a lança (Especial): bate forte, mas às vezes erra.",

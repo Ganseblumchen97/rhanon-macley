@@ -2,13 +2,13 @@
 function setBattleDecor(zone) {
   const stage = $("stage"), decor = $("bgDecor");
   if (!stage || !decor) return;
-  stage.classList.remove("zone-mata","zone-rio","zone-fechada");
+  stage.classList.remove(...[...stage.classList].filter(c => c.startsWith("zone-")));
   stage.classList.add("zone-" + (zone || curZone || "mata"));
   // à noite: um véu azul-escuro com a lua por cima do cenário (embaixo das plataformas e dos personagens)
   if (!stage.querySelector(".night-shade")) decor.insertAdjacentHTML("afterend", '<div class="night-shade" aria-hidden="true"></div>');
   stage.classList.toggle("night", !!G.night);
   decor.innerHTML = "";
-  if (zone === "rio") {
+  if (zone === "rio" || zone === "igarape" || zone === "manguezal" || zone === "varzea") {   // água: juncos e vitória-régia
     const reeds = document.createElement("div"); reeds.className = "reeds";
     for (let i=0;i<12;i++){ const r=document.createElement("div"); r.className="reed"; r.style.height=`calc(${8 + Math.random()*6} * var(--px))`; reeds.appendChild(r); }
     decor.appendChild(reeds);
@@ -86,7 +86,7 @@ function init(opts = {}) {
   $("beast").style.top = `calc(46% - ${spr.height / (+spr.dataset.scale || 1) * (animal.boss ? 1.35 : 1)} * var(--px) + 12px)`; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", animal.name); $("hero").style.display = ""; $("intent").style.display = ""; $("ehp").parentElement.style.display = ""; $("spTxt").parentElement.style.display = ""; $("sp").parentElement.style.display = "";
   musicStop();
   vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = "Lutar de novo"; $("toMap").textContent = fromExplore ? "Continuar explorando" : "Voltar ao mapa";
-  p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, items:{...G.items}};
+  p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, items:{...G.items}, furia:0};
   e = { ...animal, hp:animal.hp, max:animal.hp, intent:null, known:false, assustada:false };
   busy = false;
   lines = [animal.intro];
@@ -136,8 +136,14 @@ function render() {
   $("intent").className = "intent" + (e.known ? " known" : "");
   // estados como ícones (ui/theme.js), com os turnos que faltam; o nome aparece ao passar o mouse e para leitores de tela
   $("status").innerHTML = statusList().map(([k, name, n]) => `<span class="st" title="${name}"><img src="${statusIconURL(k)}" alt="${name}">${n ? `<b>${n}</b>` : ""}</span>`).join("");
+  $("furia").className = "furia" + (furyReady() ? " cheia" : "");
+  [...$("furia").children].forEach((d, i) => d.classList.toggle("on", i < (p ? p.furia || 0 : 0)));
   if (!subMenu) CMDS.forEach((c, i) => {
     const b = $("cmds").children[i];
+    if (c.id === "atacar" && b.dataset.f !== String(furyReady())) {   // fúria pronta: a lança vira o golpe da fúria
+      b.dataset.f = furyReady(); b.classList.toggle("furia-cmd", furyReady());
+      b.firstChild.innerHTML = `<i class="key">1</i>${furyReady() ? "Fúria!" : c.n}<small></small>`;
+    }
     b.setAttribute("aria-disabled", avail(c.id) ? "false" : "true");
     b.querySelector("small").textContent = c.id === "item" ? "×" + itemCount(p.items) : c.id === "especial" ? "PE" : "";
   });
@@ -145,14 +151,14 @@ function render() {
 /* golpe no tempo certo: um anel discreto com "Z" fecha até a hora do impacto e fica verde na janela certa.
    Apertar Z (ou Espaço, ou tocar no palco) nessa janela dá "Perfeito!" (+30% de dano) no golpe do Rhanon ou
    "Bloqueio!" (metade do dano) no golpe do bicho. Uma tentativa por golpe: apertar fora da hora perde a chance. */
-const QTE_EARLY = 230, QTE_LATE = 100;   // janela, em ms, antes e depois do impacto
+const QTE_EARLY = 250, QTE_LATE = 150;   // janela, em ms, antes e depois do impacto (o anel fica verde e faz "tic" quando ela abre)
 let qte = null, foeImpact = 0;           // qte = {at, el, ok, tried}; foeImpact = quando o último golpe do bicho chega
 function qteArm(impactIn, target) {
   qteClear();
   const q = pos(target), el = el$("qte", {left: q.x + "px", top: q.y - 34 + "px"}), lead = Math.max(0, impactIn - QTE_EARLY);
   el.innerHTML = "<i></i><b>Z</b>"; el.style.setProperty("--dur", lead + "ms");
   qte = {at: performance.now() + impactIn, el, ok: false, tried: false};
-  setTimeout(() => el.isConnected && el.classList.add("agora"), lead);
+  setTimeout(() => { if (el.isConnected) { el.classList.add("agora"); sfx("janela"); } }, lead);
   setTimeout(() => el.remove(), impactIn + QTE_LATE + 260);
 }
 function qteClear() { if (qte && qte.el) qte.el.remove(); qte = null; }
@@ -163,8 +169,18 @@ function qtePress() {
   qte.ok = dt >= -QTE_EARLY && dt <= QTE_LATE;
   qte.el.classList.add(qte.ok ? "acertou" : "errou");
 }
-// no impacto: devolve se acertou o tempo (e encerra a janela)
-function qteTake() { const ok = !!(qte && qte.ok); qteClear(); return ok; }
+// no impacto: devolve se acertou o tempo (e encerra a janela); cada janela conta para a fúria
+function qteTake() { const had = !!qte, ok = !!(qte && qte.ok); qteClear(); if (had) furyNote(ok); return ok; }
+/* fúria: FURY_MAX tempos certos seguidos (golpe perfeito ou bloqueio) enchem a barra; errar ou deixar passar zera.
+   Cheia, o comando da lança vira "Fúria!": três estocadas seguidas e a última mais forte. */
+const FURY_MAX = 3;
+const furyReady = () => !!p && p.furia >= FURY_MAX;
+function furyNote(ok) {
+  if (!p || furyReady()) return;
+  if (!ok) { p.furia = 0; return; }
+  p.furia++;
+  if (furyReady()) setTimeout(() => { pop("FÚRIA PRONTA!", $("hero"), "crit"); sfx("furia"); say("Três no tempo certo! A fúria de Rhanon está pronta: use a lança."); render(); }, 420);
+}
 function hitBeast() {
   const b = $("beast"); b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit");
   if (BEAST_A.state !== "defeat") BEAST_A.set("hurt");
@@ -177,7 +193,12 @@ function act(id) {
   if (id === "observar") HERO_A.set("observe");
   busy = true; preE = e.hp;
   let extra = false, wait = 0;   // wait = duração da animação do golpe (o bicho só responde depois)
-  if (id === "atacar") {
+  if (id === "atacar" && furyReady()) {
+    p.furia = 0;
+    const ds = [0, 1, 2].map(i => { let d = rnd(6, 10) + G.lv - 1 + weaponAtk(); if (i === 2) d = Math.round(d * (p.atento ? 2.2 : 1.6)); if (p.weak > 0) d = Math.ceil(d / 2); return d; });
+    p.atento = false; e.hp = Math.max(0, e.hp - ds.reduce((a, b) => a + b, 0));
+    wait = furyStrike(ds);
+  } else if (id === "atacar") {
     let d = rnd(6, 10) + G.lv - 1 + weaponAtk(), crit = p.atento;
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
@@ -279,10 +300,10 @@ function foeAttack(kind, d, sp0) {
   setTimeout(() => {
     if (block && qteTake()) {   // bloqueio na hora certa: metade do dano volta
       const back = Math.floor(d / 2); p.hp += back; d -= back;
-      if (back) { say(`Bloqueio! Rhanon defendeu na hora certa e evitou ${back} de dano.`); pop("BLOQUEIO!", $("hero"), "heal"); sfx("guard"); HERO_A.set("guard"); }
+      if (back) { say(`Bloqueio! Rhanon defendeu na hora certa e evitou ${back} de dano.`); pop("BLOQUEIO!", $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
     }
     holdP = null; render();
-    if (d) { anim($("hero"), "hurt"); sfx("hurt"); hurtFx(kind, d); pop("−" + d, $("hero"), "me"); if (HERO_A.state !== "defeat") HERO_A.set("hurt"); }
+    if (d) { anim($("hero"), "hurt"); sfx("hurt"); hurtFx(kind, d); pop("−" + d, $("hero"), "me"); if (HERO_A.state !== "defeat") HERO_A.set("hurt"); hitStop(d >= 10 ? 90 : 50); }
   }, impact);
 }
 // labareda do bicho (Mula sem cabeça): chamas saem dele e atravessam até o Rhanon
@@ -302,19 +323,23 @@ function strike(d, cls, kind, msg) {
   holdE = preE;
   const a = pos($("hero")), b = pos($("beast"));
   const hit = colors => {   // impacto: barra desce, número salta, registro recebe a mensagem
-    if (qteTake() && d > 0) {   // apertou Z na hora: golpe perfeito
+    const perfect = qteTake() && d > 0;
+    if (perfect) {   // apertou Z na hora: golpe perfeito
       const more = Math.max(2, Math.round(d * .3)); d += more; e.hp = Math.max(0, e.hp - more);
       msg = (msg || "") + ` Perfeito! +${more}.`; setTimeout(() => pop("PERFEITO!", $("beast"), "crit"), 160);
     }
-    holdE = null; if (msg) say(msg); render(); hitBeast(); sfx(cls === "crit" ? "critico" : "hit");
-    burst(b, colors, cls === "crit" ? 16 : 9, cls === "crit" ? 90 : 60);
-    pop(String(d), $("beast"), cls); if (cls === "crit" || d >= 14) shake();
+    const strong = cls === "crit" || perfect || d >= 14;
+    holdE = null; if (msg) say(msg); render(); hitBeast(); sfx(cls === "crit" ? "critico" : perfect ? "perfeito" : "hit");
+    burst(b, colors, strong ? 16 : 9, strong ? 90 : 60);
+    pop(String(d), $("beast"), strong ? "crit" : cls); hitImpact(strong ? "forte" : "leve"); if (strong) musicDuck();
     if (cls === "crit") setTimeout(() => pop("CRÍTICO!", $("beast"), "crit"), 220);
   };
   if (kind === "spear") {   // lança: corre até o bicho, estoca e volta (rápido)
     HERO_A.set("stab"); sfx("spear"); qteArm(REDUCE ? 0 : 450, $("beast"));
     const dx = Math.max(0, b.x - a.x - 70);
-    $("hero").animate([{transform: "translateX(0)"}, {transform: `translateX(${dx}px)`, offset: .5}, {transform: `translateX(${dx}px)`, offset: .7}, {transform: "translateX(0)"}], {duration: REDUCE ? 1 : 850, easing: "steps(14)"});
+    $("hero").animate([   // recua (antecipação), dispara acelerando até o bicho, segura a estocada e volta freando
+      {transform: "translateX(0)", easing: "cubic-bezier(.3,0,.6,1)"}, {transform: "translateX(-14px)", offset: .17, easing: "cubic-bezier(.6,0,1,.6)"},
+      {transform: `translateX(${dx}px)`, offset: .52}, {transform: `translateX(${dx}px)`, offset: .68, easing: "cubic-bezier(.2,.7,.3,1)"}, {transform: "translateX(0)"}], {duration: REDUCE ? 1 : 850});
     setTimeout(() => { hit(["#fff", "#cfd8dc", "#f2a20c"]); slash($("beast")); }, REDUCE ? 0 : 450);
     return 850;
   }
@@ -369,6 +394,28 @@ function strike(d, cls, kind, msg) {
   setTimeout(() => hit(["#ffd23a", "#f2740c", "#d62828"]), start + (N - 1) * 70 + fly);
   return start + (N - 1) * 70 + fly;   // ~2,1 s
 }
+// fúria: faixa "FÚRIA!", Rhanon corre até o bicho e dá três estocadas (a última mais forte). Devolve quanto dura (ms).
+function furyStrike(ds) {
+  holdE = preE; qteClear();
+  const b = pos($("beast")), dx = Math.max(0, b.x - pos($("hero")).x - 70), T0 = REDUCE ? 0 : 900, gap = REDUCE ? 0 : 230;
+  encounterBanner("Fúria da mata", "três golpes!"); sfx("furia"); musicDuck(1200);
+  setTimeout(() => {
+    HERO_A.set("stab"); sfx("spear");
+    $("hero").animate([{transform: "translateX(0)", easing: "cubic-bezier(.6,0,1,.6)"}, {transform: `translateX(${dx}px)`, offset: .2}, {transform: `translateX(${dx}px)`, offset: .82, easing: "cubic-bezier(.2,.7,.3,1)"}, {transform: "translateX(0)"}],
+      {duration: REDUCE ? 1 : 300 + gap * 3 + 250});
+  }, T0);
+  let shown = preE;
+  ds.forEach((d, i) => setTimeout(() => {
+    const last = i === ds.length - 1;
+    shown = Math.max(0, shown - d); holdE = last ? null : shown;
+    if (!last) HERO_A.set("stab");
+    hitBeast(); slash($("beast")); burst(b, last ? ["#ffd23a", "#ffffff", "#e5001c"] : ["#fff", "#cfd8dc", "#f2a20c"], last ? 20 : 10, last ? 110 : 60);
+    pop(String(d), $("beast"), "crit"); sfx(last ? "critico" : "hit"); hitImpact(last ? "furia" : "leve");
+    if (last) { say(`FÚRIA! Três estocadas seguidas: −${ds.join(", −")}.`); setTimeout(() => pop("FÚRIA!", $("beast"), "crit"), 200); }
+    render();
+  }, T0 + 300 + i * gap));
+  return T0 + 300 + gap * 2 + 400;
+}
 // barra de XP do painel do Rhanon (quanto falta para o próximo nível)
 function drawXp() { $("xpb").style.width = (100 * G.xp / need(G.lv)) + "%"; $("xpTxt").textContent = G.xp + " / " + need(G.lv); }
 function pickAnimal() {
@@ -392,6 +439,11 @@ function special() {
     else say(`${e.name} puxa seu cabelo: −${hit(3)} PV.`);
   }
   else if (s === "sono") { e.hp = Math.min(e.max, e.hp + 8); foeAttack("roar", 0); say(`${e.name} tira um cochilo e recupera 8 PV.`); }
+  else if (s === "assobio") { const n = hit(Math.ceil(d * .7)); p.medo = 3; setTimeout(() => HERO_A.set("scared"), 400); say(`"Fiiit!" O assobio da ${e.name} gela o sangue: −${n} PV. Rhanon fica com medo, sem defesa por 3 turnos.`); }
+  else if (s === "espinhos") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Espinhos"}; say(`${e.name} se sacode e crava espinhos em Rhanon! −${n} PV e −3 por turno até tirar todos.`); }
+  else if (s === "confusao") { const n = hit(Math.ceil(d * .6)); p.weak = 3; say(`${e.name} corre para trás e deixa pegadas trocadas. −${n} PV, e Rhanon fica perdido: golpes mais fracos por 3 turnos.`); }
+  else if (s === "casco") { e.hp = Math.min(e.max, e.hp + 12); foeAttack("roar", 0); say(`${e.name} se recolhe no casco e recupera 12 PV.`); }
+  else if (s === "encanto") { const n = hit(Math.ceil(d * .6)); p.medo = 2; p.sp = Math.max(0, p.sp - 5); setTimeout(() => HERO_A.set("scared"), 400); say(`${e.name} assobia uma música encantada... −${n} PV e −5 PE. Rhanon fica tonto, sem defesa por 2 turnos.`); }
   else if (s === "salto") say(`${e.name} salta do galho em cima de Rhanon! −${hit(Math.ceil(d * 1.5))} PV.`);
   else if (s === "abraco") { const n = hit(Math.ceil(d * 1.2)); p.preso = 1; say(`${e.name} dá um abraço apertado! −${n} PV. Rhanon não consegue fugir.`); }
   else if (s === "frenesi") { const n = hit(d); p.dot = {d: 2, t: 3, n: "Sangramento"}; say(`${e.name} morde sem parar! −${n} PV e sangramento por 3 turnos.`); }
@@ -423,7 +475,7 @@ function reward(a = e, mult = 1, drop = false) {
   drawXp();
   vit(); G.hp = Math.min(maxHP(G.lv), G.hp + maxHP(G.lv) - maxHP(L0)); G.sp = Math.min(maxSP(G.lv), G.sp + maxSP(G.lv) - maxSP(L0));
   save();
-  return (drop ? ` Ganhou ${xp} XP. ${peltName(a.id)} ficou no chão: passe por cima para pegar.` : ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).`) + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
+  return (drop ? ` Ganhou ${xp} XP. ${peltName(a.id)} ficou no chão: passe por cima para pegar.` : ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).`) + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : a.boss && NEED.parada === curZone && !G.night ? " A trilha chegou ao fim: a BR-316 está liberada no mapa." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
 }
 function keepVitals(kind) {
   vit();

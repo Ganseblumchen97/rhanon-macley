@@ -123,10 +123,11 @@ function applyTheme() {
   if (!themeReady) r.dataset.theme = t; else wipe(() => { r.dataset.theme = t; });
 }
 // abertura da batalha: o Rhanon entra pela esquerda, o bicho chega pela direita e o nome dele aparece numa faixa
-function encounterBanner(name) {
+// (a mesma faixa anuncia a fúria do Rhanon, com outro subtítulo)
+function encounterBanner(name, sub = "apareceu!") {
   const st = $("stage"); st.querySelector(".encounter")?.remove();
   const b = document.createElement("div"); b.className = "encounter"; b.setAttribute("aria-hidden", "true");
-  b.innerHTML = '<div class="enc-band"></div><h2 class="title enc-title"></h2><div class="enc-sub">apareceu!</div>';
+  b.innerHTML = `<div class="enc-band"></div><h2 class="title enc-title"></h2><div class="enc-sub">${sub}</div>`;
   st.appendChild(b);
   ransom(b.querySelector(".enc-title"), [name.toUpperCase()], name.length * 3.1);
   impactSound();

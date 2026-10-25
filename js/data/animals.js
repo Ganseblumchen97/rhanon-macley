@@ -36,28 +36,66 @@ const ANIMALS = [
   {id:"chupacabra", lv:6, boss:true, name:"Chupa-cabra", hp:110, xp:110, gold:[70,90], damage:[5,10], size:"chefe", special:"drenar", moves:MV("Garras","Salto","Chupar o sangue"), intro:"Algo secou as galinhas da aldeia. Os olhos vermelhos no escuro respondem quem foi: o Chupa-cabra."},
   {id:"mula", lv:10, boss:true, name:"Mula sem cabeça", hp:140, xp:150, gold:[100,130], damage:[8,13], size:"chefe", special:"fogo", moves:MV("Coice","Galope","Labareda"), intro:"Ferraduras batendo no escuro e um pescoço em chamas: a Mula sem cabeça corta a mata fechada."},
   {id:"boitata", lv:13, boss:true, name:"Boitatá", hp:160, xp:180, gold:[120,160], damage:[8,13], size:"chefe", special:["prender", "chocalho"], moves:MV("Mordida","Bote de fogo","Encantamento"), intro:"O lago se acende. Uma cobra de fogo de olhos enormes sobe da água: é o Boitatá, guardião da mata."},
+  // igarapé (depois do rio): de dia e de noite
+  {id:"tracaja", lv:10, name:"Tracajá", hp:78, xp:64, gold:[28,42], damage:[6,11], size:"médio", special:"casco", moves:MV("Mordida","Empurrão","Recolher no casco"), intro:"Um tracajá toma sol num tronco caído. Quando você chega perto, ele estica o pescoço e não foge."},
+  {id:"garca", lv:11, name:"Garça-branca", hp:70, xp:70, gold:[30,44], damage:[8,13], size:"médio", special:"mergulho", moves:MV("Bicada","Asa aberta","Bicada certeira"), intro:"Parada numa perna só, uma garça-branca vira o bico comprido na sua direção."},
+  {id:"boto", lv:12, name:"Boto-cor-de-rosa", hp:88, xp:80, gold:[34,50], damage:[8,13], size:"grande", special:"cardume", moves:MV("Focinhada","Salto","Redemoinho"), intro:"A água se abre e um boto-cor-de-rosa bufa bem perto. Ele não gosta de visita."},
+  {id:"jacaretinga", lv:11, name:"Jacaretinga", tint:"saturate(.6) brightness(1.15) hue-rotate(15deg)", hp:84, xp:72, gold:[32,48], damage:[8,14], size:"grande", moves:MV("Mordida","Bote","Caudada"), intro:"Olhos e narinas na superfície: um jacaretinga espera quieto no igarapé."},
+  {id:"sapo", lv:10, name:"Sapo-cururu", hp:66, xp:58, gold:[24,36], damage:[6,11], size:"pequeno", special:"picada", moves:MV("Linguada","Pulo","Leite venenoso"), intro:"Um sapo-cururu do tamanho de um prato coaxa no barranco. As costas brilham de veneno."},
+  {id:"pirarucu", lv:14, boss:true, name:"Pirarucu", hp:165, xp:210, gold:[120,160], damage:[9,15], size:"chefe", special:"estouro", moves:MV("Mordida","Rabanada","Pulo para fora d'água"), intro:"Uma sombra de três metros sobe para respirar e afunda de novo. O pirarucu, gigante do igarapé, te viu."},
+  {id:"boto_encantado", lv:15, boss:true, name:"Boto encantado", hp:175, xp:230, gold:[130,170], damage:[9,15], size:"chefe", special:["encanto", "drenar"], moves:MV("Focinhada","Salto","Encanto"), intro:"Uma música toca longe e um boto de chapéu branco aparece na beira. Dizem que ele encanta quem anda sozinho de noite."},
+  // manguezal (depois do igarapé)
+  {id:"caranguejo", lv:12, name:"Caranguejo-uçá", hp:92, xp:84, gold:[34,50], damage:[8,14], size:"médio", special:"prender", moves:MV("Pinçada","Investida de lado","Prender na garra"), intro:"A lama borbulha e um caranguejo-uçá sai da toca com as garras abertas."},
+  {id:"guaxinim", lv:13, name:"Mão-pelada", hp:90, xp:88, gold:[36,52], damage:[9,14], size:"médio", special:"roubo", moves:MV("Arranhão","Investida","Mão leve"), intro:"Um mão-pelada lava um caranguejo na água... e larga tudo para olhar a sua bolsa."},
+  {id:"macarico", lv:12, name:"Maçarico", hp:80, xp:80, gold:[30,46], damage:[9,14], size:"pequeno", special:"mergulho", moves:MV("Bicada","Corrida na lama","Bicada certeira"), intro:"Um bando de maçaricos corre na beira da lama. Um deles não gostou de você."},
+  {id:"caranguejo_rei", lv:16, boss:true, name:"Caranguejo-rei", hp:190, xp:260, gold:[150,190], damage:[10,16], size:"chefe", tint:"hue-rotate(150deg) saturate(1.5)", special:["prender", "estouro"], moves:MV("Pinçada","Martelada de garra","Prender na garra"), intro:"As raízes do mangue estalam. Um caranguejo do tamanho de uma canoa sobe da lama: o Caranguejo-rei."},
+  {id:"matinta", lv:17, boss:true, name:"Matinta Perera", hp:195, xp:280, gold:[160,200], damage:[10,17], size:"chefe", special:["assobio", "drenar"], moves:MV("Bengalada","Voo do rasga-mortalha","Assobio"), intro:"Um assobio fino corta a noite: \"fiiit\". Quem não oferece fumo para a Matinta Perera não dorme em paz."},
+  // seringal abandonado (depois do manguezal)
+  {id:"urubu", lv:14, name:"Urubu-rei", hp:98, xp:96, gold:[38,56], damage:[9,15], size:"médio", tint:"grayscale(.6) brightness(.55) contrast(1.3)", special:"fedor", moves:MV("Bicada","Voo rasante","Vômito"), intro:"Três voltas no céu e um urubu-rei pousa no galho seco. Ele acha que você está com cara de janta."},
+  {id:"cobra_cipo", lv:14, name:"Cobra-cipó", hp:90, xp:94, gold:[36,54], damage:[10,15], size:"médio", special:"salto", moves:MV("Mordida","Bote","Bote do galho"), intro:"O que parecia um cipó verde se mexe. A cobra-cipó desce do galho bem na sua frente."},
+  {id:"ourico", lv:15, name:"Ouriço-cacheiro", hp:104, xp:100, gold:[40,58], damage:[9,15], size:"médio", special:"espinhos", moves:MV("Mordida","Investida","Chuva de espinhos"), intro:"Um ouriço-cacheiro se arrepia inteiro no tronco de uma seringueira. Cada espinho é uma agulha."},
+  {id:"gaviao_real", lv:18, boss:true, name:"Gavião-real", hp:205, xp:300, gold:[170,210], damage:[11,17], size:"chefe", tint:"sepia(.5) saturate(1.4) brightness(.9)", special:"mergulho", moves:MV("Garras","Voo rasante","Mergulho do alto"), intro:"Uma sombra enorme cobre as seringueiras. O gavião-real, dono do céu do seringal, desce para te enfrentar."},
+  {id:"curupira", lv:19, boss:true, name:"Curupira", hp:210, xp:320, gold:[180,220], damage:[11,18], size:"chefe", special:["confusao", "fogo"], moves:MV("Pancada","Corrida para trás","Pegadas trocadas"), intro:"Pegadas que vão para o lado errado, um assobio e um cabelo de fogo entre as árvores: o Curupira protege a mata de quem caça demais."},
+  // várzea dos búfalos (depois do seringal): a última trilha de Ananindeua antes de Belém
+  {id:"bufalo", lv:17, name:"Búfalo", hp:120, xp:110, gold:[44,64], damage:[11,17], size:"grande", special:"estouro", moves:MV("Chifrada","Investida","Estouro na lama"), intro:"Um búfalo levanta a cabeça do capim alagado e bufa. Na várzea, quem manda é ele."},
+  {id:"soco", lv:16, name:"Socó-boi", hp:100, xp:104, gold:[40,58], damage:[10,16], size:"médio", special:"mergulho", moves:MV("Bicada","Asa aberta","Bicada certeira"), intro:"Escondido no capim, um socó-boi fica imóvel de bico para o alto... até você chegar perto."},
+  {id:"jararaca", lv:17, name:"Jararaca", hp:104, xp:108, gold:[42,62], damage:[11,16], size:"médio", special:"picada", moves:MV("Mordida","Bote","Picada venenosa"), intro:"Um chiado no capim molhado: uma jararaca se arma, de cabeça triangular, pronta para o bote."},
+  {id:"bufalo_touro", lv:20, boss:true, name:"Búfalo-touro", hp:235, xp:340, gold:[190,240], damage:[12,19], size:"chefe", tint:"brightness(.75) contrast(1.3) sepia(.3)", special:"estouro", moves:MV("Chifrada","Investida","Estouro da manada"), intro:"A lama treme. O touro da manada, de chifres do tamanho de um remo, abaixa a cabeça e raspa a pata no chão."},
+  {id:"mapinguari", lv:22, boss:true, name:"Mapinguari", hp:265, xp:400, gold:[220,280], damage:[13,20], size:"chefe", special:["fedor", "estouro"], moves:MV("Garrada","Pisão","Bocarra"), intro:"Um cheiro horrível e passos pesados no escuro. O Mapinguari, gigante de um olho só, abre a boca que tem na barriga."},
   {id:"onca_rei", lv:9, boss:true, name:"Onça-Rei", hp:140, xp:150, gold:[100,140], damage:[9,15], size:"chefe", tint:"hue-rotate(-20deg) saturate(1.5) brightness(.8)", moves:MV("Arranhão","Bote","Rugido"), intro:"A mata inteira fica em silêncio. A Onça-Rei desce da pedra, e ela não está de passagem."}
 ];
 // zonas de caça: nível mínimo, sorteio com peso [id, peso] e o chefe (aparece após 4 vitórias)
 const ZONES = {
   mata:    {n: "Mata", lv: 1, pool: [["preguica",3],["cassaco",3],["calango",3],["tatu",3],["macaco",2],["cotia",3],["quati",2],["tamandua",1]], boss: "queixada_chefe"},
   rio:     {n: "Beira do rio", lv: 2, pool: [["jacare",3],["piranha",3],["sucuri",2],["capivara",3],["ariranha",2],["poraque",2]], boss: "cobra_grande"},
+  igarape: {n: "Igarapé", lv: 10, pool: [["tracaja",3],["garca",3],["jacaretinga",2],["ariranha",2],["boto",3],["piranha",1]], boss: "pirarucu"},
+  varzea: {n: "Várzea dos búfalos", lv: 16, pool: [["bufalo",3],["soco",3],["jararaca",3],["capivara",1],["jacaretinga",1]], boss: "bufalo_touro"},
+  seringal: {n: "Seringal abandonado", lv: 14, pool: [["urubu",3],["cobra_cipo",3],["ourico",3],["guaxinim",1]], boss: "gaviao_real"},
+  manguezal: {n: "Manguezal", lv: 12, pool: [["caranguejo",3],["guaxinim",3],["macarico",3],["garca",1],["jacaretinga",1],["piranha",2]], boss: "caranguejo_rei"},
   fechada: {n: "Mata fechada", lv: 3, pool: [["surucucu",3],["onca",2],["harpia",2],["queixada",2],["jaguatirica",3],["anta",1],["caranguejeira",3]], boss: "onca_rei"}
 };
 // na batalha, estes bichos ficam meio dentro de um laguinho (os outros, no chão de terra)
-const WATER_BATTLE = new Set(["piranha", "poraque", "jacare", "ariranha", "sucuri", "cobra_grande", "boitata"]);
+const WATER_BATTLE = new Set(["piranha", "poraque", "jacare", "ariranha", "sucuri", "cobra_grande", "boitata", "boto", "jacaretinga", "pirarucu", "boto_encantado", "tracaja"]);
 // à noite (G.night) cada zona tem outros bichos e um chefe do folclore; o resto (mapa, passagem) é o mesmo
 const NIGHT_ZONES = {
   mata:    {pool: [["morcego",3],["coruja",3],["lobo",2],["cassaco",2],["tatu",1]], boss: "chupacabra"},
   fechada: {pool: [["morcego_vampiro",3],["lobo",2],["onca",2],["jaguatirica",2],["caranguejeira",2],["surucucu",2]], boss: "mula"},
-  rio:     {pool: [["jacare",3],["sucuri",2],["poraque",2],["morcego_pescador",3],["capivara",1]], boss: "boitata"}
+  rio:     {pool: [["jacare",3],["sucuri",2],["poraque",2],["morcego_pescador",3],["capivara",1]], boss: "boitata"},
+  igarape: {pool: [["sapo",3],["jacaretinga",3],["morcego_pescador",2],["boto",2],["poraque",1]], boss: "boto_encantado"},
+  manguezal: {pool: [["guaxinim",3],["caranguejo",3],["morcego_vampiro",2],["coruja",2],["poraque",1]], boss: "matinta"},
+  seringal: {pool: [["ourico",3],["cobra_cipo",3],["urubu",2],["morcego_vampiro",2]], boss: "curupira"},
+  varzea: {pool: [["bufalo",3],["jararaca",3],["morcego_vampiro",2],["sapo",2],["boto",1]], boss: "mapinguari"}
 };
 const zoneDef = z => G.night && NIGHT_ZONES[z] ? {...ZONES[z], ...NIGHT_ZONES[z], n: ZONES[z].n + " à noite"} : ZONES[z];
 // chefe vencido: de dia é a zona; à noite, "zona:noite" (os chefes do folclore não abrem passagens)
 const bossKey = z => G.night && NIGHT_ZONES[z] ? z + ":noite" : z;
 // nome do item que cada bicho deixa (os outros viram "Pele de <bicho>")
 const PELT = {morcego: "Asas de morcego", coruja: "Penas de coruja", lobo: "Pelo de lobo-guará", morcego_vampiro: "Asas de morcego-vampiro", morcego_pescador: "Asas de morcego-pescador",
-  chupacabra: "Presas do Chupa-cabra", mula: "Ferradura em brasa", boitata: "Escama de fogo do Boitatá", piranha: "Escamas de piranha", jacare: "Couro de jacaré", sucuri: "Couro de sucuri", surucucu: "Couro de surucucu", cobra_grande: "Couro da Cobra-Grande", harpia: "Penas de harpia", tatu: "Casco de tatu", calango: "Couro de calango", poraque: "Couro de poraquê", caranguejeira: "Presas de caranguejeira", ariranha: "Pele de ariranha", tamandua: "Pelos de tamanduá"};
+  chupacabra: "Presas do Chupa-cabra", mula: "Ferradura em brasa", boitata: "Escama de fogo do Boitatá", piranha: "Escamas de piranha", jacare: "Couro de jacaré", sucuri: "Couro de sucuri", surucucu: "Couro de surucucu", cobra_grande: "Couro da Cobra-Grande", harpia: "Penas de harpia", tatu: "Casco de tatu", calango: "Couro de calango", poraque: "Couro de poraquê", caranguejeira: "Presas de caranguejeira", ariranha: "Pele de ariranha", tamandua: "Pelos de tamanduá",
+  tracaja: "Casco de tracajá", garca: "Penas de garça", boto: "Dente de boto", jacaretinga: "Couro de jacaretinga", sapo: "Pele de sapo-cururu", pirarucu: "Escamas de pirarucu", boto_encantado: "Chapéu do Boto",
+  caranguejo: "Casco de caranguejo", guaxinim: "Pelo de mão-pelada", macarico: "Penas de maçarico", caranguejo_rei: "Garra do Caranguejo-rei", matinta: "Xale da Matinta",
+  urubu: "Penas de urubu-rei", cobra_cipo: "Couro de cobra-cipó", ourico: "Espinhos de ouriço", gaviao_real: "Penas de gavião-real", curupira: "Mecha de fogo do Curupira",
+  bufalo: "Couro de búfalo", soco: "Penas de socó", jararaca: "Couro de jararaca", bufalo_touro: "Chifre do Búfalo-touro", mapinguari: "Pelo do Mapinguari"};
 // curiosidades do caderno de bichos (fauna de verdade; os chefes do folclore ganham a lenda)
 const ANIMAL_FACTS = {
   onca: "Maior felino das Américas. Nada muito bem e tem a mordida mais forte entre os felinos.",
@@ -91,13 +129,41 @@ const ANIMAL_FACTS = {
   onca_rei: "Dizem os mais velhos que ela é a dona da mata fechada e que nenhum caçador volta igual depois de vê-la.",
   chupacabra: "Lenda das Américas: um bicho de olhos vermelhos que aparece de noite e seca as criações.",
   mula: "Lenda brasileira: uma mula sem cabeça que solta fogo pelo pescoço e galopa nas noites de quinta para sexta.",
-  boitata: "Lenda tupi: uma cobra de fogo de olhos enormes que protege a mata de quem a queima."
+  boitata: "Lenda tupi: uma cobra de fogo de olhos enormes que protege a mata de quem a queima.",
+  tracaja: "Tartaruga de rio da Amazônia. As fêmeas sobem nas praias de areia para enterrar os ovos na seca.",
+  garca: "Pesca parada como estátua, numa perna só, e arpoa o peixe com o bico num golpe rápido.",
+  boto: "O boto-cor-de-rosa fica mais rosado com a idade e consegue virar o pescoço, coisa rara entre os golfinhos.",
+  jacaretinga: "Menor que o jacaré-açu, tem uma \"ponte\" de osso entre os olhos, como se usasse óculos.",
+  sapo: "O cururu solta um leite venenoso pelas glândulas atrás da cabeça quando é apertado.",
+  pirarucu: "Um dos maiores peixes de água doce do mundo. Sobe para respirar ar a cada poucos minutos, e as escamas viram lixa.",
+  boto_encantado: "Lenda da Amazônia: nas noites de festa o boto vira um moço de branco, de chapéu para esconder o furo da cabeça, e encanta quem passa.",
+  caranguejo: "O caranguejo-uçá vive em tocas na lama do mangue e troca de casca para crescer. Na época de acasalar, sai todo mundo de uma vez: é a \"andada\".",
+  guaxinim: "O mão-pelada tem as patas da frente sem pelo, como mãos, e costuma molhar a comida antes de comer.",
+  macarico: "Muitos maçaricos voam milhares de quilômetros do norte do mundo até as praias e mangues do Pará.",
+  caranguejo_rei: "Os catadores contam de um caranguejo velho e enorme que nunca sai da toca de dia e manda no mangue inteiro.",
+  matinta: "Lenda do Pará: uma velha que vira pássaro e assobia de noite. Quem promete fumo para ela, no outro dia recebe a visita da velha cobrando.",
+  urubu: "O urubu-rei tem a cabeça colorida e o faro mais fino entre os urubus: os outros esperam ele abrir a carcaça.",
+  cobra_cipo: "Fina e comprida, some no meio dos galhos. Caça lagartos e sapos no alto das árvores.",
+  ourico: "O ouriço-cacheiro não lança espinhos: eles soltam fácil e grudam em quem encosta.",
+  gaviao_real: "Outro nome da harpia, a águia mais forte das Américas. Cada casal precisa de um pedaço enorme de mata só para si.",
+  curupira: "Lenda tupi: um menino de cabelo vermelho com os pés virados para trás, que confunde os caçadores com pegadas ao contrário.",
+  bufalo: "Os búfalos chegaram ao Pará há mais de cem anos e se deram tão bem na Ilha de Marajó que lá até a polícia anda montada neles.",
+  soco: "O socó-boi fica parado de bico para cima no meio do capim e o desenho das penas faz ele sumir na paisagem.",
+  jararaca: "Causa a maioria das picadas de cobra no Brasil. Do veneno dela saiu um remédio de pressão usado no mundo todo.",
+  bufalo_touro: "O mais velho da manada. Os vaqueiros da várzea contam que nenhuma cerca segura ele quando a água sobe.",
+  mapinguari: "Lenda da Amazônia: um gigante peludo de um olho só, com a boca na barriga e um fedor que se sente de longe. Só anda de noite e grita para assustar os caçadores."
 };
 // jeito de cada bicho se mexer parado (ver makeBeastActor em gfx/actors.js) e brilho dos chefes
 const MOTION = {
   sucuri: "sway", surucucu: "sway", cobra_grande: "sway", piranha: "swim", harpia: "hover", macaco: "hop",
   preguica: "slow", tatu: "curl", calango: "jitter", queixada: "snort", queixada_chefe: "snort", jacare: "slow2",
   morcego: "hover", morcego_vampiro: "hover", morcego_pescador: "hover", coruja: "hover", boitata: "sway", mula: "snort",
+  boto: "swim", pirarucu: "swim", boto_encantado: "swim", sapo: "hop", tracaja: "slow", jacaretinga: "slow2",
+  caranguejo: "jitter", caranguejo_rei: "jitter", macarico: "hop", matinta: "slow2",
+  urubu: "hover", gaviao_real: "hover", cobra_cipo: "sway", ourico: "curl", curupira: "hop",
+  bufalo: "snort", bufalo_touro: "snort", jararaca: "sway", mapinguari: "slow",
 };
 const AURA = {queixada_chefe: ["#ff8a3a", "#ffd23a"], cobra_grande: ["#7cf2ff", "#b06ad6"], onca_rei: ["#e5001c", "#ffd23a"],
-  chupacabra: ["#e5001c", "#7a1a2a"], mula: ["#ff8a3a", "#ffd23a"], boitata: ["#ffd23a", "#ff5a1c"]};
+  chupacabra: ["#e5001c", "#7a1a2a"], mula: ["#ff8a3a", "#ffd23a"], boitata: ["#ffd23a", "#ff5a1c"],
+  pirarucu: ["#e5001c", "#ff8a3a"], boto_encantado: ["#ff9fd0", "#ffffff"], caranguejo_rei: ["#7cf2ff", "#ffffff"], matinta: ["#b06ad6", "#2a2230"],
+  gaviao_real: ["#ffd23a", "#ffffff"], curupira: ["#ff5a1c", "#ffd23a"], bufalo_touro: ["#e5001c", "#ffffff"], mapinguari: ["#9bd34a", "#7a4a2a"]};

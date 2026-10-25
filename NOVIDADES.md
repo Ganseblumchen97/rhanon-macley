@@ -3,6 +3,24 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.23.0 — Ananindeua inteira e luta com peso
+
+- Luta com mais impacto: o golpe que acerta congela a tela por um instante e ela treme na medida da força; golpe forte
+  tem clarão e a música abafa. A lança recua antes de estocar. O tempo certo do Z ficou com mais folga e o anel faz
+  um "tic" quando fica verde.
+- Fúria: três tempos certos seguidos (golpe perfeito ou bloqueio) acendem os três losangos do painel. Cheia, a Lança
+  vira "Fúria!": três estocadas de uma vez, a última bem mais forte. Errar ou deixar passar zera a sequência.
+- Quatro lugares novos depois da Beira do rio, cada um com bichos de dia, um chefe e um chefe do folclore à noite:
+  - Igarapé (níveis 10 a 12): tracajá, garça, boto, jacaretinga e o Pirarucu; à noite, o Boto encantado.
+  - Manguezal (12 a 14): caranguejo-uçá, mão-pelada, maçarico e o Caranguejo-rei; à noite, a Matinta Perera.
+  - Seringal abandonado (14 a 16): urubu-rei, cobra-cipó, ouriço e o Gavião-real; à noite, o Curupira.
+  - Várzea dos búfalos (16 a 18): búfalo, socó-boi, jararaca e o Búfalo-touro; à noite, o Mapinguari.
+- O armeiro faz equipamentos novos com as peles desses bichos (lanças, coletes, calças e um arco melhores).
+- Mapa de Ananindeua novo: uma trilha só, com curvas e pontes sobre o rio, na ordem de dificuldade. Os lugares que
+  ainda não abriram ficam escondidos; ao vencer um chefe, o mapa aparece e a trilha vai se desenhando até o próximo.
+- No fim da trilha fica a BR-316, com a cabine do cobrador e a passagem para Belém (R$ 800). O ônibus ainda não está
+  saindo: Belém chega em breve.
+
 ## 0.22.0 — armeiro e equipamento
 
 - Novo vendedor na feira: o armeiro, na barraca do meio. Ele faz as armas, o arco e as armaduras de couro (com peles);

@@ -32,7 +32,16 @@ function noise(t, d, v, hp) {
 const SFX = {
   blip:  t => tone(660, t, .05, "square", .05),
   spear: t => tone(900, t, .18, "square", .07, 200),
-  hit:   t => { noise(t, .12, .2, 500); tone(220, t, .15, "square", .12, 60); },
+  // golpe que acerta, em camadas: estalo agudo (ataque), baque grave (peso) e ruído curto (textura)
+  hit:   t => { tone(1400, t, .025, "square", .06, 500); tone(160, t, .16, "sine", .2, 45); noise(t, .12, .2, 500); tone(220, t, .15, "square", .1, 60); },
+  // golpe perfeito: o baque de sempre, um "ting" brilhante por cima e um sub-grave
+  perfeito: t => { SFX.hit(t); tone(1975, t + .01, .18, "triangle", .09); tone(2637, t + .05, .22, "triangle", .06); tone(70, t, .3, "sine", .18, 35); },
+  // bloqueio na hora: metal batendo (duas parciais desafinadas) e um baque curto
+  bloqueio: t => { tone(880, t, .2, "square", .06, 820); tone(1320, t, .16, "triangle", .07, 1250); noise(t, .06, .14, 3000); tone(120, t, .1, "sine", .14, 70); },
+  // o anel ficou verde: tique discreto marcando a janela do tempo certo
+  janela: t => tone(1568, t, .03, "triangle", .035),
+  // fúria pronta / golpe da fúria: subida rápida e um acorde forte
+  furia: t => { [392, 523, 659, 784].forEach((f, i) => tone(f, t + i * .04, .12, "square", .06)); [523, 659, 784].forEach(f => tone(f, t + .18, .35, "sawtooth", .045)); noise(t + .18, .25, .12, 1200); },
   crit:  t => { noise(t, .18, .25, 400); tone(440, t, .25, "square", .14, 80); tone(880, t + .05, .2, "square", .08, 160); },
   fire:  t => { noise(t, .4, .18, 1500); tone(300, t, .4, "sawtooth", .06, 900); },
   heal:  t => [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * .07, .1, "square", .08)),
@@ -55,6 +64,13 @@ const SFX = {
   critico: t => { tone(1568, t, .08, "square", .08); tone(2093, t + .07, .3, "triangle", .09); noise(t + .02, .3, .24, 300); tone(95, t + .02, .38, "sawtooth", .17, 40); }
 };
 function sfx(n) { if (AC) SFX[n](AC.currentTime); }
+// abafa a música por um instante (golpe forte, fúria) para o impacto aparecer, e volta ao volume das opções
+function musicDuck(ms = 450) {
+  if (!AC || !musicOut) return;
+  const g = musicOut.gain, t = AC.currentTime, v = OPT.music;
+  g.cancelScheduledValues(t); g.setValueAtTime(g.value, t);
+  g.linearRampToValueAtTime(v * .3, t + .03); g.setValueAtTime(v * .3, t + ms / 1000 * .4); g.linearRampToValueAtTime(v, t + ms / 1000);
+}
 /* ---------- vozes: ronco, galo e os bichos ---------- */
 // oscilador com entrada suave, deslize de f até f2 e vibrato opcional (vib Hz, depth Hz)
 function voice(f, t, d, type, v, f2, vib = 0, depth = 0) {
@@ -119,7 +135,11 @@ const CRIES = {
 const CRY_OF = {onca: "felino", jaguatirica: "felinoP", cotia: "roedor", cassaco: "roedor", quati: "roedor", queixada: "porco", macaco: "macaco",
   harpia: "ave", sucuri: "cobra", surucucu: "cobra", jacare: "jacare", calango: "calango", anta: "anta", capivara: "capivara", ariranha: "ariranha",
   preguica: "preguica", tamandua: "fungada", tatu: "tatu", piranha: "piranha", poraque: "eletrico", caranguejeira: "aranha",
-  morcego: "morcego", coruja: "coruja", lobo: "lobo", chupacabra: "chupa", mula: "mula", boitata: "boitata"};
+  morcego: "morcego", coruja: "coruja", lobo: "lobo", chupacabra: "chupa", mula: "mula", boitata: "boitata",
+  tracaja: "tatu", garca: "ave", boto: "ariranha", jacaretinga: "jacare", sapo: "calango", pirarucu: "piranha", boto_encantado: "ariranha",
+  caranguejo: "aranha", caranguejo_rei: "aranha", guaxinim: "roedor", macarico: "ave", matinta: "coruja",
+  urubu: "ave", gaviao_real: "ave", cobra_cipo: "cobra", ourico: "fungada", curupira: "macaco",
+  bufalo: "anta", bufalo_touro: "anta", soco: "ave", jararaca: "cobra", mapinguari: "felino"};
 // grito do bicho (chefe soma um rugido grave por baixo)
 function animalCry(id, boss = false, k = 1) {
   if (!AC) return;

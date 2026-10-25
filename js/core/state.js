@@ -16,6 +16,9 @@ function vit() {
   // tutorial: ainda falta a conversa com o caçador (só num jogo sem progresso; saves antigos já passaram dela)
   G.bestiary = G.bestiary || {}; G.questsDone = G.questsDone || {}; G.quest = G.quest || null; G.offer = G.offer || null;   // caderno e pedidos
   if (G.tutorial === undefined) G.tutorial = G.lv === 1 && !G.xp && !Object.keys(G.kills || {}).length;
+  G.passagem = !!G.passagem;
+  // locais que já apareceram no mapa de Ananindeua; save antigo: tudo o que já está liberado (sem repetir animação)
+  if (!G.seen) { G.seen = {}; Object.keys(SUB).forEach(k => { if (unlocked(k)) G.seen[k] = true; }); }   // passagem de ônibus para Belém (Parada da BR-316)
   G.owned = G.owned || {tanga: true, lanca: true}; G.equip = G.equip || {legs: "tanga", torso: null, weapon: "lanca"};
 }
 const itemCount = bag => Object.values(bag || {}).reduce((a, n) => a + n, 0);

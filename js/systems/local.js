@@ -18,17 +18,25 @@ function localDone(where, msg) {
 function drawLocal() {
   vit();
   $("lhud").textContent = `Dia ${G.day}${G.night ? " (noite)" : ""} · Nv ${G.lv} · R$ ${G.money} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · DEF ${defense()} · Itens ×${itemCount(G.items)} · Peles ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
-  Object.keys(SUB).forEach(k => $("ln-" + k).classList.toggle("locked", !unlocked(k)));
+  Object.keys(SUB).forEach(k => { const n = $("ln-" + k); n.classList.toggle("locked", !unlocked(k)); n.style.display = G.seen[k] ? "" : "none"; });
+  document.querySelectorAll("#lroutes [data-b], #lbridges [data-b]").forEach(el => { el.style.display = G.seen[el.dataset.b] ? "" : "none"; });
+  $("lroad").style.display = G.seen.parada ? "" : "none";
   const l = SUB[G.sub]; $("lmk").setAttribute("transform", `translate(${l.x} ${l.y})`);
 }
 function selectSub(id, msg) {
   sfx("blip"); vit(); markNode("local", id);
-  const l = SUB[id], z = ZONES[id] && zoneDef(id), here = id === G.sub, i = $("linfo"), lock = z && !unlocked(id);
+  const l = SUB[id], z = ZONES[id] && zoneDef(id), here = id === G.sub, i = $("linfo"), lock = !unlocked(id);   // fases e a BR-316 abrem com o chefe anterior
   i.innerHTML = `<h2>${l.n}</h2><p>${l.txt}</p>` + (here ? '<p class="hint">Você está aqui.</p>' : "");
   if (!here) { btn(lock ? `${l.n} (vença o chefe: ${SUB[NEED[id]].n})` : "Ir até lá", () => goSub(id), lock, i); if (lock) lh(`Derrote o chefe de ${SUB[NEED[id]].n} para liberar este local.`); }
   else if (id === "aldeia" || id === "feira") {
     btn(id === "aldeia" ? "Entrar na aldeia" : "Entrar na feira", () => startExplore(id), false, i);
     lh(id === "aldeia" ? "Lá dentro fica a fogueira: descanse até a noite ou durma até o dia seguinte. Os aldeões dão dicas." : "Lá dentro o vendedor compra suas peles, tem comida, o artesão vende roupas e o armeiro faz armas e armaduras.");
+  }
+  else if (id === "parada") {   // cobrador vende a passagem para Belém (BUS em data/world.js)
+    if (G.passagem) lh(BUS.open ? "Você já tem a passagem. O ônibus para Belém sai daqui." : "Passagem comprada! Assim que o ônibus para Belém voltar a rodar, é só embarcar aqui.");
+    else btn(`Comprar passagem para Belém · R$ ${BUS.price}`, buyTicket, !BUS.open || G.money < BUS.price, i);
+    if (!BUS.open) lh("O cobrador avisa: \"O ônibus para Belém ainda não está saindo. Volta daqui a uns dias!\" (em breve: episódio 2)");
+    else if (!G.passagem && G.money < BUS.price) lh(`Faltam R$ ${BUS.price - G.money}. Peles de bicho forte valem bem mais na feira.`);
   }
   else if (z) {
     btn("Explorar", () => startExplore(id), false, i);
@@ -53,6 +61,12 @@ function rest(kind, quiet, toast) {
   if (toast) return msg;
   localDone("aldeia", msg);
 }
+// passagem de ônibus para Belém: cara, comprada uma vez só
+function buyTicket() {
+  if (!BUS.open || G.passagem || G.money < BUS.price) return;
+  G.money -= BUS.price; G.passagem = true; save(); sfx("more");
+  localDone("parada", "Passagem para Belém comprada! Guarde bem: o ônibus sai da Parada da BR-316.");
+}
 // compra um item da barraca de comida (vai para a bolsa)
 function buy(id) {
   const it = ITEMS[id]; if (G.money < it.price) return;
@@ -68,16 +82,21 @@ function eatItem(id) {
 function goSub(id) {
   if (moving || id === G.sub) return;
   moving = true; sfx("look");
-  const pts = subPath(G.sub, id).map(k => SUB[k]);
-  const seg = pts.slice(1).map((q, i) => Math.hypot(q.x - pts[i].x, q.y - pts[i].y)), L = seg.reduce((a, b) => a + b, 0), dur = Math.max(700, L / .26);
-  $("linfo").innerHTML = "<h2>Caminhando…</h2><p>Rhanon segue pelas trilhas.</p>";
+  // cada trecho segue a curva da trilha desenhada (o caminho de a para b, ou ao contrário se for voltando)
+  const path = subPath(G.sub, id), segs = path.slice(1).map((b, i) => {
+    const a = path[i], fw = $("lroutes").querySelector(`[data-a="${a}"][data-b="${b}"]`), bk = $("lroutes").querySelector(`[data-a="${b}"][data-b="${a}"]`), el = fw || bk;
+    const len = el ? el.getTotalLength() : Math.hypot(SUB[b].x - SUB[a].x, SUB[b].y - SUB[a].y);
+    return {len, at: u => el ? el.getPointAtLength(fw ? u : len - u) : {x: SUB[a].x + (SUB[b].x - SUB[a].x) * u / len, y: SUB[a].y + (SUB[b].y - SUB[a].y) * u / len}};
+  });
+  const L = segs.reduce((s, q) => s + q.len, 0), dur = Math.min(2800, Math.max(700, L / .26));   // longe demais anda mais rápido
+  $("linfo").innerHTML = "<h2>Caminhando…</h2><p>Rhanon segue pela trilha.</p>";
   let t0 = 0;
   const f = ts => {
     t0 = t0 || ts;
     const k = Math.min(1, Math.round((ts - t0) / dur * 60) / 60);
-    let d = k * L, i = 0; while (i < seg.length - 1 && d > seg[i]) { d -= seg[i]; i++; }
-    const u = seg[i] ? Math.min(1, d / seg[i]) : 1, a = pts[i], b = pts[i + 1];
-    $("lmk").setAttribute("transform", `translate(${a.x + (b.x - a.x) * u} ${a.y + (b.y - a.y) * u})`);
+    let d = k * L, i = 0; while (i < segs.length - 1 && d > segs[i].len) { d -= segs[i].len; i++; }
+    const q = segs[i].at(Math.min(segs[i].len, d));
+    $("lmk").setAttribute("transform", `translate(${q.x} ${q.y})`);
     if (k < 1) requestAnimationFrame(f); else { G.sub = id; save(); moving = false; drawLocal(); selectSub(id); sfx("more"); }
   };
   requestAnimationFrame(f);
@@ -214,7 +233,58 @@ function showInv(msg) {
 }
 function showLocal(zoom) {
   audio(); musicStart("local"); $("homeButton").hidden = false; $("map").hidden = true; $("local").hidden = false; drawLocal(); selectSub(G.sub);
+  setTimeout(() => { if (!$("local").hidden && $("revela").hidden) revealNext(); }, zoom ? 600 : 250);   // caminho que abriu e ainda não apareceu
   if (zoom) $("lsvg").animate([{transform: "scale(.15)", opacity: 0}, {transform: "scale(1)", opacity: 1}], {duration: 480, easing: "cubic-bezier(.2,1,.4,1)"});
+}
+/* ---------- caminho novo: o mapa aparece e a trilha vai se desenhando até a área que abriu ---------- */
+// primeira área já liberada (chefe anterior vencido) que o jogador ainda não viu aparecer no mapa
+const pendingReveal = () => { vit(); return ROUTE.find(k => unlocked(k) && !G.seen[k]); };
+function revealNext(done) { const k = pendingReveal(); if (k) revealPath(k, done); else if (done) done(); }
+let revealReady = false, revealDone = null;
+function revealPath(k, done) {
+  drawLocal();   // o mapa escondido mostra só o que já foi visto
+  const o = $("revela"), box = o.querySelector(".revela"), svg = $("lsvg").cloneNode(true), NS = "http://www.w3.org/2000/svg";
+  svg.removeAttribute("id"); svg.querySelectorAll("[id]").forEach(e => e.removeAttribute("id"));   // cópia sem ids repetidos
+  box.innerHTML = '<h2>Caminho aberto!</h2>'; box.append(svg);
+  const seg = svg.querySelector(`.lroute[data-b="${k}"]`), parts = [...svg.querySelectorAll(`[data-b="${k}"]`)], node = svg.querySelector(`.node[data-k="${k}"]`);
+  revealReady = false; revealDone = done || null; o.hidden = false; sfx("look");
+  const L = seg.getTotalLength(), trail = document.createElementNS(NS, "path"), tip = document.createElementNS(NS, "circle");
+  trail.setAttribute("d", seg.getAttribute("d")); trail.setAttribute("class", "lreveal"); trail.style.strokeDasharray = L; trail.style.strokeDashoffset = L;
+  tip.setAttribute("r", 5); tip.setAttribute("class", "lreveal-tip");
+  seg.parentNode.append(trail, tip);
+  const dur = REDUCE ? 1 : 1800, t0 = performance.now(); let steps = 0;
+  const f = now => {
+    const u = Math.min(1, (now - t0) / dur), e = u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2, p = trail.getPointAtLength(L * e);
+    trail.style.strokeDashoffset = L * (1 - e); tip.setAttribute("cx", p.x); tip.setAttribute("cy", p.y);
+    if (Math.floor(u * 6) > steps) { steps++; sfx("blip"); }   // passinhos enquanto a trilha cresce
+    if (u < 1) return requestAnimationFrame(f);
+    trail.remove(); tip.remove();
+    parts.forEach(el => { el.style.display = ""; });
+    node.style.display = ""; node.classList.remove("locked");
+    const {x, y} = SUB[k];
+    node.animate([{transform: `translate(${x}px,${y}px) scale(0)`}, {transform: `translate(${x}px,${y}px) scale(1.35)`, offset: .6}, {transform: `translate(${x}px,${y}px) scale(1)`}], {duration: 420, easing: "ease-out"});
+    if (k === "parada") svg.querySelector(".lroad")?.parentNode.style.removeProperty("display");   // a estrada para Belém aparece com a cabine
+    sfx("missao"); G.seen[k] = true; save();
+    box.insertAdjacentHTML("beforeend", `<p class="hint">${k === "parada" ? "A trilha chegou ao fim: a BR-316, de onde sai o ônibus para Belém." : `Agora a trilha segue até: ${SUB[k].n}.`}</p>`);
+    btn("Continuar", closeReveal, false, box); box.querySelector(".cmd").focus({preventScroll: true});
+    revealReady = true;
+  };
+  requestAnimationFrame(f);
+}
+function closeReveal() {
+  if (!revealReady) return;
+  $("revela").hidden = true; sfx("blip");
+  if (!$("local").hidden) { drawLocal(); selectSub(G.sub); }
+  const d = revealDone; revealDone = null; if (d) d();
+  else revealNext();   // abriu mais de uma de uma vez (save antigo): mostra a próxima
+}
+function setupReveal() {
+  document.addEventListener("keydown", ev => {
+    if ($("revela").hidden) return;
+    ev.stopImmediatePropagation(); ev.preventDefault();
+    if (["Enter", " ", "z", "Z", "Escape"].includes(ev.key) && !ev.repeat) closeReveal();
+  }, true);
+  $("revela").addEventListener("click", ev => { if (ev.target === $("revela")) closeReveal(); });
 }
 function openLocal() {
   if (moving) return;
@@ -225,9 +295,37 @@ function openLocal() {
 }
 function closeLocal() { showMap(); }
 // cria trilhas e pontos clicáveis do mapa de Ananindeua a partir de SUB e EDGES
+// trilha de Ananindeua: curva suave passando por todos os locais na ordem (ROUTE), pontes onde ela cruza o rio
+// e a BR-316 saindo do mapa a partir da cabine do cobrador
 function buildLocalNodes() {
-  $("lroutes").innerHTML = EDGES.map(([a, b]) => `<line class="lroute" x1="${SUB[a].x}" y1="${SUB[a].y}" x2="${SUB[b].x}" y2="${SUB[b].y}"/>`).join("");
-  $("lnodes").innerHTML = Object.entries(SUB).map(([k, l]) => `<g class="node" id="ln-${k}" data-k="${k}" transform="translate(${l.x} ${l.y})" tabindex="0" role="button" aria-label="${l.n}"><circle r="10"/><text y="28" text-anchor="middle">${l.n}</text></g>`).join("");
+  const P = ROUTE.map(k => [SUB[k].x, SUB[k].y]), at = i => P[Math.max(0, Math.min(P.length - 1, i))];
+  const curve = i => {   // trecho i -> i+1 (Catmull-Rom virando Bézier)
+    const [p0, p1, p2, p3] = [at(i - 1), at(i), at(i + 1), at(i + 2)];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    return `M${p1} C${c1} ${c2} ${p2}`;
+  };
+  $("lriver").setAttribute("d", LOCAL_RIVER);
+  $("lroad").innerHTML = `<path class="lroad" d="${LOCAL_ROAD}"/><path class="lroad-faixa" d="${LOCAL_ROAD}"/><text class="lroad-txt" x="6" y="18">← Belém</text>`;
+  $("lroutes").innerHTML = ROUTE.slice(1).map((k, i) => `<path class="lroute-base" data-b="${k}" d="${curve(i)}"/><path class="lroute" data-a="${ROUTE[i]}" data-b="${k}" d="${curve(i)}"/>`).join("");
+  // pontes: anda pela trilha procurando onde ela passa por cima do rio, e põe uma ponte de tábuas alinhada com a trilha
+  const river = $("lriver"), RL = river.getTotalLength(), rs = [];
+  for (let u = 0; u <= RL; u += 2) rs.push(river.getPointAtLength(u));
+  let bridges = "";
+  $("lroutes").querySelectorAll(".lroute").forEach(el => {
+    const L = el.getTotalLength();
+    for (let u = 2; u < L - 2; u += 1.5) {
+      const p = el.getPointAtLength(u);
+      if (!rs.some(r => Math.hypot(r.x - p.x, r.y - p.y) < 2)) continue;
+      const a = el.getPointAtLength(u - 2), b = el.getPointAtLength(u + 2), deg = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+      bridges += `<g class="lbridge" data-b="${el.dataset.b}" transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${deg.toFixed(1)})"><rect x="-13" y="-6" width="26" height="12"/><path d="M-8 -6V6M-3 -6V6M2 -6V6M7 -6V6"/><path class="corda" d="M-13 -6H13M-13 6H13"/></g>`;
+      u += 30;
+    }
+  });
+  $("lbridges").innerHTML = bridges;
+  const mark = k => k === "parada"   // a BR-316 é uma cabine de cobrador, não uma bolinha
+    ? '<g class="cabin"><circle r="13" class="hit"/><rect x="-9" y="-12" width="18" height="15"/><path d="M-12 -12L0 -21L12 -12Z"/><rect class="win" x="-5" y="-8" width="10" height="5"/></g>'
+    : '<circle r="10"/>';
+  $("lnodes").innerHTML = Object.entries(SUB).map(([k, l]) => `<g class="node" id="ln-${k}" data-k="${k}" transform="translate(${l.x} ${l.y})" tabindex="0" role="button" aria-label="${l.n}">${mark(k)}<text y="28" text-anchor="middle">${l.s || l.n}</text></g>`).join("");   // s = nome curto no mapa
   document.querySelectorAll("#lnodes .node").forEach(n => {
     const k = n.dataset.k, pick = () => { if (!moving) selectSub(k); };
     n.addEventListener("click", pick);

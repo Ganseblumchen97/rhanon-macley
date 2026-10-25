@@ -258,7 +258,74 @@ const QUADS = {
       if (o.tongue) d.dots([[x - 3, y + 4]], BR);
     },
     pattern: (d, P, C) => d.dots([[P.cx - 6, P.cy - 5], [P.cx - 1, P.cy - 6], [P.cx + 4, P.cy - 5], [P.cx + 7, P.cy - 2], [P.cx - 4, P.cy - 1], [P.cx + 2, P.cy - 2]], "#b8a888"),
-    claw: (d, x, y) => d.dots([[x - 3, y], [x - 4, y + 1], [x - 2, y + 1]], "#2a1a10")}
+    claw: (d, x, y) => d.dots([[x - 3, y], [x - 4, y + 1], [x - 2, y + 1]], "#2a1a10")},
+  // tracajá: pele cinza-oliva com pintas amarelas na cabeça; o casco é desenhado por cima do corpo
+  tracaja: {W: 50, H: 26, cx: 27, rx: 13, ry: 7, leg: 4, lw: 3, splay: 3, neck: 4, hu: 1, hr: 3,
+    C: {b: "#6a6a50", B: "#4a4a36", s: "#3e4630", S: "#262c1c", r: "#c8b060"}, legC: ["#6a6a50", "#4a4a36"],
+    head: (d, x, y, o, C) => {
+      d.part().ellipse(x, y, 4.5, 3.4, C.b, C.B, .6).dots([[x + 1, y - 2], [x + 3, y - 1], [x - 1, y - 3], [x + 2, y + 1]], "#e8c040");
+      d.dots([[x - 4, y]], BN); bEye(d, x - 1, y - 1, o);
+      if (o.mouth) bMouth(d, x - 5, y + 1, 3, false); if (o.tongue) d.dots([[x - 4, y + 2]], BR);
+    },
+    tail: (d, P, C) => d.limb(P.cx + P.rx - 2, P.cy + 3, P.cx + P.rx + 3, P.cy + 4, 2, C.b),
+    pattern: (d, P, C) => {
+      d.part().ellipse(P.cx + 1, P.cy - 1, P.rx + 1, P.ry, C.s, C.S, .5);
+      d.limb(P.cx - P.rx + 1, P.cy + P.ry * .5, P.cx + P.rx + 1, P.cy + P.ry * .5, 1.5, C.r);   // borda do casco
+      for (let i = -7; i <= 8; i += 5) d.limb(P.cx + i, P.cy - P.ry + 2, P.cx + i, P.cy + P.ry * .3, 1, C.S);
+      d.dots([[P.cx - 4, P.cy - 4], [P.cx + 2, P.cy - 5], [P.cx + 7, P.cy - 3]], "#5a6444");
+    }},
+  // sapo-cururu: largo, sem pescoço, olhos no alto da cabeça e as glândulas de veneno atrás deles
+  sapo: {W: 44, H: 28, cx: 25, rx: 12, ry: 7.5, leg: 4, lw: 3.5, splay: 4, neck: 0, hu: 3, hr: 6,
+    C: {b: "#8a6a3a", B: "#5e4626", l: "#d8c08a", g: "#c89a4a"}, legC: ["#7a5a30", "#5e4626"],
+    head: (d, x, y, o, C) => {
+      d.part().ellipse(x + 1, y, 7.5, 5.5, C.b, C.B, .6).ellipse(x, y + 3, 6, 2.5, C.l);
+      d.ellipse(x + 6, y - 2, 3, 1.8, C.g);   // glândula
+      d.part().ellipse(x - 1, y - 5, 2.6, 2.4, C.b); bEye(d, x - 1, y - 5, o);
+      if (o.mouth) { d.part().ellipse(x - 3, y + 3, 4.5, 2.5, BN); d.part().limb(x - 6, y + 3, x - 11, y + 2, 1.5, BR); }
+      else d.dots([[x - 6, y + 2], [x - 5, y + 2], [x - 4, y + 3], [x - 3, y + 3], [x - 2, y + 3], [x - 1, y + 3], [x, y + 3]], C.B);
+      if (o.tongue) d.dots([[x - 6, y + 3], [x - 7, y + 4]], BR);
+    },
+    pattern: (d, P, C) => d.dots([[P.cx - 6, P.cy - 4], [P.cx - 1, P.cy - 6], [P.cx + 4, P.cy - 4], [P.cx + 8, P.cy - 2], [P.cx - 3, P.cy - 1], [P.cx + 2, P.cy - 2], [P.cx + 6, P.cy + 1]], C.g)},
+  // mão-pelada: cinza, máscara preta nos olhos, mãos claras sem pelo e rabo listrado
+  guaxinim: {W: 52, H: 30, cx: 29, rx: 12, ry: 6.5, leg: 6, lw: 3, neck: 3, hu: 3, hr: 4,
+    C: {b: "#8a8a80", B: "#5e5e56", l: "#c8c8bc"}, legC: ["#4a4a44", "#34342e"], paw: ["#e0c0a0", "#b89878"],
+    head: (d, x, y, o, C) => {
+      d.part().poly([[x + 1, y - 3], [x + 2, y - 8], [x + 5, y - 3]], C.b).dots([[x + 2, y - 5]], "#e8e8e0");
+      d.part().ellipse(x, y, 5, 4.2, C.b, C.B, .6).poly([[x - 3, y - 1], [x - 9, y + 1], [x - 3, y + 3]], "#e8e8e0", "#c8c8c0", x - 6);
+      d.limb(x - 5, y - 1, x + 3, y - 1, 2, "#26262a");   // máscara
+      d.dots([[x - 9, y + 1]], BN); bEye(d, x - 1, y - 1, o);
+      if (o.mouth) bMouth(d, x - 8, y + 2, 4); if (o.tongue) d.dots([[x - 7, y + 3]], BR);
+    },
+    tail: (d, P, C) => { const x = P.cx + P.rx - 2, y = P.cy, pts = P.pose === "ko" ? [[x, y], [x + 5, y + 2], [x + 10, y + 4]] : [[x, y], [x + 5, y + 2], [x + 9, y + 6], [x + 11, y + 11]];
+      for (let i = 0; i + 1 < pts.length; i++) d.limb(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], 4.5, i % 2 ? "#3a3a36" : "#b8b8ac"); }},
+  // búfalo: grandão cinza-escuro, chifres largos curvados para trás e focinho claro
+  bufalo: {W: 66, H: 40, cx: 36, rx: 18, ry: 10, leg: 9, lw: 5, neck: 1, hu: 3, hr: 7,
+    C: {b: "#3a3638", B: "#242022", l: "#4a4648"}, paw: ["#1a1618", "#121012"],
+    head: (d, x, y, o, C) => {
+      d.part().ellipse(x, y, 7, 6, C.b, C.B, .6).ellipse(x - 5, y + 3, 4, 3, "#6a6264");
+      d.part().poly([[x - 3, y - 4], [x + 5, y - 10], [x + 14, y - 10], [x + 18, y - 4], [x + 13, y - 6], [x + 6, y - 6], [x + 1, y - 2]], "#d8d0c0", "#9a9488", x + 12);   // chifre largo, curvado para trás
+      d.dots([[x - 8, y + 2], [x - 7, y + 3]], BN); bEye(d, x - 1, y - 2, o);
+      if (o.mouth) bMouth(d, x - 8, y + 5, 4, false); if (o.tongue) d.dots([[x - 7, y + 6]], BR);
+    },
+    tail: (d, P, C) => { const x = P.cx + P.rx - 1, y = P.cy - 3; bChain(d, [[x, y], [x + 3, y + 6], [x + 3, y + 12]], [2, 1.5], C.B); d.ellipse(x + 3, y + 13, 1.5, 2, BN); },
+    pattern: (d, P, C) => d.dots([[P.cx - 8, P.cy - 7], [P.cx - 2, P.cy - 8], [P.cx + 5, P.cy - 7], [P.cx + 11, P.cy - 5]], "#5a5658")},
+  // ouriço-cacheiro: corpo redondo coberto de espinhos claros de ponta escura, focinho rosado
+  ourico: {W: 48, H: 32, cx: 26, rx: 11, ry: 8, leg: 4, lw: 3, neck: 1, hu: 1, hr: 4,
+    C: {b: "#6a5a48", B: "#4a3e30", l: "#8a7a64"}, legC: ["#4a3e30", "#34281e"],
+    head: (d, x, y, o, C) => {
+      d.part().ellipse(x, y, 4.5, 4, C.b, C.B, .6).ellipse(x - 4, y + 1, 2.4, 2, "#d89a8a");
+      d.dots([[x - 6, y + 1]], BN); bEye(d, x - 1, y - 1, o);
+      if (o.mouth) bMouth(d, x - 6, y + 2, 3); if (o.tongue) d.dots([[x - 5, y + 3]], BR);
+    },
+    tail: (d, P, C) => d.limb(P.cx + P.rx - 1, P.cy + 1, P.cx + P.rx + 6, P.cy + (P.pose === "ko" ? 3 : -3), 2.5, C.B),
+    pattern: (d, P, C) => {   // espinhos saindo das costas; arrepiados no bote e agachado
+      const up = P.pose === "attack" || P.pose === "crouch" ? 1.4 : 1;
+      d.part();
+      for (let a = -2.6; a <= -.3; a += .28) {
+        const x0 = P.cx + Math.cos(a) * P.rx * .8, y0 = P.cy + Math.sin(a) * P.ry * .8, x1 = P.cx + Math.cos(a) * (P.rx + 5 * up), y1 = P.cy + Math.sin(a) * (P.ry + 5 * up);
+        d.limb(x0, y0, x1, y1, 1, "#e8dcc0").dots([[Math.round(x1), Math.round(y1)]], "#2a1e14");
+      }
+    }}
 };
 
 /* ---------- macaco (sentado, rabo enrolado) ---------- */
@@ -493,8 +560,222 @@ function poraque(pose, f) {
   return {c: d.canvas(), head: [hx, hy]};
 }
 
+/* ---------- igarapé: garça, boto (e o Boto encantado, de chapéu) e pirarucu ---------- */
+// garça em pé numa perna só, pescoço em "S" e bico comprido; C troca as cores (o socó da várzea usa a mesma)
+function garca(pose, f, C = {b: "#f4f4ee", B: "#c8c8c0", y: "#e8c040", Y: "#b8902a", k: "#2a2a2a"}) {
+  const d = rigGrid(1, 48, 52), G = 49, o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  if (pose === "ko") {   // deitada, asa aberta e pescoço esticado no chão
+    d.part().limb(30, 45, 40, 43, 1.5, C.k).limb(32, 46, 42, 47, 1.5, C.k);
+    d.part().poly([[22, 42], [36, 38], [40, 44]], C.B);
+    d.part().ellipse(27, 45, 11, 4.5, C.b, C.B, .5);
+    d.part(); bChain(d, [[18, 45], [13, 46], [10, 46]], [3, 2], C.b, C.B);
+    d.part().ellipse(9, 45, 3.5, 3, C.b, C.B, .6).limb(6, 46, 1, 48, 1.5, C.y, C.Y);
+    bEye(d, 9, 44, o);
+    return {c: d.canvas(), head: [9, 43]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt";
+  const cx = at ? 29 : hu ? 33 : 31, cy = (cr ? 31 : 27) + (pose === "idle" ? f : 0);
+  const N = at ? [[cx - 8, cy - 2], [cx - 14, cy - 4], [cx - 16, cy - 5]] : cr ? [[cx - 8, cy - 1], [cx - 12, cy - 4], [cx - 10, cy - 7]] : hu ? [[cx - 8, cy - 2], [cx - 11, cy - 8], [cx - 7, cy - 13]] : [[cx - 8, cy - 2], [cx - 13, cy - 9], [cx - 9, cy - 15]];
+  const [hx, hy] = at ? [cx - 19, cy - 6] : cr ? [cx - 13, cy - 8] : hu ? [cx - 9, cy - 17] : [cx - 12, cy - 19];
+  d.part().limb(cx + 1, cy + 5, cx + 1, G, 1.5, C.k);   // perna de trás
+  if (pose === "idle" || pose === "blink") d.part().limb(cx - 1, cy + 5, cx - 1, cy + 12, 1.5, C.k).limb(cx - 1, cy + 12, cx + 3, cy + 9, 1.5, C.k);   // a outra dobrada
+  else d.part().limb(cx - 2, cy + 5, cx - 5, G, 1.5, C.k);
+  d.part().poly([[cx + 8, cy - 2], [cx + 15, cy + 1], [cx + 8, cy + 4]], C.B);   // cauda
+  d.part().ellipse(cx, cy, 10, 6.5, C.b, C.B, .55).ellipse(cx + 3, cy - 1, 7, 4.5, C.b, C.B, .6);
+  d.dots([[cx + 8, cy + 1], [cx + 9, cy + 2]], C.B);
+  d.part(); bChain(d, [N[0], N[1], N[2], [hx + 1, hy + 1]], [3.5, 2], C.b, C.B);
+  d.part().ellipse(hx, hy, 3.5, 3, C.b, C.B, .6);
+  d.part().limb(hx - 2, hy + 1, hx - (at ? 9 : 10), hy + (at ? 1 : 2), 1.5, C.y, C.Y);
+  if (at) d.part().limb(hx - 2, hy + 2, hx - 8, hy + 4, 1, C.Y);   // bico aberto
+  bEye(d, hx - 1, hy - 1, o);
+  return {c: d.canvas(), head: [hx, hy]};
+}
+// boto-cor-de-rosa nadando para a esquerda: testa redonda, focinho comprido e nadadeira; hat = o Boto encantado
+function boto(pose, f, hat) {
+  const d = rigGrid(1, 64, 36), C = hat ? {b: "#f2a8c0", B: "#c27894", l: "#fbd8e4"} : {b: "#e89aaa", B: "#b86a7a", l: "#f6c8d0"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", dx = at ? -3 : hu ? 3 : 0, dy = (cr ? 3 : at ? -2 : 0) + (pose === "idle" ? f : 0) + 6;
+  const pts = [[56 + dx, 20 + dy], [46 + dx, 17 + dy + (cr ? 2 : 0)], [35 + dx, 16 + dy], [25 + dx, 17 + dy], [18 + dx, 19 + dy]];
+  d.part().poly([[57 + dx, 20 + dy], [63 + dx, 13 + dy - (at ? 2 : 0)], [61 + dx, 20 + dy], [63 + dx, 27 + dy]], C.B);   // cauda
+  d.part(); bChain(d, pts, [3, 9], C.b, C.B);
+  d.ellipse(30 + dx, 21 + dy, 10, 2.5, C.l);   // barriga clara
+  d.part().poly([[34 + dx, 12 + dy], [38 + dx, 9 + dy], [40 + dx, 13 + dy]], C.B);   // corcova
+  d.part().poly([[26 + dx, 21 + dy], [31 + dx, 28 + dy], [32 + dx, 21 + dy]], C.B);   // nadadeira
+  const hx = 15 + dx, hy = 18 + dy;
+  d.part().ellipse(hx, hy, 6.5, 5.5, C.b, C.B, .6);
+  d.part().limb(hx - 4, hy + 2, hx - 14, hy + (at ? 1 : 4), 3, C.l, C.b);   // focinho
+  if (at) d.part().limb(hx - 4, hy + 4, hx - 12, hy + 7, 2, C.l).dots([[hx - 7, hy + 3], [hx - 10, hy + 4], [hx - 8, hy + 5]], BW);
+  d.dots([[hx + 2, hy - 5]], C.B);   // respiradouro
+  bEye(d, hx - 2, hy - 1, o);
+  if (hat && pose !== "ko") {   // chapéu branco escondendo o furo da cabeça
+    d.part().rect(hx - 6, hy - 7, 13, 2, "#f6f2e8").rect(hx - 3, hy - 12, 7, 5, "#f6f2e8").rect(hx - 3, hy - 9, 7, 1, "#e5001c");
+  }
+  if (pose === "ko") {   // de barriga para cima, boiando
+    const c = d.canvas(), out = document.createElement("canvas"), x = out.getContext("2d");
+    out.width = c.width; out.height = c.height; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
+    return {c: out, head: [hx, 36 - hy]};
+  }
+  return {c: d.canvas(), head: [hx, hy]};
+}
+// pirarucu: peixe enorme, cabeça chata cinza e o rabo vermelho de escamas grandes
+function pirarucu(pose, f) {
+  const d = rigGrid(1, 80, 32), C = {b: "#5a6656", B: "#3a4438", r: "#d8402a", R: "#a02a1a", l: "#b8b8a0"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  const at = pose === "attack", cr = pose === "crouch", cx = at ? 36 : cr || pose === "hurt" ? 42 : 39, cy = 15 + (pose === "idle" ? f : 0), fl = pose === "idle" ? f * 2 : 0;
+  d.part().poly([[cx + 28, cy], [cx + 38, cy - 9 + fl], [cx + 36, cy], [cx + 38, cy + 9 - fl]], C.r, C.R, cx + 34);   // cauda em leque
+  d.part().poly([[cx + 12, cy - 6], [cx + 26, cy - 4], [cx + 22, cy - 2]], C.R).poly([[cx + 12, cy + 6], [cx + 26, cy + 4], [cx + 22, cy + 2]], C.R);   // nadadeiras do fim
+  d.part().ellipse(cx + 12, cy, 18, 7, C.r, C.R, .55).ellipse(cx - 8, cy, 20, 8, C.b, C.B, .55);
+  for (let x = cx - 2; x < cx + 26; x += 4) for (const y of [cy - 4, cy, cy + 4]) d.dots([[x + (y === cy ? 2 : 0), y]], x > cx + 4 ? C.R : C.B);   // escamas
+  d.ellipse(cx - 10, cy + 4, 14, 2.5, C.l);
+  const hx = cx - 26, hy = cy;
+  d.part().poly([[hx - 2, hy - 4], [hx + 8, hy - 7], [hx + 9, hy + 6], [hx - 2, hy + 4]], C.b, C.B, hx + 6);   // cabeça chata
+  if (at) d.part().ellipse(hx - 1, hy, 3, 4, "#2a1414").dots([[hx - 2, hy - 3], [hx - 1, hy + 3]], BW);   // bocão aberto
+  else d.limb(hx - 2, hy + 1, hx + 4, hy - 1, 1, BN);
+  bEye(d, hx + 4, hy - 3, o);
+  if (pose === "ko") {
+    const c = d.canvas(), out = document.createElement("canvas"), x = out.getContext("2d");
+    out.width = c.width; out.height = c.height; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
+    return {c: out, head: [hx + 4, 32 - (hy - 3)]};
+  }
+  return {c: d.canvas(), head: [hx + 4, hy - 3]};
+}
+
+/* ---------- manguezal: caranguejo-uçá (e o Caranguejo-rei) e a Matinta Perera ---------- */
+// caranguejo de frente para a esquerda: casco azulado, patas laranja, olhos no talo e as garras na frente
+function caranguejo(pose, f) {
+  const d = rigGrid(1, 54, 32), G = 29, C = {b: "#3a5a7a", B: "#24405a", l: "#c8603a", L: "#8a3a22", t: "#f0c8a0"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : "open"};
+  const at = pose === "attack", cr = pose === "crouch", dy = (cr ? 4 : at ? -2 : 0) + (pose === "idle" ? f : 0), dx = pose === "hurt" ? 3 : 0, cx = 28 + dx, cy = 15 + dy;
+  // patas abertas em leque: joelho para cima e para fora, ponta fina no chão (lado de lá mais escuro e mais para trás)
+  const legs = (far) => { for (let i = 0; i < 3; i++) {
+    const o = far ? 4 : 0, bx = cx - 7 + i * 7 + o, dir = i - 1, kx = bx + dir * 5 + (dir ? 0 : -2), ky = cy + 8 + (i === 1 ? f : 0) - (far ? 1 : 0), fx = bx + dir * 8 - (dir ? 0 : 3);
+    d.limb(bx, cy + 4, kx, ky, 2.2, far ? C.L : C.l, C.L).limb(kx, ky, fx, G, 1.6, far ? C.L : C.l);
+  } };
+  d.part(); legs(true);
+  d.part().ellipse(cx, cy, 13, 7, C.b, C.B, .5).dots([[cx - 6, cy - 3], [cx - 1, cy - 4], [cx + 5, cy - 3], [cx + 9, cy - 1]], "#5a7a9a");
+  d.part(); legs(false);
+  for (const ex of [cx - 7, cx - 2]) { d.part().limb(ex, cy - 5, ex - 1, cy - 10, 1.2, C.B); bEye(d, ex - 1, cy - 11, o); }   // olhos no talo
+  const claw = (bx, by, big, open) => {
+    d.part().limb(cx - 10, cy + 1, bx + 4, by + 2, 2.5, C.l, C.L);
+    d.part().ellipse(bx, by, big, big * .75, C.l, C.L, .5);
+    d.poly([[bx - big, by - 1], [bx - big - 4, by - (open ? 4 : 2)], [bx - big + 1, by + 1]], C.t);   // ponta de cima
+    if (open) d.poly([[bx - big, by + 1], [bx - big - 4, by + 4], [bx - big + 1, by + 2]], C.t);
+  };
+  if (at) { claw(9, cy - 6, 5, true); claw(12, cy + 2, 3.5, true); }
+  else { claw(cx - 17, cy + 2, 5, false); claw(cx - 13, cy + 6, 3.5, false); }
+  if (pose === "ko") {   // de barriga para cima
+    const c = d.canvas(), out = document.createElement("canvas"), x = out.getContext("2d");
+    out.width = c.width; out.height = c.height; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
+    return {c: out, head: [cx - 4, 32 - cy]};
+  }
+  return {c: d.canvas(), head: [cx - 4, cy - 11]};
+}
+// Matinta Perera: velha curvada de xale preto, bengala e o pássaro rasga-mortalha no ombro; no ataque abre o xale e assobia
+function matinta(pose, f) {
+  const d = rigGrid(1, 46, 42), G = 39, C = {b: "#2a2230", B: "#17121c", s: "#a87a58", S: "#7a5236", h: "#d8d4cc", y: "#ffd23a"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" ? "shut" : "angry"};
+  if (pose === "ko") {
+    d.part().poly([[6, 39], [12, 30], [36, 28], [44, 39]], C.b, C.B, 30);
+    d.part().ellipse(10, 34, 5, 4.5, C.s, C.S, .6).limb(5, 31, 2, 38, 2, C.h);
+    d.part().limb(30, 38, 44, 32, 1.5, "#6a4a2a");   // bengala caída
+    bEye(d, 9, 33, o);
+    return {c: d.canvas(), head: [10, 31]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (cr ? 4 : 0) + (pose === "idle" ? f : 0), bx = hu ? 3 : at ? -2 : 0;
+  const hx = 15 + bx, hy = 11 + by;
+  d.part().limb(10 + bx, 22 + by, 4 + bx, G, 1.6, "#6a4a2a");   // bengala
+  // xale: no ataque abre como asas
+  d.part().poly(at ? [[hx + 2, hy - 6], [2, 12 + by], [6, G], [40, G], [44, 10 + by]] : [[hx + 2, hy - 6], [hx - 6, hy + 4], [8, G], [38, G], [34, 16 + by]], C.b, C.B, 30);
+  d.dots([[14 + bx, 25 + by], [22 + bx, 29 + by], [30 + bx, 25 + by], [18 + bx, 34 + by], [28 + bx, 35 + by]], "#3e3446");
+  for (let x = 9; x < 38; x += 3) d.dots([[x, G - 1], [x + 1, G]], "#4e4058");   // franja do xale
+  d.part().ellipse(hx, hy, 5.5, 5, C.s, C.S, .6);   // rosto dentro do capuz
+  d.limb(hx - 6, hy - 2, hx - 7, hy + 5, 1.5, "#a8a4ac").limb(hx + 6, hy - 1, hx + 7, hy + 5, 1.5, "#a8a4ac");   // cabelo grisalho dos lados
+  d.part().poly([[hx - 7, hy - 1], [hx + 1, hy - 9], [hx + 8, hy - 2], [hx + 4, hy - 5], [hx - 4, hy - 4]], C.b);   // capuz
+  if (o.eye === "shut") d.dots([[hx - 3, hy], [hx - 2, hy], [hx + 1, hy], [hx + 2, hy]], BN);
+  else d.dots([[hx - 3, hy - 1], [hx + 1, hy - 1]], C.y).dots([[hx - 3, hy], [hx + 1, hy]], "#ff8a3a");
+  if (at) d.part().ellipse(hx - 1, hy + 3, 1.2, 1.4, BN);   // assobiando
+  d.dots([[hx - 5, hy + 1]], C.S);   // nariz comprido
+  // rasga-mortalha no ombro (no ataque, voando na frente)
+  const [px, py] = at ? [6, 5 + by] : [30 + bx, 12 + by];
+  d.part().ellipse(px, py, 3.5, 2.6, "#e8e0d0", "#b8b0a0", .6).poly([[px + 2, py - 1], [px + 7, py - (at ? 6 : 2)], [px + 3, py + 1]], "#b8b0a0");
+  d.dots([[px - 2, py - 1]], BN).dots([[px - 4, py], [px - 5, py]], "#e8b030");
+  return {c: d.canvas(), head: [hx, hy]};
+}
+
+/* ---------- seringal: Curupira ---------- */
+// Curupira: menino da mata de cabelo de fogo, pele escura esverdeada e os pés virados para trás
+function curupira(pose, f) {
+  const d = rigGrid(1, 40, 42), G = 39, C = {s: "#5a7a4a", S: "#3a5a30", h: "#e5401c", H: "#ffb03a", t: "#7a5a2a", T: "#5a4020"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  const hair = (x, y, k) => {   // cabelo em labaredas, mexendo com o quadro
+    const fl = FLAMES[(f + k) % 3];
+    d.part().poly([[x - 7, y + 1], [x - 6, y - 7], [x - 3, y - 3], [x - 1, y - 10], [x + 2, y - 4], [x + 5, y - 9], [x + 7, y + 1]], fl[0]);
+    d.dots([[x - 3, y - 5], [x + 1, y - 7], [x + 4, y - 5]], fl[2]).dots([[x - 1, y - 3], [x + 3, y - 2]], fl[1]);
+  };
+  if (pose === "ko") {
+    d.part().ellipse(22, 35, 10, 3.5, C.t, C.T, .5);
+    d.part().limb(30, 35, 37, 36, 3, C.s, C.S).limb(37, 36, 38, 33, 2, C.s);   // pé virado para cima
+    hair(9, 34, 0);
+    d.part().ellipse(10, 34, 5, 4.5, C.s, C.S, .6); bEye(d, 9, 33, o);
+    return {c: d.canvas(), head: [10, 31]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (cr ? 4 : at ? -2 : 0) + (pose === "idle" ? f : 0), bx = at ? -3 : hu ? 3 : 0;
+  // pernas com os pés virados: o calcanhar aponta para a esquerda (para a frente) e os dedos para trás
+  const foot = (x, far) => { d.part().limb(x + bx, 28 + by, x + bx + 1, G - 1, 3, far ? C.S : C.s, C.S).limb(x + bx + 1, G, x + bx + 6, G, 2.5, far ? C.S : C.s); d.dots([[x + bx + 7, G], [x + bx + 7, G - 1]], C.S); };
+  foot(20, true); foot(15, false);
+  d.part().rect(12 + bx, 24 + by, 12, 6, C.t).rect(12 + bx, 28 + by, 12, 2, C.T);   // tanga de folha
+  d.part().ellipse(18 + bx, 20 + by, 6.5, 6, C.s, C.S, .55);
+  const arm = at ? [[13 + bx, 17 + by], [4 + bx, 12 + by]] : cr ? [[13 + bx, 18 + by], [8 + bx, 26 + by]] : [[13 + bx, 17 + by], [9 + bx, 24 + by]];
+  d.part().limb(...arm[0], ...arm[1], 2.5, C.s, C.S).ellipse(arm[1][0], arm[1][1], 1.6, 1.6, C.s);
+  if (at) d.part().ellipse(arm[1][0] - 2, arm[1][1] - 2, 2, 2.5, FLAMES[f % 3][1]).dots([[arm[1][0] - 2, arm[1][1] - 5]], "#ffd23a");   // chama na mão
+  const hx = 17 + bx, hy = 10 + by;
+  hair(hx + 1, hy - 2, 1);
+  d.part().ellipse(hx, hy, 5.5, 5, C.s, C.S, .6);
+  d.part().limb(23 + bx, 17 + by, 27 + bx, 24 + by, 2.5, C.S);   // braço de trás
+  if (o.eye === "shut") d.dots([[hx - 3, hy], [hx - 2, hy], [hx + 1, hy], [hx + 2, hy]], BN);
+  else { bEye(d, hx - 3, hy, o); bEye(d, hx + 1, hy, o); }
+  if (at) d.dots([[hx - 2, hy + 3], [hx - 1, hy + 3], [hx, hy + 3]], BN); else d.dots([[hx - 2, hy + 3], [hx, hy + 3]], C.S);
+  return {c: d.canvas(), head: [hx, hy]};
+}
+
+/* ---------- várzea: Mapinguari ---------- */
+// Mapinguari: gigante peludo de um olho só na testa e a boca enorme na barriga; anda curvado, braços com garras
+function mapinguari(pose, f) {
+  const d = rigGrid(1, 52, 46), G = 43, C = {b: "#7a4a2a", B: "#4e2c16", l: "#9a6a42", m: "#3a1410", t: "#e8e0c8", k: "#2a1a10"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  if (pose === "ko") {   // caído de costas
+    d.part().ellipse(28, 37, 17, 6, C.b, C.B, .5).dots([[20, 34], [26, 33], [32, 34], [38, 35]], C.l);
+    d.part().limb(40, 38, 48, 33, 4, C.b, C.B).limb(16, 38, 9, 42, 4, C.b, C.B);
+    d.part().ellipse(11, 35, 6, 5, C.b, C.B, .6); bEye(d, 10, 33, o);
+    return {c: d.canvas(), head: [11, 31]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (cr ? 4 : at ? -1 : 0) + (pose === "idle" ? f : 0), bx = at ? -3 : hu ? 3 : 0;
+  const cx = 27 + bx, cy = 25 + by;
+  d.part().limb(cx + 6, cy + 10, cx + 8, G, 5, C.B).ellipse(cx + 8, G, 4, 1.8, C.k);   // perna de trás
+  d.part().limb(cx + 10, cy - 6, cx + 16, cy + 6, 4, C.B).dots([[cx + 15, cy + 8], [cx + 17, cy + 8], [cx + 16, cy + 9]], C.t);   // braço de trás
+  d.part().ellipse(cx, cy, 13, 15, C.b, C.B, .5);
+  for (const [x, y] of [[-8, -9], [-3, -12], [4, -10], [9, -5], [-10, 2], [10, 4], [-6, 10], [6, 11]]) d.limb(cx + x, cy + y, cx + x + 1, cy + y + 3, 1, C.l);   // pelo
+  // boca na barriga: fechada é um risco com dentes; aberta é um buraco escuro cheio de dentes
+  if (at || cr) { d.part().ellipse(cx - 2, cy + 3, 6, at ? 7 : 5, C.m); for (let i = -4; i <= 2; i += 3) d.dots([[cx - 2 + i, cy - 3], [cx - 1 + i, cy + 8]], C.t); }
+  else { d.part().limb(cx - 7, cy + 3, cx + 3, cy + 4, 1.5, C.m); d.dots([[cx - 5, cy + 2], [cx - 2, cy + 2], [cx + 1, cy + 3]], C.t); }
+  d.part().limb(cx - 4, cy + 10, cx - 6, G, 5, C.b, C.B).ellipse(cx - 7, G, 4, 1.8, C.k);   // perna da frente
+  const hand = at ? [cx - 22, cy - 6] : cr ? [cx - 16, cy + 12] : [cx - 15, cy + 6];
+  d.part().limb(cx - 9, cy - 7, hand[0], hand[1], 4, C.b, C.B).dots([[hand[0] - 2, hand[1] - 1], [hand[0] - 2, hand[1] + 1], [hand[0] - 1, hand[1] + 2]], C.t);   // garras
+  const hx = cx - 2, hy = cy - 16;
+  d.part().ellipse(hx, hy, 8, 6.5, C.b, C.B, .6);
+  if (o.eye === "shut") d.rect(hx - 3, hy - 1, 5, 1, BN);
+  else if (o.eye === "x") bEye(d, hx - 1, hy - 1, o);
+  else { d.ellipse(hx - 1, hy - 1, 3, 2.6, "#ffe9a0").ellipse(hx - 2, hy - 1, 1.3, 1.6, BN).dots([[hx - 2, hy - 2]], BW); if (o.eye === "angry") d.limb(hx - 5, hy - 5, hx + 3, hy - 4, 1, BN); }   // olhão único
+  return {c: d.canvas(), head: [hx, hy]};
+}
+
 /* ---------- registro e cache ---------- */
-const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, coruja, chupacabra,
+const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, coruja, chupacabra, garca, pirarucu, caranguejo, matinta, curupira, mapinguari,
+  jararaca: cobra({b: "#8a7a5a", B: "#5e5038", k: "#3a2a1a"}, true),   // jararaca: cabeça triangular, marrom com desenhos escuros
+  soco: (pose, f) => garca(pose, f, {b: "#9a7a52", B: "#6e5436", y: "#d8b040", Y: "#a88a2a", k: "#c8a040"}),   // socó-boi: a garça em marrom listrado
+  cobra_cipo: cobra({b: "#6ab83a", B: "#3e8a24", k: "#a8e070"}, false),   // cobra-cipó: verde-folha, fina
+  macarico: (pose, f) => garca(pose, f, {b: "#a8906a", B: "#7a6446", y: "#3a2a1a", Y: "#22180e", k: "#4a3a2a"}),   // maçarico: a garça em tons de areia
+  boto: (pose, f) => boto(pose, f, false), boto_encantado: (pose, f) => boto(pose, f, true),
   boitata: cobra({b: "#e8601c", B: "#a8300c", k: "#ffd23a", eye: "#fff3a0", flame: true, rattle: ["#e8d8a0", "#a89870"]}, false),
   sucuri: cobra({b: "#5a7a3a", B: "#3a5a24", k: "#1e2a14"}, false),
   surucucu: cobra({b: "#b0905a", B: "#806440", k: "#3a2a1a"}, true)};
