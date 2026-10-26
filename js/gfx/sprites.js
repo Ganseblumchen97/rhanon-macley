@@ -49,11 +49,13 @@ function shadeCanvas(c) {
 }
 // haste da lança: madeira clara com contorno escuro ao lado (a mesma em exploração, batalha e tela inicial)
 const SPEAR_WOOD = "#d9b25a";
-function spearShaft(ctx, x0, y0, x1, y1) {
+function spearShaft(ctx, x0, y0, x1, y1, wood = SPEAR_WOOD) {
   const steep = Math.abs(x1 - x0) < Math.abs(y1 - y0), ox = steep ? 1 : 0, oy = steep ? 0 : 1;
   lineP(ctx, x0 + ox, y0 + oy, x1 + ox, y1 + oy, "#1a2418");
-  lineP(ctx, x0, y0, x1, y1, SPEAR_WOOD);
+  lineP(ctx, x0, y0, x1, y1, wood);
 }
+// cores da lança em uso (EQUIP.weapon[].look): haste p e ponta m, para os desenhos em pixel fora do gfx/rig.js
+const spearLook = () => ({p: SPEAR_WOOD, m: "#eef3f5", ...EQUIP.weapon[G.equip?.weapon]?.look});
 /* ---------- utilidades de desenho ---------- */
 function pxl(ctx, x, y, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), 1, 1); }
 function lineP(ctx, x0, y0, x1, y1, c) {

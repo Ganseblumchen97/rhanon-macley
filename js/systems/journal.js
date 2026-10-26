@@ -63,7 +63,7 @@ function rollOffer() {
 }
 // ao chegar na aldeia (ou acordar/anoitecer nela): o aldeão com pedido avisa com um somzinho
 function announceOffer() {
-  if (rollOffer()) { sfx("missao"); exToast(`${VILLAGER_NAME[questById(G.offer.id).giver]} tem um pedido para você (folha sobre a cabeça).`); }
+  if (rollOffer()) { sfx("missao"); exToast(`${VILLAGER_NAME[questById(G.offer.id).giver]} tem um pedido (folha em cima da cabeça).`); }
 }
 const questCount = q => q.need.pelt ? Math.min(q.need.n, G.pelts[q.need.pelt] || 0) : G.quest.n;
 const questReady = () => { const q = G.quest && questById(G.quest.id); return !!q && questCount(q) >= q.need.n; };
@@ -79,13 +79,13 @@ function questDeliver() {
   G.money += q.reward.money || 0;
   for (const [k, n] of Object.entries(q.reward.items || {})) G.items[k] = (G.items[k] || 0) + n;
   G.questsDone[q.id] = G.day; G.quest = null; save(); sfx("more"); exHud();
-  exOpenDialog("aldeao", `${q.thanks} Você recebeu: ${rewardText(q.reward)}.`);
+  exOpenDialog("aldeao", `${q.thanks} Recebeu: ${rewardText(q.reward)}.`);
 }
 // conversa com um aldeão: entrega, oferta ou uma dica qualquer
 function villagerTalk(look, say, d) {
   const name = VILLAGER_NAME[look] || "Aldeão", act = G.quest && questById(G.quest.id), off = !G.quest && G.offer && questById(G.offer.id);
   if (act && act.giver === look) {
-    if (questReady()) { say(name, act.thanks.split("!")[0] + "! Trouxe o que eu pedi?"); btn("Entregar", questDeliver, false, d); }
+    if (questReady()) { say(name, "E aí, trouxe o que eu pedi?"); btn("Entregar", questDeliver, false, d); }
     else say(name, `${act.text} (${questGoal(act)}: ${questCount(act)} de ${act.need.n})`);
   } else if (off && off.giver === look) { say(name, off.text); lh(`Recompensa: ${rewardText(off.reward)}.`, d); btn("Aceitar o pedido", questAccept, false, d); }
   else { const tips = look.startsWith("urbano") ? BELEM_TIPS : VILLAGER_TIPS; say(name, tips[Math.floor(Math.random() * tips.length)]); }

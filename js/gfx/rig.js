@@ -71,10 +71,11 @@ function rigGrid(S, W = RIG_W, H = RIG_H) {   // W/H: tamanho base (outros desen
 }
 
 /* ---------- armas e objetos ---------- */
-function rigSpear(d, C, x0, y0, x1, y1) {   // (x1, y1) = onde começa a ponta de pedra
+function rigSpear(d, C, x0, y0, x1, y1) {   // (x1, y1) = onde começa a ponta; cores e amarração de EQUIP.weapon[].look
   d.part().limb(x0, y0, x1, y1, 2, C.p, C.P);
-  const L = Math.hypot(x1 - x0, y1 - y0) || 1, nx = (x1 - x0) / L, ny = (y1 - y0) / L;
-  d.poly([[x1 - ny * 1.6, y1 + nx * 1.6], [x1 + ny * 1.6, y1 - nx * 1.6], [x1 + nx * 3.5, y1 + ny * 3.5]], C.m);
+  const L = Math.hypot(x1 - x0, y1 - y0) || 1, nx = (x1 - x0) / L, ny = (y1 - y0) / L, t = C.long ? 5 : 3.5;
+  if (C.band) d.part().limb(x1 - nx * 3, y1 - ny * 3, x1 - nx * 1.2, y1 - ny * 1.2, 2.8, C.band).part();
+  d.poly([[x1 - ny * 1.6, y1 + nx * 1.6], [x1 + ny * 1.6, y1 - nx * 1.6], [x1 + nx * t, y1 + ny * t]], C.m);
 }
 function rigBow(d, C, x, y0, y1, pullTo) {   // arco vertical em x; corda reta ou puxada até pullTo [x, y]
   d.part();
@@ -84,6 +85,7 @@ function rigBow(d, C, x, y0, y1, pullTo) {   // arco vertical em x; corda reta o
   }
   if (pullTo) { d.part().limb(x, y0, pullTo[0], pullTo[1], 1, C.w).limb(pullTo[0], pullTo[1], x, y1, 1, C.w); }
   else d.part().limb(x, y0, x, y1, 1, C.w);
+  if (C.fl) d.part().ellipse(x + 2, y0 + 1.5, 1.8, 1.4, C.fl).ellipse(x + 2, y1 - 1.5, 1.8, 1.4, C.fl);   // penas nas pontas
 }
 function rigTorch(d, C, x0, y0, x1, y1, f) {   // cabo de (x0,y0) até a chama em (x1,y1)
   d.part().limb(x0, y0, x1, y1, 2, C.f);
@@ -203,6 +205,8 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
 // visual do Rhanon conforme o que ele veste (G.equip) e o emprego
 function rhanonLook() {
   const q = G?.equip || {}, T = EQUIP.torso[q.torso], L = EQUIP.legs[q.legs], look = {bowBack: !!q.ranged};
+  const pal = {...EQUIP.weapon[q.weapon]?.look, ...EQUIP.ranged[q.ranged]?.look};   // cores da lança e do arco em uso
+  if (Object.keys(pal).length) look.pal = pal;
   if (G?.betterJob) Object.assign(look, {shirt: ["#26364a", "#18222f"], pants: ["#18222f", "#0f1620"], glasses: true, noBand: true});
   else if (G?.job) Object.assign(look, {shirt: ["#f4ecd8", "#cdbf9a"], pants: ["#26364a", "#18222f"], noBand: true});
   else { if (T) look.shirt = [T.color, T.shade]; if (L && L.color) look.pants = [L.color, L.shade]; }

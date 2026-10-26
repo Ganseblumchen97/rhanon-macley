@@ -3,6 +3,24 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.28.0 — textos com sotaque e armas com cara própria
+
+- O jogo todo ficou mais curto e descontraído. A gente da aldeia, da feira e de Belém agora fala como paraense: o
+  caçador te acorda com "Égua, Rhanon, acordou!", o armeiro faz "coisa pai d'égua" e a peixeira do Ver-o-Peso
+  pergunta se você sentiu o pitiú.
+- O cartão de fim de luta ficou enxuto: uma frase curta ("A onça-pintuda saiu correndo.") e, embaixo, o que você
+  ganhou, um item por linha (XP, pele e quanto ela vale, nível novo, área liberada). Perdendo em Belém, ele diz que
+  você acordou no Ver-o-Peso (antes dizia aldeia).
+- As mensagens da batalha estão mais curtas ("Bloqueio! Evitou 5 de dano.", "Lançada: −8.") e os bichos aparecem
+  com o gênero certo: "a sucuri", "a onça-pintuda recuou assustada", "o Curupira".
+- O comprador de peles avisa quando o armeiro ainda usa uma pele: ela ganha a etiqueta "armeiro usa" e a pergunta
+  antes de vender diz para quê ("O armeiro usa pra fazer: Calça de couro de anta."). A bolsa mostra a mesma etiqueta.
+- Antes de comprar, fabricar ou trocar arma e roupa, um selo compara com o que você está usando: verde "+3" é
+  melhor, vermelho "−2" é pior e cinza "=" é igual. Aparece no armeiro, no artesão e no Equipamento (E).
+- Cada lança e cada arco tem desenho próprio: ponta de dente, presa, osso, chifre ou aço, amarrações coloridas e
+  arcos com penas de harpia, gavião ou gaivota. Dá para ver no Rhanon, no golpe e no arremesso.
+- No Equipamento e na ficha do armeiro, cada item aparece desenhado num quadradinho ao lado do nome.
+
 ## 0.27.0 — músicas novas e chefes de respeito
 
 - O mapa do Pará ganhou música própria: uma guitarrada com cara de cidade de dia e uma versão calma de noite,

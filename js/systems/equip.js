@@ -15,6 +15,20 @@ function eqFigure() {
   fig.append(img);
   return fig;
 }
+// desenho do item num quadradinho de 16x16, com o mesmo contorno do Rhanon: lança e arco com as cores de look,
+// roupa com a cor dela (tanga quando a calça não tem cor); vazio = sem desenho
+function gearIcon(slot, it) {
+  const box = document.createElement("span"); box.className = "eq-icon";
+  if (!it) return box;
+  const d = rigGrid(1, 16, 16), C = {...RIG_PAL, ...it.look};
+  if (slot === "weapon") rigSpear(d, C, 2, 14, 10, 6);
+  else if (slot === "ranged") { rigBow(d, C, 5, 1, 15); d.part().limb(3, 8, 12, 8, 1, "#c9a46a").dots([[13, 8]], C.m); }
+  else if (slot === "torso") d.part().poly([[4, 2], [6, 2], [8, 5], [10, 2], [12, 2], [13, 14], [3, 14]], it.color, it.shade, 9);
+  else if (it.color) d.part().poly([[3, 2], [13, 2], [13, 15], [9, 15], [8, 7], [7, 15], [3, 15]], it.color, it.shade, 9);
+  else d.part().rect(3, 4, 10, 2, C.t).poly([[5, 6], [11, 6], [10, 11], [8, 13], [6, 11]], C.t, C.T, 9);
+  box.append(d.canvas());
+  return box;
+}
 // itens que podem ir num espaço: os seus (G.owned) e, quando dá para ficar sem, a opção vazia
 function eqChoices(s) {
   const out = Object.entries(EQUIP[s.slot]).filter(([id]) => G.owned[id]).map(([id, it]) => ({id, it}));
@@ -31,6 +45,7 @@ function openEquip(msg) {
     const it = q[s.slot] && EQUIP[s.slot][q[s.slot]], b = document.createElement("button");
     b.type = "button"; b.className = "eq-slot" + (i === EQ_SEL ? " sel" : "");
     b.innerHTML = `<small>${s.n}</small><b>${it ? it.n : s.none || "—"}</b><i>${it ? gearBonus(s.slot, it) : s.slot === "ranged" ? "o armeiro da feira faz" : ""}</i>`;
+    b.prepend(gearIcon(s.slot, it));
     b.addEventListener("click", () => { EQ_SEL = i; sfx("blip"); openEquip(); });
     cols[i < 2 ? 0 : 1].append(b);
   });
@@ -42,10 +57,12 @@ function openEquip(msg) {
   box.append(pick);
   list.forEach(c => {
     const on = q[s.slot] === c.id;
-    btn(c.it.n + (on ? " <small>usando</small>" : c.id ? ` <small>${gearBonus(s.slot, c.it)}</small>` : ""), () => { if (!on) eqSet(s.slot, c.id); }, false, pick);
+    btn(c.it.n + (on ? " <small>usando</small>" : c.id ? ` <small>${gearBonus(s.slot, c.it)}</small> ${gearCmp(s.slot, c.it)}` : ""), () => { if (!on) eqSet(s.slot, c.id); }, false, pick);
     pick.lastElementChild.classList.toggle("sel", on);
+    const sp = pick.lastElementChild.firstElementChild, key = sp.querySelector(".key");   // desenho depois do número da tecla
+    sp.insertBefore(gearIcon(s.slot, c.id && c.it), key ? key.nextSibling : sp.firstChild);
   });
-  if (!list.length) lh(s.slot === "ranged" ? "Você ainda não tem arco. O armeiro da feira faz um." : "Nada para trocar aqui ainda.", pick);
+  if (!list.length) lh(s.slot === "ranged" ? "Ainda sem arco. O armeiro da feira faz um." : "Nada pra trocar aqui ainda.", pick);
   if (msg) lh(msg, box);
   box.insertAdjacentHTML("beforeend", '<p class="hint eq-keys">Setas escolhem o espaço · Z troca para o próximo · 1-9 equipam direto · X fecha</p>');
   btn("Fechar", closeEquip, false, box);

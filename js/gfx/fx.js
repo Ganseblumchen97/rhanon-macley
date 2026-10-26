@@ -26,9 +26,11 @@ function arrowC(sc) {
 function spearC(sc) {
   const c = document.createElement("canvas"), x = c.getContext("2d");
   c.width = 26; c.height = 5;
-  spearShaft(x, 0, 1, 21, 1);
+  const sl = spearLook();
+  spearShaft(x, 0, 1, 21, 1, sl.p);
+  if (sl.band) { x.fillStyle = sl.band; x.fillRect(18, 0, 2, 3); }
   x.fillStyle = "#1a1426"; x.fillRect(21, 0, 3, 4); x.fillRect(24, 1, 2, 2);
-  x.fillStyle = "#e6edf0"; x.fillRect(22, 1, 2, 2); x.fillRect(24, 1, 1, 1);
+  x.fillStyle = sl.m; x.fillRect(22, 1, 2, 2); x.fillRect(24, 1, 1, 1);
   return px(c, sc);
 }
 function numC(str, col, sc) {

@@ -78,3 +78,4 @@ TITLE_A.mount($("titleArt"));
 drawMap(); themeReady = true;
 $("titleScreen").hidden = false;
 startAnimationLoop();
+debugSetup();   // só faz algo com ?debug na URL (ver state.js)

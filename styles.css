@@ -428,7 +428,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 #over h1{font-family:'Luckiest Guy',var(--display);font-weight:400;font-size:clamp(46px,9vw,110px);line-height:1;margin:0 0 18px;color:#fff;rotate:-5deg;-webkit-text-stroke:12px var(--ink);paint-order:stroke fill;filter:drop-shadow(3px 0 0 var(--accent)) drop-shadow(-3px 0 0 var(--accent)) drop-shadow(0 3px 0 var(--accent)) drop-shadow(0 -3px 0 var(--accent)) drop-shadow(5px 7px 0 rgba(0,0,0,.5))}
 .ch{display:inline-block;rotate:var(--r);translate:0 var(--y);animation:hop .5s cubic-bezier(.2,1.8,.4,1) backwards;animation-delay:calc(.2s + var(--i) * 45ms)}
 @keyframes hop{from{translate:0 -.6em;scale:.3}}
-#over p{display:inline-block;background:var(--paper);color:var(--ink);font:700 14px/1.6 var(--mono);padding:10px 18px;rotate:1.5deg;max-width:640px;margin:0 0 20px}
+#over p{display:inline-block;white-space:pre-line;background:var(--paper);color:var(--ink);font:700 14px/1.6 var(--mono);padding:10px 18px;rotate:1.5deg;max-width:640px;margin:0 0 20px}
 .card button{all:unset;cursor:pointer;font-family:var(--display);font-size:22px;padding:6px 24px;background:var(--paper);color:var(--ink);clip-path:polygon(5% 0,100% 0,95% 100%,0 100%);transition:scale .2s var(--pop),background .1s;margin:4px 8px}
 .card button:hover,.card button:focus-visible{scale:1.08;background:var(--accent);color:var(--on-accent)}
 /* título */
@@ -785,3 +785,19 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .bag-list .cmd.bagrow small{font-size:13px;white-space:nowrap;justify-self:start}
 .bag-list .cmd.bagrow:hover,.bag-list .cmd.bagrow.sel,.bag-list .cmd.bagrow:focus-visible{background:var(--leafB,#3f9a5c);color:#fff}
 .bag-list .cmd.bagrow[aria-disabled="true"]{opacity:1;cursor:default}
+/* comparação com o equipamento em uso (gearCmp em local.js): selo redondo verde/vermelho/cinza, sem seta */
+.cmp{display:inline-block;min-width:1.6em;padding:0 .45em;border:2px solid #1a1426;border-radius:999px;font:700 .8em/1.35 var(--mono);text-align:center;vertical-align:middle;color:#fff;box-shadow:2px 2px 0 rgba(0,0,0,.35)}
+.cmp.up{background:#2f9e4a}
+.cmp.down{background:#c8303a}
+.cmp.eq{background:#8a8478}
+.craft-use{display:inline-block;padding:0 .4em;border:2px solid #1a1426;border-radius:3px;background:#f2a20c;color:#1a1426;font:700 .75em/1.35 var(--mono);vertical-align:middle}
+.info .warn{display:block;margin-top:6px;color:#c8303a}
+.forge-vs{margin:2px 0 6px;font-size:.85em;opacity:.8}
+/* desenho do item na tela de equipar (gearIcon em equip.js) */
+.eq-icon{display:inline-grid;place-items:center;width:40px;height:40px;flex:none;border:2px solid var(--wood);border-radius:3px;background:rgba(255,255,255,.45)}
+.eq-icon canvas{width:32px;height:32px;image-rendering:pixelated}
+.eq-slot{display:grid;grid-template-columns:auto 1fr;column-gap:10px}
+.eq-slot .eq-icon{grid-row:1/4}
+.eq-pick .cmd .eq-icon{width:28px;height:28px;margin-right:6px;vertical-align:middle}
+.eq-pick .cmd .eq-icon canvas{width:24px;height:24px}
+.forge-card h3{display:flex;align-items:center;gap:8px}

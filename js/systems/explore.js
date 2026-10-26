@@ -188,13 +188,13 @@ function startExplore(zone, after, from) {
     $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false; exFit();
     musicStart("local"); exHud();
-    exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || " · peles, comida, artesão e armeiro: chegue perto de uma barraca e aperte Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
+    exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || " · peles, comida, artesão e armeiro: chega perto de uma barraca e aperta Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
   });
 }
-const SAFE_TIP = {aldeia: " · chegue perto da fogueira ou dos aldeões e aperte Z. A trilha da direita leva à feira",
-  parada: " · a cabine do cobrador vende a passagem; com ela, é só embarcar no ônibus", terminal: " · o ônibus volta para Ananindeua; a trilha da esquerda leva ao Ver-o-Peso"};
+const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira",
+  parada: " · compra a passagem na cabine e embarca no ônibus", terminal: " · o ônibus volta pra Ananindeua; a trilha da esquerda vai pro Ver-o-Peso"};
 function exitExplore() {
   if (!EX || EX.locked) return;
   EX.locked = true;
@@ -209,8 +209,8 @@ function resumeExplore(result) {
   if (en && result === "flee") { en.stunUntil = now + 3500; EX.invulnUntil = now + 2500; }
   $("explore").hidden = false; $("homeButton").hidden = true;
   musicStart("local"); exHud();
-  if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? `${en.a.name} derrotado! A aldeia vai contar essa história por muitas noites.`
-    : EX.st.next === "parada" ? "Você venceu o último chefe de Ananindeua! A passagem leva à BR-316." : EX.st.next ? `Caminho liberado: ${SUB[EX.st.next].n}! Siga a trilha até a passagem.` : "Você venceu o último chefe daqui!");
+  if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? `${theName(en.a, true)} já era! A aldeia vai falar disso por muitas noites.`
+    : EX.st.next === "parada" ? "Último chefe de Ananindeua vencido! A passagem leva à BR-316." : EX.st.next ? `Caminho livre: ${SUB[EX.st.next].n}! Segue a trilha até a passagem.` : "Último chefe daqui vencido!");
   if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); }   // o mapa mostra o caminho novo
 }
 
@@ -222,7 +222,7 @@ function exStrike() {
   const h = EX.hero; EX.cool = .35; EX.jab = .16; sfx("spear");
   // a lança alcança uns 1,5 quadrado à frente: confere pontos ao longo dela
   const reach = en => [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw);
-  if (EX.ents.some(en => en.alive && en.aquatic && reach(en)) && !EX.ents.some(en => en.alive && !en.aquatic && reach(en))) exToast("O peixe está na água: a lança não alcança. Use a flecha (X)!");
+  if (EX.ents.some(en => en.alive && en.aquatic && reach(en)) && !EX.ents.some(en => en.alive && !en.aquatic && reach(en))) exToast("O peixe tá na água e a lança não alcança. Usa a flecha (X)!");
   const target = EX.ents.find(en => en.alive && !en.aquatic && [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw));
   if (target) exHit(target);
 }
@@ -232,7 +232,7 @@ const BOW_DRAW = .32;   // segundos puxando a corda antes da flecha sair (ele pa
 const bowHand = a => [16 + a.x * 13, 25 + a.y * 9];
 function exThrow() {
   if (!EX || EX.locked || EX.dialog || EX.camp || EX.cool > 0 || EX.spear || EX.draw) return;
-  if (!G.equip.ranged) { EX.cool = 1.2; sfx("blip"); return exToast("Para atacar de longe você precisa de um arco. O armeiro da feira vende."); }
+  if (!G.equip.ranged) { EX.cool = 1.2; sfx("blip"); return exToast("Pra atacar de longe precisa de arco. O armeiro da feira faz um."); }
   const h = EX.hero; EX.cool = BOW_DRAW + .45; sfx("guard");
   EX.draw = {t: 0, aim: {x: h.aim.x, y: h.aim.y}};
 }
@@ -269,7 +269,7 @@ function pickLoot(l) {
   EX.loot = EX.loot.filter(q => q !== l); vit();
   G.pelts[l.id] = (G.pelts[l.id] || 0) + 1; save(); sfx("heal");
   exBurst(l.x, l.y - 4, ["#ffffff", "#ffd23a"], 8);
-  exToast(`Pegou: ${peltName(l.id).toLowerCase()} (vale R$ ${peltValue(l.id)} na feira).`); exHud();
+  exToast(`Pegou: ${peltName(l.id).toLowerCase()} (R$ ${peltValue(l.id)} na feira).`); exHud();
 }
 // pele no chão: trouxinha com a cor do tipo (couro, escamas, penas, casco, presas), pulando e brilhando
 function drawLoot(x, l, cx, cy, now) {
@@ -288,7 +288,7 @@ function exHit(en) {
     en.alive = false; en.koUntil = performance.now() + 1100; sfx("crit");
     exBurst(en.x, en.y - 6, ["#d8d2c0", "#a89f8a", "#ffffff"], 14);
     curZone = EX.zone;
-    exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a, G.lv - (a.lv || 1) >= ONE_HIT_LEVELS ? WEAK_XP : ONE_HIT_XP, !en.aquatic));
+    exToast(`Derrubou ${theName(a)} num golpe só! ` + reward(a, G.lv - (a.lv || 1) >= ONE_HIT_LEVELS ? WEAK_XP : ONE_HIT_XP, !en.aquatic).join(" · "));
     if (!en.aquatic) EX.loot.push({id: a.id, x: en.x, y: en.y, t0: performance.now()});   // a pele fica no chão até ele passar por cima (peixe: vai direto para a bolsa)
     exHud();
     return;
@@ -446,8 +446,9 @@ function drawHeroEnt(x, h, cx, cy, now) {
   // estocada da lança; de costas (golpe para cima) ela vai atrás do corpo e só a ponta aparece acima da cabeça
   const behind = h.dir === "up", jab = () => {
     const bx = sx + ox, by = sy - 12 + oy, L = behind ? 27 : 21;
-    spearShaft(x, bx - h.aim.x * 4, by - h.aim.y * 4, bx + h.aim.x * L, by + h.aim.y * L);
-    pxl(x, bx + h.aim.x * (L + 1), by + h.aim.y * (L + 1), "#eef3f5"); pxl(x, bx + h.aim.x * L, by + h.aim.y * L, "#cfd8dc");
+    const sl = spearLook();
+    spearShaft(x, bx - h.aim.x * 4, by - h.aim.y * 4, bx + h.aim.x * L, by + h.aim.y * L, sl.p);
+    pxl(x, bx + h.aim.x * (L + 1), by + h.aim.y * (L + 1), sl.m); pxl(x, bx + h.aim.x * L, by + h.aim.y * L, sl.band || "#cfd8dc");
   };
   drawShadow(x, sx, sy, 12);
   if (EX.jab > 0 && behind) jab();
@@ -639,28 +640,29 @@ const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 const BELEM_TIPS = [
-  "Aqui na capital tem malandro esperto: segura a bolsa! Se um deles levar seu dinheiro, vença e ele devolve.",
-  "Os urubus do Ver-o-Peso estão aqui desde antes de mim. Não mexe com eles que eles não mexem contigo.",
-  "Na Cidade Velha tem iguana tomando sol nas praças. Parece calma, mas a cauda dela é um chicote.",
-  "Dizem que de noite, na Cidade Velha, uma mulher de branco anda pelas ruas de pedra. É visagem, menino.",
-  "No porto, os ratos são do tamanho de um gato. E à noite contam que a Cobra Norato sobe a baía.",
-  "Do outro lado do canal ficam as Baixadas: casa de palafita e ponte de tábua. Na maré cheia, cuidado.",
-  "A rede da pensão é baratinha, coisa de quinze reais. Dorme aí que amanhã a gente conversa.",
-  "Erva de cheiro, banho de descarrego... aqui tem remédio para tudo. Menos para preguiça."
+  "Aqui na capital tem malandro esperto, segura a bolsa! Se um fi de rapariga desses levar teu dinheiro, vence ele que ele devolve.",
+  "Os urubus do Ver-o-Peso tão aqui desde antes de mim. Não mexe com eles que eles não mexem contigo.",
+  "Na Cidade Velha tem iguana tomando sol na praça. Parece de boa, mas a cauda dela é um chicote.",
+  "Dizem que de noite, na Cidade Velha, uma mulher de branco anda pelas ruas de pedra. É visagem, menino. Te benze.",
+  "No porto, os ratos são do tamanho de um gato. E de noite contam que a Cobra Norato sobe a baía. Arriégua!",
+  "Do outro lado do canal ficam as Baixadas: palafita e ponte de tábua. Na maré cheia, olha onde pisa.",
+  "A rede da pensão é baratinha, coisa de quinze conto. Dorme aí que amanhã a gente conversa.",
+  "Erva de cheiro, banho de descarrego... aqui tem remédio pra tudo. Menos pra leseira.",
+  "Sentiu esse pitiú? É peixe fresco, maninho. Cheiro de Ver-o-Peso."
 ];
 const VILLAGER_TIPS = [
-  "Etiqueta verde em cima do bicho? Ele cai com um golpe só.",
-  "Quando o bicho se encolhe tremendo, ele vai atacar: aperte Z quando o anel ficar verde e você bloqueia metade do golpe.",
-  "Acertar o bicho primeiro, com a lança (Z) ou uma flecha (X), te dá o primeiro turno da luta.",
-  "Três tempos certos seguidos na luta, golpe perfeito ou bloqueio, enchem a Fúria: aí a lança vira três estocadas de uma vez.",
-  "Se o bicho te alcançar antes, quem começa batendo é ele. Fique esperto com o \"!\".",
-  "A tocha do artesão assusta os bichos: eles fraquejam e você ataca de novo na mesma hora.",
-  "Sem arco? Jogue a lança (Especial): bate forte, mas às vezes erra.",
-  "O chefe de cada mata fica no fim da trilha. Vencer ele abre o caminho para a próxima.",
-  "Na fogueira da aldeia dá para descansar até a noite ou dormir até o dia seguinte. As fogueiras das trilhas recuperam tudo.",
-  "À noite a mata muda: morcegos, corujas, lobos-guará... e dizem que o Chupa-cabra ronda a mata.",
-  "Contam que na mata fechada passa uma mula sem cabeça, cuspindo fogo pelo pescoço. E no lago... o Boitatá.",
-  "O vendedor da feira paga bem por couro de jacaré. Dizem."
+  "Etiqueta verde em cima do bicho? Esse aí cai com uma lançada só.",
+  "Bicho se encolheu tremendo? Vai dar o bote. Aperta Z quando o anel ficar verde que tu bloqueia metade.",
+  "Acerta o bicho primeiro, na lança (Z) ou na flecha (X), que o primeiro turno da briga é teu.",
+  "Três tempos certos seguidos na briga, golpe perfeito ou bloqueio, enchem a Fúria: a lança vira três estocadas de uma vez. Pai d'égua!",
+  "Se o bicho te pegar antes, quem bate primeiro é ele. Viu o \"!\"? Moscou, dançou.",
+  "A tocha do artesão assusta os bichos: eles fraquejam e tu ataca de novo na mesma hora.",
+  "Sem arco? Joga a lança (Especial). Bate forte, mas às vezes erra.",
+  "O chefe de cada mata fica no fim da trilha. Vence ele que abre o caminho pra próxima.",
+  "Na fogueira da aldeia tu descansa até a noite ou dorme até o outro dia. As fogueiras das trilhas recuperam tudo.",
+  "De noite a mata muda: morcego, coruja, lobo-guará... e dizem que o Chupa-cabra anda rondando. Égua, tenho é medo.",
+  "Contam que na mata fechada passa uma mula sem cabeça, cuspindo fogo pelo pescoço. E no lago... o Boitatá. Visagem das brabas.",
+  "O vendedor da feira paga bem por couro de jacaré. Dizem, né."
 ];
 // ponto de conversa colado no Rhanon (o mais perto)
 function nearSpot() {
@@ -700,17 +702,17 @@ function exOpenDialog(kind, msg, look) {
   const d = $("exDialog"); EX.dialog = kind; exKeys.clear(); sfx("blip");
   const say = (title, text) => { d.innerHTML = `<h2>${title}</h2><p>${text}</p>`; };
   if (kind === "fogueira" && EX.st.safe) {   // fogueira da aldeia: escolhe até quando descansar
-    say("Fogueira", G.night ? "A noite está alta. Dormir aqui recupera tudo, e o dia seguinte começa."
-      : "O fogo estala e esquenta. Descansar até a noite recupera metade de PV e PE, e à noite a mata muda. Dormir até o dia seguinte recupera tudo.");
+    say("Fogueira", G.night ? "Noite alta. Dormir aqui recupera tudo e já começa o outro dia."
+      : "O fogo estala. Descansar até a noite recupera metade (e de noite a mata muda). Dormir até o outro dia recupera tudo.");
     if (!G.night) btn("Descansar até a noite", () => exCampRest("noite"), false, d);
     btn("Dormir até o dia seguinte", () => exCampRest("dormir"), false, d);
   }
   else if (kind === "fogueira") {   // fogueira no meio da trilha: só um ponto para recuperar as forças
-    say("Fogueira", "Um ponto para recuperar o fôlego no meio da trilha. Descansar recupera toda a vida e a energia.");
+    say("Fogueira", "Um respiro no meio da trilha. Descansar recupera toda a vida e a energia.");
     btn("Descansar", () => exCampRest("fogueira"), false, d);
   }
   else if (kind === "tenda" && EX.zone === "veropeso") {   // Belém: rede na pensão do Ver-o-Peso (diária barata em PENSAO)
-    say("Pensão do Ver-o-Peso", (G.night ? "Uma rede limpa, o cheiro da maré e o barulho do mercado acordando cedo. Dormir recupera tudo." : "Uma rede para quem é de fora. Dá para descansar até a noite (metade) ou dormir até o dia seguinte (tudo).") + ` Você tem R$ ${G.money}.`);
+    say("Pensão do Ver-o-Peso", (G.night ? "Rede limpa, cheiro de maré e o mercado acordando cedo. Dormir recupera tudo." : "Rede pra quem é de fora. Descansar até a noite recupera metade; dormir até o outro dia, tudo.") + ` Dinheiro: R$ ${G.money}.`);
     // paga e passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
     const nap = k => ask(`Pagar R$ ${PENSAO[k]} pela rede${k === "noite" ? " até a noite" : " até amanhã"}?`, () => {
       if (G.money < PENSAO[k]) { sfx("blip"); return exOpenDialog("tenda", `Falta dinheiro: a diária é R$ ${PENSAO[k]}.`); }
@@ -719,11 +721,11 @@ function exOpenDialog(kind, msg, look) {
     if (!G.night) btn(`Descansar até a noite (R$ ${PENSAO.noite})`, nap("noite"), false, d);
     btn(`Dormir até o dia seguinte (R$ ${PENSAO.dormir})`, nap("dormir"), false, d);
   }
-  else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => exNap("dormir"), false, d); }
-  else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }
-  else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme."); foodButtons(d); }
-  else if (kind === "artesao") { say("Artesão", "Roupas tecidas à mão e tocha para assustar os bichos. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
-  else if (kind === "armeiro") { say("Armeiro", "Lança, arco e flecha, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa boa. Escolha com as setas e aperte Enter para fabricar."); forgePanel(d); }
+  else if (kind === "tenda") { say("Tenda", "A tenda do Rhanon. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => exNap("dormir"), false, d); }
+  else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra aí o que tu caçou."); peltButtons(d); }
+  else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!"); foodButtons(d); }
+  else if (kind === "artesao") { say("Artesão", "Roupa tecida à mão e tocha pra espantar bicho. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte tu ficar, mais coisa eu te mostro."); gearButtons(d); }
+  else if (kind === "armeiro") { say("Armeiro", "Lança, arco, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar."); forgePanel(d); }
   else if (kind === "inventario") { say("Bolsa", invSummary()); invButtons(d); }
   else if (kind === "cabine") busCabin(say, d);
   else if (kind === "onibus") busDoor(say, d);
@@ -737,10 +739,10 @@ function exOpenDialog(kind, msg, look) {
 const busDest = () => EX.zone === "parada" ? "belem" : "ananindeua";
 const busSide = () => EX.zone === "parada" ? -1 : 1;   // a estrada sai pela esquerda rumo a Belém e pela direita rumo a Ananindeua
 function busCabin(say, d) {
-  if (EX.zone === "terminal") return say("Guichê do terminal", G.passagem ? "Sua passagem vale ida e volta. O ônibus para Ananindeua sai assim que você subir." : "Sem passagem não dá para embarcar.");
-  if (G.passagem) return say("Cobrador", "Passagem na mão! É só subir no ônibus. Ela vale ida e volta: do terminal de Belém dá para voltar quando quiser.");
-  if (!BUS.open) return say("Cobrador", "O ônibus para Belém ainda não está saindo. Volta daqui a uns dias!");
-  say("Cobrador", `Passagem para Belém, a capital: R$ ${BUS.price}, ida e volta. Você tem R$ ${G.money}.` + (G.money < BUS.price ? ` Faltam R$ ${BUS.price - G.money}: pele de bicho forte vale bem mais na feira.` : ""));
+  if (EX.zone === "terminal") return say("Guichê do terminal", G.passagem ? "Tua passagem vale ida e volta. O ônibus pra Ananindeua sai assim que tu subir." : "Sem passagem não embarca, maninho.");
+  if (G.passagem) return say("Cobrador", "Passagem na mão! É só subir no ônibus. Vale ida e volta: do terminal de Belém tu volta quando quiser.");
+  if (!BUS.open) return say("Cobrador", "O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!");
+  say("Cobrador", `Passagem pra Belém, a capital: R$ ${BUS.price}, ida e volta. Tu tem R$ ${G.money}.` + (G.money < BUS.price ? ` Faltam R$ ${BUS.price - G.money}. Pele de bicho forte vale bem mais na feira, viu?` : ""));
   btn(`Comprar passagem · R$ ${BUS.price}`, ask(`Comprar a passagem para Belém por R$ ${BUS.price}?`, () => {
     if (G.passagem || G.money < BUS.price) return;
     G.money -= BUS.price; G.passagem = true; save(); sfx("more"); exHud();
@@ -749,7 +751,7 @@ function busCabin(say, d) {
 }
 function busDoor(say, d) {
   const dest = busDest(), n = dest === "belem" ? "Belém" : "Ananindeua";
-  if (!G.passagem || !BUS.open) return say("Ônibus da BR-316", "O motorista aponta para a cabine: \"Sem passagem não sobe. Compra ali com o cobrador.\"");
+  if (!G.passagem || !BUS.open) return say("Ônibus da BR-316", "O motorista aponta para a cabine: \"Sem passagem não sobe, maninho. Compra ali com o cobrador.\"");
   say("Ônibus da BR-316", `O motor já está ligado. Destino: ${n}.`);
   btn(`Embarcar para ${n}`, busLeave, false, d);
 }
@@ -822,13 +824,13 @@ function exIntro() {
 }
 /* tutorial (jogo novo): depois de acordar, o caçador ensina os controles; só então o Rhanon anda e a ajuda aparece */
 const TUTORIAL = [
-  "Bom dia, Rhanon! Dormiu bem aí do lado da fogueira? Antes de ir para a mata, deixa eu te lembrar do básico.",
-  "Para andar, use as setas ou W A S D. Shift (ou C) dá uma esquiva rápida: um rolamento que passa pelo bote do bicho sem levar.",
-  "Z (ou Espaço) é o golpe de lança. Também serve para conversar com o pessoal e usar a fogueira e as barracas.",
-  "X atira flechas, mas só depois que você comprar um arco com o armeiro da feira. Quem joga com o mouse mira no cursor: clique esquerdo golpeia, o direito atira.",
-  "I abre a bolsa, com suas comidas e peles, e E abre o equipamento para trocar arma e roupa. Nos menus, as setas escolhem, Z confirma e X volta. Esc sai da fase.",
-  "Na luta, quando aparecer um anel com Z, aperte Z na hora em que ele ficar verde: seu golpe sai perfeito, ou você bloqueia metade do ataque do bicho.",
-  "Bicho com etiqueta verde cai com um golpe só. E se você acertar primeiro, começa a luta com vantagem. Boa caçada!"
+  "Égua, Rhanon, acordou! Dormiu bem aí do lado do fogo? Antes de tu ir pra mata, deixa eu te lembrar do básico.",
+  "Pra andar: setas ou W A S D. Shift (ou C) é a esquiva: tu rola e passa pelo bote do bicho sem levar.",
+  "Z (ou Espaço) é a lançada. Também serve pra conversar com o pessoal e usar a fogueira e as barracas.",
+  "X atira flecha, mas só depois que tu comprar um arco com o armeiro da feira. No mouse tu mira no cursor: botão esquerdo golpeia, o direito atira.",
+  "I abre a bolsa, com comida e peles, e E abre o equipamento pra trocar arma e roupa. Nos menus: setas escolhem, Z confirma, X volta. Esc sai da fase.",
+  "Na briga, quando aparecer o anel com Z, aperta Z na hora que ele ficar verde: o golpe sai perfeito, ou tu bloqueia metade do ataque do bicho.",
+  "Bicho com etiqueta verde cai com uma lançada só. E se tu acertar primeiro, começa a briga na frente. Bora, e não vai ficar panema!"
 ];
 function startTutorial() { EX.tutPage = 0; showTutorial(); }
 function showTutorial() {
@@ -836,13 +838,13 @@ function showTutorial() {
   EX.dialog = "tutorial"; exKeys.clear();
   d.innerHTML = `<h2>Caçador</h2><div class="tut"><canvas width="24" height="33"></canvas><p>${TUTORIAL[i]}</p></div>`;
   d.querySelector("canvas").getContext("2d").drawImage(villagerSprite("aldeao1"), 0, 0);   // retratinho de quem fala
-  btn(last ? "Vamos lá!" : "Próximo", () => { if (last) endTutorial(); else { EX.tutPage++; sfx("blip"); showTutorial(); } }, false, d);
+  btn(last ? "Bora!" : "Próximo", () => { if (last) endTutorial(); else { EX.tutPage++; sfx("blip"); showTutorial(); } }, false, d);
   d.hidden = false;
 }
 function endTutorial() {
   G.tutorial = false; save();
   $("exDialog").hidden = true; EX.dialog = null; $("explore").classList.remove("no-help"); sfx("more");
-  exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A trilha da direita leva à feira e, depois dela, à mata.");
+  exToast("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata.");
 }
 // pular a cena: aplica na hora o que ela faria (noite ou dia) e termina
 function campSkip() {
@@ -853,7 +855,7 @@ function campSkip() {
 // fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
   const kind = EX.camp.kind; EX.camp = null; EX.dialog = null; exKeys.clear();
-  if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A trilha da direita leva à feira e, depois dela, à mata.");
+  if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata.");
   exToast(rest(kind, true, true)); exHud();
   if (EX.zone === "aldeia" && kind !== "fogueira") setTimeout(() => EX && announceOffer(), 2400);   // novo dia ou noite: pode ter pedido novo   // dormir: o galo já cantou no amanhecer da cena
 }

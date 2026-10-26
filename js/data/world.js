@@ -24,23 +24,23 @@ const LOC = {
    Embaixo, da esquerda para a direita, até cruzar o rio; no meio, de volta para a esquerda, cruzando de novo;
    e no fim, lá em cima, a cabine do cobrador na BR-316, de onde sai o ônibus para a capital. */
 const SUB = {
-  aldeia:  {n: "Aldeia", x: 48, y: 242, txt: "Sua casa. Fogueira para descansar, tenda para dormir e gente conhecida por perto."},
-  feira:   {n: "Feira", x: 122, y: 262, txt: "Barracas de mandioca, peixe assado, açaí e maniçoba. Aqui você vende suas peles e compra comida."},
+  aldeia:  {n: "Aldeia", x: 48, y: 242, txt: "A casa do Rhanon. Fogueira pra descansar, tenda pra dormir e gente conhecida."},
+  feira:   {n: "Feira", x: 122, y: 262, txt: "Mandioca, peixe assado, açaí e maniçoba. Aqui se vende pele e se compra comida."},
   mata:    {n: "Mata", x: 188, y: 236, txt: "Trilhas conhecidas. Bichos pequenos e médios, bons para começar."},
   fechada: {n: "Mata fechada", x: 254, y: 264, txt: "Folhas altas, pouca luz e predadores de verdade."},
-  rio:     {n: "Beira do rio", x: 376, y: 240, txt: "Do outro lado da ponte, água, lama e dentes. Cuidado com o que se mexe na margem."},
-  igarape: {n: "Igarapé", x: 402, y: 156, txt: "Rio acima, a água entra na mata em canais estreitos. Tracajás, garças, botos... e algo enorme lá no fundo."},
-  manguezal: {n: "Manguezal", x: 290, y: 128, txt: "De volta pela ponte de cima, a mata vira lama e raiz. Caranguejos, mão-peladas e, de noite, um assobio que ninguém quer ouvir."},
-  seringal: {n: "Seringal", x: 212, y: 160, txt: "Seringueiras velhas, ainda com as marcas da faca, e a casa do seringueiro caindo aos pedaços. Lá ninguém caça à noite."},
-  varzea: {n: "Várzea", x: 120, y: 134, txt: "Campo alagado de capim alto, como em Marajó. Manadas de búfalo, socós escondidos e, dizem os vaqueiros, um gigante que fede de longe."},
-  parada: {n: "Cabine da BR-316", s: "BR-316", x: 52, y: 62, txt: "No fim da trilha, a estrada. Uma cabine de madeira com um cobrador lá dentro: é daqui que sai o ônibus para Belém, a capital."},
+  rio:     {n: "Beira do rio", x: 376, y: 240, txt: "Do outro lado da ponte: água, lama e dentes. Olho no que se mexe na margem."},
+  igarape: {n: "Igarapé", x: 402, y: 156, txt: "Rio acima, a água entra na mata em canais estreitos. Tracajá, garça, boto... e algo enorme lá no fundo."},
+  manguezal: {n: "Manguezal", x: 290, y: 128, txt: "A mata vira lama e raiz. Caranguejo, mão-pelada e, de noite, um assobio que ninguém quer ouvir."},
+  seringal: {n: "Seringal", x: 212, y: 160, txt: "Seringueiras velhas com marca de faca e a casa do seringueiro caindo aos pedaços. Lá ninguém caça de noite."},
+  varzea: {n: "Várzea", x: 120, y: 134, txt: "Campo alagado de capim alto, como no Marajó. Búfalo, socó escondido e, dizem os vaqueiros, um gigante que fede de longe."},
+  parada: {n: "Cabine da BR-316", s: "BR-316", x: 52, y: 62, txt: "No fim da trilha, a estrada. Na cabine de madeira, o cobrador vende a passagem do ônibus pra Belém."},
   /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
      pela Cidade Velha, pelo Porto e pelas Baixadas, cada vez mais difícil */
-  terminal: {city: "belem", n: "Terminal rodoviário", s: "Terminal", x: 392, y: 262, txt: "O ônibus da BR-316 para aqui. Do guichê dá para voltar para Ananindeua quando quiser: a passagem vale ida e volta."},
-  veropeso: {city: "belem", n: "Ver-o-Peso", x: 252, y: 250, txt: "A feira mais famosa do Pará, na beira da baía: peixe, açaí, ervas de cheiro, urubus no telhado de ferro... e uma rede para dormir na pensão."},
-  cidadevelha: {city: "belem", n: "Cidade Velha", x: 128, y: 266, txt: "Ruas de pedra, casarões de azulejo e praças com mangueiras. Pombos, gatos, iguanas... e uns malandros de olho na sua bolsa."},
-  porto: {city: "belem", n: "Porto e Docas", x: 86, y: 160, txt: "Galpões velhos, guindastes e barcos chegando de todo canto. Ratos do tamanho de gato e golpistas esperando quem desce do barco."},
-  baixadas: {city: "belem", n: "Baixadas", x: 262, y: 146, txt: "Do outro lado do canal, casas de palafita ligadas por pontes de tábua. Na maré cheia, a rua vira rio."}
+  terminal: {city: "belem", n: "Terminal rodoviário", s: "Terminal", x: 392, y: 262, txt: "O ônibus da BR-316 para aqui. A passagem vale ida e volta: dá pra voltar pra Ananindeua quando quiser."},
+  veropeso: {city: "belem", n: "Ver-o-Peso", x: 252, y: 250, txt: "A feira mais famosa do Pará, na beira da baía: peixe, açaí, erva de cheiro, urubu no telhado de ferro... e rede na pensão."},
+  cidadevelha: {city: "belem", n: "Cidade Velha", x: 128, y: 266, txt: "Rua de pedra, casarão de azulejo e praça com mangueira. Pombo, gato, iguana... e malandro de olho na bolsa."},
+  porto: {city: "belem", n: "Porto e Docas", x: 86, y: 160, txt: "Galpão velho, guindaste e barco chegando de todo canto. Rato do tamanho de gato e golpista esperando quem desce."},
+  baixadas: {city: "belem", n: "Baixadas", x: 262, y: 146, txt: "Do outro lado do canal, palafitas ligadas por pontes de tábua. Na maré cheia, a rua vira rio."}
 };
 /* cada cidade tem o seu mapa local (viewBox 440x325): a trilha única em ordem (route), o contorno (land), o rio ou
    canal que a trilha cruza (com as pontes calculadas) e a estrada que sai do mapa (road), com a placa (sign) */
@@ -76,24 +76,26 @@ const ITEMS = {
    night = só aparece à noite; reward: dinheiro e itens da bolsa. */
 const QUESTS = [
   {id: "cotias", giver: "aldeao1", need: {pelt: "cotia", n: 3}, reward: {money: 40, items: {mandioca: 2}},
-    text: "As cotias estão roendo a mandioca da roça. Me traga 3 peles de cotia que eu te pago.", thanks: "Isso! Agora a roça descansa. Toma, é seu."},
+    text: "As cotias tão roendo a mandioca da roça. Me traz 3 peles de cotia que eu te pago.", thanks: "Égua, isso! Agora a roça descansa. Toma, é teu."},
   {id: "chocalho", giver: "aldeao2", need: {pelt: "tatu", n: 2}, reward: {money: 55},
-    text: "Quero fazer um chocalho novo para a roda. Preciso de 2 cascos de tatu.", thanks: "Que cascos bonitos! Esse chocalho vai soar longe."},
+    text: "Quero fazer um chocalho novo pra roda. Preciso de 2 cascos de tatu.", thanks: "Que cascos bonitos! Esse chocalho vai soar longe."},
   {id: "cesta", giver: "aldeao3", need: {kill: "macaco", n: 2}, reward: {money: 30, items: {manicoba: 1}},
-    text: "Um macaco-prego roubou minha cesta de novo! Dá um susto em 2 macacos lá na mata, por favor.", thanks: "Eles vão pensar duas vezes antes de voltar. Obrigada!"},
+    text: "Um macaco-prego roubou minha cesta de novo! Dá um susto em 2 macacos lá na mata, por favor.", thanks: "Agora eles pensam duas vezes antes de voltar. Valeu, maninho!"},
   {id: "queixadas", giver: "aldeao1", lv: 5, need: {kill: "queixada", n: 3}, reward: {money: 90},
-    text: "Um bando de queixadas está passando perto da aldeia. Vença 3 deles na mata fechada.", thanks: "Bom trabalho, caçador. A aldeia dorme mais tranquila."},
+    text: "Tem um bando de queixada passando perto da aldeia. Vence 3 deles lá na mata fechada.", thanks: "Pai d'égua, caçador! A aldeia dorme mais tranquila."},
   {id: "piranhas", giver: "aldeao3", lv: 7, need: {kill: "piranha", n: 2}, reward: {money: 70, items: {peixe: 2}},
-    text: "As piranhas não deixam ninguém lavar roupa no rio. Acerte 2 delas com flechas.", thanks: "O rio é nosso de novo! Leva esses peixes assados."},
+    text: "As piranhas não deixam ninguém lavar roupa no rio. Acerta 2 delas com flecha.", thanks: "O rio é nosso de novo! Leva esses peixes assados."},
   {id: "morcegos", giver: "aldeao2", night: true, need: {kill: "morcego", n: 3}, reward: {money: 50, items: {acai: 2}},
-    text: "Esses morcegos não me deixam dormir. Afaste 3 deles da mata esta noite.", thanks: "Silêncio, finalmente. Toma um açaí para a viagem."},
+    text: "Esses morcegos não me deixam dormir. Espanta 3 deles da mata hoje de noite.", thanks: "Silêncio, finalmente. Toma um açaí pra viagem."},
   {id: "penas", giver: "aldeao3", night: true, need: {pelt: "coruja", n: 2}, reward: {money: 45},
-    text: "Dizem que pena de coruja traz sonho bom. Me traz 2 penas de coruja?", thanks: "Vou pendurar na rede. Obrigada, Rhanon!"},
+    text: "Dizem que pena de coruja traz sonho bom. Me traz 2 penas de coruja?", thanks: "Vou pendurar na rede. Brigada, Rhanon!"},
   {id: "galinhas", giver: "aldeao1", night: true, lv: 5, need: {kill: "chupacabra", n: 1}, reward: {money: 150},
-    text: "Alguma coisa está secando as galinhas de noite... Vá até o fim da mata e acabe com isso.", thanks: "Era o Chupa-cabra mesmo?! Você é corajoso. Merece isso."}
+    text: "Alguma coisa tá secando as galinhas de noite... Vai até o fim da mata e acaba com isso.", thanks: "Era o Chupa-cabra mesmo?! Égua, tu é corajoso. Merece isso."}
 ];
 const itemEffect = it => [it.hp && `+${it.hp} PV`, it.sp && `+${it.sp} PE`].filter(Boolean).join(" e ");
-/* Equipamentos: para criar um item novo, basta acrescentar uma linha em legs, torso ou weapon. */
+/* Equipamentos: para criar um item novo, basta acrescentar uma linha em legs, torso ou weapon.
+   look (armas e arcos) = cores do desenho, as mesmas chaves de RIG_PAL (gfx/rig.js): p/P haste e sombra, m ponta,
+   band amarração perto da ponta, long ponta comprida; b madeira do arco, fl penas nas pontas do arco. */
 const EQUIP = {
   legs:   {tanga: {n: "Tanga", def: 0, lv: 1, price: 0}, short: {n: "Short", def: 2, lv: 3, price: 60, color: "#3b6ea5", shade: "#27496e"},
            brim: {n: "Calça de brim da capital", def: 9, lv: 21, price: 340, color: "#2a3a5a", shade: "#1a2440"}},
@@ -105,11 +107,11 @@ const EQUIP = {
 /* Feitos pelo armeiro da feira com peles (craft: {bicho: quantas peles}) mais um pouco de dinheiro (cost). Entram no mesmo
    EQUIP do slot e depois aparecem no inventário para vestir/usar como os outros. */
 const CRAFT = {
-  weapon: {lanca_dente: {n: "Lança de dente de jacaré", atk: 3, lv: 6, craft: {jacare: 2}, cost: 60},
-           lanca_presa: {n: "Lança com presa de onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120},
-           lanca_pirarucu: {n: "Lança de osso de pirarucu", atk: 8, lv: 13, craft: {pirarucu: 1, tracaja: 2}, cost: 160},
-           lanca_chifre: {n: "Lança com chifre de búfalo", atk: 11, lv: 18, craft: {bufalo_touro: 1, bufalo: 2}, cost: 260},
-           lanca_aco: {n: "Lança com ponta de aço do porto", atk: 15, lv: 24, craft: {ratao: 1, ratazana: 3}, cost: 380}},
+  weapon: {lanca_dente: {n: "Lança de dente de jacaré", atk: 3, lv: 6, craft: {jacare: 2}, cost: 60, look: {m: "#f2e6c4", band: "#5a8a3a"}},
+           lanca_presa: {n: "Lança com presa de onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120, look: {m: "#fff8e0", band: "#e0a030", long: true}},
+           lanca_pirarucu: {n: "Lança de osso de pirarucu", atk: 8, lv: 13, craft: {pirarucu: 1, tracaja: 2}, cost: 160, look: {m: "#eef0e8", band: "#c8303a", p: "#c9a46a", P: "#8a6a3a", long: true}},
+           lanca_chifre: {n: "Lança com chifre de búfalo", atk: 11, lv: 18, craft: {bufalo_touro: 1, bufalo: 2}, cost: 260, look: {m: "#4a4044", band: "#d9b25a", p: "#a07a40", P: "#6b4e26", long: true}},
+           lanca_aco: {n: "Lança com ponta de aço do porto", atk: 15, lv: 24, craft: {ratao: 1, ratazana: 3}, cost: 380, look: {m: "#a8bccb", band: "#5a6670", p: "#6b4a2a", P: "#45301a", long: true}}},
   torso:  {colete_sucuri: {n: "Colete de couro de sucuri", def: 4, lv: 8, craft: {sucuri: 2}, cost: 90, color: "#5a7a3a", shade: "#3a5a24"},
            colete_tracaja: {n: "Colete de casco de tracajá", def: 6, lv: 12, craft: {tracaja: 3}, cost: 140, color: "#4a5a3a", shade: "#2e3a24"},
            gibao_bufalo: {n: "Gibão de couro de búfalo", def: 9, lv: 17, craft: {bufalo: 3, jararaca: 1}, cost: 240, color: "#3a3234", shade: "#221c1e"},
@@ -117,8 +119,8 @@ const CRAFT = {
   legs:   {calca_anta: {n: "Calça de couro de anta", def: 3, lv: 7, craft: {anta: 1, capivara: 1}, cost: 70, color: "#5a4a40", shade: "#3a2e28"},
            calca_jacaretinga: {n: "Calça de couro de jacaretinga", def: 5, lv: 13, craft: {jacaretinga: 2, caranguejo: 1}, cost: 130, color: "#6a7a4a", shade: "#4a5632"},
            perneira_jararaca: {n: "Perneira de couro de jararaca", def: 7, lv: 16, craft: {jararaca: 2, ourico: 1}, cost: 200, color: "#7a6a4a", shade: "#54482e"}},
-  ranged: {arco_harpia: {n: "Arco com penas de harpia", atk: 3, lv: 7, craft: {harpia: 1}, cost: 60},
-           arco_gaviao: {n: "Arco com penas de gavião-real", atk: 6, lv: 17, craft: {gaviao_real: 1, urubu: 2}, cost: 220},
-           arco_gaivota: {n: "Arco de fibra com penas de gaivota", atk: 9, lv: 23, craft: {gaivota: 2, iguana_rei: 1}, cost: 320}}
+  ranged: {arco_harpia: {n: "Arco com penas de harpia", atk: 3, lv: 7, craft: {harpia: 1}, cost: 60, look: {b: "#b8844a", fl: "#9aa0a8"}},
+           arco_gaviao: {n: "Arco com penas de gavião-real", atk: 6, lv: 17, craft: {gaviao_real: 1, urubu: 2}, cost: 220, look: {b: "#5a3a2a", fl: "#f4f4f4"}},
+           arco_gaivota: {n: "Arco de fibra com penas de gaivota", atk: 9, lv: 23, craft: {gaivota: 2, iguana_rei: 1}, cost: 320, look: {b: "#d8c49a", fl: "#ffffff"}}}
 };
 for (const s in CRAFT) Object.assign(EQUIP[s], CRAFT[s]);
