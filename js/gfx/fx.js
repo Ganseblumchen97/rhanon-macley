@@ -78,11 +78,35 @@ function hurtFx(kind, d) {
   else slash($("hero"));
   if (d >= 10) shake();
 }
-function pop(txt, el, cls) {
+// estrela de impacto (moldura do n\u00famero cr\u00edtico): pontas em volta, contorno escuro, em pixels
+function critStarC(w, h, sc) {
+  const c = document.createElement("canvas"), x = c.getContext("2d"), n = 10;
+  c.width = w; c.height = h;
+  const star = (gr, col) => {
+    x.beginPath();
+    for (let i = 0; i < n * 2; i++) { const a = Math.PI * i / n - Math.PI / 2, k = i % 2 ? .62 : 1; x.lineTo(w / 2 + Math.cos(a) * (w / 2 - gr) * k, h / 2 + Math.sin(a) * (h / 2 - gr) * k); }
+    x.fillStyle = col; x.fill();
+  };
+  star(0, "#1a0f0a"); star(1.5, "#d62828"); star(4, "#f2740c");
+  const im = x.getImageData(0, 0, w, h);   // sem meio-tom nas bordas: pixel cheio ou vazio
+  for (let i = 3; i < im.data.length; i += 4) im.data[i] = im.data[i] > 110 ? 255 : 0;
+  x.putImageData(im, 0, 0);
+  return px(c, sc);
+}
+/* n\u00famero que salta do alvo. cls: "crit" = maior, amarelo, numa estrela de impacto; "strong" = golpe forte (laranja);
+   tag = etiqueta pequena acima do n\u00famero (ex. "PERFEITO!"), que sobe junto sem cobrir o valor */
+function pop(txt, el, cls, tag) {
   const s = $("fx").getBoundingClientRect(), r = el.getBoundingClientRect(), x = r.left - s.left + r.width / 2, y = r.top - s.top + Math.min(r.height * .3, 40);
-  const num = /^[+\u2212-]?\d+$/.test(txt), col = {crit: "#f2a20c", heal: "#7dff9a", me: "#ff5a4a"}[cls] || "#fff3c4";
+  const num = /^[+\u2212-]?\d+$/.test(txt), col = {crit: "#ffd23a", strong: "#f2a20c", heal: "#7dff9a", me: "#ff5a4a"}[cls] || "#fff3c4";
   let d;
-  if (num) { d = numC(txt, col, cls === "crit" ? 8 : 6); $("fx").appendChild(d); }
+  if (num) {
+    const n = numC(txt, col, cls === "crit" ? 9 : cls === "strong" ? 7 : 6);
+    d = el$("popw", {});
+    if (tag) { const t = document.createElement("div"); t.className = "banner mini"; t.textContent = tag; d.appendChild(t); }
+    const box = document.createElement("div"); box.className = "popn"; d.appendChild(box);
+    if (cls === "crit") { box.appendChild(critStarC(Math.max(17, txt.length * 4 + 11), 17, 7)).classList.add("popstar"); box.style.margin = "26px 0"; }   // espaço para a estrela não cobrir a etiqueta
+    n.className = ""; box.appendChild(n);
+  }
   else { d = el$("banner", {}); d.textContent = txt; }
   d.style.left = x + "px"; d.style.top = y + "px";
   rm(d, 1050, [

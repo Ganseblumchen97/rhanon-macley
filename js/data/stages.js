@@ -425,4 +425,5 @@ const STAGES = {
 };
 const SOLID = "To~GHKFNVPCRM#";      // G deixa de bloquear quando o chefe da fase cai
 const ONE_HIT_LEVELS = 3;        // níveis acima do bicho para abatê-lo só com o golpe de abertura
-const ONE_HIT_XP = .5;           // abate direto dá só parte do XP (a batalha vale mais)
+const ONE_HIT_XP = .25;          // abate direto de bicho do nível (golpe forte) dá só um pouco de XP
+const WEAK_XP = 0;              // bicho ONE_HIT_LEVELS abaixo não dá XP nenhum (só a pele): subir de nível é na batalha

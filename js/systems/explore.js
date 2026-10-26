@@ -268,7 +268,7 @@ function exHit(en) {
     en.alive = false; en.koUntil = performance.now() + 1100; sfx("crit");
     exBurst(en.x, en.y - 6, ["#d8d2c0", "#a89f8a", "#ffffff"], 14);
     curZone = EX.zone;
-    exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a, ONE_HIT_XP, !en.aquatic));
+    exToast(`Abateu ${a.name.toLowerCase()} com um golpe só!` + reward(a, G.lv - (a.lv || 1) >= ONE_HIT_LEVELS ? WEAK_XP : ONE_HIT_XP, !en.aquatic));
     if (!en.aquatic) EX.loot.push({id: a.id, x: en.x, y: en.y, t0: performance.now()});   // a pele fica no chão até ele passar por cima (peixe: vai direto para a bolsa)
     exHud();
     return;
@@ -353,9 +353,11 @@ function exUpdate(dt, now) {
   if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden || !$("revela").hidden) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
-    h.aim = {x: ix / n, y: iy / n};
-    if (ix) { h.side = ix; h.dir = "side"; }   // andando para os lados (ou na diagonal): de perfil
-    else h.dir = iy < 0 ? "up" : "down";
+    if (!(EX.jab > 0)) {   // durante a estocada a lança e o corpo ficam virados para onde ela foi (a mira do mouse), mesmo andando
+      h.aim = {x: ix / n, y: iy / n};
+      if (ix) { h.side = ix; h.dir = "side"; }   // andando para os lados (ou na diagonal): de perfil
+      else h.dir = iy < 0 ? "up" : "down";
+    }
     if (slide(h, ix / n * sp, iy / n * sp) || nudge(h, ix, iy)) {
       h.walk += sp; h.movedT = now;
       if ((h.dust = (h.dust || 0) + sp) > 13) {   // a cada passo: poeirinha na trilha ou folhinhas no mato alto
@@ -620,7 +622,7 @@ const BELEM_TIPS = [
   "Dizem que de noite, na Cidade Velha, uma mulher de branco anda pelas ruas de pedra. É visagem, menino.",
   "No porto, os ratos são do tamanho de um gato. E à noite contam que a Cobra Norato sobe a baía.",
   "Do outro lado do canal ficam as Baixadas: casa de palafita e ponte de tábua. Na maré cheia, cuidado.",
-  "A rede da pensão é de graça para quem é da aldeia. Dorme aí que amanhã a gente conversa.",
+  "A rede da pensão é baratinha, coisa de quinze reais. Dorme aí que amanhã a gente conversa.",
   "Erva de cheiro, banho de descarrego... aqui tem remédio para tudo. Menos para preguiça."
 ];
 const VILLAGER_TIPS = [
@@ -684,13 +686,17 @@ function exOpenDialog(kind, msg, look) {
     say("Fogueira", "Um ponto para recuperar o fôlego no meio da trilha. Descansar recupera toda a vida e a energia.");
     btn("Descansar", () => exCampRest("fogueira"), false, d);
   }
-  else if (kind === "tenda" && EX.zone === "veropeso") {   // Belém: rede na pensão do Ver-o-Peso (de graça)
-    say("Pensão do Ver-o-Peso", G.night ? "Uma rede limpa, o cheiro da maré e o barulho do mercado acordando cedo. Dormir recupera tudo." : "Uma rede para quem é de fora. Dá para descansar até a noite (metade) ou dormir até o dia seguinte (tudo).");
-    const nap = kind2 => () => { exCloseDialog(); wipe(() => { exToast(rest(kind2, false, true)); EX.night = G.night; exHud(); musicStart("local"); }); };
-    if (!G.night) btn("Descansar até a noite", nap("noite"), false, d);
-    btn("Dormir até o dia seguinte", nap("dormir"), false, d);
+  else if (kind === "tenda" && EX.zone === "veropeso") {   // Belém: rede na pensão do Ver-o-Peso (diária barata em PENSAO)
+    say("Pensão do Ver-o-Peso", (G.night ? "Uma rede limpa, o cheiro da maré e o barulho do mercado acordando cedo. Dormir recupera tudo." : "Uma rede para quem é de fora. Dá para descansar até a noite (metade) ou dormir até o dia seguinte (tudo).") + ` Você tem R$ ${G.money}.`);
+    // paga e passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
+    const nap = k => ask(`Pagar R$ ${PENSAO[k]} pela rede${k === "noite" ? " até a noite" : " até amanhã"}?`, () => {
+      if (G.money < PENSAO[k]) { sfx("blip"); return exOpenDialog("tenda", `Falta dinheiro: a diária é R$ ${PENSAO[k]}.`); }
+      G.money -= PENSAO[k]; exNap(k);
+    });
+    if (!G.night) btn(`Descansar até a noite (R$ ${PENSAO.noite})`, nap("noite"), false, d);
+    btn(`Dormir até o dia seguinte (R$ ${PENSAO.dormir})`, nap("dormir"), false, d);
   }
-  else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => { exCloseDialog(); wipe(() => { exToast(rest("dormir", false, true)); EX.night = false; exHud(); musicStart("local"); }); }, false, d); }
+  else if (kind === "tenda") { say("Tenda", "Sua tenda. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => exNap("dormir"), false, d); }
   else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra o que você caçou."); peltButtons(d); }
   else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme."); foodButtons(d); }
   else if (kind === "artesao") { say("Artesão", "Roupas tecidas à mão e tocha para assustar os bichos. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
@@ -701,6 +707,12 @@ function exOpenDialog(kind, msg, look) {
   btn("Fechar", exCloseDialog, false, d);
   d.hidden = false; EX.confirming = null; EX.dialogT = performance.now();
   if (kind !== "armeiro" && kind !== "tutorial") { menuSelect(d, EX.keepSel ?? menuFirst(d)); EX.keepSel = null; }   // já começa com uma opção escolhida
+}
+// dormir numa rede ou tenda: passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
+function exNap(k) {
+  exCloseDialog(); EX.locked = true; exKeys.clear();
+  const night = k === "noite";
+  dawnWipe(() => { const msg = rest(k, true, true); EX.night = G.night; exHud(); musicStart("local"); setTimeout(() => { if (!EX) return; EX.locked = false; exToast(msg); }, DAWN_MS * .6); }, night ? "Anoiteceu" : `Amanheceu · Dia ${G.day + 1}`, night);
 }
 /* "Deseja vender...?": o painel vira a pergunta com Sim e Não (setas escolhem, Z confirma, X é o Não).
    Depois de responder, a loja volta com a mesma opção escolhida. */

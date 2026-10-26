@@ -85,31 +85,35 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .intent.known{background:var(--jaguar)}
 /* estilo Game Boy: plataformas, sprites e efeitos */
 .stage{--px:clamp(4px,1.6vw,10px);min-height:340px;background:linear-gradient(180deg,#2a5a3c 0 55%,#173626 55%);position:relative;overflow:hidden}
-.stage::before{inset:auto;right:7%;top:46%;width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
+/* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
+.stage{--plat:46%}
+.stage.zone-fechada{--plat:42%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
 .stage.zone-mata{background:linear-gradient(180deg,#2f6b3f 0 52%,#1a3f28 52% 100%)}
-.stage.zone-mata::before{background:#3d8a4d;right:9%;top:44%}
+.stage.zone-mata::before{background:#3d8a4d;right:9%;top:var(--plat)}
 .stage.zone-mata::after{background:#3d8a4d;left:4%;bottom:7%}
 /* beira do rio: o lago fica no fundo (faixa azul atrás) e os dois lutam em chão de terra */
 .stage.zone-rio{background:linear-gradient(180deg,#3a7a4a 0 27%,#4fa8c8 27% 28%,#2a7a9a 28% 34%,#1f6482 34% 40%,#2c5a34 40% 100%)}
-.stage.zone-rio::before{background:#8a7448;right:9%;top:44%}
+.stage.zone-rio::before{background:#8a7448;right:9%;top:var(--plat)}
 .stage.zone-rio::after{background:#8a7448;left:4%;bottom:7%}
 .stage.zone-fechada{background:linear-gradient(180deg,#264a32 0 54%,#142a1c 54% 100%)}
 /* igarapé: mata alta escura, faixa de água cor de chá e barranco */
 .stage.zone-igarape{background:linear-gradient(180deg,#24563a 0 24%,#6a7a3a 24% 25%,#4a5a2a 25% 33%,#3a4a22 33% 40%,#22462c 40% 100%)}
-.stage.zone-igarape::before{background:#6a5a36;right:9%;top:44%}
+.stage.zone-igarape::before{background:#6a5a36;right:9%;top:var(--plat)}
 .stage.zone-igarape::after{background:#6a5a36;left:4%;bottom:7%}
 .stage.zone-igarape .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px));opacity:.9}
 /* manguezal: mangue escuro, água salobra e lama */
 .stage.zone-manguezal{background:linear-gradient(180deg,#2e4a2c 0 22%,#7a9a8a 22% 23%,#4a6a6a 23% 31%,#3e5a58 31% 38%,#5a5440 38% 100%)}
-.stage.zone-manguezal::before{background:#6a6248;right:9%;top:44%}
+.stage.zone-manguezal::before{background:#6a6248;right:9%;top:var(--plat)}
 .stage.zone-manguezal::after{background:#6a6248;left:4%;bottom:7%}
 /* Belém: céu de fim de tarde e casarões coloridos (Cidade Velha), galpões cinza (Porto) e palafitas sobre a água (Baixadas) */
 .stage.zone-cidadevelha{background:linear-gradient(180deg,#e8a070 0 18%,#9a7a9a 18% 46%,#8a8478 46% 100%)}
 .stage.zone-porto{background:linear-gradient(180deg,#9aa8b0 0 30%,#7a8a96 30% 46%,#6a6a6e 46% 100%)}
 .stage.zone-baixadas{background:linear-gradient(180deg,#c89a8a 0 22%,#8a8aa0 22% 34%,#4a6a5a 34% 46%,#5e5e48 46% 100%)}
-.stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas)::before{background:#6e685c;right:9%;top:44%}
+.stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas)::before{background:#6e685c;right:9%;top:var(--plat)}
 .stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas)::after{background:#6e685c;left:4%;bottom:7%}
 .stage.zone-baixadas::before,.stage.zone-baixadas::after{background:#8a6a44}
 .predio{position:absolute;bottom:54%;width:15%;border:3px solid #1a1426;border-bottom:0;background-color:var(--c);
@@ -127,16 +131,16 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-baixadas .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px))}
 /* várzea: céu aberto, faixa de cheia e capim */
 .stage.zone-varzea{background:linear-gradient(180deg,#5a9a5a 0 26%,#7ac4d0 26% 27%,#3a8aa0 27% 34%,#4a8a6a 34% 40%,#6a9a3a 40% 100%)}
-.stage.zone-varzea::before{background:#7a9a3a;right:9%;top:44%}
+.stage.zone-varzea::before{background:#7a9a3a;right:9%;top:var(--plat)}
 .stage.zone-varzea::after{background:#7a9a3a;left:4%;bottom:7%}
 .stage.zone-varzea .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px))}
 /* seringal: mata seca, troncos claros e chão de folhas */
 .stage.zone-seringal{background:linear-gradient(180deg,#3a5a2e 0 54%,#5a5a2e 54% 100%)}
-.stage.zone-seringal::before{background:#6a6a38;right:9%;top:44%}
+.stage.zone-seringal::before{background:#6a6a38;right:9%;top:var(--plat)}
 .stage.zone-seringal::after{background:#6a6a38;left:4%;bottom:7%}
 .stage.zone-seringal .trunk{background:#c8b89a}
 .stage.zone-manguezal .reeds{bottom:auto;top:calc(38% - 9*var(--px));height:calc(9*var(--px));opacity:.85;filter:sepia(.6) brightness(.8)}
-.stage.zone-fechada::before{background:#2f5a3a;right:12%;top:42%;width:38%;opacity:.9}
+.stage.zone-fechada::before{background:#2f5a3a;right:12%;top:var(--plat);width:38%;opacity:.9}
 .stage.zone-fechada::after{background:#2f5a3a;left:8%;bottom:8%;width:44%}
 /* Elementos decorativos de fundo */
 .stage .bg-decor{position:absolute;inset:0;pointer-events:none;z-index:0}
@@ -157,7 +161,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-rio .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px));opacity:.9}
 .plate{width:min(280px,58%)}
 .spr{display:block;image-rendering:pixelated;width:calc(var(--n) * var(--px));height:auto}
-.beast{position:absolute;right:12%;top:calc(46% - 13 * var(--px) + 12px);font-size:0;filter:none;transform-origin:50% 90%}
+.beast{position:absolute;right:12%;top:calc(var(--plat) - 13 * var(--px) + 12px);font-size:0;filter:none;transform-origin:50% 90%}
 .hero{position:absolute;z-index:2;left:14%;bottom:calc(6% + 14px);transform-origin:50% 90%}
 .beast .spr,.hero .spr{animation:idleMove .9s steps(4) infinite;transform-origin:50% 100%}
 .hero .spr{animation-delay:.18s}
@@ -200,6 +204,12 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .home-button{position:fixed;left:14px;top:14px;z-index:1001;border:2px solid var(--ink);background:var(--bone);color:var(--ink);font:900 12px Arial,sans-serif;letter-spacing:.04em;padding:9px 12px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transform:skewX(-7deg)}.home-button:hover{background:#f3a72d}
 .fxp{pointer-events:none}
 .banner{font-family:var(--display);font-size:26px;color:var(--bone);background:var(--blood);padding:2px 14px;box-shadow:4px 4px 0 var(--ink);letter-spacing:1px;text-shadow:none}
+/* número de dano (gfx/fx.js pop): etiqueta pequena em cima e, no crítico, a estrela de impacto atrás do número */
+.popw{display:flex;flex-direction:column;align-items:center;gap:4px}
+.banner.mini{font-size:15px;padding:1px 8px;box-shadow:3px 3px 0 var(--ink);background:#2f8a4a}
+.popn{position:relative;display:flex;align-items:center;justify-content:center}
+.popn>canvas{position:relative;image-rendering:pixelated}
+.popn>.popstar{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
 .gshake{animation:gshake .3s steps(6)}
 @keyframes gshake{25%{transform:translate(-6px,3px)}50%{transform:translate(6px,-3px)}75%{transform:translate(-4px,2px)}}
 /* impacto (gfx/fx.js hitImpact): tremor leve no golpe comum, clarão branco e o palco "socando" para perto nos fortes */
@@ -620,7 +630,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .wipe.dusk .dawn-txt{color:#f4ecd8}
 .wipe.dusk .dawn-sun{width:19vmin}
 /* bicho de água: laguinho no lugar do chão; ele aparece meio submerso, com marola na linha d'água */
-.stage.aquatic::before{display:block;right:7%;top:44%;width:44%;height:30px;background:radial-gradient(ellipse at 50% 40%,#4ab0d8 0 42%,#1f6a8a 76%);box-shadow:0 6px 0 #0a1a28,inset 0 5px 0 rgba(170,225,255,.4)}
+.stage.aquatic::before{display:block;right:7%;top:var(--plat);width:44%;height:30px;background:radial-gradient(ellipse at 50% 40%,#4ab0d8 0 42%,#1f6a8a 76%);box-shadow:0 6px 0 #0a1a28,inset 0 5px 0 rgba(170,225,255,.4)}
 #beast.submerged{translate:0 24%}
 #beast.submerged canvas{clip-path:inset(0 0 30% 0)}
 #beast.submerged::after{content:"";position:absolute;left:-4%;right:-4%;top:69%;height:calc(1.2*var(--px));border-radius:50%;background:repeating-linear-gradient(90deg,rgba(210,240,255,.95) 0 12px,transparent 12px 24px);animation:marola 1.2s steps(2) infinite;pointer-events:none}
@@ -628,6 +638,17 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 #beast.submerged.shallow{translate:0 12%}
 #beast.submerged.shallow canvas{clip-path:inset(0 0 16% 0)}
 #beast.submerged.shallow::after{top:82%}
+/* na água, o bote e o tremor mexem só o bicho: a marola fica parada e, no bote, ele sai inteiro da água */
+#beast.submerged.lunge,#beast.submerged.hit{animation:none}
+#beast.submerged.lunge canvas.actor{animation:lungeW .55s steps(10)!important;clip-path:none}
+#beast.submerged.hit canvas.actor{animation:shakeW .35s,flashf .35s steps(1)!important}
+/* (translate/scale separados: a entrada do bicho deixa o transform do desenho preso) */
+@keyframes lungeW{
+  15%{translate:-6px 2px;scale:1.02}
+  40%{translate:calc(-1 * clamp(70px,22vw,180px)) -12px;scale:1.08}
+  70%{translate:calc(-1 * clamp(40px,14vw,110px)) -4px;scale:1.04}
+}
+@keyframes shakeW{25%{translate:-14px 0;rotate:-4deg}75%{translate:14px 0;rotate:4deg}}
 
 /* ===== tema da mata (HUD): pergaminho com moldura de cipó e folhas (--moldura, desenhada em ui/theme.js), placas de madeira
    e botões de madeira que viram folha. O Persona continua nos momentos de destaque: letras recortadas no logo, no resultado

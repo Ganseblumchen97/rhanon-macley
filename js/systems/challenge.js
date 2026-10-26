@@ -15,7 +15,7 @@ function startChallenge(kind) {
   $("beast").innerHTML = "";
   if (!isWork) $("beast").appendChild(interviewerSprite());
   $("beast").style.display = isWork ? "none" : "";
-  $("beast").className = "beast"; $("beast").style.top = "calc(46% - 13 * var(--px) + 12px)"; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", kind === "work" ? "Escritório" : "Entrevistador");
+  $("beast").className = "beast"; $("beast").style.top = "calc(var(--plat) - 13 * var(--px) + 12px)"; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", kind === "work" ? "Escritório" : "Entrevistador");
   refreshHero(true); $("hero").style.display = isWork ? "none" : "";
   $("officePerson").innerHTML = ""; $("officePerson").appendChild(workerSprite());
   $("intent").style.display = ""; $("ehp").parentElement.style.display = "none"; $("spTxt").parentElement.style.display = "none"; $("sp").parentElement.style.display = "none";

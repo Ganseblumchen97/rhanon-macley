@@ -60,6 +60,7 @@ const EDGES = Object.values(CITY).flatMap(c => c.route.slice(1).map((k, i) => [c
 /* ônibus da BR-316 entre Ananindeua (cabine da parada) e Belém (terminal): a passagem é comprada uma vez na cabine
    (G.passagem) e vale ida e volta. open = false fecharia Belém de novo (a cabine só mostraria o preço). */
 const BUS = {price: 800, open: true};
+const PENSAO = {noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
 const NEED = {fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).

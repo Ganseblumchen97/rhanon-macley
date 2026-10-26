@@ -86,7 +86,7 @@ function init(opts = {}) {
   $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = "Nv " + (animal.lv || 1);
   $("beast").innerHTML = ""; $("beast").appendChild(animalSprite(animal)); refreshHero();
   const spr = $("beast").firstChild;
-  $("beast").style.top = `calc(46% - ${spr.height / (+spr.dataset.scale || 1) * (animal.boss ? 1.35 : 1)} * var(--px) + 12px)`; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", animal.name); $("hero").style.display = ""; $("intent").style.display = ""; $("ehp").parentElement.style.display = ""; $("spTxt").parentElement.style.display = ""; $("sp").parentElement.style.display = "";
+  $("beast").style.top = `calc(var(--plat) - ${spr.height / (+spr.dataset.scale || 1) * (animal.boss ? 1.35 : 1)} * var(--px) + 12px)`; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", animal.name); $("hero").style.display = ""; $("intent").style.display = ""; $("ehp").parentElement.style.display = ""; $("spTxt").parentElement.style.display = ""; $("sp").parentElement.style.display = "";
   musicStop();
   vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = "Lutar de novo"; $("toMap").textContent = fromExplore ? "Continuar explorando" : "Voltar ao mapa";
   p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, items:{...G.items}, furia:0};
@@ -330,13 +330,12 @@ function strike(d, cls, kind, msg) {
     const perfect = qteTake() && d > 0;
     if (perfect) {   // apertou Z na hora: golpe perfeito
       const more = Math.max(2, Math.round(d * .3)); d += more; e.hp = Math.max(0, e.hp - more);
-      msg = (msg || "") + ` Perfeito! +${more}.`; setTimeout(() => pop("PERFEITO!", $("beast"), "crit"), 160);
+      msg = (msg || "") + ` Perfeito! +${more}.`;
     }
     const strong = cls === "crit" || perfect || d >= 14;
     holdE = null; if (msg) say(msg); render(); hitBeast(); sfx(cls === "crit" ? "critico" : perfect ? "perfeito" : "hit");
     burst(b, colors, strong ? 16 : 9, strong ? 90 : 60);
-    pop(String(d), $("beast"), strong ? "crit" : cls); hitImpact(strong ? "forte" : "leve"); if (strong) musicDuck();
-    if (cls === "crit") setTimeout(() => pop("CRÍTICO!", $("beast"), "crit"), 220);
+    pop(String(d), $("beast"), cls === "crit" ? "crit" : strong ? "strong" : cls, perfect ? "PERFEITO!" : null); hitImpact(strong ? "forte" : "leve"); if (strong) musicDuck();
   };
   if (kind === "spear") {   // lança: corre até o bicho, estoca e volta (rápido)
     HERO_A.set("stab"); sfx("spear"); qteArm(REDUCE ? 0 : 450, $("beast"));
@@ -414,7 +413,7 @@ function furyStrike(ds) {
     shown = Math.max(0, shown - d); holdE = last ? null : shown;
     if (!last) HERO_A.set("stab");
     hitBeast(); slash($("beast")); burst(b, last ? ["#ffd23a", "#ffffff", "#e5001c"] : ["#fff", "#cfd8dc", "#f2a20c"], last ? 20 : 10, last ? 110 : 60);
-    pop(String(d), $("beast"), "crit"); sfx(last ? "critico" : "hit"); hitImpact(last ? "furia" : "leve");
+    pop(String(d), $("beast"), last ? "crit" : "strong"); sfx(last ? "critico" : "hit"); hitImpact(last ? "furia" : "leve");
     if (last) { say(`FÚRIA! Três estocadas seguidas: −${ds.join(", −")}.`); setTimeout(() => pop("FÚRIA!", $("beast"), "crit"), 200); }
     render();
   }, T0 + 300 + i * gap));
@@ -484,7 +483,7 @@ function reward(a = e, mult = 1, drop = false) {
   drawXp();
   vit(); G.hp = Math.min(maxHP(G.lv), G.hp + maxHP(G.lv) - maxHP(L0)); G.sp = Math.min(maxSP(G.lv), G.sp + maxSP(G.lv) - maxSP(L0));
   save();
-  return (back ? ` Recuperou os R$ ${back} que ele levou.` : "") + (drop ? ` Ganhou ${xp} XP. ${peltName(a.id)} ficou no chão: passe por cima para pegar.` : ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).`) + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : a.boss && NEED.parada === curZone && !G.night ? " A trilha chegou ao fim: a BR-316 está liberada no mapa." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
+  return (back ? ` Recuperou os R$ ${back} que ele levou.` : "") + (drop ? (xp ? ` Ganhou ${xp} XP.` : " Fraco demais para dar XP.") + ` ${peltName(a.id)} ficou no chão: passe por cima para pegar.` : ` Ganhou ${xp} XP e conseguiu ${peltName(a.id).toLowerCase()} (vale R$ ${peltValue(a.id)} na feira).`) + (G.lv > L0 ? ` Subiu para o nível ${G.lv}!` : "") + (CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv ? " Um novo destino apareceu no mapa." : "") + (a.boss && NEXT_Z[curZone] ? " Novo local liberado: " + ZONES[NEXT_Z[curZone]].n + "." : a.boss && NEED.parada === curZone && !G.night ? " A trilha chegou ao fim: a BR-316 está liberada no mapa." : "") + ([...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) ? " Tem roupa nova na feira." : "");
 }
 function keepVitals(kind) {
   vit();

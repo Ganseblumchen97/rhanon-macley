@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.24.3 — ajustes de batalha e descanso
+
+- Subir de nível ficou mais justo: bicho que cai com um golpe só por ser bem mais fraco não dá mais XP (só a pele),
+  e o abate direto de um bicho do seu nível dá só um pouco. O XP de verdade vem das batalhas.
+- Com o mouse, a lança agora sai para o lado da mira mesmo se você estiver andando para o outro lado.
+- No Ver-o-Peso, a rede da pensão cobra uma diária baratinha (R$ 10 até a noite, R$ 15 até o dia seguinte) e mostra
+  a faixa do galo ao amanhecer (ou da lua ao anoitecer), como na fogueira da aldeia. A tenda da aldeia também.
+- Golpe crítico: o número sai maior, amarelo, dentro de uma estrela de impacto. O "PERFEITO!" do Z aparece pequeno em
+  cima do número, sem cobrir o dano.
+- Na batalha, os bichos agora pisam certinho na plataforma de cada cenário (antes alguns ficavam um pouco abaixo).
+- Peixes e bichos de água: a água fica parada e só o bicho salta dela no ataque.
+
 ## 0.24.2 — ônibus pelo mapa
 
 - No mapa do Pará, Belém agora fica embaixo e à esquerda de Ananindeua, como no mapa de verdade, e a BR-316 faz

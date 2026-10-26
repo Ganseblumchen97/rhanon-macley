@@ -198,11 +198,11 @@ function makeBeastActor() {
     // bicho alto demais para o palco (harpia, chefes): diminui um pouco para os pés ficarem na plataforma e a cabeça aparecer
     if (opts.fit) {
       const st = $("stage"), unit = src.getBoundingClientRect().width / w;   // tamanho de 1 pixel do desenho, já com o tamanho de chefe
-      const room = st.clientHeight * .46 + 12 - 8;
+      const room = st.clientHeight * (parseFloat(getComputedStyle(st).getPropertyValue("--plat")) || 46) / 100 + 12 - 8;   // até a plataforma (--plat em styles.css)
       if (MOTION[kind] === "hover") el.style.top = h * unit > room ? `${Math.round(8 + 4 * unit)}px` : el.style.top;   // voando: fica no alto, sem encolher
       else {
         if (unit && h * unit > room) f *= Math.max(opts.boss ? .75 : .82, room / (h * unit));
-        el.style.top = `calc(46% - ${(h * f).toFixed(2)} * var(--px) + 12px)`;
+        el.style.top = `calc(var(--plat) - ${(h * f).toFixed(2)} * var(--px) + 12px)`;
       }
     }
     motion = MOTION[kind] || (opts.person ? "person" : "");
