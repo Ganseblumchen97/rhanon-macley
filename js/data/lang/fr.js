@@ -910,6 +910,7 @@ TX.fr = {
     "Lembrança de {chefe}": "Souvenir de {chefe}",
     "Foi aqui que {chefe} caiu. Enfrentar de novo? Vale outra pele e metade do XP.": "C'est ici que {chefe} a mordu la poussière. Un nouveau combat ? Ça rapporte une autre peau et la moitié de l'XP.",
     "Enfrentar de novo": "Affronter encore",
-    "ver a lembrança": "voir le souvenir"
+    "ver a lembrança": "voir le souvenir",
+    "Belém · manhã no Ver-o-Peso...": "Belém · matin au Ver-o-Peso..."
   }
 };

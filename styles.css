@@ -842,3 +842,9 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
    a placa do bicho (nome e vida) fica por cima dos desenhos */
 .game>.stage{container-type:size;--px:clamp(4px,min(1.6vw,2.9cqh),10px)}
 .game>.stage .plate{z-index:5}
+
+/* quarto do motel do Ver-o-Peso (explore.js motelScene): cena curta por cima de tudo, em pixel art ampliada */
+.motel-room{position:fixed;inset:0;z-index:40;display:grid;place-items:center;align-content:center;gap:12px;background:#0b0a12}
+.motel-room[hidden]{display:none}
+.motel-room canvas{width:min(92vw,calc(78vh * 1.6));aspect-ratio:192/120;image-rendering:pixelated;border:4px solid #1a0f0a;box-shadow:0 0 0 4px #6d4329}
+.motel-room p{margin:0;font:700 12px var(--mono);color:#f4ecd8;opacity:.75}

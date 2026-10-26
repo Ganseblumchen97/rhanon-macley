@@ -3,6 +3,13 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.30.1 — motel no Ver-o-Peso e acordar na cidade certa
+
+- Corrigido: quem fechava o jogo em Belém e voltava acordava na aldeia, mas ao sair da fase aparecia no Ver-o-Peso.
+  Agora o Rhanon acorda na cidade onde estava: em Belém, no quarto do motel do Ver-o-Peso.
+- A rede da pensão virou um motel. Dormir nele mostra o Rhanon na cama enquanto a janela escurece (ou clareia), e
+  depois vem o galo ou o lobo. A diária continua a mesma. Dá para pular a cena com C.
+
 ## 0.30.0 — francês, batalha que cabe na tela e revanche com chefes
 
 - O jogo agora também está em francês: é só escolher nas Opções. Como no inglês e no espanhol, a tradução foi feita

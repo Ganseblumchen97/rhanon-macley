@@ -907,6 +907,7 @@ TX.es = {
     "Lembrança de {chefe}": "Recuerdo de {chefe}",
     "Foi aqui que {chefe} caiu. Enfrentar de novo? Vale outra pele e metade do XP.": "Aquí cayó {chefe}. ¿Pelear otra vez? Vale otra piel y la mitad de la XP.",
     "Enfrentar de novo": "Enfrentar otra vez",
-    "ver a lembrança": "ver el recuerdo"
+    "ver a lembrança": "ver el recuerdo",
+    "Belém · manhã no Ver-o-Peso...": "Belém · mañana en el Ver-o-Peso..."
   }
 };

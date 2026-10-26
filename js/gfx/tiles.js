@@ -138,7 +138,7 @@ function drawStageMap(rows, zone) {
   P.at = at;   // o asfalto olha os vizinhos para pintar as faixas
   rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
     const ox = tx * TILE, oy = ty * TILE;
-    if ("HKFNVPCRMQ".includes(ch)) {
+    if ("HKFNVPCRMQO".includes(ch)) {
       drawTile(x, "KVCRM".includes(ch) ? "-" : ".", ox, oy, P, tx, ty);
       if (ch === "H") x.drawImage(hut, (at(tx - 1, ty) === "H" ? (at(tx - 2, ty) === "H" ? 2 : 1) : 0) * 16, at(tx, ty - 1) === "H" ? 16 : 0, 16, 16, ox, oy, 16, 16);
       else if (ch === "K") drawStall(x, ox, oy, tx, at(tx - 1, ty) !== "K", at(tx + 1, ty) !== "K");
@@ -171,7 +171,9 @@ function drawStageMap(rows, zone) {
       }
     }
   }));
-  rows.forEach((row, ty) => [...row].forEach((ch, tx) => { if (ch === "Q" && at(tx - 1, ty) !== "Q" && at(tx, ty - 1) !== "Q") drawCabin(x, tx * TILE, ty * TILE); }));   // por cima dos quadrados do bloco
+  rows.forEach((row, ty) => [...row].forEach((ch, tx) => {   // blocos por cima dos quadrados deles: cabine e motel
+    if ("QO".includes(ch) && at(tx - 1, ty) !== ch && at(tx, ty - 1) !== ch) (ch === "Q" ? drawCabin : drawMotel)(x, tx * TILE, ty * TILE);
+  }));
   return c;
 }
 // cabine do cobrador (bloco 2x2 = 32x32): madeira, telhado de zinco, janela com o cobrador e a placa da passagem
@@ -187,6 +189,20 @@ function drawCabin(x, ox, oy) {
   x.fillStyle = "#6d4329"; x.fillRect(ox + 5, oy + 23, 22, 2);   // balcão
   x.fillStyle = OUTLINE; x.fillRect(ox + 9, oy, 14, 5); x.fillStyle = "#f2c230"; x.fillRect(ox + 10, oy + 1, 12, 3);   // placa
   x.fillStyle = OUTLINE; x.fillRect(ox + 12, oy + 2, 8, 1);
+}
+// motel do Ver-o-Peso (bloco 3x2 = 48x32): sobrado cor-de-rosa de azulejo, janelas, porta no meio e a placa vermelha
+function drawMotel(x, ox, oy) {
+  x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(ox + 2, oy + 30, 46, 3);
+  x.fillStyle = OUTLINE; x.fillRect(ox, oy + 2, 48, 30);
+  x.fillStyle = "#e89aaa"; x.fillRect(ox + 1, oy + 3, 46, 28);
+  x.fillStyle = "#c87a8a"; for (let k = 1; k < 47; k += 4) x.fillRect(ox + k, oy + 16, 2, 1);   // faixa de azulejo
+  x.fillStyle = "#8a3a4a"; x.fillRect(ox + 1, oy + 3, 46, 3);   // beiral
+  for (const wx of [5, 20, 35]) { x.fillStyle = OUTLINE; x.fillRect(ox + wx, oy + 8, 8, 7); x.fillStyle = "#bfe8ff"; x.fillRect(ox + wx + 1, oy + 9, 6, 5); x.fillStyle = "#3a7ab8"; x.fillRect(ox + wx, oy + 8, 2, 7); x.fillRect(ox + wx + 6, oy + 8, 2, 7); }   // janelas com veneziana
+  for (const wx of [5, 35]) { x.fillStyle = OUTLINE; x.fillRect(ox + wx, oy + 20, 8, 7); x.fillStyle = "#ffe98a"; x.fillRect(ox + wx + 1, oy + 21, 6, 5); }
+  x.fillStyle = OUTLINE; x.fillRect(ox + 18, oy + 19, 12, 13); x.fillStyle = "#6d4329"; x.fillRect(ox + 19, oy + 20, 10, 12); x.fillStyle = "#ffd23a"; x.fillRect(ox + 27, oy + 26, 1, 1);   // porta
+  x.fillStyle = "#9a948a"; x.fillRect(ox + 16, oy + 31, 16, 1);   // degrau
+  x.fillStyle = OUTLINE; x.fillRect(ox + 13, oy - 3, 22, 9); x.fillStyle = "#e5001c"; x.fillRect(ox + 14, oy - 2, 20, 7);   // placa
+  x.fillStyle = "#fff3c4"; for (let k = 0; k < 5; k++) x.fillRect(ox + 16 + k * 4, oy, 2, 3);   // letreiro
 }
 // troncos atravessados na passagem enquanto o chefe não cai
 function drawGate(x, sx, sy, P) {

@@ -904,6 +904,7 @@ TX.en = {
     "Lembrança de {chefe}": "Memento of {chefe}",
     "Foi aqui que {chefe} caiu. Enfrentar de novo? Vale outra pele e metade do XP.": "This is where {chefe} fell. Fight it again? It's worth another pelt and half the XP.",
     "Enfrentar de novo": "Fight again",
-    "ver a lembrança": "look at the memento"
+    "ver a lembrança": "look at the memento",
+    "Belém · manhã no Ver-o-Peso...": "Belém · morning at Ver-o-Peso..."
   }
 };

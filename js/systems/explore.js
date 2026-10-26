@@ -165,7 +165,7 @@ function startExplore(zone, after, from) {
       night: !!G.night, ents: [], fx: [], loot: [], spits: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
     const at = (tx, ty) => (st.rows[ty] || "")[tx];
     st.rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
-      if ("QU".includes(ch)) {   // bloco: um ponto só, embaixo do meio dele (onde o Rhanon chega pela calçada)
+      if ("QUO".includes(ch)) {   // bloco: um ponto só, embaixo do meio dele (onde o Rhanon chega pela calçada)
         if (at(tx - 1, ty) === ch || at(tx, ty - 1) === ch) return;
         let w = 0, h = 0; while (at(tx + w, ty) === ch) w++; while (at(tx, ty + h) === ch) h++;
         const sp = {kind: SPOTS[ch], x: tx * TILE + w * 8, y: (ty + h) * TILE + 4, tx, ty, w, h};
@@ -657,7 +657,7 @@ function drawMemento(x, s, cx, cy, now) {
   const p = (now / 1400) % 1;
   if (!REDUCE && p < .7) { x.fillStyle = p < .35 ? "#ffd23a" : "#fff3c4"; x.fillRect(sx + 4 - Math.round(p * 4), sy - 18 - Math.round(p * 10), 1, 1); }
 }
-const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", P: "aldeao", Q: "cabine", U: "onibus"};
+const SPOTS = {F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", P: "aldeao", Q: "cabine", U: "onibus"};
 const PEOPLE = ["peles", "comida", "artesao", "armeiro", "aldeao"];
 const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "ver a lembrança"};
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
@@ -820,10 +820,74 @@ function drawBus(x, b, cx, cy, now) {
   if (run) { x.fillStyle = "#c8c4b8a0"; x.fillRect(f < 0 ? X + W + 2 : X - 5, Y + 24 - (Math.floor(now / 120) % 3), 3, 2); }   // fumaça do escapamento
 }
 // dormir numa rede ou tenda: passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
+// no motel do Ver-o-Peso, antes da faixa passa a cena do quarto (Rhanon dormindo e a janela escurecendo ou clareando)
 function exNap(k) {
   exCloseDialog(); EX.locked = true; exKeys.clear();
-  const night = k === "noite";
-  dawnWipe(() => { const msg = rest(k, true, true); EX.night = G.night; exHud(); musicStart("local"); setTimeout(() => { if (!EX) return; EX.locked = false; exToast(msg); }, DAWN_MS * .6); }, night ? t("Anoiteceu") : t("Amanheceu · Dia {n}", {n: G.day + 1}), night);
+  const night = k === "noite", label = night ? t("Anoiteceu") : t("Amanheceu · Dia {n}", {n: G.day + 1});
+  const wake = hide => dawnWipe(() => { if (hide) hide(); const msg = rest(k, true, true); EX.night = G.night; exHud(); musicStart("local"); setTimeout(() => { if (!EX) return; EX.locked = false; exToast(msg); }, DAWN_MS * .6); }, label, night);
+  if (EX.zone === "veropeso") motelScene(k, wake); else wake();
+}
+/* quarto do motel: uns 3 s com o Rhanon dormindo na cama e a janela mudando de cor (noite: escurece; dormir: escurece e
+   clareia; intro: só clareia); o quarto escurece junto e o abajur acende. C, Z, Enter ou Esc pulam. done(hide) segue com
+   a próxima transição e chama hide() quando ela cobrir a tela */
+const MOTEL_MS = 3000;
+const MOTEL_SKY = {day: ["#6ab8e8", "#bfe6ff", 1], dusk: ["#c8604a", "#f8c070", .55], night: ["#0e1430", "#26305a", .12], dawn: ["#e89a9a", "#ffd890", .5]};
+function motelScene(kind, done) {
+  EX.locked = true; exKeys.clear();
+  const keys = kind === "intro" ? [[0, "dawn"], [1, "day"]] : kind === "noite" ? [[0, "day"], [.5, "dusk"], [1, "night"]]
+    : G.night ? [[0, "night"], [.55, "night"], [.8, "dawn"], [1, "day"]] : [[0, "day"], [.25, "dusk"], [.5, "night"], [.8, "dawn"], [1, "day"]];
+  wipe(() => {
+    let o = $("motelRoom");
+    if (!o) { o = document.createElement("div"); o.id = "motelRoom"; o.className = "motel-room"; o.innerHTML = '<canvas width="192" height="120"></canvas><p></p>'; document.body.appendChild(o); }
+    o.querySelector("p").textContent = t("Segure C para pular");
+    o.hidden = false;
+    const x = o.querySelector("canvas").getContext("2d"), t0 = performance.now(), D = REDUCE ? 600 : MOTEL_MS;
+    let ended = false;
+    const finish = () => { if (ended) return; ended = true; document.removeEventListener("keydown", skip, true); done(() => { o.hidden = true; }); };
+    const skip = ev => { if (["c", "C", "z", "Z", "Enter", "Escape", " "].includes(ev.key)) { ev.preventDefault(); ev.stopImmediatePropagation(); finish(); } };
+    document.addEventListener("keydown", skip, true);
+    const frame = now => { if (ended) return; const u = Math.min(1, (now - t0) / D); drawMotelRoom(x, keys, u, now); if (u < 1) requestAnimationFrame(frame); else finish(); };
+    requestAnimationFrame(frame);
+  });
+}
+const hexMix = (a, b, u) => "#" + [1, 3, 5].map(i => Math.round(parseInt(a.substr(i, 2), 16) * (1 - u) + parseInt(b.substr(i, 2), 16) * u).toString(16).padStart(2, "0")).join("");
+function motelSky(keys, u) {   // céu da janela em u (0..1): cores de cima e de baixo e quanto de luz entra no quarto
+  let i = 0; while (i < keys.length - 2 && u > keys[i + 1][0]) i++;
+  const [ua, a] = keys[i], [ub, b] = keys[Math.min(i + 1, keys.length - 1)], v = ub > ua ? Math.min(1, Math.max(0, (u - ua) / (ub - ua))) : 1, A = MOTEL_SKY[a], B = MOTEL_SKY[b];
+  return {top: hexMix(A[0], B[0], v), bottom: hexMix(A[1], B[1], v), light: A[2] + (B[2] - A[2]) * v};
+}
+function drawMotelRoom(x, keys, u, now) {
+  const sky = motelSky(keys, u), dark = 1 - sky.light;
+  x.fillStyle = "#c8b89a"; x.fillRect(0, 0, 192, 120);   // parede
+  x.fillStyle = "#b8a888"; for (let k = 6; k < 192; k += 12) x.fillRect(k, 0, 1, 92);   // papel de parede listrado
+  x.fillStyle = "#9c7a56"; x.fillRect(0, 74, 192, 18); x.fillStyle = "#6d4329"; x.fillRect(0, 74, 192, 2);   // rodapé de madeira
+  x.fillStyle = "#7a5236"; x.fillRect(0, 92, 192, 28); x.fillStyle = "#5e3e28"; for (let k = 0; k < 192; k += 16) x.fillRect(k, 92, 1, 28);   // chão
+  const win = () => {   // janela: o céu muda de cor, com estrelas e lua quando escurece
+    x.fillStyle = "#5a3a22"; x.fillRect(118, 14, 52, 40);
+    for (let y = 0; y < 34; y++) { x.fillStyle = hexMix(sky.top, sky.bottom, y / 33); x.fillRect(121, 17 + y, 46, 1); }
+    if (dark > .5) { x.fillStyle = `rgba(255,255,255,${(dark - .5) * 2})`; [[126, 22], [140, 19], [158, 26], [150, 34], [131, 38]].forEach(([sx, sy]) => x.fillRect(sx, sy, 1, 1)); x.fillStyle = `rgba(244,236,216,${(dark - .5) * 2})`; x.fillRect(159, 20, 4, 4); }
+    else { x.fillStyle = `rgba(255,236,150,${1 - dark * 2})`; x.fillRect(158, 38 - Math.round(sky.light * 12), 5, 5); }   // sol
+    x.fillStyle = "#5a3a22"; x.fillRect(143, 17, 2, 34); x.fillRect(121, 33, 46, 2);   // cruz da janela
+  };
+  win();
+  x.fillStyle = "#b03a2e"; x.fillRect(112, 12, 7, 46); x.fillRect(169, 12, 7, 46);   // cortinas
+  // cama: cabeceira, colchão, travesseiro e o cobertor por cima do Rhanon
+  x.fillStyle = "#5a3a22"; x.fillRect(14, 54, 8, 44); x.fillRect(102, 76, 6, 22);
+  x.fillStyle = "#6d4329"; x.fillRect(14, 84, 94, 8);
+  x.fillStyle = "#f4ecd8"; x.fillRect(22, 74, 84, 10);
+  x.fillStyle = "#ffffff"; x.fillRect(24, 68, 20, 9);
+  const breathe = Math.floor(now / 900) % 2, img = rigCanvas("front", {face: "blink"}, rhanonLook(), 1);
+  x.save(); x.translate(27, 72 - breathe); x.rotate(-Math.PI / 2); x.drawImage(img, -img.width / 2, 0); x.restore();   // deitado, cabeça no travesseiro
+  x.fillStyle = "#c8303a"; x.fillRect(46, 70 - breathe, 60, 15); x.fillStyle = "#e85a5a"; x.fillRect(46, 70 - breathe, 60, 3); x.fillStyle = "#9c2028"; for (let k = 52; k < 106; k += 10) x.fillRect(k, 73 - breathe, 1, 12);
+  x.fillStyle = "#6d4329"; x.fillRect(122, 76, 22, 16); x.fillStyle = "#5a3a22"; x.fillRect(122, 76, 22, 2);   // criado-mudo
+  x.fillStyle = "#3a2a1a"; x.fillRect(131, 66, 3, 10); x.fillStyle = "#f2c230"; x.fillRect(126, 60, 13, 7);   // abajur
+  x.fillStyle = `rgba(8,12,36,${dark * .72})`; x.fillRect(0, 0, 192, 120);   // o quarto escurece junto com o céu
+  if (dark > .3) {   // abajur aceso: um círculo de luz quente
+    const g = x.createRadialGradient(132, 64, 2, 132, 64, 46); g.addColorStop(0, `rgba(255,214,120,${(dark - .3) * .7})`); g.addColorStop(1, "rgba(255,214,120,0)");
+    x.fillStyle = g; x.fillRect(80, 20, 104, 90); x.fillStyle = "#ffe98a"; x.fillRect(126, 60, 13, 7);
+  }
+  win();   // a janela continua com a cor do céu por cima da sombra
+  for (let i = 0; i < 3; i++) { const p = (now / 1100 + i / 3) % 1; glyphP(x, "z", "#ffffff", 34 + p * 10, 56 - p * 16); }   // zzz
 }
 /* "Deseja vender...?": o painel vira a pergunta com Sim e Não (setas escolhem, Z confirma, X é o Não).
    Depois de responder, a loja volta com a mesma opção escolhida. */
@@ -843,7 +907,16 @@ function exCampRest(kind) {
   EX.camp = {kind, startNight: EX.night, t0: performance.now(), dur: campWake(kind) + 2600, x: f.x + (h.x < f.x ? -14 : 14), y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
 }
 // cena de abertura: amanhece, Rhanon acorda do lado da fogueira da aldeia, se espreguiça e o jogo começa
-function startIntro() { vit(); G.night = false; save(); startExplore("aldeia", exIntro); }   // a aventura sempre começa de manhã
+// a aventura sempre começa de manhã, na cidade onde o save está: na aldeia (fogueira) ou, em Belém, no quarto do motel
+function startIntro() {
+  vit(); G.night = false; save();
+  if (curCity() === "belem") return startExplore("veropeso", () => {
+    const m = EX.spots.find(q => q.kind === "tenda"), h = EX.hero;   // sai do quarto pela porta do motel
+    if (m) Object.assign(h, {x: m.x, y: m.y + 8, dir: "down", aim: {x: 0, y: 1}});
+    motelScene("intro", hide => wipe(() => { hide(); if (EX) EX.locked = false; exToast(t("Belém · manhã no Ver-o-Peso...")); }));
+  });
+  startExplore("aldeia", exIntro);
+}
 function exIntro() {
   const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), side = solidAt(f.x - 14, f.y + 5) ? 1 : -1;
   EX.camp = {kind: "intro", t0: performance.now(), dur: campWake("intro") + 2600, x: f.x + side * 14, y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};

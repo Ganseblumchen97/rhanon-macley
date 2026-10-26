@@ -7,6 +7,7 @@
    V comprador de peles   C barraca de comida   R artesão (roupas e tocha)   M armeiro (armas e armaduras)
    Cidade (Belém): # prédio/casarão (bloqueia; fachada desenhada onde a quadra termina embaixo)
    Rodovia (BR-316 e terminal): r asfalto   U ônibus (bloco 4x2)   Q cabine do cobrador (bloco 2x2)
+   Ver-o-Peso: O motel onde o Rhanon dorme (bloco 3x2; a conversa é na porta, embaixo do meio dele)
    As fases são ligadas na ordem do mapa da cidade (next): G leva para a próxima e E volta para a anterior (chegando
    na passagem dela); E sem fase anterior volta para o mapa. Cada uma entra e sai pelo lado em que fica no mapa.
    Fogueira, tenda, vendedores e aldeões são "pontos de conversa": chegando perto, Z abre o painel deles.
@@ -55,9 +56,9 @@ const STAGES = {
       "~~~~~~~=~~~~~~~~~~=~~~~~",
       "~~~~~~~=~~~~~~~~~~=~~~~~",
       "T----------------------T",
-      "T.......f..-.....,.###.T",
-      "T.KKK..KKK.-..KKK..###.T",
-      "T..V....C..-...R....N..T",
+      "T.......f..-.....,.OOO.T",
+      "T.KKK..KKK.-..KKK..OOO.T",
+      "T..V....C..-...R.......T",
       "G--,------------------SE",
       "T..........-P..........T",
       "T.######...-..KKK...f..T",
@@ -464,7 +465,7 @@ const STAGES = {
     ]
   }
 };
-const SOLID = "To~GHKFNVPCRM#QU";    // G deixa de bloquear quando a próxima fase está liberada (gateOpen em explore.js)
+const SOLID = "To~GHKFNVPCRM#QUO";    // G deixa de bloquear quando a próxima fase está liberada (gateOpen em explore.js)
 const ONE_HIT_LEVELS = 3;        // níveis acima do bicho para abatê-lo só com o golpe de abertura
 const ONE_HIT_XP = .25;          // abate direto de bicho do nível (golpe forte) dá só um pouco de XP
 const WEAK_XP = 0;              // bicho ONE_HIT_LEVELS abaixo não dá XP nenhum (só a pele): subir de nível é na batalha
