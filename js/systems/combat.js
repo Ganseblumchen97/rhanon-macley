@@ -57,20 +57,20 @@ function openSubMenu(opts, backDesc, from) {
 function closeSubMenu() { const from = subFrom; buildCmds(); render(); $("cmds").children[from].focus(); }
 const bagIds = () => Object.keys(ITEMS).filter(k => (p.items[k] || 0) > 0);
 function openItemMenu() {
-  openSubMenu(bagIds().map(k => ({label: ITEMS[k].n, small: "×" + p.items[k], desc: `${ITEMS[k].n}: ${itemEffect(ITEMS[k])}.`, fn: () => useItem(k)})), "Fecha a bolsa sem gastar o turno.", CMDS.findIndex(c => c.id === "item"));
+  openSubMenu(bagIds().map(k => ({label: ITEMS[k].n, small: "×" + p.items[k], desc: `${ITEMS[k].n}: ${itemEffect(ITEMS[k])}.`, fn: () => useItem(k)})), t("Fecha a bolsa sem gastar o turno."), CMDS.findIndex(c => c.id === "item"));
 }
 // por que um especial ainda não pode ser usado ("" = pode): flecha precisa de arco, os comprados precisam ter sido comprados
-const specialLock = s => s.id === "flecha" && !G.equip.ranged ? "sem arco" : s.price && !G.owned[s.id] ? "na feira" : "";
+const specialLock = s => s.id === "flecha" && !G.equip.ranged ? t("sem arco") : s.price && !G.owned[s.id] ? t("na feira") : "";
 function openSpecialMenu() {
-  openSubMenu(SPECIALS.map(s => ({label: s.n, small: specialLock(s) || s.cost + " PE", desc: s.d + (s.price && !G.owned[s.id] ? " À venda no artesão da feira." : ""), off: !avail(s.id), fn: () => { buildCmds(); act(s.id); }})),
-    "Volta aos comandos sem gastar o turno.", CMDS.findIndex(c => c.id === "especial"));
+  openSubMenu(SPECIALS.map(s => ({label: s.n, small: specialLock(s) || s.cost + " " + t("PE"), desc: s.d + (s.price && !G.owned[s.id] ? " " + t("À venda no artesão da feira.") : ""), off: !avail(s.id), fn: () => { buildCmds(); act(s.id); }})),
+    t("Volta aos comandos sem gastar o turno."), CMDS.findIndex(c => c.id === "especial"));
 }// usa um item da bolsa: gasta o turno, como os outros comandos
 function useItem(k) {
   const it = ITEMS[k]; if (busy || !(p.items[k] > 0)) return;
   buildCmds(); busy = true; preE = e.hp; HERO_A.set("eat");
   p.items[k]--; p.hp = Math.min(p.max, p.hp + it.hp); p.sp = Math.min(p.msp, p.sp + it.sp);
   sfx("heal"); pop(it.hp ? "+" + it.hp : "+" + it.sp, $("hero"), "heal"); burst(pos($("hero")), it.hp ? ["#7dff9a", "#fff"] : ["#19a8d8", "#fff"], 8, 40);
-  say(`Rhanon come ${it.n.toLowerCase()}: ${itemEffect(it)}.`);
+  say(t("Rhanon come {item}: {efeito}.", {item: it.n.toLowerCase(), efeito: itemEffect(it)}));
   render(); $("cmds").firstChild.focus();
   setTimeout(enemyTurn, 750);
 }
@@ -84,22 +84,22 @@ function init(opts = {}) {
   buildCmds();
   const animal = opts.animal || pickAnimal();
   noteSeen(animal.id);   // entra no caderno de bichos
-  $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = "Nv " + (animal.lv || 1);
+  $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = t("Nv") + " " + (animal.lv || 1);
   $("beast").innerHTML = ""; $("beast").appendChild(animalSprite(animal)); refreshHero();
   const spr = $("beast").firstChild;
   $("beast").style.top = `calc(var(--plat) - ${spr.height / (+spr.dataset.scale || 1) * (animal.boss ? 1.35 : 1)} * var(--px) + 12px)`; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", animal.name); $("hero").style.display = ""; $("intent").style.display = ""; $("ehp").parentElement.style.display = ""; $("spTxt").parentElement.style.display = ""; $("sp").parentElement.style.display = "";
   musicStop();
-  vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = "Lutar de novo"; $("toMap").textContent = fromExplore ? "Continuar explorando" : "Voltar ao mapa";
+  vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = t("Lutar de novo"); $("toMap").textContent = fromExplore ? t("Continuar explorando") : t("Voltar ao mapa");
   p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, items:{...G.items}, furia:0};
   e = { ...animal, hp:animal.hp, max:animal.hp, intent:null, known:false, assustada:false };
   busy = false;
   lines = [animal.intro];
-  if (opts.firstHit) { e.hp = Math.max(1, e.hp - opts.firstHit); lines.push(`Rhanon acertou primeiro: −${opts.firstHit}. Sua vez!`); }
-  if (opts.enemyFirst) lines.push(`${theName(animal, true)} pegou Rhanon de surpresa!`);
+  if (opts.firstHit) { e.hp = Math.max(1, e.hp - opts.firstHit); lines.push(t("Rhanon acertou primeiro: −{n}. Sua vez!", {n: opts.firstHit})); }
+  if (opts.enemyFirst) lines.push(t("{bicho} pegou Rhanon de surpresa!", {bicho: theName(animal, true)}));
   $("over").hidden = true;
   const wet = WATER_BATTLE.has(animal.id);   // bicho de água: laguinho no lugar do chão e ele meio submerso
   // peixes afundam mais; jacaré, ariranha e cobras só um pouco
-  $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : ""); $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("lvTxt").textContent = "Nv " + G.lv + (defense() ? " · DEF " + defense() : "");
+  $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : ""); $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
   pick(); render();
   $("cmds").firstChild.focus(); musicStart(getBattleTrackFor(animal));
   // abertura: o Rhanon entra pela esquerda, o bicho chega pela direita e o nome dele aparece numa faixa
@@ -121,13 +121,13 @@ const BOSS_INTRO = {warn: 450, roar: 1500, ready: 2700, name: 3600, go: 4500};
 function bossIntro(done) {
   const me = e, at = (ms, fn) => setTimeout(() => { if (e === me && mode === "hunt" && e.hp > 0 && p.hp > 0) fn(); }, ms);   // outra batalha começou ou a luta acabou: para
   BEAST_A.slide("42vw", "0px", 700, () => { BEAST_A.set("idle"); BEAST_A.dust(); });
-  at(BOSS_INTRO.warn, () => bossWarn("Um chefe bloqueia o caminho"));
+  at(BOSS_INTRO.warn, () => bossWarn(t("Um chefe bloqueia o caminho")));
   at(BOSS_INTRO.roar, () => {
     BEAST_A.set("bigroar"); animalCry(e.id, true, 1.4); sfx("rugidoChefe"); musicDuck(900);
     hitImpact("forte"); shake("gshake"); setTimeout(() => shake("gshake"), 380); setTimeout(() => shake("gshake-s"), 760);
   });
   at(BOSS_INTRO.ready, () => { HERO_A.set("ready"); sfx("spear"); setTimeout(() => sfx("bloqueio"), 600); });
-  at(BOSS_INTRO.name, () => encounterBanner(e.name, "chefe!"));
+  at(BOSS_INTRO.name, () => encounterBanner(e.name, t("chefe!")));
   at(BOSS_INTRO.go, done);
 }
 function pick() {
@@ -155,7 +155,7 @@ function render() {
   $("spTxt").textContent = ps + " / " + p.msp;
   drawXp();
   $("log").innerHTML = lines.map(l => "<p>" + l + "</p>").join("");
-  $("intentTxt").textContent = e.known ? "Próximo golpe: " + (e.moves || MOVES)[e.intent] : `${foe(1)} prepara o golpe…`;
+  $("intentTxt").textContent = e.known ? t("Próximo golpe: {golpe}", {golpe: (e.moves || MOVES)[e.intent]}) : t("{bicho} prepara o golpe…", {bicho: foe(1)});
   $("intent").className = "intent" + (e.known ? " known" : "");
   // estados como ícones (ui/theme.js), com os turnos que faltam; o nome aparece ao passar o mouse e para leitores de tela
   $("status").innerHTML = statusList().map(([k, name, n]) => `<span class="st" title="${name}"><img src="${statusIconURL(k)}" alt="${name}">${n ? `<b>${n}</b>` : ""}</span>`).join("");
@@ -165,10 +165,10 @@ function render() {
     const b = $("cmds").children[i];
     if (c.id === "atacar" && b.dataset.f !== String(furyReady())) {   // fúria pronta: a lança vira o golpe da fúria
       b.dataset.f = furyReady(); b.classList.toggle("furia-cmd", furyReady());
-      b.firstChild.innerHTML = `<i class="key">1</i>${furyReady() ? "Fúria!" : c.n}<small></small>`;
+      b.firstChild.innerHTML = `<i class="key">1</i>${furyReady() ? t("Fúria!") : c.n}<small></small>`;
     }
     b.setAttribute("aria-disabled", avail(c.id) ? "false" : "true");
-    b.querySelector("small").textContent = c.id === "item" ? "×" + itemCount(p.items) : c.id === "especial" ? "PE" : "";
+    b.querySelector("small").textContent = c.id === "item" ? "×" + itemCount(p.items) : c.id === "especial" ? t("PE") : "";
   });
 }
 /* golpe no tempo certo: um anel discreto com "Z" fecha até a hora do impacto e fica verde na janela certa.
@@ -202,7 +202,7 @@ function furyNote(ok) {
   if (!p || furyReady()) return;
   if (!ok) { p.furia = 0; return; }
   p.furia++;
-  if (furyReady()) setTimeout(() => { pop("FÚRIA PRONTA!", $("hero"), "crit"); sfx("furia"); say("Três no tempo certo! Fúria pronta: usa a lança."); render(); }, 420);
+  if (furyReady()) setTimeout(() => { pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t("Três no tempo certo! Fúria pronta: usa a lança.")); render(); }, 420);
 }
 function hitBeast() {
   const b = $("beast"); b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit");
@@ -225,36 +225,36 @@ function act(id) {
     let d = rnd(6, 10) + G.lv - 1 + weaponAtk(), crit = p.atento;
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
-    wait = strike(d, crit ? "crit" : "", "spear", crit ? `Golpe certeiro no ponto fraco: −${d}!` : `Lançada: −${d}.`);
+    wait = strike(d, crit ? "crit" : "", "spear", crit ? t("Golpe certeiro no ponto fraco: −{n}!", {n: d}) : t("Lançada: −{n}.", {n: d}));
   } else if (id === "arremesso") {   // lança arremessada: mais dano que o golpe, mas pode errar
     p.sp -= 3;
     const miss = !p.atento && Math.random() < .2;
     let d = miss ? 0 : rnd(10, 15) + G.lv - 1 + weaponAtk(), crit = !miss && p.atento;
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
-    wait = strike(d, crit ? "crit" : "", "throw", miss ? `Rhanon joga a lança, mas ${foe()} desvia!` : crit ? `Arremesso certeiro no ponto fraco: −${d}!` : `Rhanon joga a lança: −${d}.`);
+    wait = strike(d, crit ? "crit" : "", "throw", miss ? t("Rhanon joga a lança, mas {bicho} desvia!", {bicho: foe()}) : crit ? t("Arremesso certeiro no ponto fraco: −{n}!", {n: d}) : t("Rhanon joga a lança: −{n}.", {n: d}));
   } else if (id === "tocha") {
     p.sp -= 6;
     let d = rnd(14, 18) + G.lv - 1; if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
-    wait = strike(d, "", "fire", `A tocha cospe fogo em ${foe()}: −${d}.`);
-    if (!e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(`FRAQUEZA! ${foe(1)} recuou ${ending(e, "assustado", "assustada")}. Mais uma!`); render(); sfx("more"); pop("FRAQUEZA!", $("beast"), "crit"); }, wait + 200); }
+    wait = strike(d, "", "fire", t("A tocha cospe fogo em {bicho}: −{n}.", {bicho: foe(), n: d}));
+    if (!e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); render(); sfx("more"); pop(t("FRAQUEZA!"), $("beast"), "crit"); }, wait + 200); }
   } else if (id === "flecha") {   // tiro com o arco: menos dano que a lança, mas 40% de chance de crítico
     p.sp -= 3;
     let d = rnd(5, 9) + G.lv - 1 + ((EQUIP.ranged[G.equip.ranged] || {}).atk || 0), crit = p.atento || Math.random() < .4;   // arco melhor = flecha mais forte
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
-    wait = strike(d, crit ? "crit" : "", "arrow", crit ? `Flechada certeira no ponto fraco: −${d}!` : `Flechada: −${d}.`);
+    wait = strike(d, crit ? "crit" : "", "arrow", crit ? t("Flechada certeira no ponto fraco: −{n}!", {n: d}) : t("Flechada: −{n}.", {n: d}));
   } else if (id === "observar") {
     e.known = true; p.atento = true; sfx("look");
-    say(`Rhanon estuda ${foe()}. Vem aí: ${(e.moves || MOVES)[e.intent]}.`);
+    say(t("Rhanon estuda {bicho}. Vem aí: {golpe}.", {bicho: foe(), golpe: (e.moves || MOVES)[e.intent]}));
   } else if (id === "defender") {
     p.def = true; p.sp = Math.min(p.msp, p.sp + 3); sfx("guard");
-    say("Rhanon levanta a guarda.");
+    say(t("Rhanon levanta a guarda."));
   } else if (id === "fugir") {
     const chance = p.preso > 0 ? 0 : 35 + (e.hp < 30 ? 25 : 0) + (e.known ? 15 : 0);
     if (Math.random() * 100 < chance) { render(); return finish("flee"); }
-    say(p.preso > 0 ? "Rhanon tá preso, não dá pra fugir!" : `${foe(1)} cortou o caminho. Não deu pra fugir!`);
+    say(p.preso > 0 ? t("Rhanon tá preso, não dá pra fugir!") : t("{bicho} cortou o caminho. Não deu pra fugir!", {bicho: foe(1)}));
   }
   render();
   setTimeout(() => {
@@ -267,17 +267,17 @@ function enemyTurn() {
   const i = e.intent; foeImpact = 0;
   if (i === "arranhao") {
     let d = rnd(e.damage[0], Math.max(e.damage[0], Math.min(e.damage[1], e.damage[0]+3))); if (p.def) d = Math.ceil(d / 2); d = Math.max(1, d - pdef());
-    p.hp -= d; foeAttack("claw", d); say(`${foe(1)} ataca: −${d} PV.`);
+    p.hp -= d; foeAttack("claw", d); say(t("{bicho} ataca: −{n} PV.", {bicho: foe(1), n: d}));
   } else if (i === "bote") {
     let d = rnd(Math.max(e.damage[0], e.damage[1]-4), e.damage[1]); d = Math.max(1, d - pdef());
     if (p.def) {
       d = Math.ceil(d * .35); e.hp = Math.max(0, e.hp - 4); hitBeast();
-      say(`Desviou! O bote pega de raspão: −${d} PV. Contra-ataque: −4.`);
-    } else say(`${foe(1)} vem com tudo! −${d} PV.`);
+      say(t("Desviou! O bote pega de raspão: −{n} PV. Contra-ataque: −4.", {n: d}));
+    } else say(t("{bicho} vem com tudo! −{n} PV.", {bicho: foe(1), n: d}));
     p.hp -= d; foeAttack("claw", d);
   } else {
     if (e.special) special(); else { const sp0 = p.sp; p.hp -= 3; p.sp = Math.max(0, p.sp - 4); foeAttack("roar", 3, sp0); }
-    if (!e.special) say(`${foe(1)} encara Rhanon. −3 PV, −4 PE.`);
+    if (!e.special) say(t("{bicho} encara Rhanon. −3 PV, −4 PE.", {bicho: foe(1)}));
   }
   p.def = false; e.assustada = false;
   setTimeout(() => {
@@ -296,18 +296,18 @@ function finish(kind) {
   busy = true; battleResult = kind;
   musicStop(); keepVitals(kind); const rw = kind === "win" ? reward() : []; if (kind === "win") $("beast").classList.add("dead"); fanfare(kind);
   // cartão: título, uma frase curta e, embaixo, o que ganhou ou perdeu (um item por linha)
-  const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = curCity() === "belem" ? "no Ver-o-Peso" : "na aldeia";
+  const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = curCity() === "belem" ? t("Acordou no Ver-o-Peso, com metade das forças") : t("Acordou na aldeia, com metade das forças");
   const T = {
-    win:  e.boss ? [ending(e, "Chefe vencido!", "Chefe vencida!"), `${O} caiu. Agora a trilha é do Rhanon.`]
-      : [pick(["Vitória!", "Mandou bem!", "É isso aí!"]), WATER_BATTLE.has(e.id) ? `${O} sumiu na água.` : pick([`${O} saiu correndo.`, `${O} desistiu da briga.`, `${O} não quer mais conversa.`])],
-    flee: ["Fugiu!", `${O} fica pra próxima.`],
-    lose: ["Desmaiou...", `${O} levou a melhor.`]
+    win:  e.boss ? [t(ending(e, "Chefe vencido!", "Chefe vencida!")), t("{bicho} caiu. Agora a trilha é do Rhanon.", {bicho: O})]
+      : [t(pick(["Vitória!", "Mandou bem!", "É isso aí!"])), t(WATER_BATTLE.has(e.id) ? "{bicho} sumiu na água." : pick(["{bicho} saiu correndo.", "{bicho} desistiu da briga.", "{bicho} não quer mais conversa."]), {bicho: O})],
+    flee: [t("Fugiu!"), t("{bicho} fica pra próxima.", {bicho: O})],
+    lose: [t("Desmaiou..."), t("{bicho} levou a melhor.", {bicho: O})]
   }[kind];
-  if (kind === "lose") rw.push(`Acordou ${home}, com metade das forças`, G.lastLoss && `R$ ${G.lastLoss} a menos`);
+  if (kind === "lose") rw.push(home, G.lastLoss && t("R$ {n} a menos", {n: G.lastLoss}));
   setTimeout(() => {
     $("overTitle").textContent = T[0]; $("overTxt").textContent = [T[1], ...rw].filter(Boolean).join("\n");
     const again = kind !== "lose" && !fromExplore;
-    if (fromExplore && kind === "lose") $("toMap").textContent = curCity() === "belem" ? "Voltar ao Ver-o-Peso" : "Voltar à aldeia";
+    if (fromExplore && kind === "lose") $("toMap").textContent = curCity() === "belem" ? t("Voltar ao Ver-o-Peso") : t("Voltar à aldeia");
     $("again").style.display = again ? "" : "none"; $("over").hidden = false; (again ? $("again") : $("toMap")).focus();
   }, kind === "win" ? 1700 : kind === "lose" ? 1900 : 1150);
 }
@@ -327,7 +327,7 @@ function foeAttack(kind, d, sp0) {
   setTimeout(() => {
     if (block && qteTake()) {   // bloqueio na hora certa: metade do dano volta
       const back = Math.floor(d / 2); p.hp += back; d -= back;
-      if (back) { say(`Bloqueio! Evitou ${back} de dano.`); pop("BLOQUEIO!", $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
+      if (back) { say(t("Bloqueio! Evitou {n} de dano.", {n: back})); pop(t("BLOQUEIO!"), $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
     }
     holdP = null; render();
     if (d) { anim($("hero"), "hurt"); sfx("hurt"); hurtFx(kind, d); pop("−" + d, $("hero"), "me"); if (HERO_A.state !== "defeat") HERO_A.set("hurt"); hitStop(d >= 10 ? 90 : 50); }
@@ -353,12 +353,12 @@ function strike(d, cls, kind, msg) {
     const perfect = qteTake() && d > 0;
     if (perfect) {   // apertou Z na hora: golpe perfeito
       const more = Math.max(2, Math.round(d * .3)); d += more; e.hp = Math.max(0, e.hp - more);
-      msg = (msg || "") + ` Perfeito! +${more}.`;
+      msg = (msg || "") + " " + t("Perfeito! +{n}.", {n: more});
     }
     const strong = cls === "crit" || perfect || d >= 14;
     holdE = null; if (msg) say(msg); render(); hitBeast(); sfx(cls === "crit" ? "critico" : perfect ? "perfeito" : "hit");
     burst(b, colors, strong ? 16 : 9, strong ? 90 : 60);
-    pop(String(d), $("beast"), cls === "crit" ? "crit" : strong ? "strong" : cls, perfect ? "PERFEITO!" : null); hitImpact(strong ? "forte" : "leve"); if (strong) musicDuck();
+    pop(String(d), $("beast"), cls === "crit" ? "crit" : strong ? "strong" : cls, perfect ? t("PERFEITO!") : null); hitImpact(strong ? "forte" : "leve"); if (strong) musicDuck();
   };
   if (kind === "spear") {   // lança: corre até o bicho, estoca e volta (rápido)
     HERO_A.set("stab"); sfx("spear"); qteArm(REDUCE ? 0 : 450, $("beast"));
@@ -378,7 +378,7 @@ function strike(d, cls, kind, msg) {
       c.animate([{transform: "translate(-50%,-50%) rotate(-12deg)"}, {transform: `translate(calc(-50% + ${tx}px),calc(-50% + ${ty + 30}px)) rotate(${miss ? -20 : 8}deg)`}],
         {duration: 260, easing: "steps(7)", fill: "forwards"}).onfinish = () => {
         if (!miss) { c.remove(); hit(["#fff", "#d9b25a", "#f2a20c"]); return; }
-        qteClear(); holdE = null; if (msg) say(msg); render(); sfx("blip"); pop("ERROU!", $("beast"));
+        qteClear(); holdE = null; if (msg) say(msg); render(); sfx("blip"); pop(t("ERROU!"), $("beast"));
         c.animate([{opacity: 1}, {transform: `translate(calc(-50% + ${tx + 160}px),calc(-50% + ${ty - 10}px)) rotate(-20deg)`, opacity: 0}], {duration: 300, easing: "steps(6)", fill: "forwards"}).onfinish = () => c.remove();
       };
     }, REDUCE ? 0 : 330);
@@ -424,7 +424,7 @@ function strike(d, cls, kind, msg) {
 function furyStrike(ds) {
   holdE = preE; qteClear();
   const b = pos($("beast")), dx = Math.max(0, b.x - pos($("hero")).x - 70), T0 = REDUCE ? 0 : 900, gap = REDUCE ? 0 : 230;
-  encounterBanner("Fúria da mata", "três golpes!"); sfx("furia"); musicDuck(1200);
+  encounterBanner(t("Fúria da mata"), t("três golpes!")); sfx("furia"); musicDuck(1200);
   setTimeout(() => {
     HERO_A.set("stab"); sfx("spear");
     $("hero").animate([{transform: "translateX(0)", easing: "cubic-bezier(.6,0,1,.6)"}, {transform: `translateX(${dx}px)`, offset: .2}, {transform: `translateX(${dx}px)`, offset: .82, easing: "cubic-bezier(.2,.7,.3,1)"}, {transform: "translateX(0)"}],
@@ -437,7 +437,7 @@ function furyStrike(ds) {
     if (!last) HERO_A.set("stab");
     hitBeast(); slash($("beast")); burst(b, last ? ["#ffd23a", "#ffffff", "#e5001c"] : ["#fff", "#cfd8dc", "#f2a20c"], last ? 20 : 10, last ? 110 : 60);
     pop(String(d), $("beast"), last ? "crit" : "strong"); sfx(last ? "critico" : "hit"); hitImpact(last ? "furia" : "leve");
-    if (last) { say(`FÚRIA! Três estocadas: −${ds.join(", −")}.`); setTimeout(() => pop("FÚRIA!", $("beast"), "crit"), 200); }
+    if (last) { say(t("FÚRIA! Três estocadas: −{n}.", {n: ds.join(", −")})); setTimeout(() => pop(t("FÚRIA!"), $("beast"), "crit"), 200); }
     render();
   }, T0 + 300 + i * gap));
   return T0 + 300 + gap * 2 + 400;
@@ -453,42 +453,42 @@ const pdef = () => p && p.medo > 0 ? -2 : defense();
 function special() {
   const s = Array.isArray(e.special) ? e.special[Math.floor(Math.random() * e.special.length)] : e.special, d = rnd(e.damage[0], e.damage[1]);   // lista = sorteia um dos golpes
   const hit = (n, k) => { if (p.def) n = Math.ceil(n / 2); n = Math.max(1, n - pdef()); p.hp -= n; foeAttack(k || "claw", n); return n; };
-  if (s === "drenar") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Drenagem"}; say(`${foe(1)} crava os dentes e suga! −${n} PV, e mais 3 por turno.`); return; }
-  if (s === "fogo") { const n = hit(Math.ceil(d * 1.4), "fire"); p.dot = {d: 3, t: 2, n: "Queimadura"}; say(`${foe(1)} solta uma labareda! −${n} PV e queimadura por 2 turnos.`); return; }
-  if (s === "prender") { const n = hit(d); p.preso = 3; say(`${foe(1)} se enrola em Rhanon! −${n} PV, e nada de fugir por 3 turnos.`); return; }
-  if (s === "chocalho") { p.medo = 3; foeAttack("roar", 0); setTimeout(() => HERO_A.set("scared"), 400); say(`${foe(1)} balança o chocalho de fogo... Rhanon treme! Sem defesa por 3 turnos.`); return; }
-  if (s === "uivo") { p.medo = 2; foeAttack("roar", 0); setTimeout(() => HERO_A.set("scared"), 400); say(`${foe(1)} uiva no escuro. Rhanon se arrepia! Sem defesa por 2 turnos.`); return; }
-  if (s === "fedor") { p.weak = 3; foeAttack("roar", 0); say(`${foe(1)} solta um fedor horrível! Golpes mais fracos por 3 turnos.`); }
+  if (s === "drenar") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Drenagem"}; say(t("{bicho} crava os dentes e suga! −{n} PV, e mais 3 por turno.", {bicho: foe(1), n})); return; }
+  if (s === "fogo") { const n = hit(Math.ceil(d * 1.4), "fire"); p.dot = {d: 3, t: 2, n: "Queimadura"}; say(t("{bicho} solta uma labareda! −{n} PV e queimadura por 2 turnos.", {bicho: foe(1), n})); return; }
+  if (s === "prender") { const n = hit(d); p.preso = 3; say(t("{bicho} se enrola em Rhanon! −{n} PV, e nada de fugir por 3 turnos.", {bicho: foe(1), n})); return; }
+  if (s === "chocalho") { p.medo = 3; foeAttack("roar", 0); setTimeout(() => HERO_A.set("scared"), 400); say(t("{bicho} balança o chocalho de fogo... Rhanon treme! Sem defesa por 3 turnos.", {bicho: foe(1)})); return; }
+  if (s === "uivo") { p.medo = 2; foeAttack("roar", 0); setTimeout(() => HERO_A.set("scared"), 400); say(t("{bicho} uiva no escuro. Rhanon se arrepia! Sem defesa por 2 turnos.", {bicho: foe(1)})); return; }
+  if (s === "fedor") { p.weak = 3; foeAttack("roar", 0); say(t("{bicho} solta um fedor horrível! Golpes mais fracos por 3 turnos.", {bicho: foe(1)})); }
   else if (s === "roubo") {
     const k = bagIds()[0];
-    if (k) { p.items[k]--; foeAttack("roar", 0); say(`${foe(1)} rouba ${ITEMS[k].n.toLowerCase()} da bolsa e some nas árvores!`); }
-    else say(`${foe(1)} puxa o cabelo de Rhanon: −${hit(3)} PV.`);
+    if (k) { p.items[k]--; foeAttack("roar", 0); say(t("{bicho} rouba {item} da bolsa e some nas árvores!", {bicho: foe(1), item: ITEMS[k].n.toLowerCase()})); }
+    else say(t("{bicho} puxa o cabelo de Rhanon: −{n} PV.", {bicho: foe(1), n: hit(3)}));
   }
-  else if (s === "sono") { e.hp = Math.min(e.max, e.hp + 8); foeAttack("roar", 0); say(`${foe(1)} tira um cochilo: +8 PV.`); }
-  else if (s === "assobio") { const n = hit(Math.ceil(d * .7)); p.medo = 3; setTimeout(() => HERO_A.set("scared"), 400); say(`"Fiiit!" O assobio d${foe()} gela o sangue: −${n} PV. Sem defesa por 3 turnos.`); }
-  else if (s === "espinhos") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Espinhos"}; say(`${foe(1)} se sacode e crava espinhos! −${n} PV e −3 por turno.`); }
-  else if (s === "confusao") { const n = hit(Math.ceil(d * .6)); p.weak = 3; say(`${foe(1)} deixa pegadas trocadas. −${n} PV, e Rhanon se perde: golpes mais fracos por 3 turnos.`); }
+  else if (s === "sono") { e.hp = Math.min(e.max, e.hp + 8); foeAttack("roar", 0); say(t("{bicho} tira um cochilo: +8 PV.", {bicho: foe(1)})); }
+  else if (s === "assobio") { const n = hit(Math.ceil(d * .7)); p.medo = 3; setTimeout(() => HERO_A.set("scared"), 400); say(t("\"Fiiit!\" O assobio d{bicho} gela o sangue: −{n} PV. Sem defesa por 3 turnos.", {bicho: foe(), n})); }
+  else if (s === "espinhos") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Espinhos"}; say(t("{bicho} se sacode e crava espinhos! −{n} PV e −3 por turno.", {bicho: foe(1), n})); }
+  else if (s === "confusao") { const n = hit(Math.ceil(d * .6)); p.weak = 3; say(t("{bicho} deixa pegadas trocadas. −{n} PV, e Rhanon se perde: golpes mais fracos por 3 turnos.", {bicho: foe(1), n})); }
   else if (s === "dinheiro") {   // malandro: leva dinheiro de verdade; vencendo, ele devolve (reward)
     const n = Math.min(G.money, rnd(20, 45)); G.money -= n; e.stolen = (e.stolen || 0) + n; foeAttack("roar", 0);
-    say(n ? `${foe(1)} passa a mão no dinheiro de Rhanon: −R$ ${n}! Vence pra pegar de volta.` : `${foe(1)} enfia a mão na bolsa... e não acha nem uma moeda.`);
+    say(n ? t("{bicho} passa a mão no dinheiro de Rhanon: −R$ {n}! Vence pra pegar de volta.", {bicho: foe(1), n}) : t("{bicho} enfia a mão na bolsa... e não acha nem uma moeda.", {bicho: foe(1)}));
   }
-  else if (s === "casco") { e.hp = Math.min(e.max, e.hp + 12); foeAttack("roar", 0); say(`${foe(1)} se fecha no casco: +12 PV.`); }
-  else if (s === "encanto") { const n = hit(Math.ceil(d * .6)); p.medo = 2; p.sp = Math.max(0, p.sp - 5); setTimeout(() => HERO_A.set("scared"), 400); say(`${foe(1)} assobia uma música encantada... −${n} PV e −5 PE. Rhanon fica tonto, sem defesa por 2 turnos.`); }
-  else if (s === "salto") say(`${foe(1)} pula do galho em cima de Rhanon! −${hit(Math.ceil(d * 1.5))} PV.`);
-  else if (s === "abraco") { const n = hit(Math.ceil(d * 1.2)); p.preso = 1; say(`${foe(1)} dá um abraço apertado! −${n} PV, e nada de fugir.`); }
-  else if (s === "frenesi") { const n = hit(d); p.dot = {d: 2, t: 3, n: "Sangramento"}; say(`${foe(1)} morde sem parar! −${n} PV e sangramento por 3 turnos.`); }
-  else if (s === "choque") { const n = hit(d); p.preso = 1; p.sp = Math.max(0, p.sp - 4); say(`${foe(1)} dá um choque! −${n} PV e −4 PE. Rhanon fica travado e não consegue fugir.`); }
-  else if (s === "estouro") say(`${foe(1)} ${e.id === "anta" ? "atropela tudo pela frente" : "avança com o bando"}! −${hit(Math.ceil(d * 1.4))} PV.`);
-  else if (s === "mergulho") say(`${foe(1)} mergulha do alto! −${hit(Math.ceil(d * 1.5))} PV.`);
-  else if (s === "cardume") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Sangramento"}; say(`O cardume ataca! −${n} PV e sangramento por 3 turnos.`); }
-  else if (s === "constricao") { const n = hit(d); p.preso = 2; p.dot = {d: 3, t: 2, n: "Aperto"}; say(`${foe(1)} enrola Rhanon! −${n} PV, e nada de fugir.`); }
-  else if (s === "picada") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Veneno"}; say(`${foe(1)} pica Rhanon! −${n} PV e veneno por 3 turnos.`); }
+  else if (s === "casco") { e.hp = Math.min(e.max, e.hp + 12); foeAttack("roar", 0); say(t("{bicho} se fecha no casco: +12 PV.", {bicho: foe(1)})); }
+  else if (s === "encanto") { const n = hit(Math.ceil(d * .6)); p.medo = 2; p.sp = Math.max(0, p.sp - 5); setTimeout(() => HERO_A.set("scared"), 400); say(t("{bicho} assobia uma música encantada... −{n} PV e −5 PE. Rhanon fica tonto, sem defesa por 2 turnos.", {bicho: foe(1), n})); }
+  else if (s === "salto") say(t("{bicho} pula do galho em cima de Rhanon! −{n} PV.", {bicho: foe(1), n: hit(Math.ceil(d * 1.5))}));
+  else if (s === "abraco") { const n = hit(Math.ceil(d * 1.2)); p.preso = 1; say(t("{bicho} dá um abraço apertado! −{n} PV, e nada de fugir.", {bicho: foe(1), n})); }
+  else if (s === "frenesi") { const n = hit(d); p.dot = {d: 2, t: 3, n: "Sangramento"}; say(t("{bicho} morde sem parar! −{n} PV e sangramento por 3 turnos.", {bicho: foe(1), n})); }
+  else if (s === "choque") { const n = hit(d); p.preso = 1; p.sp = Math.max(0, p.sp - 4); say(t("{bicho} dá um choque! −{n} PV e −4 PE. Rhanon fica travado e não consegue fugir.", {bicho: foe(1), n})); }
+  else if (s === "estouro") say(t(e.id === "anta" ? "{bicho} atropela tudo pela frente! −{n} PV." : "{bicho} avança com o bando! −{n} PV.", {bicho: foe(1), n: hit(Math.ceil(d * 1.4))}));
+  else if (s === "mergulho") say(t("{bicho} mergulha do alto! −{n} PV.", {bicho: foe(1), n: hit(Math.ceil(d * 1.5))}));
+  else if (s === "cardume") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Sangramento"}; say(t("O cardume ataca! −{n} PV e sangramento por 3 turnos.", {n})); }
+  else if (s === "constricao") { const n = hit(d); p.preso = 2; p.dot = {d: 3, t: 2, n: "Aperto"}; say(t("{bicho} enrola Rhanon! −{n} PV, e nada de fugir.", {bicho: foe(1), n})); }
+  else if (s === "picada") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Veneno"}; say(t("{bicho} pica Rhanon! −{n} PV e veneno por 3 turnos.", {bicho: foe(1), n})); }
 }
 function tick() {
   if (p.dot && p.dot.t > 0) {
     p.hp -= p.dot.d; p.dot.t--;
-    if (p.dot.n === "Drenagem") { e.hp = Math.min(e.max, e.hp + p.dot.d); say(`Drenagem: −${p.dot.d} PV, e ${foe()} recupera ${p.dot.d}.`); }
-    else say(`${p.dot.n}: −${p.dot.d} PV.`);
+    if (p.dot.n === "Drenagem") { e.hp = Math.min(e.max, e.hp + p.dot.d); say(t("Drenagem: −{n} PV, e {bicho} recupera {n}.", {n: p.dot.d, bicho: foe()})); }
+    else say(`${t(p.dot.n)}: −${p.dot.d} ${t("PV")}.`);
   }
   if (p.medo > 0) p.medo--;
   if (p.weak > 0) p.weak--;
@@ -508,13 +508,13 @@ function reward(a = e, mult = 1, drop = false) {
   save();
   // o que ganhou, em pedaços curtos (o cartão mostra um por linha; a exploração junta com " · ")
   return [
-    back && `R$ ${back} de volta no bolso`,
-    xp ? `+${xp} XP` : drop && "Sem XP (fraco demais)",
-    drop ? `${peltName(a.id)} no chão: passa por cima` : `${peltName(a.id)} (R$ ${peltValue(a.id)} na feira)`,
-    G.lv > L0 && `Nível ${G.lv}!`,
-    CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv && "Destino novo no mapa",
-    a.boss && NEXT_Z[curZone] ? "Liberou: " + ZONES[NEXT_Z[curZone]].n : a.boss && NEED.parada === curZone && !G.night && "Liberou: BR-316",
-    [...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) && "Roupa nova na feira"
+    back && t("R$ {n} de volta no bolso", {n: back}),
+    xp ? `+${xp} XP` : drop && t("Sem XP (fraco demais)"),
+    drop ? t("{pele} no chão: passa por cima", {pele: peltName(a.id)}) : t("{pele} (R$ {n} na feira)", {pele: peltName(a.id), n: peltValue(a.id)}),
+    G.lv > L0 && t("Nível {n}!", {n: G.lv}),
+    CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv && t("Destino novo no mapa"),
+    a.boss && NEXT_Z[curZone] ? t("Liberou: {lugar}", {lugar: ZONES[NEXT_Z[curZone]].n}) : a.boss && NEED.parada === curZone && !G.night && t("Liberou: {lugar}", {lugar: "BR-316"}),
+    [...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) && t("Roupa nova na feira")
   ].filter(Boolean);
 }
 function keepVitals(kind) {

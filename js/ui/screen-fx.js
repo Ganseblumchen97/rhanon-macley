@@ -110,7 +110,7 @@ function dawnWipe(mid, label, night) {
   w.classList.toggle("dusk", !!night);
   w.querySelector(".dawn-sun").replaceChildren(night ? moonCanvas() : sunCanvas());
   const frames = night ? [wolfCanvas(false), wolfCanvas(true)] : [roosterCanvas(false), roosterCanvas(true)], g = w.querySelector(".dawn-galo");
-  g.replaceChildren(frames[0]); w.querySelector(".dawn-txt").textContent = label || (night ? "Anoiteceu" : "Amanheceu");
+  g.replaceChildren(frames[0]); w.querySelector(".dawn-txt").textContent = label || (night ? t("Anoiteceu") : t("Amanheceu"));
   w.classList.remove("go"); void w.offsetWidth; w.classList.add("go");
   setTimeout(mid, DAWN_MS * .22);
   setTimeout(() => sfx(night ? "uivo" : "galo"), DAWN_MS * .3);
@@ -128,14 +128,14 @@ function bossWarn(sub) {
   const b = document.createElement("div"); b.className = "boss-warn"; b.setAttribute("aria-hidden", "true");
   b.innerHTML = `<div class="bw-tape top"></div><div class="bw-tape bottom"></div><h2 class="title bw-title"></h2><div class="bw-sub">${sub}</div>`;
   st.appendChild(b);
-  ransom(b.querySelector(".bw-title"), ["CUIDADO!"], 7);
+  ransom(b.querySelector(".bw-title"), [t("CUIDADO!")], 7);
   sfx("alarme"); impactSound();
   setTimeout(() => b.classList.add("out"), REDUCE ? 500 : 1150);
   setTimeout(() => b.remove(), REDUCE ? 600 : 1550);
 }
 // abertura da batalha: o Rhanon entra pela esquerda, o bicho chega pela direita e o nome dele aparece numa faixa
 // (a mesma faixa anuncia a fúria do Rhanon, com outro subtítulo)
-function encounterBanner(name, sub = "apareceu!") {
+function encounterBanner(name, sub = t("apareceu!")) {
   const st = $("stage"); st.querySelector(".encounter")?.remove();
   const b = document.createElement("div"); b.className = "encounter"; b.setAttribute("aria-hidden", "true");
   b.innerHTML = `<div class="enc-band"></div><h2 class="title enc-title"></h2><div class="enc-sub">${sub}</div>`;
@@ -150,7 +150,7 @@ function encounterBanner(name, sub = "apareceu!") {
 function levelUpFx(lv) {
   levelUpJingle();
   const b = document.createElement("div"); b.className = "lvup"; b.setAttribute("aria-live", "polite");
-  b.innerHTML = `<span>NÍVEL ${lv}!</span><small>Rhanon ficou mais forte</small>`;
+  b.innerHTML = `<span>${t("NÍVEL {n}!", {n: lv})}</span><small>${t("Rhanon ficou mais forte")}</small>`;
   document.body.appendChild(b);
   setTimeout(() => b.remove(), REDUCE ? 1200 : 2200);
 }

@@ -188,7 +188,7 @@ function startExplore(zone, after, from) {
     $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false; exFit();
     musicStart("local"); exHud();
-    exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || " · peles, comida, artesão e armeiro: chega perto de uma barraca e aperta Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
+    exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || t(" · peles, comida, artesão e armeiro: chega perto de uma barraca e aperta Z")) : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? t(" · dizem que algo do folclore ronda o fim da trilha...") : t(" · o chefe espera no fim da trilha")));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
   });
@@ -209,8 +209,8 @@ function resumeExplore(result) {
   if (en && result === "flee") { en.stunUntil = now + 3500; EX.invulnUntil = now + 2500; }
   $("explore").hidden = false; $("homeButton").hidden = true;
   musicStart("local"); exHud();
-  if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? `${theName(en.a, true)} já era! A aldeia vai falar disso por muitas noites.`
-    : EX.st.next === "parada" ? "Último chefe de Ananindeua vencido! A passagem leva à BR-316." : EX.st.next ? `Caminho livre: ${SUB[EX.st.next].n}! Segue a trilha até a passagem.` : "Último chefe daqui vencido!");
+  if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? t("{chefe} já era! A aldeia vai falar disso por muitas noites.", {chefe: theName(en.a, true)})
+    : EX.st.next === "parada" ? t("Último chefe de Ananindeua vencido! A passagem leva à BR-316.") : EX.st.next ? t("Caminho livre: {lugar}! Segue a trilha até a passagem.", {lugar: SUB[EX.st.next].n}) : t("Último chefe daqui vencido!"));
   if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); }   // o mapa mostra o caminho novo
 }
 
@@ -222,7 +222,7 @@ function exStrike() {
   const h = EX.hero; EX.cool = .35; EX.jab = .16; sfx("spear");
   // a lança alcança uns 1,5 quadrado à frente: confere pontos ao longo dela
   const reach = en => [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw);
-  if (EX.ents.some(en => en.alive && en.aquatic && reach(en)) && !EX.ents.some(en => en.alive && !en.aquatic && reach(en))) exToast("O peixe tá na água e a lança não alcança. Usa a flecha (X)!");
+  if (EX.ents.some(en => en.alive && en.aquatic && reach(en)) && !EX.ents.some(en => en.alive && !en.aquatic && reach(en))) exToast(t("O peixe tá na água e a lança não alcança. Usa a flecha (X)!"));
   const target = EX.ents.find(en => en.alive && !en.aquatic && [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw));
   if (target) exHit(target);
 }
@@ -232,7 +232,7 @@ const BOW_DRAW = .32;   // segundos puxando a corda antes da flecha sair (ele pa
 const bowHand = a => [16 + a.x * 13, 25 + a.y * 9];
 function exThrow() {
   if (!EX || EX.locked || EX.dialog || EX.camp || EX.cool > 0 || EX.spear || EX.draw) return;
-  if (!G.equip.ranged) { EX.cool = 1.2; sfx("blip"); return exToast("Pra atacar de longe precisa de arco. O armeiro da feira faz um."); }
+  if (!G.equip.ranged) { EX.cool = 1.2; sfx("blip"); return exToast(t("Pra atacar de longe precisa de arco. O armeiro da feira faz um.")); }
   const h = EX.hero; EX.cool = BOW_DRAW + .45; sfx("guard");
   EX.draw = {t: 0, aim: {x: h.aim.x, y: h.aim.y}};
 }
@@ -269,7 +269,7 @@ function pickLoot(l) {
   EX.loot = EX.loot.filter(q => q !== l); vit();
   G.pelts[l.id] = (G.pelts[l.id] || 0) + 1; save(); sfx("heal");
   exBurst(l.x, l.y - 4, ["#ffffff", "#ffd23a"], 8);
-  exToast(`Pegou: ${peltName(l.id).toLowerCase()} (R$ ${peltValue(l.id)} na feira).`); exHud();
+  exToast(t("Pegou: {pele} (R$ {n} na feira).", {pele: peltName(l.id).toLowerCase(), n: peltValue(l.id)})); exHud();
 }
 // pele no chão: trouxinha com a cor do tipo (couro, escamas, penas, casco, presas), pulando e brilhando
 function drawLoot(x, l, cx, cy, now) {
@@ -288,7 +288,7 @@ function exHit(en) {
     en.alive = false; en.koUntil = performance.now() + 1100; sfx("crit");
     exBurst(en.x, en.y - 6, ["#d8d2c0", "#a89f8a", "#ffffff"], 14);
     curZone = EX.zone;
-    exToast(`Derrubou ${theName(a)} num golpe só! ` + reward(a, G.lv - (a.lv || 1) >= ONE_HIT_LEVELS ? WEAK_XP : ONE_HIT_XP, !en.aquatic).join(" · "));
+    exToast(t("Derrubou {bicho} num golpe só!", {bicho: theName(a)}) + " " + reward(a, G.lv - (a.lv || 1) >= ONE_HIT_LEVELS ? WEAK_XP : ONE_HIT_XP, !en.aquatic).join(" · "));
     if (!en.aquatic) EX.loot.push({id: a.id, x: en.x, y: en.y, t0: performance.now()});   // a pele fica no chão até ele passar por cima (peixe: vai direto para a bolsa)
     exHud();
     return;
@@ -349,7 +349,7 @@ function exUpdate(dt, now) {
     if (CAMP_DAWN_AT[c.kind] && el > CAMP_DAWN_AT[c.kind] && !c.dawned) {   // passa a faixa do amanhecer (galo e sol); por trás dela vira dia
       c.dawned = true;
       const toNight = c.kind === "noite";   // atrás da faixa o mundo troca: noite (lua e lobo) ou dia (sol e galo)
-      dawnWipe(() => { c.day = true; G.night = toNight; EX.night = toNight; save(); exHud(); musicStart("local"); }, toNight ? "Anoiteceu" : `Amanheceu · Dia ${G.day + 1}`, toNight);
+      dawnWipe(() => { c.day = true; G.night = toNight; EX.night = toNight; save(); exHud(); musicStart("local"); }, toNight ? t("Anoiteceu") : t("Amanheceu · Dia {n}", {n: G.day + 1}), toNight);
     }
   }
   // aviso "segure C para pular" com a barrinha enchendo (0,7 s segurando pula a cena)
@@ -576,8 +576,8 @@ function exploreFrame(t, dt) {
 function exHud() {
   vit();
   const bar = (v, m, cls) => `<i class="hb ${cls}"><u style="width:${Math.round(100 * v / m)}%"></u></i>`;   // HUD: nome do lugar e chips com barrinhas
-  $("exHud").innerHTML = `<b>${ZONES[EX.zone] ? zoneDef(EX.zone).n : SUB[EX.zone].n + (G.night ? " à noite" : "")}</b><span>Nv ${G.lv}</span>`
-    + `<span>PV ${G.hp}/${maxHP(G.lv)}${bar(G.hp, maxHP(G.lv), "pv")}</span><span>PE ${G.sp}/${maxSP(G.lv)}${bar(G.sp, maxSP(G.lv), "pe")}</span>`
+  $("exHud").innerHTML = `<b>${ZONES[EX.zone] ? zoneDef(EX.zone).n : G.night ? t("{zona} à noite", {zona: SUB[EX.zone].n}) : SUB[EX.zone].n}</b><span>${t("Nv")} ${G.lv}</span>`
+    + `<span>${t("PV")} ${G.hp}/${maxHP(G.lv)}${bar(G.hp, maxHP(G.lv), "pv")}</span><span>${t("PE")} ${G.sp}/${maxSP(G.lv)}${bar(G.sp, maxSP(G.lv), "pe")}</span>`
     + `<span>XP ${G.xp}/${need(G.lv)}${bar(G.xp, need(G.lv), "xp")}</span><span>R$ ${G.money}</span>`;
 }
 function exToast(msg) {
@@ -689,7 +689,7 @@ function drawNpc(x, s, cx, cy, now) {
 }
 // setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
 function drawSpotPrompt(x, cx, cy, now) {
-  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `Z / GOLPE: ${SPOT_LABEL[s.kind]}` : "";
+  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `${t("Z / GOLPE")}: ${SPOT_LABEL[s.kind]}` : "";
   if (el.textContent !== txt) { el.textContent = txt; el.classList.toggle("show", !!s); }
   if (!s) return;
   const px = Math.round(s.x - cx), py = Math.round(s.y - cy) - (PEOPLE.includes(s.kind) ? 30 : 10) - Math.floor(now / 250) % 2;
@@ -702,36 +702,36 @@ function exOpenDialog(kind, msg, look) {
   const d = $("exDialog"); EX.dialog = kind; exKeys.clear(); sfx("blip");
   const say = (title, text) => { d.innerHTML = `<h2>${title}</h2><p>${text}</p>`; };
   if (kind === "fogueira" && EX.st.safe) {   // fogueira da aldeia: escolhe até quando descansar
-    say("Fogueira", G.night ? "Noite alta. Dormir aqui recupera tudo e já começa o outro dia."
-      : "O fogo estala. Descansar até a noite recupera metade (e de noite a mata muda). Dormir até o outro dia recupera tudo.");
-    if (!G.night) btn("Descansar até a noite", () => exCampRest("noite"), false, d);
-    btn("Dormir até o dia seguinte", () => exCampRest("dormir"), false, d);
+    say(t("Fogueira"), G.night ? t("Noite alta. Dormir aqui recupera tudo e já começa o outro dia.")
+      : t("O fogo estala. Descansar até a noite recupera metade (e de noite a mata muda). Dormir até o outro dia recupera tudo."));
+    if (!G.night) btn(t("Descansar até a noite"), () => exCampRest("noite"), false, d);
+    btn(t("Dormir até o dia seguinte"), () => exCampRest("dormir"), false, d);
   }
   else if (kind === "fogueira") {   // fogueira no meio da trilha: só um ponto para recuperar as forças
-    say("Fogueira", "Um respiro no meio da trilha. Descansar recupera toda a vida e a energia.");
-    btn("Descansar", () => exCampRest("fogueira"), false, d);
+    say(t("Fogueira"), t("Um respiro no meio da trilha. Descansar recupera toda a vida e a energia."));
+    btn(t("Descansar"), () => exCampRest("fogueira"), false, d);
   }
   else if (kind === "tenda" && EX.zone === "veropeso") {   // Belém: rede na pensão do Ver-o-Peso (diária barata em PENSAO)
-    say("Pensão do Ver-o-Peso", (G.night ? "Rede limpa, cheiro de maré e o mercado acordando cedo. Dormir recupera tudo." : "Rede pra quem é de fora. Descansar até a noite recupera metade; dormir até o outro dia, tudo.") + ` Dinheiro: R$ ${G.money}.`);
+    say(t("Pensão do Ver-o-Peso"), (G.night ? t("Rede limpa, cheiro de maré e o mercado acordando cedo. Dormir recupera tudo.") : t("Rede pra quem é de fora. Descansar até a noite recupera metade; dormir até o outro dia, tudo.")) + " " + t("Dinheiro: R$ {n}.", {n: G.money}));
     // paga e passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
-    const nap = k => ask(`Pagar R$ ${PENSAO[k]} pela rede${k === "noite" ? " até a noite" : " até amanhã"}?`, () => {
-      if (G.money < PENSAO[k]) { sfx("blip"); return exOpenDialog("tenda", `Falta dinheiro: a diária é R$ ${PENSAO[k]}.`); }
+    const nap = k => ask(k === "noite" ? t("Pagar R$ {n} pela rede até a noite?", {n: PENSAO[k]}) : t("Pagar R$ {n} pela rede até amanhã?", {n: PENSAO[k]}), () => {
+      if (G.money < PENSAO[k]) { sfx("blip"); return exOpenDialog("tenda", t("Falta dinheiro: a diária é R$ {n}.", {n: PENSAO[k]})); }
       G.money -= PENSAO[k]; exNap(k);
     });
-    if (!G.night) btn(`Descansar até a noite (R$ ${PENSAO.noite})`, nap("noite"), false, d);
-    btn(`Dormir até o dia seguinte (R$ ${PENSAO.dormir})`, nap("dormir"), false, d);
+    if (!G.night) btn(`${t("Descansar até a noite")} (R$ ${PENSAO.noite})`, nap("noite"), false, d);
+    btn(`${t("Dormir até o dia seguinte")} (R$ ${PENSAO.dormir})`, nap("dormir"), false, d);
   }
-  else if (kind === "tenda") { say("Tenda", "A tenda do Rhanon. Dormir recupera tudo, mas o dia passa."); btn("Dormir", () => exNap("dormir"), false, d); }
-  else if (kind === "peles") { say("Comprador de peles", "Couro bom vira dinheiro bom. Mostra aí o que tu caçou."); peltButtons(d); }
-  else if (kind === "comida") { say("Barraca de comida", "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!"); foodButtons(d); }
-  else if (kind === "artesao") { say("Artesão", "Roupa tecida à mão e tocha pra espantar bicho. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte tu ficar, mais coisa eu te mostro."); gearButtons(d); }
-  else if (kind === "armeiro") { say("Armeiro", "Lança, arco, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar."); forgePanel(d); }
-  else if (kind === "inventario") { say("Bolsa", invSummary()); invButtons(d); }
+  else if (kind === "tenda") { say(t("Tenda"), t("A tenda do Rhanon. Dormir recupera tudo, mas o dia passa.")); btn(t("Dormir"), () => exNap("dormir"), false, d); }
+  else if (kind === "peles") { say(t("Comprador de peles"), t("Couro bom vira dinheiro bom. Mostra aí o que tu caçou.")); peltButtons(d); }
+  else if (kind === "comida") { say(t("Barraca de comida"), t("Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!")); foodButtons(d); }
+  else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão e tocha pra espantar bicho. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte tu ficar, mais coisa eu te mostro.")); gearButtons(d); }
+  else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
+  else if (kind === "inventario") { say(t("Bolsa"), invSummary()); invButtons(d); }
   else if (kind === "cabine") busCabin(say, d);
   else if (kind === "onibus") busDoor(say, d);
   else villagerTalk(look, say, d);   // pedido (oferta ou entrega) ou uma dica (systems/journal.js)
   if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);
-  btn("Fechar", exCloseDialog, false, d);
+  btn(t("Fechar"), exCloseDialog, false, d);
   d.hidden = false; EX.confirming = null; EX.dialogT = performance.now();
   if (kind !== "armeiro" && kind !== "tutorial") { menuSelect(d, EX.keepSel ?? menuFirst(d)); EX.keepSel = null; }   // já começa com uma opção escolhida
 }
@@ -739,21 +739,21 @@ function exOpenDialog(kind, msg, look) {
 const busDest = () => EX.zone === "parada" ? "belem" : "ananindeua";
 const busSide = () => EX.zone === "parada" ? -1 : 1;   // a estrada sai pela esquerda rumo a Belém e pela direita rumo a Ananindeua
 function busCabin(say, d) {
-  if (EX.zone === "terminal") return say("Guichê do terminal", G.passagem ? "Tua passagem vale ida e volta. O ônibus pra Ananindeua sai assim que tu subir." : "Sem passagem não embarca, maninho.");
-  if (G.passagem) return say("Cobrador", "Passagem na mão! É só subir no ônibus. Vale ida e volta: do terminal de Belém tu volta quando quiser.");
-  if (!BUS.open) return say("Cobrador", "O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!");
-  say("Cobrador", `Passagem pra Belém, a capital: R$ ${BUS.price}, ida e volta. Tu tem R$ ${G.money}.` + (G.money < BUS.price ? ` Faltam R$ ${BUS.price - G.money}. Pele de bicho forte vale bem mais na feira, viu?` : ""));
-  btn(`Comprar passagem · R$ ${BUS.price}`, ask(`Comprar a passagem para Belém por R$ ${BUS.price}?`, () => {
+  if (EX.zone === "terminal") return say(t("Guichê do terminal"), G.passagem ? t("Tua passagem vale ida e volta. O ônibus pra Ananindeua sai assim que tu subir.") : t("Sem passagem não embarca, maninho."));
+  if (G.passagem) return say(t("Cobrador"), t("Passagem na mão! É só subir no ônibus. Vale ida e volta: do terminal de Belém tu volta quando quiser."));
+  if (!BUS.open) return say(t("Cobrador"), t("O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!"));
+  say(t("Cobrador"), t("Passagem pra Belém, a capital: R$ {n}, ida e volta. Tu tem R$ {tem}.", {n: BUS.price, tem: G.money}) + (G.money < BUS.price ? " " + t("Faltam R$ {n}. Pele de bicho forte vale bem mais na feira, viu?", {n: BUS.price - G.money}) : ""));
+  btn(t("Comprar passagem · R$ {n}", {n: BUS.price}), ask(t("Comprar a passagem para Belém por R$ {n}?", {n: BUS.price}), () => {
     if (G.passagem || G.money < BUS.price) return;
     G.money -= BUS.price; G.passagem = true; save(); sfx("more"); exHud();
-    exOpenDialog("cabine", "Passagem comprada! Agora é só subir no ônibus.");
+    exOpenDialog("cabine", t("Passagem comprada! Agora é só subir no ônibus."));
   }), G.money < BUS.price, d);
 }
 function busDoor(say, d) {
   const dest = busDest(), n = dest === "belem" ? "Belém" : "Ananindeua";
-  if (!G.passagem || !BUS.open) return say("Ônibus da BR-316", "O motorista aponta para a cabine: \"Sem passagem não sobe, maninho. Compra ali com o cobrador.\"");
-  say("Ônibus da BR-316", `O motor já está ligado. Destino: ${n}.`);
-  btn(`Embarcar para ${n}`, busLeave, false, d);
+  if (!G.passagem || !BUS.open) return say(t("Ônibus da BR-316"), t("O motorista aponta para a cabine: \"Sem passagem não sobe, maninho. Compra ali com o cobrador.\""));
+  say(t("Ônibus da BR-316"), t("O motor já está ligado. Destino: {lugar}.", {lugar: n}));
+  btn(t("Embarcar para {lugar}", {lugar: n}), busLeave, false, d);
 }
 // sobe no ônibus: ele arranca e sai pela estrada; depois a viagem segue no mapa do Pará e entra na fase da outra cidade
 function busLeave() {
@@ -795,15 +795,15 @@ function drawBus(x, b, cx, cy, now) {
 function exNap(k) {
   exCloseDialog(); EX.locked = true; exKeys.clear();
   const night = k === "noite";
-  dawnWipe(() => { const msg = rest(k, true, true); EX.night = G.night; exHud(); musicStart("local"); setTimeout(() => { if (!EX) return; EX.locked = false; exToast(msg); }, DAWN_MS * .6); }, night ? "Anoiteceu" : `Amanheceu · Dia ${G.day + 1}`, night);
+  dawnWipe(() => { const msg = rest(k, true, true); EX.night = G.night; exHud(); musicStart("local"); setTimeout(() => { if (!EX) return; EX.locked = false; exToast(msg); }, DAWN_MS * .6); }, night ? t("Anoiteceu") : t("Amanheceu · Dia {n}", {n: G.day + 1}), night);
 }
 /* "Deseja vender...?": o painel vira a pergunta com Sim e Não (setas escolhem, Z confirma, X é o Não).
    Depois de responder, a loja volta com a mesma opção escolhida. */
 function exConfirm(text, yes) {
   const d = $("exDialog"), back = EX.dialog, bs = menuButtons(d);
   EX.keepSel = Math.max(0, bs.findIndex(b => b.classList.contains("sel")));
-  d.innerHTML = `<h2>Confirmar</h2><p>${text}</p>`; sfx("look");
-  btn("Sim", yes, false, d); btn("Não", () => exOpenDialog(back), false, d);
+  d.innerHTML = `<h2>${t("Confirmar")}</h2><p>${text}</p>`; sfx("look");
+  btn(t("Sim"), yes, false, d); btn(t("Não"), () => exOpenDialog(back), false, d);
   EX.confirming = back; menuSelect(d, 0);
 }
 // nas lojas da exploração pergunta antes; no resto (testes, mapa) faz direto
@@ -820,7 +820,7 @@ function exIntro() {
   const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), side = solidAt(f.x - 14, f.y + 5) ? 1 : -1;
   EX.camp = {kind: "intro", t0: performance.now(), dur: campWake("intro") + 2600, x: f.x + side * 14, y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
   h.x = EX.camp.x; h.y = EX.camp.y; h.dir = "down"; h.aim = {x: 0, y: 1};
-  exToast("Ananindeua (PA) · manhã na aldeia...");
+  exToast(t("Ananindeua (PA) · manhã na aldeia..."));
 }
 /* tutorial (jogo novo): depois de acordar, o caçador ensina os controles; só então o Rhanon anda e a ajuda aparece */
 const TUTORIAL = [
@@ -836,15 +836,15 @@ function startTutorial() { EX.tutPage = 0; showTutorial(); }
 function showTutorial() {
   const d = $("exDialog"), i = EX.tutPage, last = i === TUTORIAL.length - 1;
   EX.dialog = "tutorial"; exKeys.clear();
-  d.innerHTML = `<h2>Caçador</h2><div class="tut"><canvas width="24" height="33"></canvas><p>${TUTORIAL[i]}</p></div>`;
+  d.innerHTML = `<h2>${VILLAGER_NAME.aldeao1}</h2><div class="tut"><canvas width="24" height="33"></canvas><p>${TUTORIAL[i]}</p></div>`;
   d.querySelector("canvas").getContext("2d").drawImage(villagerSprite("aldeao1"), 0, 0);   // retratinho de quem fala
-  btn(last ? "Bora!" : "Próximo", () => { if (last) endTutorial(); else { EX.tutPage++; sfx("blip"); showTutorial(); } }, false, d);
+  btn(last ? t("Bora!") : t("Próximo"), () => { if (last) endTutorial(); else { EX.tutPage++; sfx("blip"); showTutorial(); } }, false, d);
   d.hidden = false;
 }
 function endTutorial() {
   G.tutorial = false; save();
   $("exDialog").hidden = true; EX.dialog = null; $("explore").classList.remove("no-help"); sfx("more");
-  exToast("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata.");
+  exToast(t("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata."));
 }
 // pular a cena: aplica na hora o que ela faria (noite ou dia) e termina
 function campSkip() {
@@ -855,7 +855,7 @@ function campSkip() {
 // fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
   const kind = EX.camp.kind; EX.camp = null; EX.dialog = null; exKeys.clear();
-  if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata.");
+  if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast(t("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata."));
   exToast(rest(kind, true, true)); exHud();
   if (EX.zone === "aldeia" && kind !== "fogueira") setTimeout(() => EX && announceOffer(), 2400);   // novo dia ou noite: pode ter pedido novo   // dormir: o galo já cantou no amanhecer da cena
 }

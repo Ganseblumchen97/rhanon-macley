@@ -121,7 +121,7 @@ const FEM = new Set(["onca", "preguica", "sucuri", "surucucu", "harpia", "cotia"
   "cobra_grande", "coruja", "mula", "garca", "matinta", "cobra_cipo", "jararaca", "iguana", "iguana_rei", "mulher_branco", "ratazana", "gaivota",
   "cobra_norato", "mucura", "visagem_mare", "onca_rei"]);
 const PROPER = new Set(["cobra_grande", "chupacabra", "mula", "boitata", "boto_encantado", "matinta", "curupira", "mapinguari", "mulher_branco", "cobra_norato", "onca_rei"]);
-const theName = (a, cap) => { const t = (FEM.has(a.id) ? "a " : "o ") + (PROPER.has(a.id) ? a.name : a.name.toLowerCase()); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
+const theName = (a, cap) => { if (LANG !== "pt" && TX[LANG].article) return TX[LANG].article(a, cap); const t = (FEM.has(a.id) ? "a " : "o ") + (PROPER.has(a.id) ? a.name : a.name.toLowerCase()); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
 const ending = (a, m, f) => FEM.has(a.id) ? f : m;   // "vencido"/"vencida"
 // nome do item que cada bicho deixa (os outros viram "Pele de <bicho>")
 const PELT = {morcego: "Asas de morcego", coruja: "Penas de coruja", lobo: "Pelo de lobo-guará", morcego_vampiro: "Asas de morcego-vampiro", morcego_pescador: "Asas de morcego-pescador",

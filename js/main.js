@@ -1,7 +1,8 @@
 /* Inicialização: monta os mapas, liga os botões e o teclado e abre a tela inicial.
    É o último arquivo carregado, então tudo dos outros arquivos já existe aqui. */
+applyLangData(); translateStatic();   // idioma escolhido nas Opções (core/lang.js); em português não faz nada
 if (!CURITIBA_OPEN && G.loc === "curitiba") { G.loc = "ananindeua"; save(); }   // Curitiba fechada por enquanto
-$("gameVersion").textContent = "ALFA " + GAME_VERSION;
+$("gameVersion").textContent = t("ALFA") + " " + GAME_VERSION;
 setupMapRegion();
 buildMapNodes();
 buildLocalNodes();
@@ -18,7 +19,7 @@ $("startAdventure").addEventListener("click", () => {
   audio(); musicStop();
   startIntro();   // a aventura começa com Rhanon acordando na fogueira da aldeia (a tela inicial some por trás da transição)
 });
-$("local").querySelector(".nav-help").textContent = `Setas: escolher local · Enter: confirmar · 1-9: botões · Esc: mapa do ${MAP_REGIONS[MAP_REGION].n}`;
+$("local").querySelector(".nav-help").textContent = t("Setas: escolher local · Enter: confirmar · 1-9: botões · Esc: mapa do {mapa}", {mapa: MAP_REGIONS[MAP_REGION].n});
 $("homeButton").addEventListener("click", () => {
   $("local").hidden = true;
   musicStop();
@@ -29,7 +30,7 @@ $("mute").addEventListener("click", toggleMute);
 // cartão de resultado: "Lutar de novo" / "Continuar" e "Voltar ao mapa"
 $("again").addEventListener("click", () => { if (mode === "interview" || mode === "betterInterview" || mode === "work") { if ($("overTitle").textContent.includes("encerrado")) startChallenge(challengeKind); else showMap(); } else init(); });
 $("toMap").addEventListener("click", () => {
-  $("over").hidden = true; $("again").style.display = ""; $("toMap").textContent = "Voltar ao mapa";
+  $("over").hidden = true; $("again").style.display = ""; $("toMap").textContent = t("Voltar ao mapa");
   if (fromExplore) { fromExplore = false; return wipe(() => resumeExplore(battleResult)); }
   const f = fromLocal; fromLocal = false; f ? showLocal() : showMap();
 });

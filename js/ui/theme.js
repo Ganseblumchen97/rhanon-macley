@@ -58,13 +58,13 @@ function statusIconURL(k) {
 // lista de estados do Rhanon (e do bicho) com o ícone, o nome e quantos turnos faltam
 function statusList() {
   const out = [];
-  if (p.atento) out.push(["atento", "Atento: próximo ataque crítico", ""]);
-  if (p.def) out.push(["guarda", "Em guarda", ""]);
-  if (p.dot && p.dot.t > 0) out.push([{Veneno: "veneno", Sangramento: "sangue", Queimadura: "fogo", Drenagem: "dreno", Aperto: "preso"}[p.dot.n] || "sangue", p.dot.n, p.dot.t]);
-  if (p.weak > 0) out.push(["fedor", "Fedor: golpes mais fracos", p.weak]);
-  if (p.preso > 0) out.push(["preso", "Preso: não consegue fugir", p.preso]);
-  if (p.medo > 0) out.push(["medo", "Medo: sem defesa", p.medo]);
-  if (e && e.assustada) out.push(["assustada", `${e.name} assustado`, ""]);
+  if (p.atento) out.push(["atento", t("Atento: próximo ataque crítico"), ""]);
+  if (p.def) out.push(["guarda", t("Em guarda"), ""]);
+  if (p.dot && p.dot.t > 0) out.push([{Veneno: "veneno", Sangramento: "sangue", Queimadura: "fogo", Drenagem: "dreno", Aperto: "preso"}[p.dot.n] || "sangue", t(p.dot.n), p.dot.t]);
+  if (p.weak > 0) out.push(["fedor", t("Fedor: golpes mais fracos"), p.weak]);
+  if (p.preso > 0) out.push(["preso", t("Preso: não consegue fugir"), p.preso]);
+  if (p.medo > 0) out.push(["medo", t("Medo: sem defesa"), p.medo]);
+  if (e && e.assustada) out.push(["assustada", t("{bicho} {assustado}", {bicho: theName(e, true), assustado: ending(e, "assustado", "assustada")}), ""]);
   return out;
 }
 

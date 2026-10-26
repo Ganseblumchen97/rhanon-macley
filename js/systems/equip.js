@@ -34,17 +34,17 @@ function eqChoices(s) {
   const out = Object.entries(EQUIP[s.slot]).filter(([id]) => G.owned[id]).map(([id, it]) => ({id, it}));
   return s.none && out.length ? [{id: null, it: {n: s.none}}, ...out] : out;
 }
-const eqStats = () => `ATQ +${weaponAtk()}${G.equip.ranged ? ` · flecha +${EQUIP.ranged[G.equip.ranged].atk || 0}` : ""} · DEF ${defense()}`;
+const eqStats = () => `${t("ATQ")} +${weaponAtk()}${G.equip.ranged ? ` · ${t("flecha")} +${EQUIP.ranged[G.equip.ranged].atk || 0}` : ""} · ${t("DEF")} ${defense()}`;
 function openEquip(msg) {
   vit(); audio();
   const o = $("equipar"), box = o.querySelector(".info"), q = G.equip;
-  box.innerHTML = `<h2>Equipamento</h2><p class="hint">${eqStats()}</p>`;
+  box.innerHTML = `<h2>${t("Equipamento")}</h2><p class="hint">${eqStats()}</p>`;
   const wrap = document.createElement("div"), cols = [document.createElement("div"), document.createElement("div")];
   wrap.className = "eq-wrap"; cols.forEach(c => { c.className = "eq-col"; });
   EQ_SLOTS.forEach((s, i) => {
     const it = q[s.slot] && EQUIP[s.slot][q[s.slot]], b = document.createElement("button");
     b.type = "button"; b.className = "eq-slot" + (i === EQ_SEL ? " sel" : "");
-    b.innerHTML = `<small>${s.n}</small><b>${it ? it.n : s.none || "—"}</b><i>${it ? gearBonus(s.slot, it) : s.slot === "ranged" ? "o armeiro da feira faz" : ""}</i>`;
+    b.innerHTML = `<small>${s.n}</small><b>${it ? it.n : s.none || "—"}</b><i>${it ? gearBonus(s.slot, it) : s.slot === "ranged" ? t("o armeiro da feira faz") : ""}</i>`;
     b.prepend(gearIcon(s.slot, it));
     b.addEventListener("click", () => { EQ_SEL = i; sfx("blip"); openEquip(); });
     cols[i < 2 ? 0 : 1].append(b);
@@ -57,26 +57,26 @@ function openEquip(msg) {
   box.append(pick);
   list.forEach(c => {
     const on = q[s.slot] === c.id;
-    btn(c.it.n + (on ? " <small>usando</small>" : c.id ? ` <small>${gearBonus(s.slot, c.it)}</small> ${gearCmp(s.slot, c.it)}` : ""), () => { if (!on) eqSet(s.slot, c.id); }, false, pick);
+    btn(c.it.n + (on ? ` <small>${t("usando")}</small>` : c.id ? ` <small>${gearBonus(s.slot, c.it)}</small> ${gearCmp(s.slot, c.it)}` : ""), () => { if (!on) eqSet(s.slot, c.id); }, false, pick);
     pick.lastElementChild.classList.toggle("sel", on);
     const sp = pick.lastElementChild.firstElementChild, key = sp.querySelector(".key");   // desenho depois do número da tecla
     sp.insertBefore(gearIcon(s.slot, c.id && c.it), key ? key.nextSibling : sp.firstChild);
   });
-  if (!list.length) lh(s.slot === "ranged" ? "Ainda sem arco. O armeiro da feira faz um." : "Nada pra trocar aqui ainda.", pick);
+  if (!list.length) lh(s.slot === "ranged" ? t("Ainda sem arco. O armeiro da feira faz um.") : t("Nada pra trocar aqui ainda."), pick);
   if (msg) lh(msg, box);
-  box.insertAdjacentHTML("beforeend", '<p class="hint eq-keys">Setas escolhem o espaço · Z troca para o próximo · 1-9 equipam direto · X fecha</p>');
-  btn("Fechar", closeEquip, false, box);
+  box.insertAdjacentHTML("beforeend", `<p class="hint eq-keys">${t("Setas escolhem o espaço · Z troca para o próximo · 1-9 equipam direto · X fecha")}</p>`);
+  btn(t("Fechar"), closeEquip, false, box);
   if (o.hidden) { o.hidden = false; sfx("blip"); }
 }
 function eqSet(slot, id) {
   G.equip[slot] = id; save(); sfx("guard");
   const it = id && EQUIP[slot][id];
-  openEquip(it ? `${slot === "torso" || slot === "legs" ? "Vestiu" : "Pegou"}: ${it.n}.` : `${EQ_SLOTS.find(s => s.slot === slot).none}.`);
+  openEquip(it ? (slot === "torso" || slot === "legs" ? t("Vestiu: {item}.", {item: it.n}) : t("Pegou: {item}.", {item: it.n})) : `${EQ_SLOTS.find(s => s.slot === slot).none}.`);
 }
 function closeEquip() {
   $("equipar").hidden = true; sfx("blip");
   if (EX && !$("explore").hidden) { if (EX.dialog === "inventario") exOpenDialog("inventario"); }
-  else if (!$("local").hidden && $("linfo").querySelector("h2")?.textContent === "Inventário") showInv();
+  else if (!$("local").hidden && $("linfo").querySelector("h2")?.textContent === t("Inventário")) showInv();
 }
 function setupEquip() {
   $("equipar").addEventListener("click", ev => { if (ev.target === $("equipar")) closeEquip(); });

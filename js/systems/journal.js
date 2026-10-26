@@ -15,7 +15,7 @@ function habitat(id) {
   for (const [z, d] of Object.entries(ZONES)) {
     if (d.boss === id || d.pool.some(([a]) => a === id)) out.push(ZONES[z].n + (d.boss === id ? " (chefe)" : ""));
     const n = NIGHT_ZONES[z];
-    if (n && (n.boss === id || n.pool.some(([a]) => a === id))) out.push(ZONES[z].n + " à noite" + (n.boss === id ? " (chefe)" : ""));
+    if (n && (n.boss === id || n.pool.some(([a]) => a === id))) out.push(t("{zona} à noite", {zona: ZONES[z].n}) + (n.boss === id ? " " + t("(chefe)") : ""));
   }
   return out.join(", ") || "?";
 }
@@ -28,14 +28,14 @@ function journalCard(a) {
   const card = document.createElement("div"); card.className = "cad-card" + (seen ? "" : " nao-visto");
   card.append(c);
   card.insertAdjacentHTML("beforeend", seen
-    ? `<b>${a.name}</b><small>Nv ${a.lv}${a.boss ? " · chefe" : ""} · vencidos: ${b.wins}</small><small>${habitat(a.id)}</small><p>${ANIMAL_FACTS[a.id] || ""}</p>`
+    ? `<b>${a.name}</b><small>${t("Nv")} ${a.lv}${a.boss ? " · " + t("chefe") : ""} · ${t("vencidos: {n}", {n: b.wins})}</small><small>${habitat(a.id)}</small><p>${ANIMAL_FACTS[a.id] || ""}</p>`
     : `<b>???</b><small>${habitat(a.id)}</small>`);
   return card;
 }
 function openJournal() {
   vit();
   const o = $("caderno"), box = o.querySelector(".info"), seen = ANIMALS.filter(a => G.bestiary[a.id] && G.bestiary[a.id].seen).length;
-  box.innerHTML = `<h2>Caderno de bichos</h2><p class="hint">${seen} de ${ANIMALS.length} bichos encontrados. Os que faltam aparecem só como silhueta.</p><div class="cad-grid"></div>`;
+  box.innerHTML = `<h2>${t("Caderno de bichos")}</h2><p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><div class="cad-grid"></div>`;
   const grid = box.querySelector(".cad-grid");
   ANIMALS.forEach(a => grid.append(journalCard(a)));
   btn("Fechar", closeJournal, false, box);
@@ -63,15 +63,15 @@ function rollOffer() {
 }
 // ao chegar na aldeia (ou acordar/anoitecer nela): o aldeão com pedido avisa com um somzinho
 function announceOffer() {
-  if (rollOffer()) { sfx("missao"); exToast(`${VILLAGER_NAME[questById(G.offer.id).giver]} tem um pedido (folha em cima da cabeça).`); }
+  if (rollOffer()) { sfx("missao"); exToast(t("{quem} tem um pedido (folha em cima da cabeça).", {quem: VILLAGER_NAME[questById(G.offer.id).giver]})); }
 }
 const questCount = q => q.need.pelt ? Math.min(q.need.n, G.pelts[q.need.pelt] || 0) : G.quest.n;
 const questReady = () => { const q = G.quest && questById(G.quest.id); return !!q && questCount(q) >= q.need.n; };
-function questGoal(q) { const a = ANIMALS.find(x => x.id === (q.need.kill || q.need.pelt)); return q.need.kill ? `vencer ${q.need.n} × ${a.name.toLowerCase()}` : `${q.need.n} × ${peltName(q.need.pelt).toLowerCase()}`; }
-const rewardText = r => [r.money && `R$ ${r.money}`, ...Object.entries(r.items || {}).map(([k, n]) => `${ITEMS[k].n} ×${n}`)].filter(Boolean).join(" e ");
+function questGoal(q) { const a = ANIMALS.find(x => x.id === (q.need.kill || q.need.pelt)); return q.need.kill ? t("vencer {n} × {bicho}", {n: q.need.n, bicho: a.name.toLowerCase()}) : `${q.need.n} × ${peltName(q.need.pelt).toLowerCase()}`; }
+const rewardText = r => [r.money && `R$ ${r.money}`, ...Object.entries(r.items || {}).map(([k, n]) => `${ITEMS[k].n} ×${n}`)].filter(Boolean).join(t(" e "));
 function questAccept() {
   const q = questById(G.offer.id); G.quest = {id: q.id, n: 0}; G.offer = null; save(); sfx("heal");
-  exOpenDialog("aldeao", `Pedido aceito: ${questGoal(q)}. Recompensa: ${rewardText(q.reward)}.`);
+  exOpenDialog("aldeao", t("Pedido aceito: {meta}. Recompensa: {premio}.", {meta: questGoal(q), premio: rewardText(q.reward)}));
 }
 function questDeliver() {
   const q = questById(G.quest.id);
@@ -85,13 +85,13 @@ function questDeliver() {
 function villagerTalk(look, say, d) {
   const name = VILLAGER_NAME[look] || "Aldeão", act = G.quest && questById(G.quest.id), off = !G.quest && G.offer && questById(G.offer.id);
   if (act && act.giver === look) {
-    if (questReady()) { say(name, "E aí, trouxe o que eu pedi?"); btn("Entregar", questDeliver, false, d); }
-    else say(name, `${act.text} (${questGoal(act)}: ${questCount(act)} de ${act.need.n})`);
-  } else if (off && off.giver === look) { say(name, off.text); lh(`Recompensa: ${rewardText(off.reward)}.`, d); btn("Aceitar o pedido", questAccept, false, d); }
+    if (questReady()) { say(name, t("E aí, trouxe o que eu pedi?")); btn(t("Entregar"), questDeliver, false, d); }
+    else say(name, `${act.text} (${questGoal(act)}: ${t("{n} de {total}", {n: questCount(act), total: act.need.n})})`);
+  } else if (off && off.giver === look) { say(name, off.text); lh(t("Recompensa: {premio}.", {premio: rewardText(off.reward)}), d); btn(t("Aceitar o pedido"), questAccept, false, d); }
   else { const tips = look.startsWith("urbano") ? BELEM_TIPS : VILLAGER_TIPS; say(name, tips[Math.floor(Math.random() * tips.length)]); }
 }
 // linha do pedido na bolsa
-const questLine = () => { const q = G.quest && questById(G.quest.id); return q ? `<br>Pedido de ${VILLAGER_NAME[q.giver].toLowerCase()}: ${questGoal(q)} (${questCount(q)} de ${q.need.n})` : ""; };
+const questLine = () => { const q = G.quest && questById(G.quest.id); return q ? "<br>" + t("Pedido de {quem}: {meta} ({n} de {total})", {quem: VILLAGER_NAME[q.giver].toLowerCase(), meta: questGoal(q), n: questCount(q), total: q.need.n}) : ""; };
 // ícone sobre o aldeão: folha com anotações (tem pedido) ou com um visto verde (pedido pronto para entregar)
 function questMark(look) {
   if (G.offer && !G.quest && questById(G.offer.id).giver === look) return "pedido";

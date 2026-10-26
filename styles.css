@@ -801,3 +801,6 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .eq-pick .cmd .eq-icon{width:28px;height:28px;margin-right:6px;vertical-align:middle}
 .eq-pick .cmd .eq-icon canvas{width:24px;height:24px}
 .forge-card h3{display:flex;align-items:center;gap:8px}
+/* aviso de tradução automática (core/lang.js) */
+.t-menu .lang-note{margin:6px 0 0;padding:4px 8px;border-left:3px solid #f2a20c;background:rgba(0,0,0,.35);color:#fff3c4;font:700 12px/1.4 var(--mono);max-width:420px}
+.opcoes .lang-note{color:#a0601a}

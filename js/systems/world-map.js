@@ -1,7 +1,7 @@
 /* Mapa grande (Pará ou Brasil, ver MAP_REGION em data/world.js): HUD, painel de informações, viagem e troca de telas. */
 const curVis = () => CURITIBA_OPEN && (G.lv >= REQ.lv || G.loc === "curitiba");
 function drawMap() {
-  vit(); $("hud").textContent = `Nv ${G.lv} · XP ${G.xp}/${need(G.lv)} · R$ ${G.money}` + (G.loc === "ananindeua" || G.loc === "belem" ? ` · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)}` : "") + (G.job ? ` · PROGRAMADOR · XP PROF. ${G.jobXp||0}` : "") + (G.betterJob ? " · SÊNIOR" : "");
+  vit(); $("hud").textContent = `${t("Nv")} ${G.lv} · XP ${G.xp}/${need(G.lv)} · R$ ${G.money}` + (G.loc === "ananindeua" || G.loc === "belem" ? ` · ${t("PV")} ${G.hp}/${maxHP(G.lv)} · ${t("PE")} ${G.sp}/${maxSP(G.lv)}` : "") + (G.job ? ` · PROGRAMADOR · XP PROF. ${G.jobXp||0}` : "") + (G.betterJob ? " · SÊNIOR" : "");
   const R = MAP_REGIONS[MAP_REGION];
   if ($("n-curitiba")) $("n-curitiba").style.display = curVis() ? "" : "none";
   $("route").style.display = R.route.includes("curitiba") && !curVis() ? "none" : "";
@@ -41,17 +41,17 @@ function btn(txt, fn, off, host) {
 function select(id) {
   sfx("blip"); markNode("map", id);
   const l = LOC[id], here = id === G.loc, i = $("info");
-  i.innerHTML = `<h2>${l.n}</h2><p>${l.txt}</p>` + (here ? '<p class="hint">Você está aqui.</p>' : "");
+  i.innerHTML = `<h2>${l.n}</h2><p>${l.txt}</p>` + (here ? `<p class="hint">${t("Você está aqui.")}</p>` : "");
   if (l.soon) {   // destino que ainda não abre (Belém)
-    btn("Em breve", () => {}, true);
+    btn(t("Em breve"), () => {}, true);
     i.insertAdjacentHTML("beforeend", '<p class="hint">Um dia Rhanon vai precisar chegar à capital para pegar um avião. Por enquanto, a aventura é em Ananindeua.</p>');
   } else if (here && id === "belem") {
-    btn("Entrar em Belém", openLocal);
+    btn(t("Entrar em Belém"), openLocal);
   } else if (id === "belem" || (id === "ananindeua" && G.loc === "belem")) {   // entre as duas cidades só se vai de ônibus
-    if (G.passagem && BUS.open) { btn(id === "belem" ? "Viajar de ônibus para Belém" : "Voltar de ônibus para Ananindeua", () => busRide(id)); i.insertAdjacentHTML("beforeend", '<p class="hint">A passagem vale ida e volta pela BR-316.</p>'); }
+    if (G.passagem && BUS.open) { btn(id === "belem" ? t("Viajar de ônibus para Belém") : t("Voltar de ônibus para Ananindeua"), () => busRide(id)); i.insertAdjacentHTML("beforeend", `<p class="hint">${t("A passagem vale ida e volta pela BR-316.")}</p>`); }
     else i.insertAdjacentHTML("beforeend", '<p class="hint">Para chegar à capital, compre a passagem na cabine da BR-316, no fim da trilha de Ananindeua.</p>');
   } else if (here && id === "ananindeua") {
-    btn("Entrar em Ananindeua", openLocal);
+    btn(t("Entrar em Ananindeua"), openLocal);
     i.insertAdjacentHTML("beforeend", !CURITIBA_OPEN ? (MAP_REGION === "para" ? "" : '<p class="hint">Em breve: novos destinos.</p>') : curVis() ? '<p class="hint">Curitiba apareceu no mapa. Toque nela para viajar.</p>' : `<p class="hint">Existe um destino distante. Para ir até lá: Nv ${REQ.lv} e R$ ${REQ.money}.</p>`);
   } else if (here && id === "curitiba") {
     if (!G.job) {
@@ -66,16 +66,16 @@ function select(id) {
   } else if (!here) {
     const cost = id === "curitiba" ? REQ.money : 0, miss = cost - G.money;
     i.insertAdjacentHTML("beforeend", `<p class="hint">Passagem: R$ ${cost}</p>`);
-    btn(miss > 0 ? `Faltam R$ ${miss}` : "Viajar", () => go(id, cost), miss > 0);
+    btn(miss > 0 ? t("Faltam R$ {n}", {n: miss}) : t("Viajar"), () => go(id, cost), miss > 0);
   }
   resetButton(i, () => { drawMap(); select(G.loc); });
 }
 // "Zerar progresso" (pede um segundo clique para confirmar); after = redesenha a tela de onde veio
 function resetButton(host, after) {
   const r = document.createElement("button");
-  r.className = "cmd"; r.type = "button"; r.style.opacity = ".6"; r.innerHTML = "<span>Zerar progresso</span>";
+  r.className = "cmd"; r.type = "button"; r.style.opacity = ".6"; r.innerHTML = `<span>${t("Zerar progresso")}</span>`;
   r.addEventListener("click", () => {
-    if (!sure) { sure = true; r.firstChild.textContent = "Clique de novo para confirmar"; return; }
+    if (!sure) { sure = true; r.firstChild.textContent = t("Clique de novo para confirmar"); return; }
     sure = false; G = {lv: 1, xp: 0, money: 0, loc: "ananindeua", job:false, jobXp:0, jobMissions:0, betterJob:false}; save(); after();
   });
   host.appendChild(r);
@@ -88,7 +88,7 @@ function go(id, cost) {
   moving = true;
   const a = LOC[G.loc], b = LOC[id];
   G.money -= cost; save(); drawMap();
-  $("info").innerHTML = "<h2>Viajando…</h2><p>A trilha é longa. Cuidado com os animais pelo caminho.</p>"; sfx("look");
+  $("info").innerHTML = `<h2>${t("Viajando…")}</h2><p>${t("A trilha é longa. Cuidado com os animais pelo caminho.")}</p>`; sfx("look");
   let t0 = 0;
   const travelMs = 3200;
   const f = ts => {

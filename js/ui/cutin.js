@@ -75,14 +75,14 @@ function battleCutin(kind, cb) {
   el.className = "cutin " + kind; el.hidden = false;
   cutinSound(kind);
   if (kind === "ambush") {
-    el.innerHTML = '<div class="ci-dim"></div><div class="ci-band ci-b1"></div><div class="ci-band ci-b2"></div><div class="ci-bang">!</div><div class="ci-sub">DESPREVENIDO!</div><div class="ci-flash"></div>';
+    el.innerHTML = '<div class="ci-dim"></div><div class="ci-band ci-b1"></div><div class="ci-band ci-b2"></div><div class="ci-bang">!</div><div class="ci-sub">' + t("DESPREVENIDO!") + '</div><div class="ci-flash"></div>';
     setTimeout(() => el.classList.add("out"), 650);
     setTimeout(cb, 720);
     setTimeout(() => { el.hidden = true; el.innerHTML = ""; }, 1000);
     return;
   }
   el.innerHTML = '<div class="ci-dim"></div><div class="ci-band ci-b1"></div><div class="ci-band ci-b2"></div>' +
-    '<div class="ci-strip"><div class="ci-zoom"></div></div><h2 class="title ci-name"></h2><div class="ci-sub">ATACA PRIMEIRO!</div><div class="ci-flash"></div>';
+    '<div class="ci-strip"><div class="ci-zoom"></div></div><h2 class="title ci-name"></h2><div class="ci-sub">' + t("ATACA PRIMEIRO!") + '</div><div class="ci-flash"></div>';
   ransom(el.querySelector(".ci-name"), ["RHANON"], 5);
   const zoom = el.querySelector(".ci-zoom"), art = artCanvas("cutin/eyes");
   let stop = false;

@@ -17,7 +17,7 @@ function localDone(where, msg) {
 }
 function drawLocal() {
   vit();
-  $("lhud").textContent = `Dia ${G.day}${G.night ? " (noite)" : ""} · Nv ${G.lv} · R$ ${G.money} · PV ${G.hp}/${maxHP(G.lv)} · PE ${G.sp}/${maxSP(G.lv)} · DEF ${defense()} · Itens ×${itemCount(G.items)} · Peles ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
+  $("lhud").textContent = `${t("Dia")} ${G.day}${G.night ? " " + t("(noite)") : ""} · ${t("Nv")} ${G.lv} · R$ ${G.money} · ${t("PV")} ${G.hp}/${maxHP(G.lv)} · ${t("PE")} ${G.sp}/${maxSP(G.lv)} · ${t("DEF")} ${defense()} · ${t("Itens")} ×${itemCount(G.items)} · ${t("Peles")} ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
   if ($("lnodes").dataset.city !== curCity()) buildLocalNodes();   // trocou de cidade (ônibus): redesenha o mapa
   CITY[curCity()].route.forEach(k => { const n = $("ln-" + k); n.classList.toggle("locked", !unlocked(k)); n.style.display = G.seen[k] ? "" : "none"; });
   document.querySelectorAll("#lroutes [data-b], #lbridges [data-b]").forEach(el => { el.style.display = G.seen[el.dataset.b] ? "" : "none"; });
@@ -27,39 +27,39 @@ function drawLocal() {
 function selectSub(id, msg) {
   sfx("blip"); vit(); markNode("local", id);
   const l = SUB[id], z = ZONES[id] && zoneDef(id), here = id === G.sub, i = $("linfo"), lock = !unlocked(id);   // fases e a BR-316 abrem com o chefe anterior
-  i.innerHTML = `<h2>${l.n}</h2><p>${l.txt}</p>` + (here ? '<p class="hint">Você está aqui.</p>' : "");
-  if (!here) { btn(lock ? `${l.n} (chefe de ${SUB[NEED[id]].n} primeiro)` : "Ir até lá", () => goSub(id), lock, i); if (lock) lh(`Abre quando cair o chefe de ${SUB[NEED[id]].n}.`); }
+  i.innerHTML = `<h2>${l.n}</h2><p>${l.txt}</p>` + (here ? `<p class="hint">${t("Você está aqui.")}</p>` : "");
+  if (!here) { btn(lock ? t("{lugar} (chefe de {antes} primeiro)", {lugar: l.n, antes: SUB[NEED[id]].n}) : t("Ir até lá"), () => goSub(id), lock, i); if (lock) lh(t("Abre quando cair o chefe de {antes}.", {antes: SUB[NEED[id]].n})); }
   else if (id === "aldeia" || id === "feira") {
-    btn(id === "aldeia" ? "Entrar na aldeia" : "Entrar na feira", () => startExplore(id), false, i);
-    lh(id === "aldeia" ? "Lá dentro: fogueira pra descansar ou dormir, e aldeões com dicas." : "Lá dentro: comprador de peles, comida, artesão (roupas) e armeiro (armas).");
+    btn(id === "aldeia" ? t("Entrar na aldeia") : t("Entrar na feira"), () => startExplore(id), false, i);
+    lh(id === "aldeia" ? t("Lá dentro: fogueira pra descansar ou dormir, e aldeões com dicas.") : t("Lá dentro: comprador de peles, comida, artesão (roupas) e armeiro (armas)."));
   }
   else if (id === "parada") {   // cobrador vende a passagem para Belém (BUS em data/world.js)
-    btn("Ir até a estrada", () => startExplore(id), false, i);
-    if (G.passagem && BUS.open) { btn("Embarcar no ônibus para Belém", () => busRide("belem"), false, i); lh("A passagem vale ida e volta: do terminal de Belém dá pra voltar quando quiser."); }
-    else if (G.passagem) lh("Passagem comprada! Quando o ônibus pra Belém voltar a rodar, é só embarcar aqui.");
-    else btn(`Comprar passagem para Belém · R$ ${BUS.price}`, buyTicket, !BUS.open || G.money < BUS.price, i);
-    if (!BUS.open) lh("O cobrador avisa: \"O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!\" (em breve: episódio 2)");
-    else if (!G.passagem && G.money < BUS.price) lh(`Faltam R$ ${BUS.price - G.money}. Pele de bicho forte vale bem mais na feira.`);
+    btn(t("Ir até a estrada"), () => startExplore(id), false, i);
+    if (G.passagem && BUS.open) { btn(t("Embarcar no ônibus para Belém"), () => busRide("belem"), false, i); lh(t("A passagem vale ida e volta: do terminal de Belém dá pra voltar quando quiser.")); }
+    else if (G.passagem) lh(t("Passagem comprada! Quando o ônibus pra Belém voltar a rodar, é só embarcar aqui."));
+    else btn(t("Comprar passagem para Belém · R$ {n}", {n: BUS.price}), buyTicket, !BUS.open || G.money < BUS.price, i);
+    if (!BUS.open) lh(t("O cobrador avisa: \"O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!\" (em breve: episódio 2)"));
+    else if (!G.passagem && G.money < BUS.price) lh(t("Faltam R$ {n}. Pele de bicho forte vale bem mais na feira.", {n: BUS.price - G.money}));
   }
   else if (id === "terminal") {   // em Belém: o mesmo ônibus volta pela BR-316
-    btn("Entrar no terminal", () => startExplore(id), false, i);
-    btn("Voltar para Ananindeua", () => busRide("ananindeua"), false, i);
-    lh("A passagem vale ida e volta. Na aldeia tem a fogueira e as matas de sempre.");
+    btn(t("Entrar no terminal"), () => startExplore(id), false, i);
+    btn(t("Voltar para Ananindeua"), () => busRide("ananindeua"), false, i);
+    lh(t("A passagem vale ida e volta. Na aldeia tem a fogueira e as matas de sempre."));
   }
   else if (id === "veropeso") {
-    btn("Entrar no Ver-o-Peso", () => startExplore(id), false, i);
-    lh("Lá dentro: peles, comida, artesão, armeiro e uma rede na pensão.");
+    btn(t("Entrar no Ver-o-Peso"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: peles, comida, artesão, armeiro e uma rede na pensão."));
   }
   else if (z) {
-    btn("Explorar", () => startExplore(id), false, i);
+    btn(t("Explorar"), () => startExplore(id), false, i);
     const boss = ANIMALS.find(a => a.id === z.boss);
-    if (G.night) lh(BS()[bossKey(id)] ? `${theName(boss, true)} já caiu ✓` : `É noite: os bichos são outros, e ${theName(boss)} ronda o fim da trilha.`);
-    else lh(BS()[id] ? "Chefe vencido ✓ · a passagem no fim da trilha tá aberta." : `${theName(boss, true)} espera no fim da trilha.`);
-    if (G.hp < maxHP(G.lv) * .35) lh("Rhanon tá muito ferido. Melhor descansar na aldeia antes de caçar.");
+    if (G.night) lh(BS()[bossKey(id)] ? t("{chefe} já caiu ✓", {chefe: theName(boss, true)}) : t("É noite: os bichos são outros, e {chefe} ronda o fim da trilha.", {chefe: theName(boss)}));
+    else lh(BS()[id] ? t("Chefe vencido ✓ · a passagem no fim da trilha tá aberta.") : t("{chefe} espera no fim da trilha.", {chefe: theName(boss, true)}));
+    if (G.hp < maxHP(G.lv) * .35) lh(t("Rhanon tá muito ferido. Melhor descansar na aldeia antes de caçar."));
   }
   if (msg) lh(msg);
-  btn("Inventário", showInv, false, i);
-  btn("Voltar ao mapa do " + MAP_REGIONS[MAP_REGION].n, closeLocal, false, i);
+  btn(t("Inventário"), showInv, false, i);
+  btn(t("Voltar ao mapa do {mapa}", {mapa: MAP_REGIONS[MAP_REGION].n}), closeLocal, false, i);
 }
 // kind: "dormir" (tudo, vira o dia seguinte), "noite" (metade, vira noite) ou "fogueira" (ponto de descanso da trilha: tudo, sem mudar a hora)
 // quiet = o galo já cantou na cena da fogueira (exploração); toast = só devolve a mensagem (a exploração mostra no topo)
@@ -69,8 +69,8 @@ function rest(kind, quiet, toast) {
   if (kind === "dormir") { G.day++; G.night = false; if (!quiet) setTimeout(() => sfx("galo"), 450); }   // amanhece com o galo
   if (kind === "noite") G.night = true;
   save(); sfx("heal");
-  const msg = kind === "dormir" ? `Rhanon dormiu até o dia seguinte. Dia ${G.day}.` : kind === "noite" ? "Rhanon descansou até a noite. De noite a mata é outra: cuidado com o escuro."
-    : "Rhanon recuperou tudo junto à fogueira.";
+  const msg = kind === "dormir" ? t("Rhanon dormiu até o dia seguinte. Dia {n}.", {n: G.day}) : kind === "noite" ? t("Rhanon descansou até a noite. De noite a mata é outra: cuidado com o escuro.")
+    : t("Rhanon recuperou tudo junto à fogueira.");
   if (toast) return msg;
   localDone("aldeia", msg);
 }
@@ -84,7 +84,7 @@ function busRide(city, toStage) {
   moving = true; sfx("look");
   const road = $("route"), L = road.getTotalLength(), fromStart = MAP_REGIONS[MAP_REGION].route[0] === G.loc;
   $("mk").style.display = "none"; $("mkbus").style.display = "";
-  $("info").innerHTML = `<h2>Na estrada…</h2><p>${city === "belem" ? "O ônibus segue pela BR-316 rumo a Belém." : "O ônibus volta pela BR-316 para Ananindeua."}</p>`;
+  $("info").innerHTML = `<h2>${t("Na estrada…")}</h2><p>${city === "belem" ? t("O ônibus segue pela BR-316 rumo a Belém.") : t("O ônibus volta pela BR-316 para Ananindeua.")}</p>`;
   let t0 = 0, last = null, vrum = 0;
   const f = ts => {
     t0 = t0 || ts;
@@ -99,7 +99,7 @@ function busRide(city, toStage) {
     buildLocalNodes();
     if (toStage) { if (city === "belem") G.belemVisto = true; save(); return startExplore(G.sub); }   // desce do ônibus na fase do terminal (ou da BR-316)
     openLocal();   // entra na cidade de chegada, no terminal (ou na cabine da BR-316)
-    if (city === "belem" && !G.belemVisto) { G.belemVisto = true; save(); setTimeout(() => lh("Primeira vez na capital! Segue a trilha até o Ver-o-Peso: lá dá pra vender peles e dormir."), 1300); }
+    if (city === "belem" && !G.belemVisto) { G.belemVisto = true; save(); setTimeout(() => lh(t("Primeira vez na capital! Segue a trilha até o Ver-o-Peso: lá dá pra vender peles e dormir.")), 1300); }
   };
   requestAnimationFrame(f);
 }
@@ -107,19 +107,19 @@ function busRide(city, toStage) {
 function buyTicket() {
   if (!BUS.open || G.passagem || G.money < BUS.price) return;
   G.money -= BUS.price; G.passagem = true; save(); sfx("more");
-  localDone("parada", "Passagem pra Belém comprada! Vale ida e volta: embarca aqui na cabine ou direto no mapa do Pará.");
+  localDone("parada", t("Passagem pra Belém comprada! Vale ida e volta: embarca aqui na cabine ou direto no mapa do Pará."));
 }
 // compra um item da barraca de comida (vai para a bolsa)
 function buy(id) {
   const it = ITEMS[id]; if (G.money < it.price) return;
   G.money -= it.price; G.items[id] = (G.items[id] || 0) + 1; save(); sfx("heal");
-  localDone("feira", `Comprou: ${it.n}. Na bolsa: ×${G.items[id]}.`);
+  localDone("feira", t("Comprou: {item}. Na bolsa: ×{n}.", {item: it.n, n: G.items[id]}));
 }
 // come um item fora da batalha (inventário)
 function eatItem(id) {
   const it = ITEMS[id]; if (!G.items[id]) return;
   G.items[id]--; G.hp = Math.min(maxHP(G.lv), G.hp + it.hp); G.sp = Math.min(maxSP(G.lv), G.sp + it.sp);
-  save(); sfx("heal"); invDone(`Rhanon comeu ${it.n.toLowerCase()}: ${itemEffect(it)}.`);
+  save(); sfx("heal"); invDone(t("Rhanon comeu {item}: {efeito}.", {item: it.n.toLowerCase(), efeito: itemEffect(it)}));
 }
 function goSub(id) {
   if (moving || id === G.sub) return;
@@ -131,7 +131,7 @@ function goSub(id) {
     return {len, at: u => el ? el.getPointAtLength(fw ? u : len - u) : {x: SUB[a].x + (SUB[b].x - SUB[a].x) * u / len, y: SUB[a].y + (SUB[b].y - SUB[a].y) * u / len}};
   });
   const L = segs.reduce((s, q) => s + q.len, 0), dur = Math.min(2800, Math.max(700, L / .26));   // longe demais anda mais rápido
-  $("linfo").innerHTML = "<h2>Caminhando…</h2><p>Rhanon segue pela trilha.</p>";
+  $("linfo").innerHTML = `<h2>${t("Caminhando…")}</h2><p>${t("Rhanon segue pela trilha.")}</p>`;
   let t0 = 0;
   const f = ts => {
     t0 = t0 || ts;
@@ -143,42 +143,42 @@ function goSub(id) {
   };
   requestAnimationFrame(f);
 }
-const peltName = id => PELT[id] || "Pele de " + ANIMALS.find(a => a.id === id).name.toLowerCase();
+const peltName = id => PELT[id] || t("Pele de {bicho}", {bicho: ANIMALS.find(a => a.id === id).name.toLowerCase()});
 const peltValue = id => { const g = ANIMALS.find(a => a.id === id).gold; return Math.round((g[0] + g[1]) / 2); };
 const peltIds = () => Object.keys(G.pelts).filter(k => G.pelts[k] > 0);
 const peltsTotal = () => peltIds().reduce((a, k) => a + G.pelts[k] * peltValue(k), 0);
 // o que o armeiro ainda faz com essa pele (CRAFT de algo que o Rhanon não tem): avisa antes de vender sem querer
 const peltUses = k => GEAR_SLOTS.flatMap(slot => Object.entries(CRAFT[slot] || {}).filter(([id, it]) => !G.owned[id] && it.craft[k]).map(([, it]) => it.n));
-const USE_TAG = '<small class="craft-use">armeiro usa</small>';
-const useWarn = names => ` <b class="warn">O armeiro usa pra fazer: ${names.join(", ")}.</b>`;
+const USE_TAG = () => `<small class="craft-use">${t("armeiro usa")}</small>`;
+const useWarn = names => ` <b class="warn">${t("O armeiro usa pra fazer: {itens}.", {itens: names.join(", ")})}</b>`;
 /* Lojas da feira, cada uma numa barraca: comprador de peles, comida, artesão (roupas e tocha) e armeiro (armas e armaduras). */
 function peltButtons(i) {
   const ids = peltIds();
   const useful = ids.filter(k => peltUses(k).length);
-  if (ids.length > 1) btn(`Vender todas as peles · R$ ${peltsTotal()}`, ask(`Vender todas as peles por R$ ${peltsTotal()}?` + (useful.length ? ` <b class="warn">Cuidado: o armeiro usa ${useful.map(k => peltName(k).toLowerCase()).join(", ")}.</b>` : ""), sellAll), false, i);
-  ids.forEach(k => { const u = peltUses(k); btn(`Vender ${peltName(k)} ×${G.pelts[k]} · R$ ${G.pelts[k] * peltValue(k)}` + (u.length ? " " + USE_TAG : ""), ask(`Vender ${peltName(k).toLowerCase()} ×${G.pelts[k]} por R$ ${G.pelts[k] * peltValue(k)}?` + (u.length ? useWarn(u) : ""), () => sell(k)), false, i); });
-  if (!ids.length) lh("Nenhuma pele pra vender ainda. Caça primeiro e volta aqui.", i);
+  if (ids.length > 1) btn(t("Vender todas as peles · R$ {n}", {n: peltsTotal()}), ask(t("Vender todas as peles por R$ {n}?", {n: peltsTotal()}) + (useful.length ? ` <b class="warn">${t("Cuidado: o armeiro usa {peles}.", {peles: useful.map(k => peltName(k).toLowerCase()).join(", ")})}</b>` : ""), sellAll), false, i);
+  ids.forEach(k => { const u = peltUses(k); btn(t("Vender {pele} ×{n} · R$ {v}", {pele: peltName(k), n: G.pelts[k], v: G.pelts[k] * peltValue(k)}) + (u.length ? " " + USE_TAG() : ""), ask(t("Vender {pele} ×{n} por R$ {v}?", {pele: peltName(k).toLowerCase(), n: G.pelts[k], v: G.pelts[k] * peltValue(k)}) + (u.length ? useWarn(u) : ""), () => sell(k)), false, i); });
+  if (!ids.length) lh(t("Nenhuma pele pra vender ainda. Caça primeiro e volta aqui."), i);
 }
-function foodButtons(i) { Object.entries(ITEMS).forEach(([id, it]) => btn(`${it.n} (${itemEffect(it)}) · R$ ${it.price}`, ask(`Comprar ${it.n.toLowerCase()} por R$ ${it.price}?`, () => buy(id)), G.money < it.price, i)); }
+function foodButtons(i) { Object.entries(ITEMS).forEach(([id, it]) => btn(`${it.n} (${itemEffect(it)}) · R$ ${it.price}`, ask(t("Comprar {item} por R$ {n}?", {item: it.n.toLowerCase(), n: it.price}), () => buy(id)), G.money < it.price, i)); }
 function sell(k) {
   const n = G.pelts[k] || 0, v = n * peltValue(k); if (!n) return;
-  G.money += v; G.pelts[k] = 0; save(); sfx("more"); localDone("feira", `Vendeu ${peltName(k).toLowerCase()} ×${n} por R$ ${v}.`);
+  G.money += v; G.pelts[k] = 0; save(); sfx("more"); localDone("feira", t("Vendeu {pele} ×{n} por R$ {v}.", {pele: peltName(k).toLowerCase(), n, v}));
 }
 function sellAll() {
   const v = peltsTotal(); G.money += v; Object.keys(G.pelts).forEach(k => { G.pelts[k] = 0; });
-  save(); sfx("more"); localDone("feira", `Vendeu todas as peles por R$ ${v}.`);
+  save(); sfx("more"); localDone("feira", t("Vendeu todas as peles por R$ {v}.", {v}));
 }
 const GEAR_SLOTS = ["weapon", "ranged", "torso", "legs"];
 // selo de comparação com o que está em uso no mesmo espaço (ATQ da arma/flecha, DEF da roupa): verde "+3", vermelho "−2", cinza "="
 const gearStat = (slot, it) => (slot === "torso" || slot === "legs" ? it?.def : it?.atk) || 0;
 function gearCmp(slot, it) {
   const cur = G.equip[slot] && EQUIP[slot][G.equip[slot]];
-  if (cur === it) return '<b class="cmp eq">em uso</b>';
-  if (slot === "ranged" && !cur) return '<b class="cmp up">novo</b>';
+  if (cur === it) return `<b class="cmp eq">${t("em uso")}</b>`;
+  if (slot === "ranged" && !cur) return `<b class="cmp up">${t("novo")}</b>`;
   const d = gearStat(slot, it) - gearStat(slot, cur);
-  return `<b class="cmp ${d > 0 ? "up" : d < 0 ? "down" : "eq"}" title="comparado com ${cur ? cur.n : "nada"}">${d > 0 ? "+" + d : d < 0 ? "−" + -d : "="}</b>`;
+  return `<b class="cmp ${d > 0 ? "up" : d < 0 ? "down" : "eq"}" title="${t("comparado com {item}", {item: cur ? cur.n : t("nada")})}">${d > 0 ? "+" + d : d < 0 ? "−" + -d : "="}</b>`;
 }
-const gearBonus = (slot, it) => slot === "ranged" ? (it.atk ? `flecha +${it.atk}` : "ataca de longe") : slot === "weapon" ? `ATQ +${it.atk || 0}` : `DEF +${it.def || 0}`;
+const gearBonus = (slot, it) => slot === "ranged" ? (it.atk ? `${t("flecha")} +${it.atk}` : t("ataca de longe")) : slot === "weapon" ? `${t("ATQ")} +${it.atk || 0}` : `${t("DEF")} +${it.def || 0}`;
 const SMITH_SLOTS = ["weapon", "ranged"];   // feitos pelo armeiro; roupas (torso, legs) ficam com o artesão
 // artesão: roupas de EQUIP com preço e especiais à venda (tocha); itens novos em EQUIP aparecem aqui sozinhos
 function gearButtons(i) {
@@ -186,15 +186,15 @@ function gearButtons(i) {
   GEAR_SLOTS.filter(slot => !SMITH_SLOTS.includes(slot)).forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => {
     if (!it.price || G.owned[id]) return;
     const lock = G.lv < it.lv; any = true;
-    btn((lock ? `${it.n} (Nv ${it.lv})` : `Comprar ${it.n} · R$ ${it.price} · ${gearBonus(slot, it)}`) + " " + gearCmp(slot, it), ask(`Comprar ${it.n.toLowerCase()} por R$ ${it.price}? ${gearCmp(slot, it)}`, () => buyGear(slot, id)), lock || G.money < it.price, i);
+    btn((lock ? `${it.n} (${t("Nv")} ${it.lv})` : t("Comprar {item} · R$ {n}", {item: it.n, n: it.price}) + ` · ${gearBonus(slot, it)}`) + " " + gearCmp(slot, it), ask(t("Comprar {item} por R$ {n}?", {item: it.n.toLowerCase(), n: it.price}) + " " + gearCmp(slot, it), () => buyGear(slot, id)), lock || G.money < it.price, i);
   }));
   // especiais de batalha à venda (SPECIALS com price), como a tocha
   SPECIALS.forEach(s => {
     if (!s.price || G.owned[s.id]) return;
     const lock = G.lv < s.lv; any = true;
-    btn(lock ? `${s.n} (Nv ${s.lv})` : `Comprar ${s.n} · R$ ${s.price} · especial de batalha`, ask(`Comprar ${s.n.toLowerCase()} por R$ ${s.price}?`, () => buySpecial(s.id)), lock || G.money < s.price, i);
+    btn(lock ? `${s.n} (${t("Nv")} ${s.lv})` : t("Comprar {item} · R$ {n}", {item: s.n, n: s.price}) + " · " + t("especial de batalha"), ask(t("Comprar {item} por R$ {n}?", {item: s.n.toLowerCase(), n: s.price}), () => buySpecial(s.id)), lock || G.money < s.price, i);
   });
-  if (!any) lh("O artesão não tem nada novo por enquanto.", i);
+  if (!any) lh(t("O artesão não tem nada novo por enquanto."), i);
 }
 /* ---------- armeiro: nomes à esquerda; o escolhido mostra à direita o que precisa, quanto você tem e "Fabricar" ---------- */
 // armas/arco com preço (só dinheiro) e tudo de CRAFT (peles + dinheiro), do menor nível para o maior
@@ -212,7 +212,7 @@ function forgePanel(d) {
   box.className = "forge"; list.className = "forge-list"; card.className = "forge-card";
   box.append(list, card); d.appendChild(box);
   if (!items.some(o => o.id === EX.forgeSel)) EX.forgeSel = (items.find(o => !G.owned[o.id]) || items[0]).id;
-  items.forEach(o => btn(o.it.n + (G.owned[o.id] ? " <small>feito</small>" : (G.lv < o.it.lv ? ` <small>Nv ${o.it.lv}</small>` : "") + " " + gearCmp(o.slot, o.it)), () => forgeSelect(o.id), false, list));
+  items.forEach(o => btn(o.it.n + (G.owned[o.id] ? ` <small>${t("feito")}</small>` : (G.lv < o.it.lv ? ` <small>${t("Nv")} ${o.it.lv}</small>` : "") + " " + gearCmp(o.slot, o.it)), () => forgeSelect(o.id), false, list));
   forgeSelect(EX.forgeSel, true);
 }
 function forgeSelect(id, quiet) {
@@ -223,16 +223,16 @@ function forgeSelect(id, quiet) {
   const it = o.it, row = (name, have, need, txt) => `<li class="${have >= need ? "ok" : "falta"}"><span>${name}</span><b>${txt}</b></li>`;
   const cur = G.equip[o.slot] && EQUIP[o.slot][G.equip[o.slot]];
   card.innerHTML = `<h3>${it.n}</h3><p class="forge-bonus">${gearBonus(o.slot, it)} ${G.owned[id] ? "" : gearCmp(o.slot, it)}</p>` +
-    (G.owned[id] || !cur ? "" : `<p class="forge-vs">Em uso: ${cur.n} (${gearBonus(o.slot, cur)})</p>`) + (G.owned[id] ? '<p class="hint">Já é seu. Troque no equipamento (E).</p>' :
-    '<ul class="forge-need">' + (G.lv < it.lv ? row("Nível", G.lv, it.lv, `${G.lv}/${it.lv}`) : "") +
+    (G.owned[id] || !cur ? "" : `<p class="forge-vs">${t("Em uso: {item}", {item: cur.n})} (${gearBonus(o.slot, cur)})</p>`) + (G.owned[id] ? `<p class="hint">${t("Já é seu. Troque no equipamento (E).")}</p>` :
+    '<ul class="forge-need">' + (G.lv < it.lv ? row(t("Nível"), G.lv, it.lv, `${G.lv}/${it.lv}`) : "") +
     Object.entries(it.craft || {}).map(([p, n]) => row(peltName(p), G.pelts[p] || 0, n, `${Math.min(n, G.pelts[p] || 0)}/${n}`)).join("") +
-    row("Dinheiro", G.money, forgeCost(it), `R$ ${forgeCost(it)}`) + "</ul>");
+    row(t("Dinheiro"), G.money, forgeCost(it), `R$ ${forgeCost(it)}`) + "</ul>");
   card.querySelector("h3").prepend(gearIcon(o.slot, it));
   if (G.owned[id]) return;
   const b = document.createElement("button"), off = forgeLacks(it);
-  b.className = "cmd forge-make"; b.type = "button"; b.innerHTML = '<span><i class="key">Z</i>Fabricar</span>';   // a tecla some em tela de toque, como nos outros botões
+  b.className = "cmd forge-make"; b.type = "button"; b.innerHTML = `<span><i class="key">Z</i>${t("Fabricar")}</span>`;   // a tecla some em tela de toque, como nos outros botões
   if (off) b.setAttribute("aria-disabled", "true");
-  b.addEventListener("click", () => { if (!forgeLacks(it)) ask(`Fabricar ${it.n.toLowerCase()}? Gasta R$ ${forgeCost(it)}` + (it.craft ? " e as peles da lista." : ".") + " " + gearCmp(o.slot, it), () => forgeMake(o))(); });
+  b.addEventListener("click", () => { if (!forgeLacks(it)) ask((it.craft ? t("Fabricar {item}? Gasta R$ {n} e as peles da lista.", {item: it.n.toLowerCase(), n: forgeCost(it)}) : t("Fabricar {item}? Gasta R$ {n}.", {item: it.n.toLowerCase(), n: forgeCost(it)})) + " " + gearCmp(o.slot, it), () => forgeMake(o))(); });
   card.appendChild(b);
 }
 // teclado no armeiro: setas escolhem o item, Z/Enter/Espaço fabricam (devolve true se usou a tecla)
@@ -250,24 +250,24 @@ function forgeKey(ev) {
 function forgeMake({slot, id, it}) {
   Object.entries(it.craft || {}).forEach(([k, n]) => { G.pelts[k] -= n; });
   G.money -= forgeCost(it); G.owned[id] = true; G.equip[slot] = id; save(); sfx("forja");
-  localDone("feira", `O armeiro fez: ${it.n}. Já tá ${slot === "torso" || slot === "legs" ? "no corpo" : "na mão"}.` + (slot === "ranged" ? " Na exploração, X atira flecha." : ""));
+  localDone("feira", (slot === "torso" || slot === "legs" ? t("O armeiro fez: {item}. Já tá no corpo.", {item: it.n}) : t("O armeiro fez: {item}. Já tá na mão.", {item: it.n})) + (slot === "ranged" ? " " + t("Na exploração, X atira flecha.") : ""));
 }
 function buySpecial(id) {
   const s = SPECIALS.find(q => q.id === id); if (G.money < s.price || G.lv < s.lv) return;
   G.money -= s.price; G.owned[id] = true; save(); sfx("heal");
-  localDone("feira", `Comprou: ${s.n}. Usa em "Especial" na batalha.`);
+  localDone("feira", t("Comprou: {item}. Usa em \"Especial\" na batalha.", {item: s.n}));
 }
 function buyGear(slot, id) {
   const it = EQUIP[slot][id]; if (G.money < it.price || G.lv < it.lv) return;
   G.money -= it.price; G.owned[id] = true; G.equip[slot] = id; save(); sfx("heal");
-  localDone("feira", `Comprou e vestiu: ${it.n}. DEF total: ${defense()}.`);
+  localDone("feira", t("Comprou e vestiu: {item}. DEF total: {n}.", {item: it.n, n: defense()}));
 }
 
 /* ---------- inventário (no mapa de Ananindeua e, com I, dentro das fases) ---------- */
 // resumo da bolsa: roupa e arma ficam no Equipamento (E); aqui só a defesa, o pedido e o valor das peles
 function invSummary() {
   const ids = peltIds();
-  return `Defesa: ${defense()} · Dinheiro: R$ ${G.money}` + (ids.length ? ` · Peles valem R$ ${peltsTotal()} na feira` : "") + questLine();
+  return t("Defesa: {def} · Dinheiro: R$ {n}", {def: defense(), n: G.money}) + (ids.length ? " · " + t("Peles valem R$ {n} na feira", {n: peltsTotal()}) : "") + questLine();
 }
 /* lista da bolsa: comida (Z come) e materiais (peles), mostrando BAG_ROWS linhas e rolando com as setas */
 const BAG_ROWS = 10;
@@ -281,15 +281,15 @@ function invButtons(i) {
     if (fn) b.addEventListener("click", fn); else b.setAttribute("aria-disabled", "true");
     list.appendChild(b);
   };
-  head("Comida" + (food.length ? " · Z para comer" : ""));
+  head(t("Comida") + (food.length ? " · " + t("Z para comer") : ""));
   if (food.length) food.forEach(([k, n]) => row(ITEMS[k].n, n, itemEffect(ITEMS[k]), () => eatItem(k)));
-  else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">Nada para comer. A barraca de comida da feira vende.</div>`);
-  head("Materiais");
-  if (ids.length) ids.forEach(k => row(peltName(k), G.pelts[k], `R$ ${peltValue(k)} cada` + (peltUses(k).length ? " " + USE_TAG : "")));
-  else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">Nenhuma pele ainda. Vença bichos para conseguir peles.</div>`);
+  else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">${t("Nada para comer. A barraca de comida da feira vende.")}</div>`);
+  head(t("Materiais"));
+  if (ids.length) ids.forEach(k => row(peltName(k), G.pelts[k], t("R$ {n} cada", {n: peltValue(k)}) + (peltUses(k).length ? " " + USE_TAG() : "")));
+  else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">${t("Nenhuma pele ainda. Vença bichos para conseguir peles.")}</div>`);
   i.appendChild(list);
-  btn("Equipamento", () => openEquip(), false, i);   // trocar arma e roupa (systems/equip.js)
-  btn("Caderno de bichos", openJournal, false, i);
+  btn(t("Equipamento"), () => openEquip(), false, i);   // trocar arma e roupa (systems/equip.js)
+  btn(t("Caderno de bichos"), openJournal, false, i);
 }
 // depois de comer/trocar equipamento: atualiza o inventário de onde veio
 function invDone(msg) {
@@ -299,10 +299,10 @@ function invDone(msg) {
 function showInv(msg) {
   sfx("blip"); vit();
   const i = $("linfo");
-  i.innerHTML = `<h2>Bolsa</h2><p>${invSummary()}</p>`;
+  i.innerHTML = `<h2>${t("Bolsa")}</h2><p>${invSummary()}</p>`;
   invButtons(i);
   if (msg) lh(msg, i);
-  btn("Voltar", () => selectSub(G.sub), false, i);
+  btn(t("Voltar"), () => selectSub(G.sub), false, i);
 }
 function showLocal(zoom) {
   audio(); musicStart("local"); $("homeButton").hidden = false; $("map").hidden = true; $("local").hidden = false; drawLocal(); selectSub(G.sub);
@@ -318,7 +318,7 @@ function revealPath(k, done) {
   drawLocal();   // o mapa escondido mostra só o que já foi visto
   const o = $("revela"), box = o.querySelector(".revela"), svg = $("lsvg").cloneNode(true), NS = "http://www.w3.org/2000/svg";
   svg.removeAttribute("id"); svg.querySelectorAll("[id]").forEach(e => e.removeAttribute("id"));   // cópia sem ids repetidos
-  box.innerHTML = '<h2>Caminho aberto!</h2>'; box.append(svg);
+  box.innerHTML = `<h2>${t("Caminho aberto!")}</h2>`; box.append(svg);
   const seg = svg.querySelector(`.lroute[data-b="${k}"]`), parts = [...svg.querySelectorAll(`[data-b="${k}"]`)], node = svg.querySelector(`.node[data-k="${k}"]`);
   revealReady = false; revealDone = done || null; o.hidden = false; sfx("look");
   const L = seg.getTotalLength(), trail = document.createElementNS(NS, "path"), tip = document.createElementNS(NS, "circle");
@@ -338,8 +338,8 @@ function revealPath(k, done) {
     node.animate([{transform: `translate(${x}px,${y}px) scale(0)`}, {transform: `translate(${x}px,${y}px) scale(1.35)`, offset: .6}, {transform: `translate(${x}px,${y}px) scale(1)`}], {duration: 420, easing: "ease-out"});
     if (k === CITY[curCity()].gate) svg.querySelector(".lroad")?.parentNode.style.removeProperty("display");   // a estrada aparece com a cabine
     sfx("missao"); G.seen[k] = true; save();
-    box.insertAdjacentHTML("beforeend", `<p class="hint">${k === "parada" ? "Fim da trilha: a BR-316, de onde sai o ônibus pra Belém." : `Agora a trilha segue até: ${SUB[k].n}.`}</p>`);
-    btn("Continuar", closeReveal, false, box); box.querySelector(".cmd").focus({preventScroll: true});
+    box.insertAdjacentHTML("beforeend", `<p class="hint">${k === "parada" ? t("Fim da trilha: a BR-316, de onde sai o ônibus pra Belém.") : t("Agora a trilha segue até: {lugar}.", {lugar: SUB[k].n})}</p>`);
+    btn(t("Continuar"), closeReveal, false, box); box.querySelector(".cmd").focus({preventScroll: true});
     revealReady = true;
   };
   requestAnimationFrame(f);
@@ -371,7 +371,7 @@ function closeLocal() { showMap(); }
 // pontes onde ela cruza o rio/canal e a BR-316 saindo do mapa a partir da cabine do cobrador (ou do terminal)
 function buildLocalNodes() {
   const C = CITY[curCity()], ROUTE = C.route, P = ROUTE.map(k => [SUB[k].x, SUB[k].y]), at = i => P[Math.max(0, Math.min(P.length - 1, i))];
-  $("lnodes").dataset.city = curCity(); $("lsvg").setAttribute("aria-label", "Mapa estilizado de " + C.n);
+  $("lnodes").dataset.city = curCity(); $("lsvg").setAttribute("aria-label", t("Mapa estilizado de {cidade}", {cidade: C.n}));
   $("lland").setAttribute("points", C.land); $("lbay").setAttribute("d", C.bay || "");
   const curve = i => {   // trecho i -> i+1 (Catmull-Rom virando Bézier)
     const [p0, p1, p2, p3] = [at(i - 1), at(i), at(i + 1), at(i + 2)];

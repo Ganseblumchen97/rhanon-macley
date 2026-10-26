@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.29.0 — o jogo em inglês e espanhol
+
+- Agora dá para jogar em inglês e em espanhol: é só escolher o idioma nas Opções (a engrenagem). Na primeira vez,
+  o jogo abre no idioma do navegador; o português continua sendo o original.
+- Tudo foi traduzido: falas, batalha, lojas, mapas, caderno de bichos e o tutorial. As gírias do Norte viraram
+  gírias leves de cada idioma.
+- A tradução foi feita por IA, então pode ter algum erro: a tela inicial e as Opções avisam. Achou algo estranho?
+  Manda pra gente.
+
 ## 0.28.0 — textos com sotaque e armas com cara própria
 
 - O jogo todo ficou mais curto e descontraído. A gente da aldeia, da feira e de Belém agora fala como paraense: o

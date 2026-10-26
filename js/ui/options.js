@@ -16,15 +16,18 @@ function setVolume(kind, v) {
 function openOptions() {
   audio();
   const o = $("opcoes"), box = o.querySelector(".info");
-  box.innerHTML = `<h2>Opções</h2>
-    <label class="opt-row">Música <input type="range" min="0" max="100" step="5" value="${Math.round(OPT.music * 100)}" data-k="music"><output>${Math.round(OPT.music * 100)}%</output></label>
-    <label class="opt-row">Efeitos <input type="range" min="0" max="100" step="5" value="${Math.round(OPT.sfx * 100)}" data-k="sfx"><output>${Math.round(OPT.sfx * 100)}%</output></label>
-    <p class="hint">Durante as cenas, segure C para pular.</p>`;
+  box.innerHTML = `<h2>${t("Opções")}</h2>
+    <label class="opt-row">${t("Música")} <input type="range" min="0" max="100" step="5" value="${Math.round(OPT.music * 100)}" data-k="music"><output>${Math.round(OPT.music * 100)}%</output></label>
+    <label class="opt-row">${t("Efeitos")} <input type="range" min="0" max="100" step="5" value="${Math.round(OPT.sfx * 100)}" data-k="sfx"><output>${Math.round(OPT.sfx * 100)}%</output></label>
+    <label class="opt-row">${t("Idioma")} <select data-k="lang">${Object.entries(LANGS).map(([k, n]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${n}</option>`).join("")}</select></label>
+    ${LANG !== "pt" ? `<p class="hint lang-note">${t(LANG_NOTE)}</p>` : ""}
+    <p class="hint">${t("Durante as cenas, segure C para pular.")}</p>`;
+  box.querySelector("select").addEventListener("change", ev => setLang(ev.target.value));   // recarrega o jogo no idioma novo
   box.querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => {
     setVolume(inp.dataset.k, inp.value / 100); inp.nextElementSibling.textContent = inp.value + "%";
     if (inp.dataset.k === "sfx") sfx("blip");   // amostra do volume dos efeitos
   }));
-  btn("Fechar", closeOptions, false, box);
+  btn(t("Fechar"), closeOptions, false, box);
   o.hidden = false; box.querySelector("input").focus();
 }
 function closeOptions() { $("opcoes").hidden = true; sfx("blip"); }
