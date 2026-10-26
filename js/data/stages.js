@@ -5,6 +5,7 @@
    B chefe da zona   G passagem para a próxima fase (abre quando o chefe cai)
    Aldeia e feira (safe: sem bichos): H oca (3x2, porta no quadrado do meio)   K barraca   F fogueira   N tenda   P aldeão
    V comprador de peles   C barraca de comida   R artesão (roupas e tocha)   M armeiro (armas e armaduras)
+   X xamã (talismãs com as peles dos chefes)
    Cidade (Belém): # prédio/casarão (bloqueia; fachada desenhada onde a quadra termina embaixo)
    Rodovia (BR-316 e terminal): r asfalto   U ônibus (bloco 4x2)   Q cabine do cobrador (bloco 2x2)
    Ver-o-Peso: O motel onde o Rhanon dorme (bloco 3x2; a conversa é na porta, embaixo do meio dele)
@@ -22,7 +23,7 @@ const STAGES = {
       "T.HHH..f..HHH..f..HHH..T",
       "T..-.......-.......-...T",
       "T..--------------------G",
-      "T.....,,...-....,,.....T",
+      "T.....,,...-..X.,,.....T",
       "T..P.......-........P..T",
       "T.......F..-...........T",
       "T....f.....-...P.f.....T",
@@ -465,7 +466,7 @@ const STAGES = {
     ]
   }
 };
-const SOLID = "To~GHKFNVPCRM#QUO";    // G deixa de bloquear quando a próxima fase está liberada (gateOpen em explore.js)
+const SOLID = "To~GHKFNVPCRMX#QUO";    // G deixa de bloquear quando a próxima fase está liberada (gateOpen em explore.js)
 const ONE_HIT_LEVELS = 3;        // níveis acima do bicho para abatê-lo só com o golpe de abertura
 const ONE_HIT_XP = .25;          // abate direto de bicho do nível (golpe forte) dá só um pouco de XP
 const WEAK_XP = 0;              // bicho ONE_HIT_LEVELS abaixo não dá XP nenhum (só a pele): subir de nível é na batalha

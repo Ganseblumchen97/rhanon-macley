@@ -1,6 +1,6 @@
 /* Ananindeua: mapa local, descanso, feira, peles, roupas e inventário. */
-const defense = () => ["legs", "torso"].reduce((a, k) => a + ((G.equip && EQUIP[k][G.equip[k]] && EQUIP[k][G.equip[k]].def) || 0), 0);
-const weaponAtk = () => (G.equip && EQUIP.weapon[G.equip.weapon] && EQUIP.weapon[G.equip.weapon].atk) || 0;
+const defense = () => ["legs", "torso"].reduce((a, k) => a + ((G.equip && EQUIP[k][G.equip[k]] && EQUIP[k][G.equip[k]].def) || 0), 0) + charmStat("def");
+const weaponAtk = () => ((G.equip && EQUIP.weapon[G.equip.weapon] && EQUIP.weapon[G.equip.weapon].atk) || 0) + charmStat("atk");   // com o talismã
 const unlocked = k => !NEED[k] || !!BS()[NEED[k]];
 function subPath(a, b) {
   const adj = {}; EDGES.forEach(([x, y]) => { (adj[x] = adj[x] || []).push(y); (adj[y] = adj[y] || []).push(x); });
@@ -147,10 +147,12 @@ const peltName = id => PELT[id] || t("Pele de {bicho}", {bicho: ANIMALS.find(a =
 const peltValue = id => { const g = ANIMALS.find(a => a.id === id).gold; return Math.round((g[0] + g[1]) / 2); };
 const peltIds = () => Object.keys(G.pelts).filter(k => G.pelts[k] > 0);
 const peltsTotal = () => peltIds().reduce((a, k) => a + G.pelts[k] * peltValue(k), 0);
-// o que o armeiro ainda faz com essa pele (CRAFT de algo que o Rhanon não tem): avisa antes de vender sem querer
-const peltUses = k => GEAR_SLOTS.flatMap(slot => Object.entries(CRAFT[slot] || {}).filter(([id, it]) => !G.owned[id] && it.craft[k]).map(([, it]) => it.n));
-const USE_TAG = () => `<small class="craft-use">${t("armeiro usa")}</small>`;
-const useWarn = names => ` <b class="warn">${t("O armeiro usa pra fazer: {itens}.", {itens: names.join(", ")})}</b>`;
+// receitas com peles: as do armeiro (CRAFT) e os talismãs do xamã (CHARMS), como [id, item]
+const RECIPES = () => [...GEAR_SLOTS.flatMap(slot => Object.entries(CRAFT[slot] || {})), ...Object.entries(CHARMS)];
+// o que ainda dá para fazer com essa pele (receita de algo que o Rhanon não tem): avisa antes de vender sem querer
+const peltUses = k => RECIPES().filter(([id, it]) => !G.owned[id] && it.craft[k]).map(([, it]) => it.n);
+const USE_TAG = () => `<small class="craft-use">${t("tem receita")}</small>`;
+const useWarn = names => ` <b class="warn">${t("Serve pra fazer: {itens}.", {itens: names.join(", ")})}</b>`;
 /* Lojas da feira, cada uma numa barraca: comprador de peles, comida, artesão (roupas e tocha) e armeiro (armas e armaduras). */
 function peltButtons(i) {
   const ids = peltIds();
@@ -166,8 +168,8 @@ function sell(k) {
   const n = G.pelts[k] || 0, v = n * peltValue(k); if (!n) return;
   G.money += v; G.pelts[k] = 0; save(); sfx("more"); localDone("feira", t("Vendeu {pele} ×{n} por R$ {v}.", {pele: peltName(k).toLowerCase(), n, v}));
 }
-// quantas peles k as receitas que o Rhanon ainda não tem pedem, somadas; o que passar disso é sobra
-const peltKeep = k => GEAR_SLOTS.reduce((n, slot) => n + Object.entries(CRAFT[slot] || {}).filter(([id, it]) => !G.owned[id]).reduce((m, [, it]) => m + (it.craft[k] || 0), 0), 0);
+// quantas peles k as receitas (armeiro e xamã) que o Rhanon ainda não tem pedem, somadas; o que passar disso é sobra
+const peltKeep = k => RECIPES().filter(([id]) => !G.owned[id]).reduce((m, [, it]) => m + (it.craft[k] || 0), 0);
 const peltSpare = k => Math.max(0, (G.pelts[k] || 0) - peltKeep(k));
 const sparesTotal = () => peltIds().reduce((a, k) => a + peltSpare(k) * peltValue(k), 0);
 function sellSpares() {
@@ -180,11 +182,12 @@ const gearStat = (slot, it) => (slot === "torso" || slot === "legs" ? it?.def : 
 function gearCmp(slot, it) {
   const cur = G.equip[slot] && EQUIP[slot][G.equip[slot]];
   if (cur === it) return `<b class="cmp eq">${t("em uso")}</b>`;
+  if (slot === "amulet") return "";   // talismãs têm efeitos diferentes: sem selo de número
   if (slot === "ranged" && !cur) return `<b class="cmp up">${t("novo")}</b>`;
   const d = gearStat(slot, it) - gearStat(slot, cur);
   return `<b class="cmp ${d > 0 ? "up" : d < 0 ? "down" : "eq"}" title="${t("comparado com {item}", {item: cur ? cur.n : t("nada")})}">${d > 0 ? "+" + d : d < 0 ? "−" + -d : "="}</b>`;
 }
-const gearBonus = (slot, it) => slot === "ranged" ? (it.atk ? `${t("flecha")} +${it.atk}` : t("ataca de longe")) : slot === "weapon" ? `${t("ATQ")} +${it.atk || 0}` : `${t("DEF")} +${it.def || 0}`;
+const gearBonus = (slot, it) => slot === "amulet" ? charmDesc(it) : slot === "ranged" ? (it.atk ? `${t("flecha")} +${it.atk}` : t("ataca de longe")) : slot === "weapon" ? `${t("ATQ")} +${it.atk || 0}` : `${t("DEF")} +${it.def || 0}`;
 const SMITH_SLOTS = ["weapon", "ranged"];   // feitos pelo armeiro; roupas (torso, legs) ficam com o artesão
 // artesão: roupas de EQUIP com preço e especiais à venda (tocha); itens novos em EQUIP aparecem aqui sozinhos
 function gearButtons(i) {
@@ -203,9 +206,18 @@ function gearButtons(i) {
   if (!any) lh(t("O artesão não tem nada novo por enquanto."), i);
 }
 /* ---------- armeiro: nomes à esquerda; o escolhido mostra à direita o que precisa, quanto você tem e "Fabricar" ---------- */
-// armas/arco com preço (só dinheiro) e tudo de CRAFT (peles + dinheiro), do menor nível para o maior
+// o xamã só mostra o talismã de chefe que o Rhanon já venceu (de dia ou de noite, em qualquer zona)
+const bossBeaten = id => (G.bestiary[id]?.wins || 0) > 0 || (G.pelts[id] || 0) > 0 ||
+  Object.keys(ZONES).some(z => (ZONES[z].boss === id && BS()[z]) || (NIGHT_ZONES[z]?.boss === id && BS()[z + ":noite"]));
+// o que o talismã faz, em pedaços curtos: "ATQ +4 · 20% de chance de desviar do golpe"
+const CHARM_FX = {dreno: "cura {n}% do dano que dá", queima: "{n}% de chance de queimar o bicho", sangra: "{n}% de chance de fazer o bicho sangrar",
+  turno: "{n}% de chance de agir de novo", encanto: "{n}% de chance do bicho perder a vez", esquiva: "{n}% de chance de desviar do golpe", espinho: "devolve {n}% do dano recebido"};
+const charmDesc = it => [it.atk && `${t("ATQ")} +${it.atk}`, it.def && `${t("DEF")} +${it.def}`, it.hp && `${t("PV")} +${it.hp}`, it.sp && `${t("PE")} +${it.sp}`,
+  it.fx && t(CHARM_FX[it.fx], {n: it.ch})].filter(Boolean).join(" · ");
+// armas/arco com preço (só dinheiro) e tudo de CRAFT (peles + dinheiro), do menor nível para o maior; no xamã, os talismãs
 function forgeItems() {
   const out = [];
+  if (EX && EX.dialog === "xama") return Object.entries(CHARMS).filter(([id, it]) => G.owned[id] || bossBeaten(Object.keys(it.craft)[0])).map(([id, it]) => ({slot: "amulet", id, it}));
   SMITH_SLOTS.forEach(slot => Object.entries(EQUIP[slot]).forEach(([id, it]) => { if (it.price) out.push({slot, id, it}); }));
   GEAR_SLOTS.forEach(slot => Object.entries(CRAFT[slot] || {}).forEach(([id, it]) => out.push({slot, id, it})));
   return out.sort((a, b) => a.it.lv - b.it.lv);
@@ -243,6 +255,7 @@ function forgeSelect(id, quiet) {
 }
 // teclado no armeiro: setas escolhem o item, Z/Enter/Espaço fabricam (devolve true se usou a tecla)
 function forgeKey(ev) {
+  if (!$("exDialog").querySelector(".forge")) return false;   // xamã sem talismã para mostrar: painel comum
   if (ev.key === "ArrowUp" || ev.key === "ArrowDown") {
     ev.preventDefault();
     const items = forgeItems(), k = items.findIndex(o => o.id === EX.forgeSel);
@@ -255,7 +268,8 @@ function forgeKey(ev) {
 // o armeiro gasta as peles e o dinheiro, e o Rhanon já sai usando/vestindo
 function forgeMake({slot, id, it}) {
   Object.entries(it.craft || {}).forEach(([k, n]) => { G.pelts[k] -= n; });
-  G.money -= forgeCost(it); G.owned[id] = true; G.equip[slot] = id; save(); sfx("forja");
+  G.money -= forgeCost(it); G.owned[id] = true; G.equip[slot] = id; vit(); save(); sfx("forja");
+  if (slot === "amulet") return localDone("aldeia", t("O xamã fez: {item}. Já tá no pescoço.", {item: it.n}));
   localDone("feira", (slot === "torso" || slot === "legs" ? t("O armeiro fez: {item}. Já tá no corpo.", {item: it.n}) : t("O armeiro fez: {item}. Já tá na mão.", {item: it.n})) + (slot === "ranged" ? " " + t("Na exploração, X atira flecha.") : ""));
 }
 function buySpecial(id) {

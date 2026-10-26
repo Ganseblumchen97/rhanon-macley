@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.32.0 — o xamã e os talismãs dos chefes
+
+- Chegou o xamã na aldeia, perto do caminho do meio. Leve a ele as peles de um chefe que você já venceu e ele faz um
+  talismã: os chefes de dia pedem 4 peles, os da noite pedem 5, mais um pouco de dinheiro.
+- Os talismãs dos chefes de dia dão força, defesa, vida ou energia. Os amuletos dos chefes da noite fazem coisas
+  diferentes: queimar ou sangrar o bicho, curar com o golpe, agir duas vezes, fazer o bicho perder a vez, desviar de
+  golpes ou devolver o dano. Os da noite mais difíceis juntam as duas coisas.
+- Novo espaço "Talismã" na tela de equipamento (E). Com ele, o Rhanon aparece com um colar no peito.
+- Agora todo chefe deixa de 1 a 3 peles. A revanche (a lembrança no lugar onde ele caiu) virou o jeito de juntar
+  peles para o talismã.
+- "Vender sobras" no comprador de peles também guarda as peles que o xamã ainda vai pedir.
+
 ## 0.31.0 — batalhas com cenário de verdade e tela inicial na mata
 
 - Cada área tem o próprio cenário de batalha em pixel art: árvores na mata, rio com juncos e vitórias-régias, mangue,

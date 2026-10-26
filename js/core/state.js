@@ -4,7 +4,10 @@
 const DEBUG = /[?&]debug(&|=|$)/.test(location.search) ? new URLSearchParams(location.search) : null;
 const KEY = DEBUG ? "rhanon-save-debug" : "rhanon-save-v1";
 const need = l => 20 + 20 * l;                 // XP para passar do nível l
-const maxHP = l => 40 + 6 * (l - 1), maxSP = l => 20 + 2 * (l - 1);
+// talismã em uso (EQUIP.amulet, feito pelo xamã): charmStat("atk" | "def" | "hp" | "sp") soma ao status; charm() = o item inteiro
+const charm = () => (typeof EQUIP !== "undefined" && G.equip && EQUIP.amulet && EQUIP.amulet[G.equip.amulet]) || {};
+const charmStat = k => charm()[k] || 0;
+const maxHP = l => 40 + 6 * (l - 1) + charmStat("hp"), maxSP = l => 20 + 2 * (l - 1) + charmStat("sp");
 
 let G = {lv: 1, xp: 0, money: 0, loc: "ananindeua"};
 if (!DEBUG) try { Object.assign(G, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (_) {}

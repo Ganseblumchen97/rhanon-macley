@@ -3,7 +3,8 @@
    Setas escolhem o espaço, 1-9 equipam o item da lista, Z/Enter passam para o próximo, X/Esc/E fecham. */
 const EQ_SLOTS = [
   {slot: "weapon", n: "Arma"}, {slot: "ranged", n: "Arco", none: "Sem arco"},       // coluna da esquerda
-  {slot: "torso", n: "Tronco", none: "Sem camisa"}, {slot: "legs", n: "Pernas"}      // coluna da direita
+  {slot: "torso", n: "Tronco", none: "Sem camisa"}, {slot: "legs", n: "Pernas"},     // coluna da direita
+  {slot: "amulet", n: "Talismã", none: "Sem talismã"}                                 // embaixo, na esquerda (feito pelo xamã)
 ];
 let EQ_SEL = 0;   // espaço escolhido (índice em EQ_SLOTS)
 const EQ_POSE = {lh: [3, 24], rh: [29, 24], lf: [10, 40], rf: [22, 40]};   // braços na horizontal, pernas um pouco abertas
@@ -23,6 +24,7 @@ function gearIcon(slot, it) {
   const d = rigGrid(1, 16, 16), C = {...RIG_PAL, ...it.look};
   if (slot === "weapon") rigSpear(d, C, 2, 14, 10, 6);
   else if (slot === "ranged") { rigBow(d, C, 5, 1, 15); d.part().limb(3, 8, 12, 8, 1, "#c9a46a").dots([[13, 8]], C.m); }
+  else if (slot === "amulet") { const c = it.night ? ["#b07ae8", "#6a3aa8"] : ["#ffd23a", "#c8902a"]; d.part().limb(4, 2, 8, 8, 1, "#6d4329").limb(12, 2, 8, 8, 1, "#6d4329").part().ellipse(8, 10.5, 3.6, 3.6, c[0], c[1]).dots([[7, 9]], "#ffffff"); }
   else if (slot === "torso") d.part().poly([[4, 2], [6, 2], [8, 5], [10, 2], [12, 2], [13, 14], [3, 14]], it.color, it.shade, 9);
   else if (it.color) d.part().poly([[3, 2], [13, 2], [13, 15], [9, 15], [8, 7], [7, 15], [3, 15]], it.color, it.shade, 9);
   else d.part().rect(3, 4, 10, 2, C.t).poly([[5, 6], [11, 6], [10, 11], [8, 13], [6, 11]], C.t, C.T, 9);
@@ -44,10 +46,10 @@ function openEquip(msg) {
   EQ_SLOTS.forEach((s, i) => {
     const it = q[s.slot] && EQUIP[s.slot][q[s.slot]], b = document.createElement("button");
     b.type = "button"; b.className = "eq-slot" + (i === EQ_SEL ? " sel" : "");
-    b.innerHTML = `<small>${s.n}</small><b>${it ? it.n : s.none || "—"}</b><i>${it ? gearBonus(s.slot, it) : s.slot === "ranged" ? t("o armeiro da feira faz") : ""}</i>`;
+    b.innerHTML = `<small>${s.n}</small><b>${it ? it.n : s.none || "—"}</b><i>${it ? gearBonus(s.slot, it) : s.slot === "ranged" ? t("o armeiro da feira faz") : s.slot === "amulet" ? t("o xamã da aldeia faz") : ""}</i>`;
     b.prepend(gearIcon(s.slot, it));
     b.addEventListener("click", () => { EQ_SEL = i; sfx("blip"); openEquip(); });
-    cols[i < 2 ? 0 : 1].append(b);
+    cols[i < 2 || i > 3 ? 0 : 1].append(b);
   });
   wrap.append(cols[0], eqFigure(), cols[1]);
   box.append(wrap);

@@ -25,7 +25,8 @@ const GLYPH = {
 /* Gente da aldeia e da feira: mesmo esqueleto do Rhanon (gfx/rig.js), com outras cores e enfeites.
    pal troca cores de RIG_PAL (s/S pele, h cabelo, H brilho do cabelo, g/G cocar, r pintura, t/T tanga);
    feather = pena no cocar; longHair = cabelo até os ombros; top = faixa de tecido no peito;
-   prop = o que leva na mão ("pelt" pele, "basket" cesto, "bow" arco, "cloth" pano dobrado, "spear" lança em pé). */
+   prop = o que leva na mão ("pelt" pele, "basket" cesto, "bow" arco, "cloth" pano dobrado, "spear" lança em pé, "staff" cajado com maracá);
+   charm = cor da pedra do colar no peito (o Rhanon com talismã também usa). */
 const VILLAGER_LOOK = {
   aldeao1: {pal: {g: "#d62828", G: "#8f1a1a", r: "#f2a20c", t: "#9c6339", T: "#6d4329"}, feather: "#ffd23a"},
   aldeao2: {pal: {h: "#bdb6ac", H: "#f4ecd8", s: "#a86f40", S: "#7d4f2c", g: "#7a2a8a", G: "#4e1a5a"}},
@@ -37,5 +38,7 @@ const VILLAGER_LOOK = {
   urbano1: {pal: {g: "#e5401c", G: "#a82a10", r: "#1a1426", s: "#b47a48", S: "#8a5a32"}, shirt: ["#e8c040", "#b8902a"], pants: ["#2a2a30", "#18181c"], longHair: true, prop: "basket"},
   urbano2: {pal: {g: "#3f9a5c", G: "#25663a", r: "#e5401c", h: "#3a2a22"}, shirt: ["#3f9a5c", "#2a6a3e"], pants: ["#c8402a", "#8a2a1a"], longHair: true, prop: "basket"},
   urbano3: {pal: {r: "#1a1426", s: "#9a6236", S: "#6e4424"}, shirt: ["#c8402a", "#8a2a1a"], pants: ["#26364a", "#18222f"], noBand: true, prop: "pelt"},
+  // xamã: cabelo branco comprido, cocar roxo com pena azul, pintura de jenipapo, colar e o cajado com maracá
+  xama: {pal: {h: "#d8d0c4", H: "#f4ecd8", g: "#7a2a8a", G: "#4e1a5a", r: "#1a1426", s: "#9a6236", S: "#6e4424", t: "#2a2230", T: "#17121c"}, feather: "#3fb0d8", longHair: true, charm: "#f4ecd8", prop: "staff"},
   armeiro: {pal: {h: "#3a2a22", g: "#e5741c", G: "#a8480e", r: "#2a2230", s: "#9a6236", S: "#6e4424", t: "#5a4a40", T: "#3a2e28"}, feather: "#ffffff", top: "#7d4f2c", prop: "spear"}
 };

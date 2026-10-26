@@ -678,9 +678,9 @@ function drawMemento(x, s, cx, cy, now) {
   const p = (now / 1400) % 1;
   if (!REDUCE && p < .7) { x.fillStyle = p < .35 ? "#ffd23a" : "#fff3c4"; x.fillRect(sx + 4 - Math.round(p * 4), sy - 18 - Math.round(p * 10), 1, 1); }
 }
-const SPOTS = {F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", P: "aldeao", Q: "cabine", U: "onibus"};
-const PEOPLE = ["peles", "comida", "artesao", "armeiro", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "ver a lembrança"};
+const SPOTS = {F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", X: "xama", P: "aldeao", Q: "cabine", U: "onibus"};
+const PEOPLE = ["peles", "comida", "artesao", "armeiro", "xama", "aldeao"];
+const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o xamã", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "ver a lembrança"};
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 const BELEM_TIPS = [
@@ -695,6 +695,7 @@ const BELEM_TIPS = [
   "Sentiu esse pitiú? É peixe fresco, maninho. Cheiro de Ver-o-Peso."
 ];
 const VILLAGER_TIPS = [
+  "O xamã da aldeia faz talismã com as peles dos chefes. Cada chefe deixa uma, duas, até três. Revanche serve pra isso, viu?",
   "Etiqueta verde em cima do bicho? Esse aí cai com uma lançada só.",
   "Bicho se encolheu tremendo? Vai dar o bote. Aperta Z quando o anel ficar verde que tu bloqueia metade.",
   "Acerta o bicho primeiro, na lança (Z) ou na flecha (X), que o primeiro turno da briga é teu.",
@@ -770,10 +771,11 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "comida") { say(t("Barraca de comida"), t("Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!")); foodButtons(d); }
   else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão e tocha pra espantar bicho. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte tu ficar, mais coisa eu te mostro.")); gearButtons(d); }
   else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
+  else if (kind === "xama") { say(t("Xamã"), t("Todo chefe que tu derruba deixa um pedaço da força dele. Me traz as peles do chefe que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem força de chefe nenhum pra eu trabalhar. Vence um chefe e me traz as peles dele."), d); }
   else if (kind === "inventario") { say(t("Bolsa"), invSummary()); invButtons(d); }
   else if (kind === "lembranca") {   // revanche com o chefe vencido
     const b = rematchBoss(), spot = nearSpot() || EX.spots.find(s => s.kind === "lembranca");
-    say(t("Lembrança de {chefe}", {chefe: b.name}), t("Foi aqui que {chefe} caiu. Enfrentar de novo? Vale outra pele e metade do XP.", {chefe: theName(b)}));
+    say(t("Lembrança de {chefe}", {chefe: b.name}), t("Foi aqui que {chefe} caiu. Enfrentar de novo? Vale de 1 a 3 peles e metade do XP.", {chefe: theName(b)}));
     btn(t("Enfrentar de novo"), () => exRematch(spot), false, d);
   }
   else if (kind === "cabine") busCabin(say, d);
@@ -782,7 +784,7 @@ function exOpenDialog(kind, msg, look) {
   if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);
   btn(t("Fechar"), exCloseDialog, false, d);
   d.hidden = false; EX.confirming = null; EX.dialogT = performance.now();
-  if (kind !== "armeiro" && kind !== "tutorial") { menuSelect(d, EX.keepSel ?? menuFirst(d)); EX.keepSel = null; }   // já começa com uma opção escolhida
+  if (kind !== "armeiro" && !(kind === "xama" && d.querySelector(".forge")) && kind !== "tutorial") { menuSelect(d, EX.keepSel ?? menuFirst(d)); EX.keepSel = null; }   // já começa com uma opção escolhida
 }
 /* ---------- BR-316: cabine do cobrador e o ônibus (fases parada e terminal) ---------- */
 const busDest = () => EX.zone === "parada" ? "belem" : "ananindeua";
@@ -1063,7 +1065,7 @@ function dialogKey(ev) {
     return;
   }
   const d = $("exDialog");
-  if (EX.dialog === "armeiro" && !EX.confirming && forgeKey(ev)) return;
+  if ((EX.dialog === "armeiro" || EX.dialog === "xama") && !EX.confirming && forgeKey(ev)) return;
   if (/^[1-9]$/.test(ev.key)) { ev.preventDefault(); pressPanel(d.querySelectorAll(".cmd[data-key]")[+ev.key - 1]); }
   else if (menuKey(ev, d)) return;   // setas escolhem, Z/Enter/Espaço confirmam
   else if (["Escape", "x", "X", "i", "I"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); EX.confirming ? exOpenDialog(EX.confirming) : exCloseDialog(); }   // X volta (na pergunta, é o "Não")

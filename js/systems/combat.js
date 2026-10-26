@@ -217,13 +217,13 @@ function act(id) {
     wait = strike(d, crit ? "crit" : "", "throw", miss ? t("Rhanon joga a lança, mas {bicho} desvia!", {bicho: foe()}) : crit ? t("Arremesso certeiro no ponto fraco: −{n}!", {n: d}) : t("Rhanon joga a lança: −{n}.", {n: d}));
   } else if (id === "tocha") {
     p.sp -= 6;
-    let d = rnd(14, 18) + G.lv - 1; if (p.weak > 0) d = Math.ceil(d / 2);
+    let d = rnd(14, 18) + G.lv - 1 + charmStat("atk"); if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
     wait = strike(d, "", "fire", t("A tocha cospe fogo em {bicho}: −{n}.", {bicho: foe(), n: d}));
     if (!e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); render(); sfx("more"); pop(t("FRAQUEZA!"), $("beast"), "crit"); }, wait + 200); }
   } else if (id === "flecha") {   // tiro com o arco: menos dano que a lança, mas 40% de chance de crítico
     p.sp -= 3;
-    let d = rnd(5, 9) + G.lv - 1 + ((EQUIP.ranged[G.equip.ranged] || {}).atk || 0), crit = p.atento || Math.random() < .4;   // arco melhor = flecha mais forte
+    let d = rnd(5, 9) + G.lv - 1 + ((EQUIP.ranged[G.equip.ranged] || {}).atk || 0) + charmStat("atk"), crit = p.atento || Math.random() < .4;   // arco melhor = flecha mais forte
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
     wait = strike(d, crit ? "crit" : "", "arrow", crit ? t("Flechada certeira no ponto fraco: −{n}!", {n: d}) : t("Flechada: −{n}.", {n: d}));
@@ -238,16 +238,21 @@ function act(id) {
     if (Math.random() * 100 < chance) { render(); return finish("flee"); }
     say(p.preso > 0 ? t("Rhanon tá preso, não dá pra fugir!") : t("{bicho} cortou o caminho. Não deu pra fugir!", {bicho: foe(1)}));
   }
+  const again = !extra && ["atacar", "arremesso", "tocha", "flecha"].includes(id) && charmRoll("turno");   // talismã: age de novo
   render();
   setTimeout(() => {
     if (e.hp <= 0) return finish("win");
-    if (extra) { busy = false; render(); return; }
+    if (again) { say(t("O talismã brilha: mais um turno!")); pop(t("DE NOVO!"), $("hero"), "crit"); sfx("more"); }
+    if (extra || again) { busy = false; render(); return; }
     setTimeout(enemyTurn, 450);   // respiro antes do bicho reagir
   }, wait + 550);
 }
 function enemyTurn() {
   const i = e.intent; foeImpact = 0;
-  if (i === "arranhao") {
+  if (charmRoll("encanto")) {   // talismã do Boto: o bicho fica parado, encantado
+    say(t("O talismã encanta {bicho}: perdeu a vez.", {bicho: foe()})); pop(t("ENCANTADO!"), $("beast"), "crit"); sfx("look"); BEAST_A.set("hurt");
+    foeImpact = 600;
+  } else if (i === "arranhao") {
     let d = rnd(e.damage[0], Math.max(e.damage[0], Math.min(e.damage[1], e.damage[0]+3))); if (p.def) d = Math.ceil(d / 2); d = Math.max(1, d - pdef());
     p.hp -= d; foeAttack("claw", d); say(t("{bicho} ataca: −{n} PV.", {bicho: foe(1), n: d}));
   } else if (i === "bote") {
@@ -314,6 +319,13 @@ function foeAttack(kind, d, sp0) {
       const back = Math.floor(d / 2); p.hp += back; d -= back;
       if (back) { say(t("Bloqueio! Evitou {n} de dano.", {n: back})); pop(t("BLOQUEIO!"), $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
     }
+    if (d > 0 && charmRoll("esquiva")) {   // talismã do Curupira: escapa do golpe inteiro
+      p.hp += d; d = 0; say(t("Rhanon desvia no último instante!")); pop(t("DESVIOU!"), $("hero"), "heal"); sfx("esquiva");
+    }
+    if (d > 0 && charm().fx === "espinho" && e.hp > 0) {   // talismã do Mapinguari: parte do golpe volta para o bicho
+      const n = Math.max(1, Math.round(d * charm().ch / 100)); e.hp = Math.max(0, e.hp - n);
+      setTimeout(() => { hitBeast(); pop("−" + n, $("beast")); say(t("O talismã devolve o golpe: {bicho} perde {n} PV.", {bicho: foe(), n})); render(); }, 120);
+    }
     holdP = null; render();
     if (d) { anim($("hero"), "hurt"); sfx("hurt"); hurtFx(kind, d); pop("−" + d, $("hero"), "me"); if (HERO_A.state !== "defeat") HERO_A.set("hurt"); hitStop(d >= 10 ? 90 : 50); }
   }, impact);
@@ -354,7 +366,7 @@ function strike(d, cls, kind, msg) {
       msg = (msg || "") + " " + t("Perfeito! +{n}.", {n: more});
     }
     const strong = cls === "crit" || perfect || d >= 14;
-    holdE = null; if (msg) say(msg); render(); hitBeast(); sfx(cls === "crit" ? "critico" : perfect ? "perfeito" : "hit");
+    holdE = null; if (msg) say(msg); charmOnHit(d); render(); hitBeast(); sfx(cls === "crit" ? "critico" : perfect ? "perfeito" : "hit");
     burst(b, colors, strong ? 16 : 9, strong ? 90 : 60);
     pop(String(d), $("beast"), cls === "crit" ? "crit" : strong ? "strong" : cls, perfect ? t("PERFEITO!") : null); hitImpact(strong ? "forte" : "leve"); if (strong) musicDuck();
   };
@@ -435,7 +447,7 @@ function furyStrike(ds) {
     if (!last) HERO_A.set("stab");
     hitBeast(); slash($("beast")); burst(b, last ? ["#ffd23a", "#ffffff", "#e5001c"] : ["#fff", "#cfd8dc", "#f2a20c"], last ? 20 : 10, last ? 110 : 60);
     pop(String(d), $("beast"), last ? "crit" : "strong"); sfx(last ? "critico" : "hit"); hitImpact(last ? "furia" : "leve");
-    if (last) { say(t("FÚRIA! Três estocadas: −{n}.", {n: ds.join(", −")})); setTimeout(() => pop(t("FÚRIA!"), $("beast"), "crit"), 200); }
+    if (last) { say(t("FÚRIA! Três estocadas: −{n}.", {n: ds.join(", −")})); charmOnHit(ds.reduce((a, b) => a + b, 0)); setTimeout(() => pop(t("FÚRIA!"), $("beast"), "crit"), 200); }
     render();
   }, T0 + 300 + i * gap));
   return T0 + 300 + gap * 2 + 400;
@@ -482,7 +494,25 @@ function special() {
   else if (s === "constricao") { const n = hit(d); p.preso = 2; p.dot = {d: 3, t: 2, n: "Aperto"}; say(t("{bicho} enrola Rhanon! −{n} PV, e nada de fugir.", {bicho: foe(1), n})); }
   else if (s === "picada") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Veneno"}; say(t("{bicho} pica Rhanon! −{n} PV e veneno por 3 turnos.", {bicho: foe(1), n})); }
 }
+/* ---------- talismãs do xamã (CHARMS em data/world.js) ---------- */
+const charmRoll = k => charm().fx === k && Math.random() * 100 < charm().ch;   // sorteia o efeito do talismã em uso
+// golpe do Rhanon acertou: o dreno cura parte do dano; sangra/queima podem deixar o bicho perdendo PV por 3 turnos
+function charmOnHit(d) {
+  const c = charm();
+  if (!c.fx || d <= 0 || e.hp <= 0) return;
+  if (c.fx === "dreno") {
+    const n = Math.min(p.max - p.hp, Math.max(1, Math.round(d * c.ch / 100)));
+    if (n > 0) { p.hp += n; setTimeout(() => pop("+" + n, $("hero"), "heal"), 250); say(t("O talismã devolve {n} PV.", {n})); }
+  } else if ((c.fx === "sangra" || c.fx === "queima") && Math.random() * 100 < c.ch) {
+    const fire = c.fx === "queima"; e.dot = {d: 2 + Math.floor(G.lv / 5), t: 3, fire};
+    say(t(fire ? "{bicho} pegou fogo!" : "{bicho} tá sangrando!", {bicho: foe(1)})); setTimeout(() => pop(t(fire ? "QUEIMOU!" : "SANGROU!"), $("beast"), "crit"), 300);
+  }
+}
 function tick() {
+  if (e.dot && e.dot.t > 0 && e.hp > 0) {   // sangramento ou queimadura que o talismã deixou no bicho
+    const n = Math.min(e.hp, e.dot.d); e.hp -= n; e.dot.t--; hitBeast(); pop("−" + n, $("beast"));
+    say(t(e.dot.fire ? "Queimadura: {bicho} perde {n} PV." : "Sangramento: {bicho} perde {n} PV.", {bicho: foe(), n}));
+  }
   if (p.dot && p.dot.t > 0) {
     p.hp -= p.dot.d; p.dot.t--;
     if (p.dot.n === "Drenagem") { e.hp = Math.min(e.max, e.hp + p.dot.d); say(t("Drenagem: −{n} PV, e {bicho} recupera {n}.", {n: p.dot.d, bicho: foe()})); }
@@ -497,7 +527,9 @@ function tick() {
 function reward(a = e, mult = 1, drop = false) {
   noteWin(a.id);   // caderno de bichos e pedido de "vencer"
   const back = a.stolen || 0; if (back) { G.money += back; a.stolen = 0; }   // dinheiro que o malandro levou volta
-  if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit(); if (!drop) G.pelts[a.id] = (G.pelts[a.id] || 0) + 1;
+  if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit();
+  const got = drop ? 0 : a.boss ? rnd(1, 3) : 1;   // chefe deixa de 1 a 3 (o xamã faz talismã com elas)
+  if (got) G.pelts[a.id] = (G.pelts[a.id] || 0) + got;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }
   if (G.lv > L0) setTimeout(() => levelUpFx(G.lv), $("explore").hidden ? 1800 : 150);   // na batalha, espera o cartão de vitória
@@ -508,7 +540,7 @@ function reward(a = e, mult = 1, drop = false) {
   return [
     back && t("R$ {n} de volta no bolso", {n: back}),
     xp ? `+${xp} XP` : drop && t("Sem XP (fraco demais)"),
-    drop ? t("{pele} no chão: passa por cima", {pele: peltName(a.id)}) : t("{pele} (R$ {n} na feira)", {pele: peltName(a.id), n: peltValue(a.id)}),
+    drop ? t("{pele} no chão: passa por cima", {pele: peltName(a.id)}) : got > 1 ? t("{pele} ×{q} (R$ {n} cada na feira)", {pele: peltName(a.id), q: got, n: peltValue(a.id)}) : t("{pele} (R$ {n} na feira)", {pele: peltName(a.id), n: peltValue(a.id)}),
     G.lv > L0 && t("Nível {n}!", {n: G.lv}),
     CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv && t("Destino novo no mapa"),
     a.boss && NEXT_Z[curZone] ? t("Liberou: {lugar}", {lugar: ZONES[NEXT_Z[curZone]].n}) : a.boss && NEED.parada === curZone && !G.night && t("Liberou: {lugar}", {lugar: "BR-316"}),

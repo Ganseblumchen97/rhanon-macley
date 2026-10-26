@@ -106,7 +106,7 @@ function rigTorch(d, C, x0, y0, x1, y1, f) {   // cabo de (x0,y0) até a chama e
 /* ---------- o personagem ---------- */
 const RIG_CACHE = new Map();
 // pose: {lf, rf: pés [x,y]; lh, rh: mãos; lean, dy: parte de cima; sit; face; weapon; side; pull; f (quadro da chama)}
-// look: {pal, shirt, pants, glasses, noBand, bowBack, longHair, feather, top, prop}
+// look: {pal, shirt, pants, glasses, noBand, bowBack, longHair, feather, top, prop, charm}
 function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   const key = view + scale + JSON.stringify(pose) + JSON.stringify(look);
   if (RIG_CACHE.has(key)) return RIG_CACHE.get(key);
@@ -149,6 +149,7 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   if (!back && !look.shirt) d.dots([[13 + lean, 25 + hy], [13 + lean, 26 + hy], [13 + lean, 27 + hy], [19 + lean, 25 + hy], [19 + lean, 26 + hy], [19 + lean, 27 + hy]], C.r)   // pintura
     .dots([[12 + lean, 22 + hy], [14 + lean, 23 + hy], [16 + lean, 23 + hy], [18 + lean, 23 + hy], [20 + lean, 22 + hy]], C.w);                                     // colar de dentes
   if (look.top) d.rect(10 + lean, 23 + hy, 12, 2, look.top);
+  if (look.charm && !back) d.part().limb(hx - 3, 20 + hy, hx, 23 + hy, .8, "#3a2414").limb(hx + 3, 20 + hy, hx, 23 + hy, .8, "#3a2414").part().ellipse(hx, 24 + hy, 1.6, 1.6, look.charm);   // colar com a pedra do talismã
   // cintura: faixa e aba da tanga (ou a cintura da calça/short)
   const band = look.pants ? look.pants : [C.t, C.T];
   d.part().rect(10, hip - 1, 12, 2, band[0]).rect(10, hip, 12, 1, band[1]);
@@ -206,6 +207,7 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   if (look.prop === "bow") rigBow(d, C, 27, 14 + hy, 34 + hy);
   if (look.prop === "cloth") d.part().rect(lh[0] - 2, lh[1] - 1, 5, 6, "#e9e2cf").rect(lh[0] - 2, lh[1] + 1, 5, 1, "#19a8d8").rect(lh[0] - 2, lh[1] + 3, 5, 1, "#e5001c");
   if (look.prop === "spear") rigSpear(d, C, rh[0], 42, rh[0], 7 + hy);
+  if (look.prop === "staff") d.part().limb(rh[0], 43, rh[0], 6 + hy, 1.6, "#7a4a1e").part().ellipse(rh[0], 5 + hy, 2.2, 2.6, "#d9b25a", "#a07a30").dots([[rh[0] - 2, 9 + hy], [rh[0] + 2, 9 + hy]], "#e5001c");
   // mãos por cima de tudo (segurando a haste/o arco)
   if (!(back && W === "diag")) d.part().ellipse(lh[0], lh[1], 1.6, 1.6, C.s).ellipse(rh[0], rh[1], 1.6, 1.6, C.s);
   const c = d.canvas();
@@ -238,6 +240,7 @@ function rhanonSleeping(breathe = 0) {
 function rhanonLook() {
   const q = G?.equip || {}, T = EQUIP.torso[q.torso], L = EQUIP.legs[q.legs], look = {bowBack: !!q.ranged};
   const pal = {...EQUIP.weapon[q.weapon]?.look, ...EQUIP.ranged[q.ranged]?.look};   // cores da lança e do arco em uso
+  if (q.amulet && EQUIP.amulet[q.amulet]) look.charm = EQUIP.amulet[q.amulet].night ? "#b07ae8" : "#ffd23a";   // talismã no peito
   if (Object.keys(pal).length) look.pal = pal;
   if (G?.betterJob) Object.assign(look, {shirt: ["#26364a", "#18222f"], pants: ["#18222f", "#0f1620"], glasses: true, noBand: true});
   else if (G?.job) Object.assign(look, {shirt: ["#f4ecd8", "#cdbf9a"], pants: ["#26364a", "#18222f"], noBand: true});

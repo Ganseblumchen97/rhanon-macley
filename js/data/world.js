@@ -124,3 +124,33 @@ const CRAFT = {
            arco_gaivota: {n: "Arco de fibra com penas de gaivota", atk: 9, lv: 23, craft: {gaivota: 2, iguana_rei: 1}, cost: 320, look: {b: "#d8c49a", fl: "#ffffff"}}}
 };
 for (const s in CRAFT) Object.assign(EQUIP[s], CRAFT[s]);
+/* Talismãs do xamã da aldeia (espaço "amulet" do equipamento, um por vez). Cada um sai das peles de um chefe
+   (o chefe deixa de 1 a 3 por luta, então dá umas duas ou três revanches) mais um trocado (cost).
+   Os dos chefes de dia dão status (atk, def, hp = PV máximo, sp = PE máximo); os da noite dão um efeito (fx, com
+   a chance ou a parte em % em ch) e os noturnos mais fortes juntam um status com o efeito. Efeitos (charmFx, combat.js):
+   sangra/queima = o golpe pode deixar o bicho sangrando ou queimando; dreno = cura parte do dano dado; turno = chance
+   de agir de novo; encanto = chance do bicho perder a vez; esquiva = chance de escapar do golpe; espinho = devolve
+   parte do dano recebido. night: true = amuleto de chefe da noite (cor e ícone). */
+const CHARMS = {
+  t_queixada:   {n: "Talismã do Queixada", lv: 5, craft: {queixada_chefe: 4}, cost: 40, atk: 2},
+  t_chupacabra: {n: "Amuleto do Chupa-cabra", lv: 6, craft: {chupacabra: 5}, cost: 60, night: true, fx: "dreno", ch: 20},
+  t_onca:       {n: "Talismã da Onça-Rei", lv: 9, craft: {onca_rei: 4}, cost: 80, atk: 4},
+  t_mula:       {n: "Amuleto da Mula", lv: 10, craft: {mula: 5}, cost: 100, night: true, fx: "queima", ch: 25},
+  t_cobra:      {n: "Talismã da Cobra-Grande", lv: 12, craft: {cobra_grande: 4}, cost: 120, hp: 20},
+  t_boitata:    {n: "Amuleto do Boitatá", lv: 13, craft: {boitata: 5}, cost: 130, night: true, fx: "turno", ch: 15},
+  t_pirarucu:   {n: "Talismã do Pirarucu", lv: 14, craft: {pirarucu: 4}, cost: 140, def: 3, hp: 15},
+  t_boto:       {n: "Amuleto do Boto", lv: 15, craft: {boto_encantado: 5}, cost: 150, night: true, fx: "encanto", ch: 20},
+  t_caranguejo: {n: "Talismã do Caranguejo-rei", lv: 16, craft: {caranguejo_rei: 4}, cost: 160, def: 6},
+  t_matinta:    {n: "Amuleto da Matinta", lv: 17, craft: {matinta: 5}, cost: 170, night: true, fx: "sangra", ch: 30},
+  t_gaviao:     {n: "Talismã do Gavião-real", lv: 18, craft: {gaviao_real: 4}, cost: 180, atk: 5, sp: 10},
+  t_curupira:   {n: "Amuleto do Curupira", lv: 19, craft: {curupira: 5}, cost: 190, night: true, atk: 4, fx: "esquiva", ch: 20},
+  t_bufalo:     {n: "Talismã do Búfalo-touro", lv: 20, craft: {bufalo_touro: 4}, cost: 200, atk: 6, def: 4},
+  t_mapinguari: {n: "Amuleto do Mapinguari", lv: 22, craft: {mapinguari: 5}, cost: 220, night: true, def: 6, fx: "espinho", ch: 30},
+  t_iguana:     {n: "Talismã da Iguana-rei", lv: 24, craft: {iguana_rei: 4}, cost: 240, def: 8, hp: 30},
+  t_mulher:     {n: "Amuleto da Mulher de Branco", lv: 25, craft: {mulher_branco: 5}, cost: 250, night: true, sp: 15, fx: "turno", ch: 20},
+  t_ratao:      {n: "Talismã do Ratão", lv: 26, craft: {ratao: 4}, cost: 260, atk: 8, sp: 15},
+  t_norato:     {n: "Amuleto da Cobra Norato", lv: 27, craft: {cobra_norato: 5}, cost: 270, night: true, atk: 8, fx: "sangra", ch: 35},
+  t_jacare:     {n: "Talismã do Jacaré do canal", lv: 28, craft: {jacare_canal: 4}, cost: 280, atk: 9, def: 7, hp: 30},
+  t_visagem:    {n: "Amuleto da Visagem da maré", lv: 29, craft: {visagem_mare: 5}, cost: 290, night: true, hp: 40, fx: "dreno", ch: 25}
+};
+EQUIP.amulet = CHARMS;
