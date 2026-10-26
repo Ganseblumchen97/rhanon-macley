@@ -241,16 +241,30 @@ function buyGear(slot, id) {
 }
 
 /* ---------- inventário (no mapa de Ananindeua e, com I, dentro das fases) ---------- */
+// resumo da bolsa: roupa e arma ficam no Equipamento (E); aqui só a defesa, o pedido e o valor das peles
 function invSummary() {
-  const q = G.equip, ids = peltIds();
-  return "Vestindo: " + (q.torso ? EQUIP.torso[q.torso].n : "sem camisa") + " e " + EQUIP.legs[q.legs].n +
-    "<br>Arma: " + EQUIP.weapon[q.weapon].n + (q.ranged ? " + " + EQUIP.ranged[q.ranged].n : "") + " · Defesa: " + defense() +
-    questLine() +
-    "<br>Bolsa: " + (Object.entries(G.items).filter(([, n]) => n > 0).map(([k, n]) => `${ITEMS[k].n} ×${n}`).join(", ") || "vazia") +
-    "<br>" + (ids.length ? ids.map(k => `${peltName(k)} ×${G.pelts[k]} (R$ ${peltValue(k)} cada)`).join("<br>") : "Nenhuma pele ainda. Vença bichos para conseguir peles.");
+  const ids = peltIds();
+  return `Defesa: ${defense()} · Dinheiro: R$ ${G.money}` + (ids.length ? ` · Peles valem R$ ${peltsTotal()} na feira` : "") + questLine();
 }
+/* lista da bolsa: comida (Z come) e materiais (peles), mostrando BAG_ROWS linhas e rolando com as setas */
+const BAG_ROWS = 10;
 function invButtons(i) {
-  Object.entries(G.items).forEach(([k, n]) => { if (n > 0) btn(`Comer ${ITEMS[k].n.toLowerCase()} ×${n} (${itemEffect(ITEMS[k])})`, () => eatItem(k), false, i); });
+  const list = document.createElement("div"), food = Object.entries(G.items).filter(([, n]) => n > 0), ids = peltIds();
+  list.className = "bag-list"; list.style.setProperty("--rows", BAG_ROWS);
+  const head = t => list.insertAdjacentHTML("beforeend", `<div class="bag-head">${t}</div>`);
+  const row = (name, n, info, fn) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "cmd bagrow";
+    b.innerHTML = `<span><b>${name}</b><em>×${n}</em><small>${info}</small></span>`;
+    if (fn) b.addEventListener("click", fn); else b.setAttribute("aria-disabled", "true");
+    list.appendChild(b);
+  };
+  head("Comida" + (food.length ? " · Z para comer" : ""));
+  if (food.length) food.forEach(([k, n]) => row(ITEMS[k].n, n, itemEffect(ITEMS[k]), () => eatItem(k)));
+  else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">Nada para comer. A barraca de comida da feira vende.</div>`);
+  head("Materiais");
+  if (ids.length) ids.forEach(k => row(peltName(k), G.pelts[k], `R$ ${peltValue(k)} cada`));
+  else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">Nenhuma pele ainda. Vença bichos para conseguir peles.</div>`);
+  i.appendChild(list);
   btn("Equipamento", () => openEquip(), false, i);   // trocar arma e roupa (systems/equip.js)
   btn("Caderno de bichos", openJournal, false, i);
 }
@@ -261,8 +275,8 @@ function invDone(msg) {
 }
 function showInv(msg) {
   sfx("blip"); vit();
-  const i = $("linfo"), ids = peltIds();
-  i.innerHTML = `<h2>Inventário</h2><p>${invSummary()}</p>` + (ids.length ? `<p class="hint">Valor das peles: R$ ${peltsTotal()}. Venda na feira.</p>` : "");
+  const i = $("linfo");
+  i.innerHTML = `<h2>Bolsa</h2><p>${invSummary()}</p>`;
   invButtons(i);
   if (msg) lh(msg, i);
   btn("Voltar", () => selectSub(G.sub), false, i);

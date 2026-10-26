@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.25.0 — bolsa arrumada e bichos redesenhados
+
+- A bolsa agora mostra só comida e materiais (as peles), numa lista de 10 linhas que rola com as setas. Roupa e
+  arma ficam só no Equipamento (E). Em cima aparecem a defesa, o dinheiro e quanto suas peles valem na feira.
+- Na batalha, se a lista de Itens ou de Especiais ficar grande, ela rola em vez de crescer pela tela.
+- O lobo-guará ganhou um desenho mais selvagem: pescoço curto, cabeça erguida, crina e rabo espetados.
+- O vira-lata caramelo e o cachorro bravo de Belém agora têm desenho de cachorro mesmo (antes usavam o do lobo):
+  focinho curto, rabo enrolado, coleira no caramelo e corrente no bravo.
+- O pessoal de Belém, quando desmaia, fica sentado no chão, tonto e com estrelinhas na cabeça.
+
 ## 0.24.3 — ajustes de batalha e descanso
 
 - Subir de nível ficou mais justo: bicho que cai com um golpe só por ser bem mais fraco não dá mais XP (só a pele),

@@ -83,6 +83,24 @@ function catHead(d, hx, hy, o, C, s = 1) {
   if (o.tongue) { const [tx, ty] = q(-8, 4); d.part().rect(tx, ty, 2, 2, BR); }
 }
 
+// cabeça de cão: crânio redondo, focinho curto, orelha caída (ou em pé no bravo) e coleira
+function dogHead(d, x, y, o, C, brave) {
+  if (brave) d.part().poly([[x + 1, y - 3], [x + 3, y - 9], [x + 5, y - 3]], C.b).dots([[x + 3, y - 6]], C.B);   // orelha em pé
+  d.part().ellipse(x, y, 5.5, 5, C.b, C.B, .6).ellipse(x - 5, y + 2, 3.8, 2.8, C.l, C.B, .6);
+  d.dots([[x - 9, y + 1], [x - 8, y + 1], [x - 9, y + 2]], BN);   // nariz
+  if (!brave) d.part().poly([[x + 1, y - 4], [x + 6, y - 3], [x + 5, y + 3], [x + 2, y + 1]], C.B);   // orelha caída
+  if (o.eye === "angry" || brave) { bEye(d, x - 2, y - 1, {eye: o.eye === "open" ? "angry" : o.eye}); } else bEye(d, x - 2, y - 1, o);
+  if (o.mouth) bMouth(d, x - 9, y + 3, 5); else if (brave) d.dots([[x - 7, y + 4], [x - 5, y + 4]], BW);   // dentes à mostra
+  if (o.tongue) d.dots([[x - 7, y + 5], [x - 6, y + 5]], BR);
+}
+function dogQuad(C, brave) {
+  return {W: 50, H: 34, cx: 27, rx: 12, ry: 6.5, leg: 9, lw: 3, neck: 1, hu: 5, hr: 5, C, paw: [C.l, C.B],
+    head: (d, x, y, o, C) => dogHead(d, x, y, o, C, brave),
+    tail: (d, P, C) => { const x = P.cx + P.rx - 2, y = P.cy - 2, e = P.pose === "ko" ? [[x + 5, y + 4], [x + 9, y + 6]] : brave ? [[x + 5, y - 3], [x + 9, y - 5]] : [[x + 4, y - 5], [x + 2, y - 9]];
+      bChain(d, [[x, y], ...e], [3, 2.5], C.b, C.B); },
+    pattern: (d, P, C) => d.rect(Math.round(P.cx - P.rx - 1), Math.round(P.cy - 4), 3, 6, brave ? "#8a8a90" : BR)};   // coleira (corrente no bravo)
+}
+
 /* ---------- espécies ---------- */
 const rosette = (d, x, y, c) => d.dots([[x, y], [x + 1, y], [x - 1, y + 1], [x + 2, y + 1], [x, y + 2], [x + 1, y + 2]], c);
 const QUADS = {
@@ -227,16 +245,29 @@ const QUADS = {
     tail: (d, P, C) => { const x = P.cx + P.rx - 3, y = P.cy, e = P.pose === "attack" ? [[x + 8, y - 2], [x + 16, y - 5]] : [[x + 8, y + 1], [x + 17, y + 2]];
       bChain(d, [[x, y], ...e], [6, 2], C.b, C.B); d.dots([[x + 3, y - 3], [x + 7, y - 2], [x + 11, y - 1]], C.B); },
     pattern: (d, P, C) => { for (let i = -13; i <= 13; i += 3) d.dots([[Math.round(P.cx + i), Math.round(P.cy - P.ry + 1)], [Math.round(P.cx + i + 1), Math.round(P.cy - 1)]], C.B); }},
-  lobo: {W: 56, H: 40, cx: 30, rx: 13, ry: 6, leg: 13, lw: 2.2, neck: 5, hu: 7, hr: 5,
+  // lobo-guará: pernas compridas e pretas, pescoço curto com crina espetada, rabo cheio de pontas com a ponta branca
+  lobo: {W: 56, H: 40, cx: 30, rx: 14, ry: 7, leg: 12, lw: 2.4, neck: 2, hu: 7, hr: 5,
     C: {b: "#c8641c", B: "#8a3e10", l: "#e8a050"}, legC: ["#1a1414", "#0e0a0a"],
     head: (d, x, y, o, C) => {
-      d.part().poly([[x + 1, y - 3], [x + 2, y - 10], [x + 5, y - 3]], C.b).poly([[x - 2, y - 3], [x - 2, y - 9], [x + 1, y - 4]], C.B);   // orelhonas
-      d.part().ellipse(x, y, 5, 4, C.b, C.B, .6).poly([[x - 3, y - 1], [x - 11, y + 1], [x - 11, y + 3], [x - 3, y + 3]], "#2a1a14");   // focinho preto
-      bEye(d, x - 1, y - 1, o); if (o.mouth) bMouth(d, x - 10, y + 3, 4); if (o.tongue) d.dots([[x - 9, y + 4]], BR);
+      d.part().poly([[x + 1, y - 3], [x + 3, y - 11], [x + 6, y - 3]], C.b).poly([[x - 2, y - 3], [x - 2, y - 10], [x + 1, y - 4]], C.B);   // orelhonas
+      d.dots([[x + 3, y - 7], [x + 3, y - 6]], "#2a1a14");
+      d.part().ellipse(x, y, 5.5, 4.5, C.b, C.B, .6).poly([[x - 3, y - 1], [x - 10, y + 1], [x - 10, y + 3], [x - 3, y + 3]], "#2a1a14");   // focinho preto
+      d.part().poly([[x + 3, y + 2], [x + 1, y + 7], [x - 1, y + 3]], C.l).poly([[x + 5, y + 1], [x + 5, y + 6], [x + 2, y + 3]], C.l);   // tufos do queixo
+      bEye(d, x - 1, y - 1, o); if (o.mouth) bMouth(d, x - 9, y + 3, 4); if (o.tongue) d.dots([[x - 8, y + 4]], BR);
     },
-    tail: (d, P, C) => { const x = P.cx + P.rx - 2, y = P.cy - 1, e = P.pose === "ko" ? [[x + 6, y + 3], [x + 11, y + 5]] : [[x + 5, y + 4], [x + 9, y + 9]];
-      bChain(d, [[x, y], ...e], [4, 3], C.b, C.B); d.ellipse(e[1][0], e[1][1], 2, 2, "#f4ecd8"); },
-    pattern: (d, P, C) => d.poly([[P.cx - 11, P.cy - 5], [P.cx - 3, P.cy - P.ry], [P.cx - 2, P.cy - 3], [P.cx - 10, P.cy - 1]], "#2a1a14")},   // crina preta
+    tail: (d, P, C) => { const x = P.cx + P.rx - 2, y = P.cy - 1, e = P.pose === "ko" ? [[x + 6, y + 3], [x + 11, y + 5]] : P.pose === "attack" ? [[x + 6, y - 2], [x + 11, y - 3]] : [[x + 5, y + 3], [x + 9, y + 8]];
+      bChain(d, [[x, y], ...e], [5, 4], C.b, C.B);
+      const [mx, my] = e[0]; d.poly([[mx - 1, my - 2], [mx + 2, my - 6], [mx + 3, my - 1]], C.b).poly([[mx + 2, my + 2], [mx + 6, my + 1], [mx + 3, my + 4]], C.B);   // pelo espetado
+      d.ellipse(e[1][0], e[1][1], 2.5, 2.5, "#f4ecd8"); },
+    pattern: (d, P, C) => {   // crina preta espetada da nuca até o meio das costas
+      const top = P.cy - P.ry + 1;
+      [[-13, 1], [-9, 0], [-5, 0], [-1, 0], [3, 1]].forEach(([dx, dy], i) => { const bx = Math.round(P.cx + dx), by = Math.round(top + dy); d.poly([[bx - 2, by + 2], [bx + (i < 3 ? -1 : 0), by - 4 + i % 2], [bx + 2, by + 2]], "#2a1a14"); });
+      d.poly([[P.cx - 13, P.cy - 3], [P.cx - 2, P.cy - P.ry + 1], [P.cx - 2, P.cy - 3], [P.cx - 11, P.cy]], "#2a1a14");
+      [[-13, 3]].forEach(([dx, dy]) => { const bx = Math.round(P.cx + dx), by = Math.round(P.cy + dy); d.poly([[bx, by - 2], [bx - 4, by + 1], [bx, by + 2]], C.l); });   // peito felpudo
+    }},
+  // cães da cidade (vira-lata caramelo, cachorro bravo): pescoço curto, focinho curto, orelha caída e rabo enrolado
+  caramelo: dogQuad({b: "#d8963c", B: "#a86a22", l: "#f4d8a0", k: "#2a1a10"}),
+  cachorro_bravo: dogQuad({b: "#2e2a2a", B: "#181414", l: "#6a5a4a", k: "#0e0a0a"}, true),
   mula: {W: 60, H: 44, cx: 32, rx: 16, ry: 8, leg: 13, lw: 3.5, neck: 0, hu: 10, hr: 7,
     C: {b: "#4a3020", B: "#2e1c12", l: "#5e3e2a"}, paw: ["#9aa0a8", "#6a7078"],   // ferraduras
     head: (d, x, y, o, C, P) => {   // sem cabeça: o pescoço acaba numa labareda
@@ -805,12 +836,10 @@ function pombo(pose, f) {
 // gente da cidade (malandros e golpistas): o mesmo esqueleto do Rhanon, de frente; no desmaio fica deitado
 function pessoa(look) {
   return (pose, f) => {
-    const P = {idle: {dy: f}, blink: {face: "blink"}, crouch: {dy: 2, lf: [10, 40], rf: [22, 40]}, attack: {lean: -2, lh: [1, 20], face: "happy"}, hurt: {lean: 2, face: "hurt"}, ko: {face: "hurt"}}[pose] || {};
+    const P = {idle: {dy: f}, blink: {face: "blink"}, crouch: {dy: 2, lf: [10, 40], rf: [22, 40]}, attack: {lean: -2, lh: [1, 20], face: "happy"}, hurt: {lean: 2, face: "hurt"},
+      ko: {sit: true, lean: 2, dy: 1, face: "hurt", lh: [7, 39], rh: [27, 39]}}[pose] || {};   // desmaiado: sentado no chão, tonto, mãos apoiadas
     const S = 1.4, c = rigCanvas("front", P, look, S);   // 1.4 na grade 2x = do tamanho do Rhanon na batalha
-    if (pose !== "ko") return {c, head: [16 * S, 13 * S]};
-    const out = document.createElement("canvas"), x = out.getContext("2d");
-    out.width = c.height; out.height = c.width; x.translate(0, c.width); x.rotate(-Math.PI / 2); x.drawImage(c, 0, 0);   // deitado, cabeça para a esquerda
-    return {c: out, head: [13 * S, c.width - 16 * S]};
+    return {c, head: pose === "ko" ? [18 * S, 20 * S] : [16 * S, 13 * S]};
   };
 }
 // visagem (assombração de Belém): vestido comprido sem pés, flutuando, cabelo escuro e olhos acesos; C troca as cores

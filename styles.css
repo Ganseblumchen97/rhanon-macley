@@ -270,6 +270,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .game>.stage{max-height:560px}
 .game>.log{width:calc(100% - 28px)}
 .cmds{display:flex;flex-direction:column;gap:6px}
+.cmds.scroll{max-height:var(--cmdsH,360px);overflow-y:auto;overflow-x:hidden;padding-right:28px}
 .cmd{
   appearance:none;border:0;cursor:pointer;text-align:left;
   font-family:var(--display);font-size:20px;color:var(--bone);background:var(--moss);
@@ -576,7 +577,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .forge-card h3{margin:0;font-size:clamp(18px,2vw,24px)}
 .forge-bonus{font-weight:700;color:var(--leafBD)}
 .forge-need{list-style:none;margin:6px 0 8px;padding:0;font:700 15px var(--mono)}
-.forge-need li{display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px dashed rgba(58,36,20,.3)}
+.forge-need li{display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px dashed rgba(58,36,20,.3);scroll-margin:24px 0 4px}
 .forge-need li.ok b{color:var(--leafBD)}
 .forge-need li.falta b{color:var(--red)}
 .forge-need li.ok b::before{content:"✓ "}
@@ -759,3 +760,16 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 @media (pointer:coarse){.eq-keys{display:none}}
 @media(max-width:560px){.eq-wrap{grid-template-columns:1fr 1fr}.eq-fig{grid-column:1/-1;grid-row:1;justify-self:center}}
 
+
+/* bolsa (local.js invButtons): lista compacta com --rows linhas visíveis; as setas rolam junto com a escolha */
+.bag-list{max-height:calc(var(--rows) * 30px + 28px);overflow-y:auto;margin:6px 0 10px;padding-right:6px;border:3px solid var(--wood,#6b4126);border-radius:4px;background:rgba(107,65,38,.08);scrollbar-color:var(--wood,#6b4126) transparent}
+.bag-head{font:700 13px var(--mono);text-transform:uppercase;letter-spacing:1px;padding:4px 10px;background:var(--wood,#6b4126);color:var(--parch,#f4ecd8)}
+.bag-empty{font:14px var(--mono);padding:6px 10px;opacity:.75}
+.bag-list .cmd.bagrow{all:unset;display:block;box-sizing:border-box;width:100%;height:30px;cursor:pointer;font:700 15px var(--mono);color:var(--ink);border-bottom:1px dashed rgba(58,36,20,.3);scroll-margin:24px 0 4px}
+.bag-list .cmd.bagrow::before,.bag-list .cmd.bagrow::after,.bag-list .cmd.bagrow>span::before{display:none}
+.bag-list .cmd.bagrow>span{display:grid;grid-template-columns:minmax(0,1fr) 3em 12em;gap:10px;align-items:center;height:100%;padding:0 10px}
+.bag-list .cmd.bagrow b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bag-list .cmd.bagrow em{font-style:normal;text-align:right}
+.bag-list .cmd.bagrow small{font-size:13px;white-space:nowrap;justify-self:start}
+.bag-list .cmd.bagrow:hover,.bag-list .cmd.bagrow.sel,.bag-list .cmd.bagrow:focus-visible{background:var(--leafB,#3f9a5c);color:#fff}
+.bag-list .cmd.bagrow[aria-disabled="true"]{opacity:1;cursor:default}

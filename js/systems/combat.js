@@ -42,15 +42,16 @@ function cmdButton(html, desc, fn, off) {
   $("cmds").appendChild(b);
 }
 function buildCmds() {
-  subMenu = null; const box = $("cmds"); box.innerHTML = ""; box.style.minHeight = "";
+  subMenu = null; const box = $("cmds"); box.innerHTML = ""; box.style.minHeight = ""; box.classList.remove("scroll");
   CMDS.forEach((c, n) => cmdButton(`<i class="key">${n + 1}</i>${c.n}<small></small>`, c.d, () => act(c.id)));   // o número é a tecla de atalho (1-6)
-  box.style.minHeight = box.offsetHeight + "px";   // a lista principal fixa a altura: Especial/Itens abrem no mesmo espaço
+  box.style.minHeight = box.offsetHeight + "px"; box.style.setProperty("--cmdsH", box.offsetHeight + "px");   // a lista principal fixa a altura: Especial/Itens abrem no mesmo espaço
 }
 // opts: [{label, small, desc, fn, off}]; números escolhem, Esc volta sem gastar o turno
 function openSubMenu(opts, backDesc, from) {
   subMenu = opts; subFrom = from; sfx("look"); $("cmds").innerHTML = "";
   opts.forEach((o, n) => cmdButton(`<i class="key">${n + 1}</i>${o.label}<small>${o.small || ""}</small>`, o.desc, o.fn, o.off));
   cmdButton(`<i class="key">X</i>Voltar`, backDesc, closeSubMenu);
+  $("cmds").classList.toggle("scroll", opts.length >= CMDS.length);   // bolsa cheia: não passa da altura dos comandos, rola com as setas
   $("cmds").firstChild.focus();
 }
 function closeSubMenu() { const from = subFrom; buildCmds(); render(); $("cmds").children[from].focus(); }
