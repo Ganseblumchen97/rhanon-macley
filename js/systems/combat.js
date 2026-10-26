@@ -109,9 +109,26 @@ function init(opts = {}) {
   BEAST_A.mount($("beast"), $("beast").querySelector("canvas") || animalSprite(e), {id: e.id, boss, state: "enter", fit: true});
   busy = true; render();
   HERO_A.slide("-38vw", "0px", 650, () => HERO_A.set("idle"));
+  const ready = () => { if (opts.enemyFirst) return enemyTurn(); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus(); };
+  if (boss && !REDUCE) return bossIntro(ready);
   BEAST_A.slide("42vw", "0px", 600, () => { BEAST_A.set("idle"); BEAST_A.dust(); BEAST_A.bang(); animalCry(e.id, boss); });
   setTimeout(() => encounterBanner(e.name), 380);
-  setTimeout(() => { if (opts.enemyFirst) return enemyTurn(); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus(); }, REDUCE ? 300 : 1350);
+  setTimeout(ready, REDUCE ? 300 : 1350);
+}
+/* apresentação do chefe (a música do chefe abre junto, com tambores e badalada): o chefe chega, "CUIDADO!" bate na
+   tela, ele solta um rugido longo que faz tudo tremer, o Rhanon gira a lança e firma a guarda, e só então o nome aparece */
+const BOSS_INTRO = {warn: 450, roar: 1500, ready: 2700, name: 3600, go: 4500};
+function bossIntro(done) {
+  const me = e, at = (ms, fn) => setTimeout(() => { if (e === me && mode === "hunt" && e.hp > 0 && p.hp > 0) fn(); }, ms);   // outra batalha começou ou a luta acabou: para
+  BEAST_A.slide("42vw", "0px", 700, () => { BEAST_A.set("idle"); BEAST_A.dust(); });
+  at(BOSS_INTRO.warn, () => bossWarn("Um chefe bloqueia o caminho"));
+  at(BOSS_INTRO.roar, () => {
+    BEAST_A.set("bigroar"); animalCry(e.id, true, 1.4); sfx("rugidoChefe"); musicDuck(900);
+    hitImpact("forte"); shake("gshake"); setTimeout(() => shake("gshake"), 380); setTimeout(() => shake("gshake-s"), 760);
+  });
+  at(BOSS_INTRO.ready, () => { HERO_A.set("ready"); sfx("spear"); setTimeout(() => sfx("bloqueio"), 600); });
+  at(BOSS_INTRO.name, () => encounterBanner(e.name, "chefe!"));
+  at(BOSS_INTRO.go, done);
 }
 function pick() {
   const r = Math.random() * 100;

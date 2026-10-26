@@ -52,6 +52,9 @@ const SFX = {
   guard: t => tone(150, t, .12, "triangle", .2, 100),
   look:  t => { tone(700, t, .08, "square", .06); tone(1000, t + .1, .08, "square", .06); },
   roar:  t => { noise(t, .5, .2, 200); tone(110, t, .5, "sawtooth", .14, 55); },
+  // apresentação do chefe: sirene de alerta (dois tons, três vezes) e o rugido longo e grave que faz o chão tremer
+  alarme: t => { for (let k = 0; k < 3; k++) { tone(880, t + k * .26, .11, "square", .045); tone(622, t + k * .26 + .13, .11, "square", .045); } },
+  rugidoChefe: t => { noise(t, 1.1, .26, 260); tone(95, t, 1.1, "sawtooth", .16, 38); tone(142, t + .05, .9, "square", .07, 60); tone(48, t, 1.2, "sine", .22, 30); noise(t + .1, .7, .12, 900); },
   claw:  t => { noise(t, .1, .2, 3000); tone(1200, t, .12, "square", .06, 300); },
   hurt:  t => { tone(300, t, .2, "square", .12, 90); noise(t, .1, .18, 600); },
   more:  t => [784, 988, 1175, 1568].forEach((f, i) => tone(f, t + i * .06, .08, "square", .08)),

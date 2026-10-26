@@ -93,6 +93,14 @@ function makeHeroActor() {
         pose.weapon = "torchup"; pose.f = Math.floor(t / 70) % 3; pose.lean = el > 450 && el < 1100 ? 1 : 0;
         if (el > 2100) set("idle");
         break;
+      case "ready": {   // chefe apareceu: gira a lança (para cima, diagonal, para trás...), firma a guarda e a ponta brilha
+        const spin = ["up", "diag", "raise", "diag", "up", "guard"], k = Math.min(spin.length - 1, Math.floor(el / 95));
+        if (weaponOn) pose.weapon = spin[k]; pose.dy = k === spin.length - 1 ? 1 : 0; pose.lean = k === spin.length - 1 ? 1 : 0;
+        lift = el < 380 ? Math.round(Math.sin(el / 380 * Math.PI) * 3) : 0;
+        if (!lastFx && el > 600) { lastFx = 1; const [gx, gy] = grid(SX + 27, SY + 4); PFX.burst(8, "star", ["#ffffff", "#bff3ff", "#ffd23a"], gx, gy, 16, {life: .6}); PFX.burst(5, "ring", ["#ffffff"], gx, gy, 10, {life: .4}); }
+        if (el > 1300) set("idle");
+        break;
+      }
       case "guard":
         pose.dy = 1; if (weaponOn) pose.weapon = "guard";
         if (!lastFx) { lastFx = 1; const [gx, gy] = grid(SX + 16, SY + 22); PFX.burst(6, "ring", ["#bff3ff", "#ffffff"], gx, gy, 18, {life: .5}); }
@@ -279,6 +287,15 @@ function makeBeastActor() {
         } else ox = -Math.round((520 - el) / 60);
         if (el > 520) set("idle");
         break;
+      case "bigroar":   // apresentação do chefe: cresce e treme por mais tempo, soltando ondas e um anel de choque
+        scale = 1 + (Math.floor(el / 90) % 2) * .12; shake = 1;
+        if (!lastFx || el - lastFx > 160) {
+          lastFx = el || 1; const [gx, gy] = grid(MX + 2, MT + h * .4);
+          PFX.emit("wave", ["#ffffff", "#ff6b4a"], gx - 2, gy, -18, -5, .6); PFX.emit("wave", ["#ffffff"], gx - 2, gy + 3, -18, 4, .6);
+          if (el < 200) PFX.burst(10, "ring", ["#ffffff", "#ff6b4a"], gx + 4, gy, 30, {life: .6});
+        }
+        if (el > 1150) set("idle");
+        break;
       case "roar":
         scale = 1 + (Math.floor(el / 110) % 2) * .08; shake = 1;
         if (!lastFx || el - lastFx > 220) {
@@ -307,7 +324,7 @@ function makeBeastActor() {
     let rp = null;
     if (rig) {
       sx = sy = scale = 1;
-      rp = state === "prep" ? "crouch" : state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" ? "attack" : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
+      rp = state === "prep" ? "crouch" : state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" || state === "bigroar" ? "attack" : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
       if (rp === "idle" && t % 3400 < 140) rp = "blink";   // pisca de vez em quando
     }
     g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;

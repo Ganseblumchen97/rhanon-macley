@@ -122,6 +122,17 @@ function applyTheme() {
   if (r.dataset.theme === t) return;
   if (!themeReady) r.dataset.theme = t; else wipe(() => { r.dataset.theme = t; });
 }
+// chefe chegando: a tela escurece, faixas de alerta listradas batem nas bordas e "CUIDADO!" aparece em letras de recorte
+function bossWarn(sub) {
+  const st = $("stage"); st.querySelector(".boss-warn")?.remove();
+  const b = document.createElement("div"); b.className = "boss-warn"; b.setAttribute("aria-hidden", "true");
+  b.innerHTML = `<div class="bw-tape top"></div><div class="bw-tape bottom"></div><h2 class="title bw-title"></h2><div class="bw-sub">${sub}</div>`;
+  st.appendChild(b);
+  ransom(b.querySelector(".bw-title"), ["CUIDADO!"], 7);
+  sfx("alarme"); impactSound();
+  setTimeout(() => b.classList.add("out"), REDUCE ? 500 : 1150);
+  setTimeout(() => b.remove(), REDUCE ? 600 : 1550);
+}
 // abertura da batalha: o Rhanon entra pela esquerda, o bicho chega pela direita e o nome dele aparece numa faixa
 // (a mesma faixa anuncia a fúria do Rhanon, com outro subtítulo)
 function encounterBanner(name, sub = "apareceu!") {

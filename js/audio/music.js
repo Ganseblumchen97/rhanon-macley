@@ -21,7 +21,8 @@ function stepWork(s, t) {
    e é composta por instrumentos sintetizados (sino, flauta, piano elétrico, pad, baixo, bateria,
    berimbau, atabaque, caxixi). As melodias são refeitas a cada trecho, então a música não fica igual.
    Faixas: "title" (abertura), "map" (mapa grande: Pará/Brasil), "local" (Ananindeua, toque de capoeira com flauta),
-   "localNight" (Ananindeua à noite), "battleCapo" (batalha: a roda de capoeira acelerada), "battleBoss" (chefe, tenso);
+   "localNight" (Ananindeua à noite), "battleCapo" (batalha: a roda de capoeira acelerada), "battleBoss" (chefe: abertura
+   sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
   let X = null, DEST = null;              // contexto de áudio e saída (troca no teste offline)
@@ -169,6 +170,50 @@ const MUS = (() => {
     g.gain.value = 0; g.gain.setValueAtTime(vol, when); g.gain.exponentialRampToValueAtTime(.0001, when + .5);
     o.connect(g).connect(bus.mix); o.start(when); o.stop(when + .55);
   }
+
+  // guitarra da guitarrada paraense: corda beliscada brilhante, com vibrato depois do ataque
+  function guitar(freq, when, dur, vol, bright = 2600) {
+    const f = X.createBiquadFilter(), g = X.createGain(), lfo = X.createOscillator(), depth = X.createGain();
+    f.type = "lowpass"; f.frequency.setValueAtTime(bright, when); f.frequency.exponentialRampToValueAtTime(bright * .35, when + Math.min(dur, .6));
+    g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .004); g.gain.exponentialRampToValueAtTime(vol * .45, when + .12); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .2);
+    lfo.frequency.value = 5.5; depth.gain.setValueAtTime(0, when); depth.gain.linearRampToValueAtTime(freq * .006, when + .25);
+    lfo.connect(depth);
+    for (const det of [-6, 6]) { const o = X.createOscillator(); o.type = "sawtooth"; o.frequency.value = freq; o.detune.value = det; depth.connect(o.frequency); o.connect(f); o.start(when); o.stop(when + dur + .25); }
+    f.connect(g).connect(bus.mix); lfo.start(when); lfo.stop(when + dur + .25);
+  }
+  // guitarra distorcida (riff do chefe): onda serrilhada passando por uma saturação pesada
+  let DIST = null;
+  function distCurve() {
+    if (DIST) return DIST;
+    const n = 1024, c = new Float32Array(n);
+    for (let i = 0; i < n; i++) { const x = i / (n - 1) * 2 - 1; c[i] = Math.tanh(x * 6); }
+    return DIST = c;
+  }
+  function dist(freq, when, dur, vol, cutoff = 1600) {
+    const ws = X.createWaveShaper(), f = X.createBiquadFilter(), g = X.createGain();
+    ws.curve = distCurve(); f.type = "lowpass"; f.frequency.value = cutoff;
+    g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .005); g.gain.setValueAtTime(vol, when + dur * .7); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .05);
+    for (const [type, mul] of [["sawtooth", 1], ["square", .5]]) { const o = X.createOscillator(); o.type = type; o.frequency.value = freq * mul; o.connect(ws); o.start(when); o.stop(when + dur + .08); }
+    ws.connect(f).connect(g).connect(bus.mix);
+  }
+  // metais (acorde de serrilhadas com o filtro abrindo, como um naipe tocando forte)
+  function brass(notes, when, dur, vol) {
+    const f = X.createBiquadFilter(), g = X.createGain();
+    f.type = "lowpass"; f.frequency.setValueAtTime(500, when); f.frequency.exponentialRampToValueAtTime(2800, when + .08); f.frequency.exponentialRampToValueAtTime(900, when + dur);
+    g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .03); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .1);
+    f.connect(g).connect(bus.mix);
+    for (const m of notes) for (const det of [-9, 9]) { const o = X.createOscillator(); o.type = "sawtooth"; o.frequency.value = mtof(m); o.detune.value = det; o.connect(f); o.start(when); o.stop(when + dur + .15); }
+  }
+  // coro grave (um "aah" escuro): pad com formante de vogal
+  function choir(notes, when, dur, vol) {
+    const f = X.createBiquadFilter(), f2 = X.createBiquadFilter(), g = X.createGain();
+    f.type = "bandpass"; f.frequency.value = 700; f.Q.value = 1.2; f2.type = "lowpass"; f2.frequency.value = 1400;
+    g.gain.setValueAtTime(.0001, when); g.gain.exponentialRampToValueAtTime(vol, when + .5); g.gain.setValueAtTime(vol, when + dur - .3); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .6);
+    f.connect(f2).connect(g).connect(bus.mix);
+    for (const m of notes) for (const det of [-12, 0, 12]) { const o = X.createOscillator(); o.type = "sawtooth"; o.frequency.value = mtof(m); o.detune.value = det; o.connect(f); o.start(when); o.stop(when + dur + .7); }
+  }
+  // sino grave de alerta (badalada)
+  function toll(m, when, vol) { synth("sine", mtof(m), when, 3, vol); synth("sine", mtof(m) * 2.4, when, 1.4, vol * .35); synth("sine", mtof(m) * 3.9, when, .6, vol * .2); }
 
   // viradas e melodias das batalhas (iguais às da vitrine)
   function battleFill(t, d, s, barIn, build) {
@@ -392,35 +437,107 @@ const MUS = (() => {
         if (m) flute(mtof(m.note), t, m.len * d * .9, part === "A2" ? .032 : .028);
       }
     },
-    // chefe: a mesma roda, mas em ré frígio/menor harmônico, com pedal grave pulsando, surdo pesado,
-    // agogô de alerta, pad com nota "fora" e flauta + lead em escala tensa
+    // chefe: começa com um zumbido grave, badalada e tambores (o chefe se apresenta); depois tambores de guerra, riff
+    // de guitarra distorcida em ré frígio, metais nos tempos fortes, coro escuro e a melodia em menor harmônico.
+    // Forma: abertura (só na primeira volta) e A - B - A' - C (B em meio-tempo com cordas em trêmulo; C só tambores e coro)
     battleBoss: {
-      bpm: 138, wet: .3, level: .3,
-      chords: [{bass: 38, notes: [50, 53, 57, 62]}, {bass: 39, notes: [51, 55, 58, 63]}, {bass: 38, notes: [50, 53, 57, 60]}, {bass: 37, notes: [49, 52, 55, 58], resolve: [49, 52, 55, 57]}],
-      chordsB: [{bass: 34, notes: [50, 53, 58, 62]}, {bass: 33, notes: [49, 52, 57, 61]}, {bass: 34, notes: [50, 55, 58, 62]}, {bass: 33, notes: [49, 52, 55, 58], resolve: [49, 53, 57, 61]}],
-      scale: [62, 63, 65, 67, 69, 70, 73, 74, 75, 77], form: ["A", "B", "A2", "C"], pedal: [0, 0, 1, 0, 0, 0, 1, 0], melody: null,
+      bpm: 148, wet: .28, level: .3,
+      chords: [{bass: 38, notes: [50, 53, 57, 62]}, {bass: 39, notes: [51, 55, 58, 63]}, {bass: 36, notes: [48, 51, 55, 60]}, {bass: 37, notes: [49, 52, 55, 58], resolve: [49, 52, 57, 61]}],
+      chordsB: [{bass: 34, notes: [50, 53, 58, 62]}, {bass: 33, notes: [49, 52, 57, 61]}, {bass: 31, notes: [50, 55, 58, 62]}, {bass: 33, notes: [49, 52, 55, 58], resolve: [49, 53, 57, 61]}],
+      form: ["A", "B", "A2", "C"], riff: [0, 0, 12, 0, 1, 0, 12, 0, 0, 0, 10, 0, -1, 0, 8, 7], intro: 32, melody: null,
+      play(i, t, d) {
+        if (i < this.intro) {   // abertura: o chão treme antes da luta
+          const s = i % 16, bar = Math.floor(i / 16);
+          if (i === 0) { choir([26, 33, 38], t, d * 32, .02); toll(50, t, .05); }
+          if (s === 0 || s === 8) surdo(t, .16); if (s === 6 || s === 14) surdo(t, .09);
+          if (bar === 1 && s === 0) { sweep(t, d * 16, .04); toll(51, t, .04); }
+          if (bar === 1 && s >= 8 && s % 2 === 0) snare(t, .02 + (s - 8) * .006);
+          return;
+        }
+        const j = i - this.intro, s = j % 16, bar = Math.floor(j / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const list = part === "B" ? this.chordsB : this.chords, chord = list[Math.floor(barIn / 2)];
+        const notes = chord.resolve && barIn % 2 ? chord.resolve : chord.notes;
+        const half = part === "B", brk = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (j % 128 === 0) { this.melody = part === "C" ? null : TRACKS.local.makeMelody(list, 0); hat(t, .03, true); }
+        if (s === 0 && barIn % 2 === 0) { choir(notes.slice(0, 3).map(n => n - 12), t, d * 32, brk ? .02 : .013); toll(notes[0] + 12, t, .03); }
+        if (brk || build) {   // ponte: coração batendo, tambores e o coro; a virada cresce no fim
+          if (s === 0 || s === 3) kick(t, .14); if (s === 8 || s === 14) surdo(t, .12);
+          if (build && !battleFill(t, d, s, barIn, true) && (s === 4 || s === 12)) snare(t, .04);
+          return;
+        }
+        // tambores de guerra
+        if (half) { if (s === 0 || s === 10) kick(t, .15); if (s === 8) { snare(t, .07); clap(t); } if (s === 14 || s === 15) surdo(t, .1); }
+        else {
+          if ([0, 3, 8, 11].includes(s)) kick(t, .14);
+          if (!battleFill(t, d, s, barIn, false) && (s === 4 || s === 12)) { snare(t, .065); clap(t); }
+          if (s === 14 || s === 15) surdo(t, .09 + (s - 14) * .03);
+        }
+        if (s % 2 === 0) hat(t, s % 4 === 2 ? .014 : .007, s === 6 && half);
+        // riff distorcido (no meio-tempo só as cabeças de tempo) e metais nos tempos fortes
+        const r = this.riff[s];
+        if (!half || s % 4 === 0) dist(mtof(chord.bass + 12 + r), t, d * (half ? 3.6 : .9), half ? .03 : .024, half ? 1100 : 1500);
+        if (s === 0 || (s === 10 && !half)) brass(notes.slice(1).map(n => n + 12), t, d * (s === 0 ? 3 : 1.5), .012);
+        if (half) synth("sawtooth", mtof(notes[3] + 12), t, d * .9, .007, 3200);   // cordas em trêmulo
+        if (s === 0) synth("sine", mtof(chord.bass), t, d * 15, .09);
+        const m = this.melody && this.melody[j % 128];
+        if (m) { lead(mtof(m.note), t, m.len * d, part === "A2" ? .015 : .012); flute(mtof(m.note - 12), t, m.len * d, .018); }
+      }
+    },
+    // mapa do Pará de dia: guitarrada/carimbó com cara de cidade. Bateria com caixa e chimbal, baixo andando, curimbó
+    // (atabaque) e maracas por baixo, piano elétrico no contratempo e a guitarra solando. Forma A - A' - B - A''
+    mapPara: {
+      bpm: 116, wet: .24, level: .42, swing: .1,
+      chords: [{bass: 45, notes: [57, 60, 64, 67, 72]}, {bass: 38, notes: [57, 62, 65, 69, 72]}, {bass: 43, notes: [55, 59, 62, 67, 71]}, {bass: 48, notes: [55, 60, 64, 67, 72]}],
+      chordsB: [{bass: 41, notes: [57, 60, 65, 69, 72]}, {bass: 43, notes: [55, 59, 62, 67, 71]}, {bass: 45, notes: [57, 60, 64, 69, 72]}, {bass: 40, notes: [56, 59, 62, 64, 68], resolve: [56, 59, 62, 64, 71]}],
+      form: ["A", "A2", "B", "A3"], bassline: [[0, 0], [3, 7], [6, 12], [8, 0], [10, 7], [13, 10], [14, 12]], melody: null,
       play(i, t, d) {
         const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
-        const list = part === "B" ? this.chordsB : this.chords, chord = list[barIn % 4];
-        const notes = chord.resolve && s >= 8 ? chord.resolve : chord.notes;
-        const bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
-        if (i % 128 === 0) { this.melody = part === "C" ? null : battleMelody(list, this.scale, 12); sweep(t, d * 8, .025); }
-        // pedal grave em colcheias (ré e mi bemol), o coração da tensão
-        if (s % 2 === 0) synth("sawtooth", mtof(26 + this.pedal[s / 2]), t, d * 1.7, bridge ? .03 : .045, 500);
-        if ([0, 3, 6, 8, 11, 14].includes(s)) surdo(t, s === 0 || s === 8 ? .13 : .08);
-        if (s === 6 || s === 14) agogo(t, s === 6);
-        if (s % 4 === 2) chi(t, .016); if (s === 0 || s === 8) berimbau(45, t, .05);   // berimbau gunga, mais grave
-        if (s === 0) pad([...notes, notes[0] + 1], t, d * 16, .009);   // nota "fora" no pad
-        if (bridge) { if (s % 4 === 0) tapa(t, .025); return; }
-        if (s === 0 || s === 10) kick(t, .12);
-        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) snare(t, .05);
-        if (s % 2 === 0) hat(t, s % 4 === 2 ? .014 : .007);
-        if (s % 2 === 1) caxixi(t, .006);
+        const list = part === "B" ? this.chordsB : this.chords, chord = list[Math.floor(barIn / 2)];
+        const notes = chord.resolve && barIn % 2 ? chord.resolve : chord.notes;
+        if (i % 128 === 0) this.melody = part === "A" ? null : TRACKS.local.makeMelody(list, part === "A3" ? 12 : 0);
+        // bateria de cidade
+        if (s === 0 || s === 8 || (s === 6 && bar % 2)) kick(t, .12);
+        if (s === 4 || s === 12) { snare(t, .045); if (part === "B") clap(t); }
+        if (s % 2 === 0) hat(t, s % 4 === 2 ? .018 : .009, s === 14 && barIn === 7);
+        // carimbó: curimbó grave/agudo e maracas
+        if ([0, 3, 6, 10].includes(s)) atabaque(t, s === 0 ? .09 : .06, s === 3 || s === 10);
+        if (s % 2 === 1) caxixi(t, s % 4 === 3 ? .012 : .007);
+        const b = this.bassline.find(([at]) => at === s);
+        if (b) synth("triangle", mtof(chord.bass + b[1] - 12), t, d * 1.6, .11);
+        if (s === 2 || s === 6 || s === 10 || s === 14) notes.slice(1, 4).forEach(m => ep(mtof(m), t, .16, .011));   // piano no contratempo
+        if (s === 0 && barIn % 2 === 0) pad(notes, t, d * 32, part === "A" ? .008 : .006);
+        if (part === "A" && (s === 0 || s === 8)) guitar(mtof(notes[4]), t, d * 4, .012);   // guitarra pontuando enquanto não sola
         const m = this.melody && this.melody[i % 128];
-        if (m) { lead(mtof(m.note), t, m.len * d, .012); flute(mtof(m.note - 12), t, m.len * d, .02); }
+        if (m) { guitar(mtof(m.note), t, m.len * d, .02); if (m.len >= 6) guitar(mtof(m.note), t + d * 2, d * 2, .008); }   // nota longa: repique de guitarrada
+        if (Math.random() < .004) bird(t);
+      }
+    },
+    // mapa do Pará à noite: a mesma harmonia, mais lenta, com piano elétrico, percussão de mão macia, grilos e a
+    // guitarra grave e com eco; a cidade acesa ao longe e a mata em volta
+    mapParaNight: {
+      bpm: 88, wet: .48, level: .4, swing: .12,
+      chords: [{bass: 45, notes: [57, 60, 64, 67, 71]}, {bass: 38, notes: [57, 60, 62, 65, 69]}, {bass: 43, notes: [55, 59, 62, 65, 69]}, {bass: 40, notes: [56, 59, 62, 64, 68], resolve: [55, 59, 62, 64, 67]}],
+      chordsB: [{bass: 41, notes: [57, 60, 64, 65, 69]}, {bass: 40, notes: [55, 59, 62, 64, 67]}, {bass: 38, notes: [57, 60, 62, 65, 72]}, {bass: 40, notes: [56, 59, 62, 64, 68], resolve: [56, 59, 62, 65, 68]}],
+      form: ["A", "A2", "B", "A3"], melody: null,
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const list = part === "B" ? this.chordsB : this.chords, chord = list[Math.floor(barIn / 2)];
+        const notes = chord.resolve && barIn % 2 ? chord.resolve : chord.notes;
+        if (i % 128 === 0) this.melody = part === "A" ? null : TRACKS.local.makeMelody(list, -12);
+        if (s === 0 || (s === 10 && bar % 2)) kick(t, .07);
+        if (s === 8) noiseHit(t, .06, .02, "bandpass", 2400, 2);   // aro da caixa
+        if (s % 4 === 2) noiseHit(t, .07, .006, "highpass", 5000);   // vassourinha
+        if (s === 0 || s === 6) atabaque(t, .05, s === 6);
+        if (s % 4 === 3 && Math.random() < .5) caxixi(t, .005);
+        if (s === 0) synth("sine", mtof(chord.bass - 12), t, d * 14, .08);
+        if (s === 0 || s === 7) notes.slice(0, 4).forEach(m => ep(mtof(m), t, s === 0 ? .9 : .4, .012));
+        if (s === 0 && barIn % 2 === 0) { pad(notes, t, d * 32, .01); bell(mtof(notes[4] + 12), t, .012, 2.4); }
+        if (s % 8 === 4 && Math.random() < .5) cricket(t);
+        if (Math.random() < .0015) owl(t);
+        const m = this.melody && this.melody[i % 128];
+        if (m) guitar(mtof(m.note + 12), t, m.len * d, .016, 1800);
       }
     }
-
   };
   function makeLick(from, dense) {
     const out = new Array(16).fill(null); let idx = 3;
@@ -605,6 +722,7 @@ function legacyStop() { if (legacyTimer) clearInterval(legacyTimer); legacyTimer
 function musicStart(id) {
   id = id || "battleCapo";
   if (id === "local" && G.night) id = "localNight";   // à noite a música da exploração muda de clima
+  if (id === "map" && MAP_REGION === "para") id = G.night ? "mapParaNight" : "mapPara";   // mapa do Pará: guitarrada de dia e de noite
   if (MUS.has(id)) { legacyStop(); MUS.play(id); }
   else { MUS.stop(.4); legacyStart(id); }
 }

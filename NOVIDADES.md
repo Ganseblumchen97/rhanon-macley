@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.27.0 — músicas novas e chefes de respeito
+
+- O mapa do Pará ganhou música própria: uma guitarrada com cara de cidade de dia e uma versão calma de noite,
+  com grilos e guitarra com eco.
+- Nova música de chefe, bem mais ameaçadora: começa com tambores e badalada, depois guitarra distorcida, metais
+  e coro.
+- Antes de lutar com um chefe, ele se apresenta: "CUIDADO!" aparece na tela, o chefe solta um rugido que faz
+  tudo tremer e o Rhanon gira a lança e se prepara. Só então a luta começa.
+
 ## 0.26.0 — caminho de verdade até Belém
 
 - As fases agora se ligam a pé, na ordem do mapa: aldeia → feira → mata → ... → várzea → BR-316, e em Belém
