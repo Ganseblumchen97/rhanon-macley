@@ -77,6 +77,6 @@ document.addEventListener("visibilitychange", () => { if (AC) document.hidden ? 
 ransom($("titleLogo"), ["MACLEY'S", "ADVENTURE"], 7);
 TITLE_A.mount($("titleArt"));
 drawMap(); themeReady = true;
-$("titleScreen").hidden = false;
+$("titleScreen").hidden = false; drawTitleForest();
 startAnimationLoop();
 debugSetup();   // só faz algo com ?debug na URL (ver state.js)

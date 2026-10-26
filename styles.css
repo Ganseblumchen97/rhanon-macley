@@ -104,7 +104,6 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-igarape{background:linear-gradient(180deg,#24563a 0 24%,#6a7a3a 24% 25%,#4a5a2a 25% 33%,#3a4a22 33% 40%,#22462c 40% 100%)}
 .stage.zone-igarape::before{background:#6a5a36;right:9%;top:var(--plat)}
 .stage.zone-igarape::after{background:#6a5a36;left:4%;bottom:7%}
-.stage.zone-igarape .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px));opacity:.9}
 /* manguezal: mangue escuro, água salobra e lama */
 .stage.zone-manguezal{background:linear-gradient(180deg,#2e4a2c 0 22%,#7a9a8a 22% 23%,#4a6a6a 23% 31%,#3e5a58 31% 38%,#5a5440 38% 100%)}
 .stage.zone-manguezal::before{background:#6a6248;right:9%;top:var(--plat)}
@@ -116,49 +115,19 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas)::before{background:#6e685c;right:9%;top:var(--plat)}
 .stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas)::after{background:#6e685c;left:4%;bottom:7%}
 .stage.zone-baixadas::before,.stage.zone-baixadas::after{background:#8a6a44}
-.predio{position:absolute;bottom:54%;width:15%;border:3px solid #1a1426;border-bottom:0;background-color:var(--c);
-  background-image:linear-gradient(#bfe8ff,#bfe8ff),linear-gradient(#bfe8ff,#bfe8ff);background-size:24% 18%;background-repeat:no-repeat;background-position:22% 30%,78% 30%}
-.predio::before{content:"";position:absolute;left:-6%;right:-6%;top:-12px;height:10px;background:#8a3a22;border:3px solid #1a1426}
-.predio.p1{--c:#3a7ab8;left:2%;height:26%}
-.predio.p2{--c:#e8c040;left:19%;height:20%}
-.predio.p3{--c:#e89aaa;right:24%;height:23%}
-.predio.p4{--c:#5aa06a;right:4%;height:29%}
-.stage.zone-porto .predio{--c:#8a929a;width:20%}
-.stage.zone-porto .predio::before{background:#5a6670}
-.stage.zone-porto .predio.p2,.stage.zone-porto .predio.p3{display:none}
-.stage.zone-baixadas .predio{--c:#8a5a32;width:12%;bottom:58%}
-.stage.zone-baixadas .predio.p2{--c:#c8a070}.stage.zone-baixadas .predio.p3{--c:#3f9a5c}
-.stage.zone-baixadas .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px))}
 /* várzea: céu aberto, faixa de cheia e capim */
 .stage.zone-varzea{background:linear-gradient(180deg,#5a9a5a 0 26%,#7ac4d0 26% 27%,#3a8aa0 27% 34%,#4a8a6a 34% 40%,#6a9a3a 40% 100%)}
 .stage.zone-varzea::before{background:#7a9a3a;right:9%;top:var(--plat)}
 .stage.zone-varzea::after{background:#7a9a3a;left:4%;bottom:7%}
-.stage.zone-varzea .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px))}
 /* seringal: mata seca, troncos claros e chão de folhas */
 .stage.zone-seringal{background:linear-gradient(180deg,#3a5a2e 0 54%,#5a5a2e 54% 100%)}
 .stage.zone-seringal::before{background:#6a6a38;right:9%;top:var(--plat)}
 .stage.zone-seringal::after{background:#6a6a38;left:4%;bottom:7%}
-.stage.zone-seringal .trunk{background:#c8b89a}
-.stage.zone-manguezal .reeds{bottom:auto;top:calc(38% - 9*var(--px));height:calc(9*var(--px));opacity:.85;filter:sepia(.6) brightness(.8)}
 .stage.zone-fechada::before{background:#2f5a3a;right:12%;top:var(--plat);width:38%;opacity:.9}
 .stage.zone-fechada::after{background:#2f5a3a;left:8%;bottom:8%;width:44%}
 /* Elementos decorativos de fundo */
 .stage .bg-decor{position:absolute;inset:0;pointer-events:none;z-index:0}
 .stage .bg-decor>*{position:absolute}
-.stage .tree{width:calc(8*var(--px));height:calc(16*var(--px));bottom:calc(6% + 10px);filter:drop-shadow(3px 4px 0 rgba(0,0,0,.35))}
-.stage .tree.left{left:4%}
-.stage .tree.mid{left:18%}
-.stage .tree.right{right:22%}
-.stage .tree .trunk{position:absolute;left:50%;bottom:0;width:calc(2*var(--px));height:calc(6*var(--px));transform:translateX(-50%);background:#7a4a1e;border:1px solid #1a0f0a}
-.stage .tree .crown{position:absolute;left:50%;bottom:calc(4*var(--px));width:calc(8*var(--px));height:calc(10*var(--px));transform:translateX(-50%);background:#2f7a3f;clip-path:polygon(50% 0,100% 35%,85% 100%,15% 100%,0 35%);border:1px solid #1a2f1a}
-.stage .bush{width:calc(6*var(--px));height:calc(4*var(--px));bottom:calc(6% + 12px);background:#3a8a4a;border-radius:40% 60% 50% 50%;border:1px solid #1a2f1a;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.3))}
-.stage .bush.b1{left:10%}
-.stage .bush.b2{right:14%}
-.stage .bush.b3{left:28%}
-.stage .reeds{position:absolute;left:0;right:0;bottom:calc(6% + 4px);height:calc(10*var(--px));display:flex;gap:calc(2*var(--px));justify-content:space-around;opacity:.8}
-.stage .reed{width:calc(1*var(--px));height:calc(10*var(--px));background:linear-gradient(180deg,#4a8a5a 0,#2a5a3a 100%);border-radius:1px}
-.stage .lilypad{width:calc(6*var(--px));height:calc(2*var(--px));border-radius:50%;background:#3a7a4a;top:31%;left:62%;opacity:.8}
-.stage.zone-rio .reeds{bottom:auto;top:calc(40% - 9*var(--px));height:calc(9*var(--px));opacity:.9}
 .plate{width:min(280px,58%)}
 .spr{display:block;image-rendering:pixelated;width:calc(var(--n) * var(--px));height:auto}
 .beast{position:absolute;right:12%;top:calc(var(--plat) - 13 * var(--px) + 12px);font-size:0;filter:none;transform-origin:50% 90%}
@@ -266,8 +235,8 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .ui{display:grid;grid-template-columns:1fr minmax(210px,300px);gap:14px;padding:14px 14px 18px;align-items:end}
 /* batalha com tamanho máximo: em tela muito grande o palco não estica (a investida da lança mede a distância até o bicho) */
 .game{align-content:center}
-.game>:is(.stage,.log,.ui){width:100%;max-width:1100px;justify-self:center;box-sizing:border-box}
-.game>.stage{max-height:560px}
+.game>:is(.stage,.log,.ui){width:100%;max-width:1400px;justify-self:center;box-sizing:border-box}
+.game>.stage{max-height:700px}
 .game>.log{width:calc(100% - 28px)}
 .cmds{display:flex;flex-direction:column;gap:6px}
 .cmds.scroll{max-height:var(--cmdsH,360px);overflow-y:auto;overflow-x:hidden;padding-right:28px}
@@ -651,9 +620,14 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 #beast.submerged.shallow{translate:0 12%}
 #beast.submerged.shallow canvas{clip-path:inset(0 0 16% 0)}
 #beast.submerged.shallow::after{top:82%}
-/* na água, o bote e o tremor mexem só o bicho: a marola fica parada e, no bote, ele sai inteiro da água */
+/* na água, o tremor mexe só o bicho: a marola fica parada e ele continua meio submerso */
 #beast.submerged.lunge,#beast.submerged.hit{animation:none}
-#beast.submerged.lunge canvas.actor{animation:lungeW .55s steps(10)!important;clip-path:none}
+#beast.submerged.lunge canvas.actor{animation:lungeW .55s steps(10)!important}
+/* bicho na água ataca de longe (foeSplash): sobe um pouco, sem sair da água, e cospe o jato */
+#beast.submerged.surge{animation:none}
+#beast.submerged.surge canvas.actor{animation:surgeW .5s steps(8)!important}
+@keyframes surgeW{30%{translate:4px -4px;scale:1.03}60%{translate:-10px -8px;scale:1.06}}
+.fx-jato{position:absolute;display:block;box-shadow:0 0 0 2px rgba(10,26,40,.55);image-rendering:pixelated;pointer-events:none}
 #beast.submerged.hit canvas.actor{animation:shakeW .35s,flashf .35s steps(1)!important}
 /* (translate/scale separados: a entrada do bicho deixa o transform do desenho preso) */
 @keyframes lungeW{
@@ -812,9 +786,9 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 :root:is(:lang(zh),:lang(ja)) body{line-break:strict;word-break:normal}
 :root:lang(ko) body{word-break:keep-all}
 /* ===== HUD da batalha compacto: tudo cabe na altura da janela (notebook com 600px de altura inclusive). O palco
-   encolhe até caber (no máximo 560px), o registro mostra as 3 últimas linhas, os comandos vão em 3 colunas e o painel
+   encolhe até caber (no máximo 700px), o registro mostra as 3 últimas linhas, os comandos vão em 3 colunas e o painel
    do Rhanon põe PV ao lado de PE e XP ao lado da Fúria ===== */
-.game{height:100dvh;min-height:0;grid-template-rows:minmax(0,560px) auto auto}
+.game{height:100dvh;min-height:0;grid-template-rows:minmax(0,700px) auto auto}
 .game>.stage{min-height:0;max-height:none;height:100%}
 .game>.over{overflow-y:auto}   /* mapas e cartões rolam se não couberem na janela */
 .game>.log{min-height:0;height:calc(3 * 1.4em + 14px);font-size:clamp(13px,1.5vw,16px);line-height:1.4;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
@@ -840,7 +814,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 }
 /* o tamanho dos desenhos (--px) também olha a altura do palco (cqh), para o Rhanon e os chefes caberem num palco baixo;
    a placa do bicho (nome e vida) fica por cima dos desenhos */
-.game>.stage{container-type:size;--px:clamp(4px,min(1.6vw,2.9cqh),10px)}
+.game>.stage{container-type:size;--px:clamp(4px,min(1.6vw,2.9cqh),12px)}
 .game>.stage .plate{z-index:5}
 
 /* quarto do motel do Ver-o-Peso (explore.js motelScene): cena curta por cima de tudo, em pixel art ampliada */
@@ -848,3 +822,43 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .motel-room[hidden]{display:none}
 .motel-room canvas{width:min(92vw,calc(78vh * 1.6));aspect-ratio:192/120;image-rendering:pixelated;border:4px solid #1a0f0a;box-shadow:0 0 0 4px #6d4329}
 .motel-room p{margin:0;font:700 12px var(--mono);color:#f4ecd8;opacity:.75}
+
+/* ===== cenário da batalha (gfx/scenery.js): um canvas em pixel art atrás de tudo, do tamanho da janela; o palco vira a
+   janela da luta e os montinhos de chão (--platL, --platW na água) trocam as elipses lisas. A imagem tem a superfície
+   em cima (7 de 10 linhas): o centro dela fica onde os pés pisavam antes (12-13px abaixo do topo da elipse antiga). ===== */
+.game>.scene-bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;image-rendering:pixelated;pointer-events:none}
+.game:has(#map:not([hidden])) .scene-bg,.game.working-mode .scene-bg,.game.challenge-mode .scene-bg{display:none}
+.game>.stage.scenic{background:none;outline:4px solid var(--ink);box-shadow:0 0 0 7px rgba(0,0,0,.25)}
+.game>.stage.scenic .bg-decor{display:none}
+.game>.stage.scenic::before,.game>.stage.scenic::after{background:var(--platL) center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;opacity:1;
+  image-rendering:pixelated;height:auto;aspect-ratio:64/10;filter:drop-shadow(0 4px 0 rgba(0,0,0,.28))}
+.game>.stage.scenic::before{right:7%;width:44%;top:var(--plat);translate:0 calc(13px - 35%)}
+.game>.stage.scenic::after{left:4%;width:46%;bottom:calc(6% + 14px);translate:0 65%}
+.game>.stage.scenic.aquatic::before{background-image:var(--platW)}
+
+/* ===== tela inicial na mata (drawTitleForest em gfx/scenery.js): fundo em pixel art ao entardecer com vaga-lumes; o
+   Persona fica na faixa preta inclinada, no risco vermelho e nas letras recortadas, agora de pergaminho, madeira e folha ===== */
+.title-screen{isolation:isolate;background:#06120a}
+.title-screen>.title-bg{position:absolute;inset:0;width:100%;height:100%;z-index:-3;image-rendering:pixelated}
+.title-screen::before{content:"";position:absolute;left:-20vw;right:-20vw;top:47vh;height:46vh;z-index:-2;background:rgba(6,18,10,.88);rotate:-6deg;
+  clip-path:polygon(0 14%,45% 0,100% 20%,100% 86%,58% 100%,0 82%);box-shadow:inset 0 0 0 1px #000}
+.title-screen::after{content:"";position:absolute;left:-20vw;right:-20vw;top:44.5vh;height:1.2vh;z-index:-2;background:var(--red);rotate:-6deg;box-shadow:0 2.6vh 0 -.2vh #f6e9c4}
+.title-flies{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.title-flies i{position:absolute;width:6px;height:6px;background:#fff27a;box-shadow:0 0 10px 3px rgba(255,240,120,.55);animation:vagalume 6s steps(12) infinite}
+.title-flies i:nth-child(1){left:22%;top:38%}.title-flies i:nth-child(2){left:48%;top:30%;animation-delay:-1s}.title-flies i:nth-child(3){left:61%;top:58%;animation-delay:-2.3s}
+.title-flies i:nth-child(4){left:9%;top:66%;animation-delay:-3.1s}.title-flies i:nth-child(5){left:35%;top:72%;animation-delay:-4s}.title-flies i:nth-child(6){left:78%;top:70%;animation-delay:-.6s}
+.title-flies i:nth-child(7){left:88%;top:42%;animation-delay:-2.8s}.title-flies i:nth-child(8){left:55%;top:16%;animation-delay:-5s}.title-flies i:nth-child(9){left:16%;top:20%;animation-delay:-3.6s}
+.title-flies i:nth-child(10){left:70%;top:84%;animation-delay:-1.7s}
+@keyframes vagalume{0%,100%{opacity:0;translate:0 0}20%{opacity:1}50%{opacity:.4;translate:18px -22px}70%{opacity:1;translate:-8px -36px}}
+@media (prefers-reduced-motion:reduce){.title-flies i{animation:none;opacity:.7}}
+/* letras do logo: pedaços de pergaminho, tábua, folha e o amarelo da lua, com contorno e sombra dura */
+.title .l{box-shadow:3px 3px 0 #06120a;outline:2px solid #06120a}
+.title .l.a{background:linear-gradient(180deg,#f6e9c4,#e8d29a);color:#3a2414}
+.title .l.b{background:linear-gradient(180deg,#8a5a34 0 18%,#6b4126 18%);color:#f6e9c4}
+.title .l.c{background:#3f9a5c;color:#f6e9c4;font-family:Anton,Impact,sans-serif;clip-path:polygon(0 8%,100% 0,94% 100%,4% 92%)}
+.title .l.d{background:none;outline:0;box-shadow:none;color:#ffe98a;text-shadow:3px 3px 0 #06120a,-2px 0 0 #06120a,0 -2px 0 #06120a}
+.title .l.b:nth-child(3n+1){position:relative}
+.title .l.b:nth-child(3n+1)::after{content:"";position:absolute;right:-.22em;top:-.26em;width:.42em;height:.3em;background:#5fb06a;border:2px solid #06120a;border-radius:0 80% 0 80%;rotate:-20deg}
+.title-art::after{content:"";position:absolute;width:min(30vw,380px);aspect-ratio:64/10;background:var(--titlePlat) center/100% 100% no-repeat;image-rendering:pixelated;left:50%;bottom:0;translate:-50% 45%;z-index:-1}
+@media(min-width:761px){.title-art{position:relative}}
+.t-menu .desc{background:rgba(6,18,10,.85);color:#f6e9c4}

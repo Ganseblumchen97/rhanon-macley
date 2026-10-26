@@ -4,7 +4,7 @@
 // tamanho da câmera em pixels do jogo: acompanha a janela (exFit), com cada pixel do jogo virando VIEW_Z pixels da tela
 let VIEW_W = 240, VIEW_H = 176, VIEW_Z = 3;
 function exFit() {
-  const W = innerWidth, H = innerHeight, z = Math.max(2, Math.round(Math.min(W / 300, H / 190)));   // ~19 x 12 quadrados ou mais
+  const W = innerWidth, H = innerHeight, z = Math.max(2, Math.round(Math.min(W / 380, H / 220)));   // ~24 x 14 quadrados ou mais (em tela grande o zoom não cresce tanto)
   VIEW_Z = z; VIEW_W = Math.ceil(W / z); VIEW_H = Math.ceil(H / z);
   const cv = $("exCanvas"); cv.style.width = VIEW_W * z + "px"; cv.style.height = VIEW_H * z + "px";
 }
@@ -256,8 +256,9 @@ function exMouseWorld(ev) {
   const r = $("exCanvas").getBoundingClientRect(), c = EX.cam || {cx: 0, cy: 0};
   return {x: (ev.clientX - r.left) / VIEW_Z + c.cx, y: (ev.clientY - r.top) / VIEW_Z + c.cy};
 }
-/* esquiva: um rolamento rápido na direção em que anda (ou para onde mira), sem levar bote no caminho */
-const DODGE_TIME = .24, DODGE_SPEED = 3.2, DODGE_COOL = .75;
+/* esquiva: um rolamento rápido na direção em que anda (ou para onde mira), sem levar bote no caminho; depois espera
+   DODGE_COOL segundos (a rodinha ao lado do Rhanon carrega, drawDodgeCool) */
+const DODGE_TIME = .3, DODGE_SPEED = 2.8, DODGE_COOL = 2;
 function exDodge() {
   if (!EX || EX.locked || EX.dialog || EX.camp || EX.draw || EX.dodge || (EX.dodgeCool || 0) > 0) return;
   const h = EX.hero, ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0), n = Math.hypot(ix, iy);
@@ -427,6 +428,7 @@ function drawShadow(x, sx, sy, w) { x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(
 function drawHeroEnt(x, h, cx, cy, now) {
   const sx = snap(h.x - cx), sy = snap(h.y - cy);
   if (EX.boarding) return;   // já subiu no ônibus
+  if (EX.dodge) return drawHeroRoll(x, h, sx, sy);
   if (now < EX.invulnUntil && Math.floor(now / 100) % 2) return;
   const walking = now - h.movedT < 90, step = Math.floor(h.walk / 7);
   const art = IMG["hero/walk/" + (h.dir === "side" ? "down" : h.dir)];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
@@ -458,6 +460,25 @@ function drawHeroEnt(x, h, cx, cy, now) {
   if (B) drawAimBow(x, sx - iw / 2 + B[0] * OW_SCALE, sy - ih + 1 + B[1] * OW_SCALE, bowAim, pull, !!EX.draw, now);
   if (EX.jab > 0 && !behind) jab();
   grassOver(x, h, cx, cy);
+  drawDodgeCool(x, sx, sy, now);
+}
+// rolamento: o Rhanon de perfil, encolhido, dá uma volta inteira no ar baixo enquanto avança (lança guardada)
+function drawHeroRoll(x, h, sx, sy) {
+  const dg = EX.dodge, k = 1 - Math.max(0, dg.t) / DODGE_TIME, side = dg.vx < -.1 ? -1 : dg.vx > .1 ? 1 : h.side || 1;
+  const img = rigSideCanvas({step: "walk1", dy: 2, weapon: null, side}, {...rhanonLook(), bowBack: false}, OW_SCALE);
+  const iw = img.width, ih = img.height, lift = Math.sin(k * Math.PI) * 3;
+  drawShadow(x, sx, sy, 10);
+  x.save(); x.translate(sx, sy - ih * .38 - lift); x.rotate(side * k * Math.PI * 2); x.scale(1, .82);
+  x.drawImage(img, -iw / 2, -ih / 2, iw, ih); x.restore();
+}
+// rodinha da esquiva: enche enquanto recarrega e pisca uma vez quando fica pronta
+function drawDodgeCool(x, sx, sy, now) {
+  const c = EX.dodgeCool || 0;
+  if (c <= 0) { if (EX.dodgeReady && now - EX.dodgeReady < 260) { x.fillStyle = "rgba(255,255,255,.85)"; x.beginPath(); x.arc(sx + 9, sy - 30, 3.5, 0, Math.PI * 2); x.fill(); } return; }
+  EX.dodgeReady = now;
+  const p = 1 - c / DODGE_COOL, X = sx + 9, Y = sy - 30;
+  x.lineWidth = 1.4; x.strokeStyle = "rgba(0,0,0,.55)"; x.beginPath(); x.arc(X, Y, 3.5, 0, Math.PI * 2); x.stroke();
+  x.strokeStyle = "#ffd23a"; x.beginPath(); x.arc(X, Y, 3.5, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); x.stroke();
 }
 // arco virado para a mira: a corda vai até o ponto puxado e, enquanto puxa, a flecha fica encaixada
 function drawAimBow(x, X, Y, a, pull, nocked, now) {

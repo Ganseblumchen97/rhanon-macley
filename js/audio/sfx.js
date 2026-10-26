@@ -56,6 +56,8 @@ const SFX = {
   alarme: t => { for (let k = 0; k < 3; k++) { tone(880, t + k * .26, .11, "square", .045); tone(622, t + k * .26 + .13, .11, "square", .045); } },
   rugidoChefe: t => { noise(t, 1.1, .26, 260); tone(95, t, 1.1, "sawtooth", .16, 38); tone(142, t + .05, .9, "square", .07, 60); tone(48, t, 1.2, "sine", .22, 30); noise(t + .1, .7, .12, 900); },
   claw:  t => { noise(t, .1, .2, 3000); tone(1200, t, .12, "square", .06, 300); },
+  agua:  t => { noise(t, .3, .14, 1200); tone(420, t, .2, "triangle", .05, 1300); tone(1300, t + .18, .1, "sine", .03, 600); },   // jato d'água do bicho
+  choque: t => { [0, .05, .1, .16].forEach((o, i) => tone(i % 2 ? 1800 : 260, t + o, .05, "square", .05, i % 2 ? 900 : 520)); noise(t, .22, .08, 5000); },   // raio do poraquê
   hurt:  t => { tone(300, t, .2, "square", .12, 90); noise(t, .1, .18, 600); },
   more:  t => [784, 988, 1175, 1568].forEach((f, i) => tone(f, t + i * .06, .08, "square", .08)),
   // armeiro fabricando: três marteladas na bigorna e um brilho de "pronto!"

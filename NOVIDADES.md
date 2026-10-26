@@ -3,6 +3,23 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.31.0 — batalhas com cenário de verdade e tela inicial na mata
+
+- Cada área tem o próprio cenário de batalha em pixel art: árvores na mata, rio com juncos e vitórias-régias, mangue,
+  seringueiras, campo aberto na várzea, casarões na Cidade Velha, galpões no Porto e palafitas nas Baixadas. O cenário
+  ocupa a tela inteira, e o Rhanon e o bicho pisam em montinhos de grama, areia, lama, pedra ou tábua.
+- A tela inicial agora é uma mata ao entardecer, com lua, cipós e vaga-lumes. As letras do título viraram pedaços de
+  pergaminho, madeira e folha.
+- Os bichos de água não saem mais dela para atacar: cospem um jato d'água de longe, e o poraquê solta um raio. Antes,
+  depois do primeiro bote eles ficavam inteiros fora da água até o fim da luta.
+- Cada lança feita pelo armeiro tem uma ponta diferente no Rhanon (farpas, presa curva, osso, chifre, lâmina de aço),
+  igual ao desenho da tela de equipamento.
+- O rolamento (Shift ou C) agora é um rolamento de verdade e tem 2 segundos de espera. Uma rodinha amarela ao lado do
+  Rhanon mostra quando dá para rolar de novo.
+- No comprador de peles, "Vender tudo" virou "Vender sobras": guarda as peles que o armeiro ainda vai pedir para as
+  armas e roupas que você não fez e vende o resto.
+- Em telas grandes a exploração mostra mais do mapa ao redor, e a batalha pode ficar maior.
+
 ## 0.30.2 — Rhanon dormindo com cobertinha
 
 - No quarto do motel, o Rhanon agora aparece inteiro deitado na cama: cabeça no travesseiro, braço por cima e o

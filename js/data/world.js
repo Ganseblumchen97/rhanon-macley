@@ -107,11 +107,11 @@ const EQUIP = {
 /* Feitos pelo armeiro da feira com peles (craft: {bicho: quantas peles}) mais um pouco de dinheiro (cost). Entram no mesmo
    EQUIP do slot e depois aparecem no inventário para vestir/usar como os outros. */
 const CRAFT = {
-  weapon: {lanca_dente: {n: "Lança de dente de jacaré", atk: 3, lv: 6, craft: {jacare: 2}, cost: 60, look: {m: "#f2e6c4", band: "#5a8a3a"}},
-           lanca_presa: {n: "Lança com presa de onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120, look: {m: "#fff8e0", band: "#e0a030", long: true}},
-           lanca_pirarucu: {n: "Lança de osso de pirarucu", atk: 8, lv: 13, craft: {pirarucu: 1, tracaja: 2}, cost: 160, look: {m: "#eef0e8", band: "#c8303a", p: "#c9a46a", P: "#8a6a3a", long: true}},
-           lanca_chifre: {n: "Lança com chifre de búfalo", atk: 11, lv: 18, craft: {bufalo_touro: 1, bufalo: 2}, cost: 260, look: {m: "#4a4044", band: "#d9b25a", p: "#a07a40", P: "#6b4e26", long: true}},
-           lanca_aco: {n: "Lança com ponta de aço do porto", atk: 15, lv: 24, craft: {ratao: 1, ratazana: 3}, cost: 380, look: {m: "#a8bccb", band: "#5a6670", p: "#6b4a2a", P: "#45301a", long: true}}},
+  weapon: {lanca_dente: {n: "Lança de dente de jacaré", atk: 3, lv: 6, craft: {jacare: 2}, cost: 60, look: {tip: "dente", m: "#f2e6c4", band: "#5a8a3a"}},
+           lanca_presa: {n: "Lança com presa de onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120, look: {tip: "presa", m: "#fff8e0", band: "#e0a030", long: true}},
+           lanca_pirarucu: {n: "Lança de osso de pirarucu", atk: 8, lv: 13, craft: {pirarucu: 1, tracaja: 2}, cost: 160, look: {tip: "osso", m: "#eef0e8", band: "#c8303a", p: "#c9a46a", P: "#8a6a3a", long: true}},
+           lanca_chifre: {n: "Lança com chifre de búfalo", atk: 11, lv: 18, craft: {bufalo_touro: 1, bufalo: 2}, cost: 260, look: {tip: "chifre", m: "#4a4044", band: "#d9b25a", p: "#a07a40", P: "#6b4e26", long: true}},
+           lanca_aco: {n: "Lança com ponta de aço do porto", atk: 15, lv: 24, craft: {ratao: 1, ratazana: 3}, cost: 380, look: {tip: "aco", m: "#a8bccb", band: "#5a6670", p: "#6b4a2a", P: "#45301a", long: true}}},
   torso:  {colete_sucuri: {n: "Colete de couro de sucuri", def: 4, lv: 8, craft: {sucuri: 2}, cost: 90, color: "#5a7a3a", shade: "#3a5a24"},
            colete_tracaja: {n: "Colete de casco de tracajá", def: 6, lv: 12, craft: {tracaja: 3}, cost: 140, color: "#4a5a3a", shade: "#2e3a24"},
            gibao_bufalo: {n: "Gibão de couro de búfalo", def: 9, lv: 17, craft: {bufalo: 3, jararaca: 1}, cost: 240, color: "#3a3234", shade: "#221c1e"},

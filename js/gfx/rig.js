@@ -71,11 +71,21 @@ function rigGrid(S, W = RIG_W, H = RIG_H) {   // W/H: tamanho base (outros desen
 }
 
 /* ---------- armas e objetos ---------- */
+// formato da ponta (look.tip): dente = farpas dos lados, presa = curva, osso = nó na base, chifre = curva escura e comprida,
+// aco = lâmina larga de folha; sem tip, triângulo simples. O mesmo desenho sai no Rhanon e no ícone da tela de equipar.
 function rigSpear(d, C, x0, y0, x1, y1) {   // (x1, y1) = onde começa a ponta; cores e amarração de EQUIP.weapon[].look
+  const L0 = Math.hypot(x1 - x0, y1 - y0) || 1, t = (C.long ? 5 : 3.5) + (C.tip === "chifre" ? 1.5 : 0) + (C.tip ? 1 : 0);
+  const back = t - 3.5 + (C.tip ? 1 : 0);   // ponta maior começa mais para trás: a lança inteira continua dentro do desenho
+  x1 -= (x1 - x0) / L0 * back; y1 -= (y1 - y0) / L0 * back;
   d.part().limb(x0, y0, x1, y1, 2, C.p, C.P);
-  const L = Math.hypot(x1 - x0, y1 - y0) || 1, nx = (x1 - x0) / L, ny = (y1 - y0) / L, t = C.long ? 5 : 3.5;
+  const L = Math.hypot(x1 - x0, y1 - y0) || 1, nx = (x1 - x0) / L, ny = (y1 - y0) / L;
+  const at = (u, v) => [x1 + nx * u - ny * v, y1 + ny * u + nx * v];   // u ao longo da lança, v para o lado
   if (C.band) d.part().limb(x1 - nx * 3, y1 - ny * 3, x1 - nx * 1.2, y1 - ny * 1.2, 2.8, C.band).part();
-  d.poly([[x1 - ny * 1.6, y1 + nx * 1.6], [x1 + ny * 1.6, y1 - nx * 1.6], [x1 + nx * t, y1 + ny * t]], C.m);
+  if (C.tip === "osso") { d.ellipse(...at(-.2, 0), 2.2, 2.2, C.m).part(); }
+  if (C.tip === "presa" || C.tip === "chifre") d.poly([at(0, -2), at(0, 2), at(t * .55, 1.8), at(t, -1.6), at(t * .5, -.6)], C.m);
+  else if (C.tip === "aco") d.poly([at(0, 0), at(t * .38, 2.6), at(t + .5, 0), at(t * .38, -2.6)], C.m);
+  else d.poly([at(0, -1.6), at(0, 1.6), at(t, 0)], C.m);
+  if (C.tip === "dente") d.part().poly([at(.4, 1.4), at(2, 3.4), at(2.2, 1)], C.m).poly([at(.4, -1.4), at(2, -3.4), at(2.2, -1)], C.m);
 }
 function rigBow(d, C, x, y0, y1, pullTo) {   // arco vertical em x; corda reta ou puxada até pullTo [x, y]
   d.part();

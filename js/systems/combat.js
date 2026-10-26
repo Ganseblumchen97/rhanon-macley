@@ -8,25 +8,7 @@ function setBattleDecor(zone) {
   if (!stage.querySelector(".night-shade")) decor.insertAdjacentHTML("afterend", '<div class="night-shade" aria-hidden="true"></div>');
   stage.classList.toggle("night", !!G.night);
   decor.innerHTML = "";
-  if (["cidadevelha", "porto", "baixadas"].includes(zone)) {   // cidade: casarões/galpões ao fundo (e água nas Baixadas)
-    for (let i = 1; i <= 4; i++) { const p = document.createElement("div"); p.className = "predio p" + i; decor.appendChild(p); }
-    if (zone === "baixadas") { const reeds = document.createElement("div"); reeds.className = "reeds"; for (let i = 0; i < 10; i++) { const r = document.createElement("div"); r.className = "reed"; r.style.height = `calc(${7 + Math.random() * 5} * var(--px))`; reeds.appendChild(r); } decor.appendChild(reeds); }
-  } else if (zone === "rio" || zone === "igarape" || zone === "manguezal" || zone === "varzea") {   // água: juncos e vitória-régia
-    const reeds = document.createElement("div"); reeds.className = "reeds";
-    for (let i=0;i<12;i++){ const r=document.createElement("div"); r.className="reed"; r.style.height=`calc(${8 + Math.random()*6} * var(--px))`; reeds.appendChild(r); }
-    decor.appendChild(reeds);
-    const l = document.createElement("div"); l.className="lilypad"; decor.appendChild(l);
-  } else if (zone === "fechada") {
-    const t1=document.createElement("div"); t1.className="tree left"; t1.innerHTML='<div class="trunk"></div><div class="crown"></div>'; decor.appendChild(t1);
-    const t2=document.createElement("div"); t2.className="tree right"; t2.innerHTML='<div class="trunk"></div><div class="crown"></div>'; decor.appendChild(t2);
-    const b1=document.createElement("div"); b1.className="bush b1"; decor.appendChild(b1);
-    const b2=document.createElement("div"); b2.className="bush b3"; decor.appendChild(b2);
-  } else {
-    const t1=document.createElement("div"); t1.className="tree left"; t1.innerHTML='<div class="trunk"></div><div class="crown"></div>'; decor.appendChild(t1);
-    const t2=document.createElement("div"); t2.className="tree mid"; t2.innerHTML='<div class="trunk"></div><div class="crown"></div>'; decor.appendChild(t2);
-    const b1=document.createElement("div"); b1.className="bush b1"; decor.appendChild(b1);
-    const b2=document.createElement("div"); b2.className="bush b2"; decor.appendChild(b2);
-  }
+  setScenery(zone || curZone || "mata");   // cenário em pixel art (gfx/scenery.js)
 }
 
 // batalha comum: a roda de capoeira acelerada; chefe: a versão tensa
@@ -315,13 +297,16 @@ function finish(kind) {
 const FOE_PREP = 650;   // o bicho se prepara antes do golpe: tempo de reagir com o Z
 function foeAttack(kind, d, sp0) {
   holdP = {hp: p.hp + d, sp: sp0 === undefined ? p.sp : sp0};
-  const block = d > 0 && kind !== "roar", prep = block ? FOE_PREP : 0, impact = prep + (kind === "roar" ? 400 : kind === "fire" ? 1000 : 220);
+  // bicho na água não sai dela: ataca de longe (jato d'água; poraquê, choque) e o tiro leva mais tempo até chegar
+  const wet = kind !== "roar" && kind !== "fire" && $("beast").classList.contains("submerged");
+  const block = d > 0 && kind !== "roar", prep = block ? FOE_PREP : 0, impact = prep + (kind === "roar" ? 400 : kind === "fire" ? 1000 : wet ? 460 : 220);
   foeImpact = Math.max(foeImpact, impact);
   if (block) { BEAST_A.set("prep"); qteArm(impact, $("hero")); }
   setTimeout(() => {
     BEAST_A.set(kind === "roar" || kind === "fire" ? "roar" : "windup");
     if (kind === "roar") { animalCry(e.id, e.boss); anim($("beast"), "hit"); }
     else if (kind === "fire") foeFlames();
+    else if (wet) foeSplash(e.id === "poraque");
     else { anim($("beast"), "lunge"); sfx("claw"); }
   }, prep);
   setTimeout(() => {
@@ -332,6 +317,19 @@ function foeAttack(kind, d, sp0) {
     holdP = null; render();
     if (d) { anim($("hero"), "hurt"); sfx("hurt"); hurtFx(kind, d); pop("−" + d, $("hero"), "me"); if (HERO_A.state !== "defeat") HERO_A.set("hurt"); hitStop(d >= 10 ? 90 : 50); }
   }, impact);
+}
+// bicho na água: sobe um pouco (sem sair dela) e cospe um jato que atravessa até o Rhanon; o poraquê solta um raio
+function foeSplash(shock) {
+  const a = pos($("beast")), b = pos($("hero")), cols = shock ? ["#fff27a", "#ffd23a", "#ffffff"] : ["#86d6ff", "#d2f0ff", "#4ab0d8"];
+  anim($("beast"), "surge"); sfx(shock ? "choque" : "agua");
+  for (let i = 0; i < 14; i++) setTimeout(() => {
+    const c = document.createElement("i"), sz = 9 + (i % 3) * 4, sx = a.x - 30, sy = a.y - 6;
+    c.className = "fx-jato"; c.style.cssText = `left:${sx}px;top:${sy}px;width:${sz}px;height:${sz}px;background:${cols[i % 3]}`;
+    $("fx").appendChild(c);
+    const arc = shock ? (i % 2 ? 14 : -14) : -40 - (i % 3) * 6;   // jato faz curva para cima; raio vai em zigue-zague
+    c.animate([{transform: "translate(-50%,-50%)"}, {transform: `translate(calc(-50% + ${(b.x - sx) / 2}px),calc(-50% + ${(b.y - sy) / 2 + arc}px))`, offset: .5},
+      {transform: `translate(calc(-50% + ${b.x - sx}px),calc(-50% + ${b.y - sy}px)) scale(1.4)`, opacity: .6}], {duration: 380, easing: "steps(8)", fill: "forwards"}).onfinish = () => c.remove();
+  }, 40 + i * 18);
 }
 // labareda do bicho (Mula sem cabeça): chamas saem dele e atravessam até o Rhanon
 function foeFlames() {

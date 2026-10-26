@@ -155,7 +155,9 @@ const useWarn = names => ` <b class="warn">${t("O armeiro usa pra fazer: {itens}
 function peltButtons(i) {
   const ids = peltIds();
   const useful = ids.filter(k => peltUses(k).length);
-  if (ids.length > 1) btn(t("Vender todas as peles · R$ {n}", {n: peltsTotal()}), ask(t("Vender todas as peles por R$ {n}?", {n: peltsTotal()}) + (useful.length ? ` <b class="warn">${t("Cuidado: o armeiro usa {peles}.", {peles: useful.map(k => peltName(k).toLowerCase()).join(", ")})}</b>` : ""), sellAll), false, i);
+  // "vender sobras": guarda o que o armeiro ainda vai pedir (peltKeep) e vende o resto
+  const spare = sparesTotal(), kept = useful.filter(k => peltKeep(k) > 0);
+  if (spare > 0 && (ids.length > 1 || kept.length)) btn(t("Vender sobras · R$ {n}", {n: spare}), ask(t("Vender as peles que sobram por R$ {n}?", {n: spare}) + (kept.length ? ` ${t("Fica guardado: {peles}.", {peles: kept.map(k => `${peltName(k).toLowerCase()} ×${Math.min(G.pelts[k], peltKeep(k))}`).join(", ")})}` : ""), sellSpares), false, i);
   ids.forEach(k => { const u = peltUses(k); btn(t("Vender {pele} ×{n} · R$ {v}", {pele: peltName(k), n: G.pelts[k], v: G.pelts[k] * peltValue(k)}) + (u.length ? " " + USE_TAG() : ""), ask(t("Vender {pele} ×{n} por R$ {v}?", {pele: peltName(k).toLowerCase(), n: G.pelts[k], v: G.pelts[k] * peltValue(k)}) + (u.length ? useWarn(u) : ""), () => sell(k)), false, i); });
   if (!ids.length) lh(t("Nenhuma pele pra vender ainda. Caça primeiro e volta aqui."), i);
 }
@@ -164,9 +166,13 @@ function sell(k) {
   const n = G.pelts[k] || 0, v = n * peltValue(k); if (!n) return;
   G.money += v; G.pelts[k] = 0; save(); sfx("more"); localDone("feira", t("Vendeu {pele} ×{n} por R$ {v}.", {pele: peltName(k).toLowerCase(), n, v}));
 }
-function sellAll() {
-  const v = peltsTotal(); G.money += v; Object.keys(G.pelts).forEach(k => { G.pelts[k] = 0; });
-  save(); sfx("more"); localDone("feira", t("Vendeu todas as peles por R$ {v}.", {v}));
+// quantas peles k as receitas que o Rhanon ainda não tem pedem, somadas; o que passar disso é sobra
+const peltKeep = k => GEAR_SLOTS.reduce((n, slot) => n + Object.entries(CRAFT[slot] || {}).filter(([id, it]) => !G.owned[id]).reduce((m, [, it]) => m + (it.craft[k] || 0), 0), 0);
+const peltSpare = k => Math.max(0, (G.pelts[k] || 0) - peltKeep(k));
+const sparesTotal = () => peltIds().reduce((a, k) => a + peltSpare(k) * peltValue(k), 0);
+function sellSpares() {
+  const v = sparesTotal(); G.money += v; peltIds().forEach(k => { G.pelts[k] -= peltSpare(k); });
+  save(); sfx("more"); localDone("feira", t("Vendeu as sobras por R$ {v}.", {v}));
 }
 const GEAR_SLOTS = ["weapon", "ranged", "torso", "legs"];
 // selo de comparação com o que está em uso no mesmo espaço (ATQ da arma/flecha, DEF da roupa): verde "+3", vermelho "−2", cinza "="
