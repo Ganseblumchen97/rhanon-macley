@@ -1,6 +1,6 @@
 /* Inicialização: monta os mapas, liga os botões e o teclado e abre a tela inicial.
    É o último arquivo carregado, então tudo dos outros arquivos já existe aqui. */
-applyLangData(); translateStatic();   // idioma escolhido nas Opções (core/lang.js); em português não faz nada
+applyLangData(); translateStatic();   // idioma escolhido nas Opções (core/lang.js); em português (ou sem o arquivo do idioma) não faz nada
 if (!CURITIBA_OPEN && G.loc === "curitiba") { G.loc = "ananindeua"; save(); }   // Curitiba fechada por enquanto
 $("gameVersion").textContent = t("ALFA") + " " + GAME_VERSION;
 setupMapRegion();

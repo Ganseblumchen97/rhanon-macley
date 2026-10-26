@@ -804,3 +804,41 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 /* aviso de tradução automática (core/lang.js) */
 .t-menu .lang-note{margin:6px 0 0;padding:4px 8px;border-left:3px solid #f2a20c;background:rgba(0,0,0,.35);color:#fff3c4;font:700 12px/1.4 var(--mono);max-width:420px}
 .opcoes .lang-note{color:#a0601a}
+
+/* chinês, japonês e coreano (core/lang.js baixa a Noto do idioma): a fonte entra depois das do jogo, então só cobre os
+   caracteres que elas não têm; letras, números e símbolos continuam no visual de sempre */
+:root:lang(zh){--cjk:"Noto Sans SC"} :root:lang(ja){--cjk:"Noto Sans JP"} :root:lang(ko){--cjk:"Noto Sans KR"}
+:root:is(:lang(zh),:lang(ja),:lang(ko)){--mono:'JetBrains Mono',var(--cjk),Consolas,monospace;--display:Anton,var(--cjk),Impact,'Arial Black',sans-serif;--body:'Archivo Black',var(--cjk),Impact,'Arial Black',sans-serif}
+:root:is(:lang(zh),:lang(ja)) body{line-break:strict;word-break:normal}
+:root:lang(ko) body{word-break:keep-all}
+/* ===== HUD da batalha compacto: tudo cabe na altura da janela (notebook com 600px de altura inclusive). O palco
+   encolhe até caber (no máximo 560px), o registro mostra as 3 últimas linhas, os comandos vão em 3 colunas e o painel
+   do Rhanon põe PV ao lado de PE e XP ao lado da Fúria ===== */
+.game{height:100dvh;min-height:0;grid-template-rows:minmax(0,560px) auto auto}
+.game>.stage{min-height:0;max-height:none;height:100%}
+.game>.over{overflow-y:auto}   /* mapas e cartões rolam se não couberem na janela */
+.game>.log{min-height:0;height:calc(3 * 1.4em + 14px);font-size:clamp(13px,1.5vw,16px);line-height:1.4;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.game>.log p{margin:0}
+.game>.ui{grid-template-columns:minmax(0,1fr) minmax(260px,380px);padding:6px 14px 10px;gap:14px;align-items:center}
+.ui .cmds{display:grid;grid-template-columns:repeat(3,max-content);gap:6px 20px;align-content:start}
+.ui .cmds.scroll{grid-template-columns:repeat(2,max-content)}
+.ui .cmd{--x:0px;font-size:clamp(17px,2vw,25px)}
+.ui .cmd:hover,.ui .cmd:focus-visible,.ui .cmd.sel{translate:8px 0}
+.ui .desc{margin:6px 4px 0;font-size:11px}
+.ui .me{display:grid;grid-template-columns:1fr 1fr;column-gap:16px;row-gap:0;padding:8px 16px 10px;align-items:end}
+.ui .me h2{grid-column:1/-1;margin-bottom:2px}
+.ui .me>:nth-child(2){grid-column:1;grid-row:2} .ui .me>.bar.pv{grid-column:1;grid-row:3}
+.ui .me>:nth-child(4){grid-column:2;grid-row:2} .ui .me>.bar.sp{grid-column:2;grid-row:3}
+.ui .me>.xp-row{grid-column:1;grid-row:4} .ui .me>.bar.xp{grid-column:1;grid-row:5}
+.ui .me>.furia-row{grid-column:2;grid-row:4/6;align-self:center}
+.ui .me>.status{grid-column:1/-1;grid-row:6;min-height:0}
+.ui .me .row{margin-top:4px}
+.ui .me .bar{margin-top:3px;height:12px}
+@media (max-width:640px){
+  .game>.ui{grid-template-columns:1fr}
+  .ui .cmds{grid-template-columns:repeat(2,max-content)}
+}
+/* o tamanho dos desenhos (--px) também olha a altura do palco (cqh), para o Rhanon e os chefes caberem num palco baixo;
+   a placa do bicho (nome e vida) fica por cima dos desenhos */
+.game>.stage{container-type:size;--px:clamp(4px,min(1.6vw,2.9cqh),10px)}
+.game>.stage .plate{z-index:5}

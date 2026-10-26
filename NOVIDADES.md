@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.30.0 — francês, batalha que cabe na tela e revanche com chefes
+
+- O jogo agora também está em francês: é só escolher nas Opções. Como no inglês e no espanhol, a tradução foi feita
+  por IA, então pode ter algum erro.
+- A batalha cabe em qualquer tela: em notebook ou janela mais baixa, a barra de vida e os comandos não somem mais lá
+  embaixo. O palco se ajusta à altura da janela.
+- A parte de baixo da batalha ficou mais enxuta: comandos em três colunas, PV ao lado de PE, e o registro mostra só as
+  últimas mensagens.
+- Revanche: o chefe vencido deixa uma lembrança no lugar onde caiu. Chegue perto e aperte Z para enfrentá-lo de novo.
+  A revanche dá a pele outra vez e metade do XP.
+
 ## 0.29.0 — o jogo em inglês e espanhol
 
 - Agora dá para jogar em inglês e em espanhol: é só escolher o idioma nas Opções (a engrenagem). Na primeira vez,

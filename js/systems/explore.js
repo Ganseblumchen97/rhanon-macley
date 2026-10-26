@@ -175,6 +175,7 @@ function startExplore(zone, after, from) {
       if (ch === "S") EX.hero = {x: tx * TILE + 8, y: ty * TILE + 12, hw: 5, hh: 3, dir: "down", aim: {x: 0, y: 1}, walk: 0, flip: false, movedT: 0};
       else if (ch === "a") { const a = pickFromPool(zone, "terra"); if (a) EX.ents.push(makeAnimalEnt(a, tx, ty)); }
       else if (ch === "B" && !BS()[bossKey(zone)]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === zoneDef(zone).boss), tx, ty));
+      else if (ch === "B") EX.spots.push({kind: "lembranca", x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});   // chefe vencido: dá para enfrentar de novo
       else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "aldeao" ? (cityOf(zone) === "belem" ? "urbano" : "aldeao") + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
     }));
     if (from === "back") {   // do lado de dentro da passagem, virado para a fase
@@ -209,7 +210,8 @@ function resumeExplore(result) {
   if (en && result === "flee") { en.stunUntil = now + 3500; EX.invulnUntil = now + 2500; }
   $("explore").hidden = false; $("homeButton").hidden = true;
   musicStart("local"); exHud();
-  if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? t("{chefe} já era! A aldeia vai falar disso por muitas noites.", {chefe: theName(en.a, true)})
+  if (en && result === "win" && en.rematch) exToast(t("Revanche vencida: {chefe} caiu de novo!", {chefe: theName(en.a)}));
+  else if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? t("{chefe} já era! A aldeia vai falar disso por muitas noites.", {chefe: theName(en.a, true)})
     : EX.st.next === "parada" ? t("Último chefe de Ananindeua vencido! A passagem leva à BR-316.") : EX.st.next ? t("Caminho livre: {lugar}! Segue a trilha até a passagem.", {lugar: SUB[EX.st.next].n}) : t("Último chefe daqui vencido!"));
   if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); }   // o mapa mostra o caminho novo
 }
@@ -538,6 +540,7 @@ function exDraw(now) {
   const alive = EX.ents.filter(en => en.alive), knocked = EX.ents.filter(en => !en.alive && en.ko && en.koUntil > now);
   const people = EX.spots.filter(s => PEOPLE.includes(s.kind)).map(s => ({y: s.y + 5, draw: () => drawNpc(x, s, cx, cy, now)}));
   if (EX.bus) people.push({y: EX.bus.y + EX.bus.h, draw: () => drawBus(x, EX.bus, cx, cy, now)});
+  EX.spots.filter(s => s.kind === "lembranca").forEach(s => people.push({y: s.y + 4, draw: () => drawMemento(x, s, cx, cy, now)}));
   [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...knocked.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...people, (EX.camp ? {y: EX.camp.y, draw: () => drawCampHero(x, cx, cy, now)} : {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)})]
     .sort((a, b) => a.y - b.y).forEach(o => o.draw());
   const s = EX.spear;
@@ -634,9 +637,29 @@ function setupExploreInput() {
 }
 
 /* ---------- aldeia e feira: pontos de conversa ---------- */
+/* revanche com o chefe: a lembrança no lugar onde ele caiu pergunta se o Rhanon quer enfrentá-lo de novo. A luta é a
+   de sempre (com a apresentação) e dá a pele outra vez, mas só REMATCH_XP do XP, para não virar atalho de nível */
+const REMATCH_XP = .5;
+const rematchBoss = () => ANIMALS.find(a => a.id === (G.night && NIGHT_ZONES[EX.zone] ? NIGHT_ZONES[EX.zone].boss : zoneDef(EX.zone).boss));
+function exRematch(spot) {
+  exCloseDialog();
+  const en = makeAnimalEnt(rematchBoss(), spot.tx, spot.ty); en.rematch = true;
+  EX.ents.push(en); exStartBattle(en, {rematch: true});
+}
+// lembrança: estaca com a pele do chefe pendurada e um brilho subindo de vez em quando
+function drawMemento(x, s, cx, cy, now) {
+  const sx = Math.round(s.x - cx), sy = Math.round(s.y - cy) + 4;
+  x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(sx - 6, sy, 12, 2);
+  x.fillStyle = OUTLINE; x.fillRect(sx - 2, sy - 16, 4, 17); x.fillStyle = "#9c6339"; x.fillRect(sx - 1, sy - 15, 2, 15);   // estaca
+  x.fillStyle = OUTLINE; x.fillRect(sx - 6, sy - 15, 12, 9); x.fillStyle = "#c8a070"; x.fillRect(sx - 5, sy - 14, 10, 7);   // pele
+  x.fillStyle = "#e5001c"; x.fillRect(sx - 5, sy - 12, 10, 1);   // amarração vermelha
+  x.fillStyle = "#7a4a2a"; x.fillRect(sx - 3, sy - 10, 2, 2); x.fillRect(sx + 1, sy - 10, 2, 2);
+  const p = (now / 1400) % 1;
+  if (!REDUCE && p < .7) { x.fillStyle = p < .35 ? "#ffd23a" : "#fff3c4"; x.fillRect(sx + 4 - Math.round(p * 4), sy - 18 - Math.round(p * 10), 1, 1); }
+}
 const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", P: "aldeao", Q: "cabine", U: "onibus"};
 const PEOPLE = ["peles", "comida", "artesao", "armeiro", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus"};
+const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "ver a lembrança"};
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 const BELEM_TIPS = [
@@ -727,6 +750,11 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão e tocha pra espantar bicho. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte tu ficar, mais coisa eu te mostro.")); gearButtons(d); }
   else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
   else if (kind === "inventario") { say(t("Bolsa"), invSummary()); invButtons(d); }
+  else if (kind === "lembranca") {   // revanche com o chefe vencido
+    const b = rematchBoss(), spot = nearSpot() || EX.spots.find(s => s.kind === "lembranca");
+    say(t("Lembrança de {chefe}", {chefe: b.name}), t("Foi aqui que {chefe} caiu. Enfrentar de novo? Vale outra pele e metade do XP.", {chefe: theName(b)}));
+    btn(t("Enfrentar de novo"), () => exRematch(spot), false, d);
+  }
   else if (kind === "cabine") busCabin(say, d);
   else if (kind === "onibus") busDoor(say, d);
   else villagerTalk(look, say, d);   // pedido (oferta ou entrega) ou uma dica (systems/journal.js)

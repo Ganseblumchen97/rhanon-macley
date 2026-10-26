@@ -91,7 +91,7 @@ function init(opts = {}) {
   musicStop();
   vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = t("Lutar de novo"); $("toMap").textContent = fromExplore ? t("Continuar explorando") : t("Voltar ao mapa");
   p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, items:{...G.items}, furia:0};
-  e = { ...animal, hp:animal.hp, max:animal.hp, intent:null, known:false, assustada:false };
+  e = { ...animal, hp:animal.hp, max:animal.hp, intent:null, known:false, assustada:false, rematch: !!opts.rematch };   // rematch: revanche pela lembrança do chefe
   busy = false;
   lines = [animal.intro];
   if (opts.firstHit) { e.hp = Math.max(1, e.hp - opts.firstHit); lines.push(t("Rhanon acertou primeiro: −{n}. Sua vez!", {n: opts.firstHit})); }
@@ -294,7 +294,7 @@ function finish(kind) {
   // depois da fanfarra, a música do lugar volta baixinho enquanto o cartão de resultado está na tela
   setTimeout(() => { if (!$("over").hidden && mode === "hunt") musicStart(fromLocal || fromExplore ? "local" : "map"); }, 2800);
   busy = true; battleResult = kind;
-  musicStop(); keepVitals(kind); const rw = kind === "win" ? reward() : []; if (kind === "win") $("beast").classList.add("dead"); fanfare(kind);
+  musicStop(); keepVitals(kind); const rw = kind === "win" ? reward(e, e.rematch ? REMATCH_XP : 1) : []; if (kind === "win") $("beast").classList.add("dead"); fanfare(kind);
   // cartão: título, uma frase curta e, embaixo, o que ganhou ou perdeu (um item por linha)
   const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = curCity() === "belem" ? t("Acordou no Ver-o-Peso, com metade das forças") : t("Acordou na aldeia, com metade das forças");
   const T = {

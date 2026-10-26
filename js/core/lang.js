@@ -4,9 +4,12 @@
    {nome} pelo valor. Os nomes e falas dos dados (bichos, locais, itens...) são trocados uma vez ao abrir o jogo
    (applyLangData, chamada no main.js), e os textos fixos do index.html por translateStatic.
    O idioma fica em localStorage["rhanon-opcoes"].lang; sem escolha, vale o do navegador (?lang=en na URL força um,
-   só naquela abertura). Trocar recarrega a página.
+   só naquela abertura). Trocar recarrega a página. Só o arquivo do idioma escolhido é baixado (pedido logo abaixo,
+   antes dos outros scripts); chinês, japonês e coreano também baixam a fonte Noto do idioma (LANG_FONT).
    Falta de tradução: node tools/conferir_textos.js lista o que cada idioma ainda não tem. */
-const LANGS = {pt: "Português", en: "English", es: "Español"};
+const LANGS = {pt: "Português", en: "English", es: "Español", fr: "Français"};
+// fonte com os caracteres de cada idioma que as fontes do jogo não têm (o Google Fonts baixa só os que aparecem)
+const LANG_FONT = {zh: "Noto Sans SC", ja: "Noto Sans JP", ko: "Noto Sans KR"};
 const TX = {};
 const LANG = (() => {
   let l = (location.search.match(/[?&]lang=(\w+)/) || [])[1];   // ?lang=en na URL vale só nesta abertura (testes)
@@ -14,6 +17,13 @@ const LANG = (() => {
   if (!LANGS[l]) l = (navigator.language || "pt").slice(0, 2).toLowerCase();
   return LANGS[l] ? l : "pt";
 })();
+// pede o arquivo do idioma (e a fonte dele) já agora: document.write faz o navegador carregar e rodar antes dos próximos
+// scripts, como se a tag estivesse no index.html. A versão no endereço fura o cache de quem joga, como o ?v= das outras.
+if (LANG !== "pt") {
+  document.documentElement.lang = LANG;
+  document.write(`<script src="js/data/lang/${LANG}.js?v=${GAME_VERSION}"><\/script>`);
+  if (LANG_FONT[LANG]) document.write(`<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${LANG_FONT[LANG].replace(/ /g, "+")}:wght@400;700;900&display=swap">`);
+}
 // aviso mostrado na tela inicial e nas Opções quando o idioma não é o português (o texto vem traduzido)
 const LANG_NOTE = "Tradução feita por IA a partir do português: pode haver erros.";
 function t(pt, vars) {
@@ -49,8 +59,7 @@ function langWalk(root, path, fn) {
   });
 }
 function applyLangData() {
-  if (LANG === "pt") return;
-  document.documentElement.lang = LANG;
+  if (LANG === "pt" || !TX[LANG]) return;
   LANG_FIELDS.forEach(([name, ...path]) => {
     let root; try { root = eval(name); } catch (_) { return; }   // const globais não ficam em window
     langWalk(root, path, (o, k) => { o[k] = t(o[k]); });
@@ -58,7 +67,7 @@ function applyLangData() {
 }
 // textos fixos do index.html: troca cada texto e cada aria-label/title que tenha tradução
 function translateStatic() {
-  if (LANG === "pt") return;
+  if (LANG === "pt" || !TX[LANG]) return;
   const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   for (let n; (n = w.nextNode());) {
     const s = n.nodeValue.trim();
