@@ -34,6 +34,7 @@ function selectSub(id, msg) {
     lh(id === "aldeia" ? "Lá dentro fica a fogueira: descanse até a noite ou durma até o dia seguinte. Os aldeões dão dicas." : "Lá dentro o vendedor compra suas peles, tem comida, o artesão vende roupas e o armeiro faz armas e armaduras.");
   }
   else if (id === "parada") {   // cobrador vende a passagem para Belém (BUS em data/world.js)
+    btn("Ir até a estrada", () => startExplore(id), false, i);
     if (G.passagem && BUS.open) { btn("Embarcar no ônibus para Belém", () => busRide("belem"), false, i); lh("A passagem vale ida e volta: do terminal de Belém dá para voltar quando quiser."); }
     else if (G.passagem) lh("Passagem comprada! Assim que o ônibus para Belém voltar a rodar, é só embarcar aqui.");
     else btn(`Comprar passagem para Belém · R$ ${BUS.price}`, buyTicket, !BUS.open || G.money < BUS.price, i);
@@ -41,6 +42,7 @@ function selectSub(id, msg) {
     else if (!G.passagem && G.money < BUS.price) lh(`Faltam R$ ${BUS.price - G.money}. Peles de bicho forte valem bem mais na feira.`);
   }
   else if (id === "terminal") {   // em Belém: o mesmo ônibus volta pela BR-316
+    btn("Entrar no terminal", () => startExplore(id), false, i);
     btn("Voltar para Ananindeua", () => busRide("ananindeua"), false, i);
     lh("A passagem vale ida e volta. Na aldeia dá para descansar na fogueira e caçar nas matas de sempre.");
   }
@@ -74,7 +76,8 @@ function rest(kind, quiet, toast) {
 /* viagem de ônibus pela BR-316 (passagem de ida e volta): dá para embarcar na cabine/terminal ou direto no mapa do
    Pará. O ônibus anda pela estrada do mapa grande, de uma cidade até a outra, e o mapa entra na cidade de chegada. */
 const BUS_MS = 3600;
-function busRide(city) {
+// toStage = embarcou na fase da rodovia: chegando, entra direto na fase da cabine/terminal da outra cidade
+function busRide(city, toStage) {
   if (moving || !G.passagem || G.loc === city) return;
   if ($("map").hidden) showMapNow();   // saindo da cabine/terminal: volta para o mapa do Pará
   moving = true; sfx("look");
@@ -92,7 +95,9 @@ function busRide(city) {
     if (u < 1) return requestAnimationFrame(f);
     G.loc = city; G.sub = CITY[city].gate; G.seen[G.sub] = true; save();
     $("mkbus").style.display = "none"; $("mk").style.display = ""; moving = false; drawMap(); sfx("more");
-    buildLocalNodes(); openLocal();   // entra na cidade de chegada, no terminal (ou na cabine da BR-316)
+    buildLocalNodes();
+    if (toStage) { if (city === "belem") G.belemVisto = true; save(); return startExplore(G.sub); }   // desce do ônibus na fase do terminal (ou da BR-316)
+    openLocal();   // entra na cidade de chegada, no terminal (ou na cabine da BR-316)
     if (city === "belem" && !G.belemVisto) { G.belemVisto = true; save(); setTimeout(() => lh("Primeira vez na capital! Siga a trilha até o Ver-o-Peso: lá dá para vender peles e dormir."), 1300); }
   };
   requestAnimationFrame(f);

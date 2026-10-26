@@ -23,9 +23,13 @@ let exMsgTimer = null;
 
 /* ---------- terreno e colisão ---------- */
 function stageTile(tx, ty) { const r = EX.rows[ty]; return (r && r[tx]) || "T"; }
+// a passagem (G) abre quando a próxima fase está liberada no mapa (nas fases de caça: o chefe daqui caiu)
+const gateOpen = () => !!EX.st.next && unlocked(EX.st.next);
+// fase anterior na corrente (quem tem esta como next): o E volta para ela
+const STAGE_PREV = Object.fromEntries(Object.entries(STAGES).filter(([, st]) => st.next).map(([k, st]) => [st.next, k]));
 function solidAt(px, py) {
   const ch = stageTile(Math.floor(px / TILE), Math.floor(py / TILE));
-  return ch === "G" ? !BS()[EX.zone] : SOLID.includes(ch);
+  return ch === "G" ? !gateOpen() : SOLID.includes(ch);
 }
 // a caixa dos pés (meia largura hw, meia altura hh) em (x, y) encosta em algo sólido?
 function boxBlocked(x, y, hw, hh) {
@@ -49,7 +53,7 @@ function nudge(ent, ix, iy) {
 }
 function spearBlocked(px, py) {
   const ch = stageTile(Math.floor(px / TILE), Math.floor(py / TILE));
-  return ch === "T" || ch === "o" || ch === "#" || (ch === "G" && !BS()[EX.zone]);
+  return ch === "T" || ch === "o" || ch === "#" || (ch === "G" && !gateOpen());
 }
 
 /* ---------- entrar, sair e trocar de fase ---------- */
@@ -151,30 +155,46 @@ function makeAnimalEnt(a, tx, ty) {
     state: "wander", vx: 0, vy: 0, until: 0, face: -1, walk: 0, stunUntil: 0};
 }
 // after: chamado depois de montar a fase (cena de abertura)
-function startExplore(zone, after) {
+// from = "back": chegou voltando da fase seguinte, então aparece do lado de dentro da passagem (G)
+function startExplore(zone, after, from) {
   if (moving || (EX && EX.starting)) return;
   if (EX) EX.starting = true;
   wipe(() => {
     const st = STAGES[zone];
     EX = {zone, st, rows: st.rows, map: drawStageMap(st.rows, zone), pal: TILE_PAL[zone] || TILE_PAL.mata,
       night: !!G.night, ents: [], fx: [], loot: [], spits: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
+    const at = (tx, ty) => (st.rows[ty] || "")[tx];
     st.rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
+      if ("QU".includes(ch)) {   // bloco: um ponto só, embaixo do meio dele (onde o Rhanon chega pela calçada)
+        if (at(tx - 1, ty) === ch || at(tx, ty - 1) === ch) return;
+        let w = 0, h = 0; while (at(tx + w, ty) === ch) w++; while (at(tx, ty + h) === ch) h++;
+        const sp = {kind: SPOTS[ch], x: tx * TILE + w * 8, y: (ty + h) * TILE + 4, tx, ty, w, h};
+        EX.spots.push(sp); if (ch === "U") EX.bus = {x: tx * TILE, y: ty * TILE, w: w * TILE, h: h * TILE, dx: 0, spot: sp};
+        return;
+      }
       if (ch === "S") EX.hero = {x: tx * TILE + 8, y: ty * TILE + 12, hw: 5, hh: 3, dir: "down", aim: {x: 0, y: 1}, walk: 0, flip: false, movedT: 0};
       else if (ch === "a") { const a = pickFromPool(zone, "terra"); if (a) EX.ents.push(makeAnimalEnt(a, tx, ty)); }
       else if (ch === "B" && !BS()[bossKey(zone)]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === zoneDef(zone).boss), tx, ty));
       else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "aldeao" ? (cityOf(zone) === "belem" ? "urbano" : "aldeao") + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
     }));
+    if (from === "back") {   // do lado de dentro da passagem, virado para a fase
+      const gy = st.rows.findIndex(r => r.includes("G")), gx = st.rows[gy].indexOf("G"), W = st.rows[0].length, H = st.rows.length;
+      const [ix, iy] = gx === 0 ? [1, 0] : gx === W - 1 ? [-1, 0] : gy === 0 ? [0, 1] : [0, -1];
+      Object.assign(EX.hero, {x: (gx + ix) * TILE + 8, y: (gy + iy) * TILE + 12, dir: ix ? "side" : iy > 0 ? "down" : "up", side: ix || 1, aim: {x: ix, y: iy}});
+    }
     if (!st.safe) spawnFish(zone, st.rows);
     vit(); G.sub = zone; save();
     curZone = zone; fromLocal = false; exKeys.clear();
     $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false; exFit();
     musicStart("local"); exHud();
-    exToast(st.safe ? SUB[zone].n + (zone === "aldeia" ? " · chegue perto da fogueira ou dos aldeões e aperte Z" : " · peles, comida, artesão e armeiro: chegue perto de uma barraca e aperte Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
+    exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || " · peles, comida, artesão e armeiro: chegue perto de uma barraca e aperte Z") : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? " · dizem que algo do folclore ronda o fim da trilha..." : " · o chefe espera no fim da trilha"));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
   });
 }
+const SAFE_TIP = {aldeia: " · chegue perto da fogueira ou dos aldeões e aperte Z. A trilha da direita leva à feira",
+  parada: " · a cabine do cobrador vende a passagem; com ela, é só embarcar no ônibus", terminal: " · o ônibus volta para Ananindeua; a trilha da esquerda leva ao Ver-o-Peso"};
 function exitExplore() {
   if (!EX || EX.locked) return;
   EX.locked = true;
@@ -190,7 +210,7 @@ function resumeExplore(result) {
   $("explore").hidden = false; $("homeButton").hidden = true;
   musicStart("local"); exHud();
   if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? `${en.a.name} derrotado! A aldeia vai contar essa história por muitas noites.`
-    : EX.st.next ? `Caminho liberado: ${ZONES[EX.st.next].n}! Siga a trilha até a passagem.` : "Você venceu o último chefe de Ananindeua! A BR-316 está liberada no mapa.");
+    : EX.st.next === "parada" ? "Você venceu o último chefe de Ananindeua! A passagem leva à BR-316." : EX.st.next ? `Caminho liberado: ${SUB[EX.st.next].n}! Siga a trilha até a passagem.` : "Você venceu o último chefe daqui!");
   if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); }   // o mapa mostra o caminho novo
 }
 
@@ -319,6 +339,7 @@ function exAnimal(en, dt, now) {
 }
 function exUpdate(dt, now) {
   const h = EX.hero;
+  if (EX.boarding && busPull(now)) return;
   EX.cool = Math.max(0, EX.cool - dt); EX.jab = Math.max(0, EX.jab - dt); EX.shoot = Math.max(0, (EX.shoot || 0) - dt);
   if (EX.draw && (EX.draw.t += dt) >= BOW_DRAW) exRelease();
   if (EX.spits.length && !EX.dialog && !EX.camp) { exSpits(dt, now); if (!EX || EX.locked) return; }
@@ -370,8 +391,8 @@ function exUpdate(dt, now) {
   }
   if (!EX.locked) {
     const ch = stageTile(Math.floor(h.x / TILE), Math.floor(h.y / TILE));
-    if (ch === "E") return exitExplore();
-    if (ch === "G" && BS()[EX.zone] && EX.st.next) { EX.locked = true; return startExplore(EX.st.next); }
+    if (ch === "E") { if (!STAGE_PREV[EX.zone]) return exitExplore(); EX.locked = true; return startExplore(STAGE_PREV[EX.zone], null, "back"); }   // volta pela trilha
+    if (ch === "G" && gateOpen()) { EX.locked = true; return startExplore(EX.st.next); }
   }
   const s = EX.spear;
   if (s && s.stuck) { s.stuck -= dt; if (s.stuck <= 0) EX.spear = null; }
@@ -403,6 +424,7 @@ function grassOver(x, ent, cx, cy) {
 function drawShadow(x, sx, sy, w) { x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(sx - w / 2, sy - 1, w, 2); x.fillRect(sx - w / 2 + 2, sy - 2, w - 4, 4); }
 function drawHeroEnt(x, h, cx, cy, now) {
   const sx = snap(h.x - cx), sy = snap(h.y - cy);
+  if (EX.boarding) return;   // já subiu no ônibus
   if (now < EX.invulnUntil && Math.floor(now / 100) % 2) return;
   const walking = now - h.movedT < 90, step = Math.floor(h.walk / 7);
   const art = IMG["hero/walk/" + (h.dir === "side" ? "down" : h.dir)];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
@@ -508,12 +530,13 @@ function exDraw(now) {
       const sw = Math.round(Math.sin(now / 650 + tx * .9 + ty * .4) * 1.4); x.fillStyle = EX.night ? "#5a8a6a90" : "#9ad87a";
       x.fillRect(sx + 5 + sw, sy + 3, 2, 1); x.fillRect(sx + 9 + sw, sy + 5, 1, 1);
     }
-    if (ch === "G" && !BS()[EX.zone]) drawGate(x, sx, sy, EX.pal);
+    if (ch === "G" && !gateOpen()) drawGate(x, sx, sy, EX.pal);
     if (ch === "F") drawFire(x, sx, sy, now);
   }
   EX.loot.forEach(l => drawLoot(x, l, cx, cy, now));   // no chão, embaixo de todo mundo
   const alive = EX.ents.filter(en => en.alive), knocked = EX.ents.filter(en => !en.alive && en.ko && en.koUntil > now);
   const people = EX.spots.filter(s => PEOPLE.includes(s.kind)).map(s => ({y: s.y + 5, draw: () => drawNpc(x, s, cx, cy, now)}));
+  if (EX.bus) people.push({y: EX.bus.y + EX.bus.h, draw: () => drawBus(x, EX.bus, cx, cy, now)});
   [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...knocked.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...people, (EX.camp ? {y: EX.camp.y, draw: () => drawCampHero(x, cx, cy, now)} : {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)})]
     .sort((a, b) => a.y - b.y).forEach(o => o.draw());
   const s = EX.spear;
@@ -610,9 +633,9 @@ function setupExploreInput() {
 }
 
 /* ---------- aldeia e feira: pontos de conversa ---------- */
-const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", P: "aldeao"};
+const SPOTS = {F: "fogueira", N: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", P: "aldeao", Q: "cabine", U: "onibus"};
 const PEOPLE = ["peles", "comida", "artesao", "armeiro", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", aldeao: "conversar"};
+const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus"};
 const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 const BELEM_TIPS = [
@@ -702,11 +725,69 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "artesao") { say("Artesão", "Roupas tecidas à mão e tocha para assustar os bichos. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte você fica, mais coisa eu te mostro."); gearButtons(d); }
   else if (kind === "armeiro") { say("Armeiro", "Lança, arco e flecha, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa boa. Escolha com as setas e aperte Enter para fabricar."); forgePanel(d); }
   else if (kind === "inventario") { say("Bolsa", invSummary()); invButtons(d); }
+  else if (kind === "cabine") busCabin(say, d);
+  else if (kind === "onibus") busDoor(say, d);
   else villagerTalk(look, say, d);   // pedido (oferta ou entrega) ou uma dica (systems/journal.js)
   if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);
   btn("Fechar", exCloseDialog, false, d);
   d.hidden = false; EX.confirming = null; EX.dialogT = performance.now();
   if (kind !== "armeiro" && kind !== "tutorial") { menuSelect(d, EX.keepSel ?? menuFirst(d)); EX.keepSel = null; }   // já começa com uma opção escolhida
+}
+/* ---------- BR-316: cabine do cobrador e o ônibus (fases parada e terminal) ---------- */
+const busDest = () => EX.zone === "parada" ? "belem" : "ananindeua";
+const busSide = () => EX.zone === "parada" ? -1 : 1;   // a estrada sai pela esquerda rumo a Belém e pela direita rumo a Ananindeua
+function busCabin(say, d) {
+  if (EX.zone === "terminal") return say("Guichê do terminal", G.passagem ? "Sua passagem vale ida e volta. O ônibus para Ananindeua sai assim que você subir." : "Sem passagem não dá para embarcar.");
+  if (G.passagem) return say("Cobrador", "Passagem na mão! É só subir no ônibus. Ela vale ida e volta: do terminal de Belém dá para voltar quando quiser.");
+  if (!BUS.open) return say("Cobrador", "O ônibus para Belém ainda não está saindo. Volta daqui a uns dias!");
+  say("Cobrador", `Passagem para Belém, a capital: R$ ${BUS.price}, ida e volta. Você tem R$ ${G.money}.` + (G.money < BUS.price ? ` Faltam R$ ${BUS.price - G.money}: pele de bicho forte vale bem mais na feira.` : ""));
+  btn(`Comprar passagem · R$ ${BUS.price}`, ask(`Comprar a passagem para Belém por R$ ${BUS.price}?`, () => {
+    if (G.passagem || G.money < BUS.price) return;
+    G.money -= BUS.price; G.passagem = true; save(); sfx("more"); exHud();
+    exOpenDialog("cabine", "Passagem comprada! Agora é só subir no ônibus.");
+  }), G.money < BUS.price, d);
+}
+function busDoor(say, d) {
+  const dest = busDest(), n = dest === "belem" ? "Belém" : "Ananindeua";
+  if (!G.passagem || !BUS.open) return say("Ônibus da BR-316", "O motorista aponta para a cabine: \"Sem passagem não sobe. Compra ali com o cobrador.\"");
+  say("Ônibus da BR-316", `O motor já está ligado. Destino: ${n}.`);
+  btn(`Embarcar para ${n}`, busLeave, false, d);
+}
+// sobe no ônibus: ele arranca e sai pela estrada; depois a viagem segue no mapa do Pará e entra na fase da outra cidade
+function busLeave() {
+  exCloseDialog(); EX.locked = true; exKeys.clear(); sfx("look");
+  EX.boarding = {t0: performance.now(), vrum: 0};
+}
+function busPull(now) {
+  const b = EX.bus, el = now - EX.boarding.t0;
+  if (el > 350) b.dx = busSide() * ((el - 350) / 1000) ** 2 * 260;   // espera a porta fechar e acelera
+  if (now - EX.boarding.vrum > 520) { EX.boarding.vrum = now; sfx("onibus"); }
+  if (el < 2000) return false;
+  const dest = busDest();
+  EX.boarding = null; $("explore").hidden = true; $("exDialog").hidden = true; EX = null; exKeys.clear();
+  busRide(dest, true);
+  return true;
+}
+// ônibus vermelho visto de lado, frente virada para o lado em que a estrada sai (b.dx = quanto já andou)
+function drawBus(x, b, cx, cy, now) {
+  const f = busSide(), X = Math.round(b.x + b.dx - cx), Y = Math.round(b.y - cy), W = b.w, run = b.dx !== 0, bob = run && Math.floor(now / 90) % 2;
+  x.fillStyle = "rgba(0,0,0,.3)"; x.fillRect(X + 3, Y + 27, W - 6, 4);
+  const y = Y + bob;
+  x.fillStyle = OUTLINE; x.fillRect(X, y + 3, W, 24);
+  x.fillStyle = "#d62828"; x.fillRect(X + 1, y + 4, W - 2, 22);
+  x.fillStyle = "#f4ecd8"; x.fillRect(X + 1, y + 4, W - 2, 3);   // teto claro
+  x.fillStyle = "#9c1a1a"; x.fillRect(X + 1, y + 22, W - 2, 4);   // saia escura
+  x.fillStyle = "#f2c230"; x.fillRect(X + 1, y + 18, W - 2, 2);   // faixa amarela
+  const front = f < 0 ? X + 1 : X + W - 9;
+  for (let k = 0; k < 6; k++) { const wx = f < 0 ? X + 12 + k * 8 : X + 3 + k * 8; x.fillStyle = OUTLINE; x.fillRect(wx, y + 8, 7, 8); x.fillStyle = "#9ad0e8"; x.fillRect(wx + 1, y + 9, 5, 6); x.fillStyle = "#e8f6ff"; x.fillRect(wx + 1, y + 9, 2, 2); }
+  x.fillStyle = OUTLINE; x.fillRect(front, y + 7, 8, 12); x.fillStyle = "#bfe8ff"; x.fillRect(front + 1, y + 8, 6, 9);   // para-brisa
+  const door = f < 0 ? X + 11 : X + W - 19; x.fillStyle = OUTLINE; x.fillRect(door - 1, y + 8, 1, 17);   // porta perto da frente
+  x.fillStyle = "#ffe98a"; x.fillRect(f < 0 ? X + 1 : X + W - 3, y + 21, 2, 2);   // farol
+  for (const wx of [X + 10, X + W - 14]) {
+    x.fillStyle = OUTLINE; x.fillRect(wx, Y + 23, 8, 7); x.fillStyle = "#3a3a40"; x.fillRect(wx + 1, Y + 24, 6, 5);
+    x.fillStyle = "#a8a8b0"; x.fillRect(wx + 3, Y + 26, 2, 1); if (run && Math.floor(now / 70) % 2) x.fillRect(wx + 3, Y + 25, 1, 3);
+  }
+  if (run) { x.fillStyle = "#c8c4b8a0"; x.fillRect(f < 0 ? X + W + 2 : X - 5, Y + 24 - (Math.floor(now / 120) % 3), 3, 2); }   // fumaça do escapamento
 }
 // dormir numa rede ou tenda: passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
 function exNap(k) {
@@ -761,7 +842,7 @@ function showTutorial() {
 function endTutorial() {
   G.tutorial = false; save();
   $("exDialog").hidden = true; EX.dialog = null; $("explore").classList.remove("no-help"); sfx("more");
-  exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A mata fica no caminho de saída.");
+  exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A trilha da direita leva à feira e, depois dela, à mata.");
 }
 // pular a cena: aplica na hora o que ela faria (noite ou dia) e termina
 function campSkip() {
@@ -772,7 +853,7 @@ function campSkip() {
 // fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
   const kind = EX.camp.kind; EX.camp = null; EX.dialog = null; exKeys.clear();
-  if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A mata fica no caminho de saída.");
+  if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast("Aldeia · chegue perto da fogueira ou dos aldeões e aperte Z. A trilha da direita leva à feira e, depois dela, à mata.");
   exToast(rest(kind, true, true)); exHud();
   if (EX.zone === "aldeia" && kind !== "fogueira") setTimeout(() => EX && announceOffer(), 2400);   // novo dia ou noite: pode ter pedido novo   // dormir: o galo já cantou no amanhecer da cena
 }

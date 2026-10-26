@@ -17,11 +17,13 @@ const TILE_PAL = {
   porto: {g1: "#8e8e88", g2: "#7a7a74", tall: "#6a7a4a", tallHi: "#9aaa6a", path: "#55555a", path2: "#44444a", leaf: "#3a6a3a", leaf2: "#2a502a", leafHi: "#5a8a4a", trunk: "#5a4a3a", rock: "#8a8a8a", rock2: "#5a5a5a", water: "#3a6a7a", water2: "#7aa8b0", wood: "#8a6a4a", wood2: "#5a4430", roof: "#7a8a96", roof2: "#5a6670", walls: ["#8a8a8a", "#c8603a", "#3a7ab8", "#e8c040"]},
   baixadas: {g1: "#7a7a5a", g2: "#6a6a4a", tall: "#5a7a3a", tallHi: "#8aaa5a", path: "#9a7a52", path2: "#7a5e3a", leaf: "#3a6a32", leaf2: "#2a5024", leafHi: "#5a8a44", trunk: "#5a4030", rock: "#8a847a", rock2: "#5e5a50", water: "#4a6a5a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30", roof: "#a85a3a", roof2: "#7a3e24", walls: ["#8a5a32", "#c8a070", "#3f9a5c", "#e89aaa"]},
   // várzea: capim claro, água de cheia azul-esverdeada e poucas árvores
+  parada: {g1: "#8ab04a", g2: "#7aa040", tall: "#5e8a34", tallHi: "#c0dc70", path: "#c8aa6a", path2: "#ac8e54", leaf: "#3f7f36", leaf2: "#2e6428", leafHi: "#5aa04a", trunk: "#6d4329", rock: "#a09d90", rock2: "#706d64", water: "#3a8aa0", water2: "#7ac4d0", wood: "#a8703f", wood2: "#6d4329"},
+  terminal: {g1: "#b4ac9c", g2: "#a09888", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7e786c", path2: "#625c52", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#8a96a0", roof2: "#5e6a74", walls: ["#e8e2cf", "#3a7ab8", "#e8c040", "#c8603a"]},
   varzea: {g1: "#8ab04a", g2: "#7aa040", tall: "#5e8a34", tallHi: "#c0dc70", path: "#c8aa6a", path2: "#ac8e54", leaf: "#3f7f36", leaf2: "#2e6428", leafHi: "#5aa04a", trunk: "#6d4329", rock: "#a09d90", rock2: "#706d64", water: "#3a8aa0", water2: "#7ac4d0", wood: "#a8703f", wood2: "#6d4329"}
 };
 const OUTLINE = "#1a2418";
 // tipo de terreno desenhado embaixo das letras especiais
-const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: "."};
+const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "r"};
 
 function fillEllipse(x, cx, cy, rx, ry, col) {
   x.fillStyle = col;
@@ -60,6 +62,13 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
     x.fillStyle = P.wood; x.fillRect(ox, oy + 2, TILE, 12);
     x.fillStyle = P.wood2; for (let k = 0; k < TILE; k += 4) x.fillRect(ox + k, oy + 2, 1, 12);
     x.fillRect(ox, oy + 2, TILE, 1); x.fillRect(ox, oy + 13, TILE, 1);
+  } else if (ch === "r") {   // asfalto da BR-316: faixa branca nas beiradas e tracejado amarelo no meio (at = vizinho)
+    const road = c => c === "r" || c === "U", at = P.at || (() => "r");
+    x.fillStyle = "#4a4a50"; x.fillRect(ox, oy, TILE, TILE);
+    x.fillStyle = "#56565c"; for (let k = 0; k < 4; k++) x.fillRect(ox + Math.floor(r(k + 70) * 15), oy + Math.floor(r(k + 80) * 15), 1, 1);
+    const up = road(at(tx, ty - 1)), down = road(at(tx, ty + 1));
+    x.fillStyle = "#e8e2cf"; if (!up) x.fillRect(ox, oy + 1, TILE, 1); if (!down) x.fillRect(ox, oy + 14, TILE, 1);
+    if (up && down && tx % 2 === 0) { x.fillStyle = "#f2c230"; x.fillRect(ox + 3, oy + 7, 10, 2); }
   } else if (ch === "o") {
     grass();
     fillEllipse(x, ox + 8, oy + 9, 7, 6, OUTLINE); fillEllipse(x, ox + 8, oy + 9, 6, 5, P.rock2); fillEllipse(x, ox + 7, oy + 8, 5, 4, P.rock);
@@ -126,9 +135,10 @@ function drawStageMap(rows, zone) {
   const P = TILE_PAL[zone] || TILE_PAL.mata, H = rows.length, W = rows[0].length;
   const c = document.createElement("canvas"); c.width = W * TILE; c.height = H * TILE;
   const x = c.getContext("2d"), hut = hutCanvas(), at = (tx, ty) => (rows[ty] || "")[tx];
+  P.at = at;   // o asfalto olha os vizinhos para pintar as faixas
   rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
     const ox = tx * TILE, oy = ty * TILE;
-    if ("HKFNVPCRM".includes(ch)) {
+    if ("HKFNVPCRMQ".includes(ch)) {
       drawTile(x, "KVCRM".includes(ch) ? "-" : ".", ox, oy, P, tx, ty);
       if (ch === "H") x.drawImage(hut, (at(tx - 1, ty) === "H" ? (at(tx - 2, ty) === "H" ? 2 : 1) : 0) * 16, at(tx, ty - 1) === "H" ? 16 : 0, 16, 16, ox, oy, 16, 16);
       else if (ch === "K") drawStall(x, ox, oy, tx, at(tx - 1, ty) !== "K", at(tx + 1, ty) !== "K");
@@ -161,7 +171,22 @@ function drawStageMap(rows, zone) {
       }
     }
   }));
+  rows.forEach((row, ty) => [...row].forEach((ch, tx) => { if (ch === "Q" && at(tx - 1, ty) !== "Q" && at(tx, ty - 1) !== "Q") drawCabin(x, tx * TILE, ty * TILE); }));   // por cima dos quadrados do bloco
   return c;
+}
+// cabine do cobrador (bloco 2x2 = 32x32): madeira, telhado de zinco, janela com o cobrador e a placa da passagem
+function drawCabin(x, ox, oy) {
+  x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(ox + 3, oy + 29, 27, 3);
+  x.fillStyle = OUTLINE; x.fillRect(ox + 2, oy + 9, 28, 22);
+  x.fillStyle = "#9c6339"; x.fillRect(ox + 3, oy + 10, 26, 20);
+  x.fillStyle = "#7a4a2e"; for (let k = 5; k < 29; k += 5) x.fillRect(ox + k, oy + 10, 1, 20);   // tábuas
+  x.fillStyle = OUTLINE; x.fillRect(ox, oy + 4, 32, 7); x.fillStyle = "#a8b0b8"; x.fillRect(ox + 1, oy + 5, 30, 5); x.fillStyle = "#7a828a"; for (let k = 2; k < 31; k += 3) x.fillRect(ox + k, oy + 5, 1, 5);   // zinco
+  x.fillStyle = OUTLINE; x.fillRect(ox + 6, oy + 13, 20, 10); x.fillStyle = "#bfe8ff"; x.fillRect(ox + 7, oy + 14, 18, 8);
+  const p = villagerSprite("aldeao2");   // o cobrador na janela (só a cabeça e os ombros)
+  x.save(); x.beginPath(); x.rect(ox + 7, oy + 14, 18, 8); x.clip(); x.drawImage(p, ox + 16 - Math.round(p.width / 2), oy + 9); x.restore();
+  x.fillStyle = "#6d4329"; x.fillRect(ox + 5, oy + 23, 22, 2);   // balcão
+  x.fillStyle = OUTLINE; x.fillRect(ox + 9, oy, 14, 5); x.fillStyle = "#f2c230"; x.fillRect(ox + 10, oy + 1, 12, 3);   // placa
+  x.fillStyle = OUTLINE; x.fillRect(ox + 12, oy + 2, 8, 1);
 }
 // troncos atravessados na passagem enquanto o chefe não cai
 function drawGate(x, sx, sy, P) {

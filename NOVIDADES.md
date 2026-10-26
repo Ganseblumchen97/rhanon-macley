@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.26.0 — caminho de verdade até Belém
+
+- As fases agora se ligam a pé, na ordem do mapa: aldeia → feira → mata → ... → várzea → BR-316, e em Belém
+  terminal → Ver-o-Peso → Cidade Velha → Porto → Baixadas. A passagem no fim leva para a próxima e a seta amarela
+  do começo volta para a anterior.
+- Cada fase entra pelo lado de onde você vem no mapa e sai pelo lado da próxima área. Por isso os mapas de caça
+  foram refeitos: bichos, pedras e mato mudaram de lugar.
+- A aldeia tem uma trilha à direita que leva à feira, e a feira leva à mata.
+- Nova fase da BR-316: a estrada com a cabine do cobrador (que vende a passagem) e o ônibus parado. Suba nele, veja
+  o ônibus arrancar e viajar pelo mapa do Pará até descer no terminal de Belém.
+- Novo terminal de Belém: a mesma estrada entre os prédios da capital, com o ônibus de volta para Ananindeua e a
+  trilha para o Ver-o-Peso.
+
 ## 0.25.0 — bolsa arrumada e bichos redesenhados
 
 - A bolsa agora mostra só comida e materiais (as peles), numa lista de 10 linhas que rola com as setas. Roupa e
