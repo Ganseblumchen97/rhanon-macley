@@ -40,6 +40,8 @@ const SFX = {
   bloqueio: t => { tone(880, t, .2, "square", .06, 820); tone(1320, t, .16, "triangle", .07, 1250); noise(t, .06, .14, 3000); tone(120, t, .1, "sine", .14, 70); },
   // o anel ficou verde: tique discreto marcando a janela do tempo certo
   janela: t => tone(1568, t, .03, "triangle", .035),
+  // ônibus na estrada: ronco grave do motor
+  onibus: t => { tone(70, t, .4, "sawtooth", .05, 60); tone(105, t + .05, .3, "square", .025, 95); noise(t, .3, .04, 200); },
   // esquiva: um "fuup" de ar (ruído agudo descendo) e um toque leve no chão
   esquiva: t => { noise(t, .16, .1, 2200); tone(900, t, .12, "triangle", .04, 300); tone(140, t + .1, .06, "sine", .06, 90); },
   // fúria pronta / golpe da fúria: subida rápida e um acorde forte

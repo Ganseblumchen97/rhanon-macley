@@ -14,8 +14,8 @@ function setupMapRegion() {
   svg.setAttribute("aria-label", R.aria);
   svg.querySelector(".land").innerHTML = R.land.map(d => `<path d="${d}"/>`).join("") + (R.river ? `<path class="river" d="${R.river}"/>` : "");
   for (const [k, [x, y, ly]] of Object.entries(R.pos)) Object.assign(LOC[k], {x, y, ly});
-  const [a, b] = R.route.map(k => LOC[k]);
-  Object.entries({x1: a.x, y1: a.y, x2: b.x, y2: b.y}).forEach(([k, v]) => $("route").setAttribute(k, v));
+  const [a, b] = R.route.map(k => LOC[k]), c = R.curve;   // estrada entre as duas cidades: reta ou em curva
+  $("route").setAttribute("d", c ? `M${a.x},${a.y} C${a.x + c[0]},${a.y + c[1]} ${b.x + c[2]},${b.y + c[3]} ${b.x},${b.y}` : `M${a.x},${a.y} L${b.x},${b.y}`);
 }
 // cria os pontos clicáveis do mapa a partir de LOC (só os que existem no mapa escolhido)
 function buildMapNodes() {
@@ -48,7 +48,8 @@ function select(id) {
   } else if (here && id === "belem") {
     btn("Entrar em Belém", openLocal);
   } else if (id === "belem" || (id === "ananindeua" && G.loc === "belem")) {   // entre as duas cidades só se vai de ônibus
-    i.insertAdjacentHTML("beforeend", id === "belem" ? `<p class="hint">Para chegar à capital, compre a passagem na cabine da BR-316, no fim da trilha de Ananindeua${G.passagem ? " (você já tem a passagem)" : ""}.</p>` : '<p class="hint">Para voltar, pegue o ônibus no terminal rodoviário de Belém.</p>');
+    if (G.passagem && BUS.open) { btn(id === "belem" ? "Viajar de ônibus para Belém" : "Voltar de ônibus para Ananindeua", () => busRide(id)); i.insertAdjacentHTML("beforeend", '<p class="hint">A passagem vale ida e volta pela BR-316.</p>'); }
+    else i.insertAdjacentHTML("beforeend", '<p class="hint">Para chegar à capital, compre a passagem na cabine da BR-316, no fim da trilha de Ananindeua.</p>');
   } else if (here && id === "ananindeua") {
     btn("Entrar em Ananindeua", openLocal);
     i.insertAdjacentHTML("beforeend", !CURITIBA_OPEN ? (MAP_REGION === "para" ? "" : '<p class="hint">Em breve: novos destinos.</p>') : curVis() ? '<p class="hint">Curitiba apareceu no mapa. Toque nela para viajar.</p>' : `<p class="hint">Existe um destino distante. Para ir até lá: Nv ${REQ.lv} e R$ ${REQ.money}.</p>`);

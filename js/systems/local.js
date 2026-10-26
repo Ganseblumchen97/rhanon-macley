@@ -71,27 +71,37 @@ function rest(kind, quiet, toast) {
   if (toast) return msg;
   localDone("aldeia", msg);
 }
-/* viagem de ônibus pela BR-316: o ônibus atravessa a tela e o Rhanon desce na outra cidade (passagem de ida e volta) */
+/* viagem de ônibus pela BR-316 (passagem de ida e volta): dá para embarcar na cabine/terminal ou direto no mapa do
+   Pará. O ônibus anda pela estrada do mapa grande, de uma cidade até a outra, e o mapa entra na cidade de chegada. */
+const BUS_MS = 3600;
 function busRide(city) {
-  if (moving || !G.passagem) return;
+  if (moving || !G.passagem || G.loc === city) return;
+  if ($("map").hidden) showMapNow();   // saindo da cabine/terminal: volta para o mapa do Pará
   moving = true; sfx("look");
-  const b = document.createElement("div"); b.className = "busride"; b.setAttribute("aria-live", "polite");
-  b.innerHTML = `<div class="br-road"></div><div class="br-bus"><i></i><i></i><i></i><b></b></div><span>${city === "belem" ? "BR-316 · rumo a Belém" : "BR-316 · de volta a Ananindeua"}</span>`;
-  if (city !== "belem") b.classList.add("volta");
-  document.body.append(b);
-  setTimeout(() => sfx("guard"), 300); setTimeout(() => sfx("guard"), 900);
-  setTimeout(() => {
+  const road = $("route"), L = road.getTotalLength(), fromStart = MAP_REGIONS[MAP_REGION].route[0] === G.loc;
+  $("mk").style.display = "none"; $("mkbus").style.display = "";
+  $("info").innerHTML = `<h2>Na estrada…</h2><p>${city === "belem" ? "O ônibus segue pela BR-316 rumo a Belém." : "O ônibus volta pela BR-316 para Ananindeua."}</p>`;
+  let t0 = 0, last = null, vrum = 0;
+  const f = ts => {
+    t0 = t0 || ts;
+    const u = Math.min(1, (ts - t0) / (REDUCE ? 400 : BUS_MS)), e = u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2, p = road.getPointAtLength(L * (fromStart ? e : 1 - e));
+    const flip = last && p.x < last.x - .01 ? -1 : last && p.x > last.x + .01 ? 1 : $("mkbus").dataset.f || 1;   // o ônibus vira para o lado em que anda
+    $("mkbus").dataset.f = flip; $("mkbus").setAttribute("transform", `translate(${p.x} ${p.y}) scale(${1.6 * flip} 1.6) translate(0 ${Math.floor(ts / 120) % 2})`);
+    last = p;
+    if (ts - vrum > 650) { vrum = ts; sfx("onibus"); }
+    if (u < 1) return requestAnimationFrame(f);
     G.loc = city; G.sub = CITY[city].gate; G.seen[G.sub] = true; save();
-    moving = false; buildLocalNodes(); showLocal(true); sfx("more");
-    if (city === "belem" && !G.belemVisto) { G.belemVisto = true; save(); setTimeout(() => lh("Primeira vez na capital! Siga a trilha até o Ver-o-Peso: lá dá para vender peles e dormir."), 700); }
-  }, REDUCE ? 400 : 2200);
-  setTimeout(() => b.remove(), REDUCE ? 600 : 2700);
+    $("mkbus").style.display = "none"; $("mk").style.display = ""; moving = false; drawMap(); sfx("more");
+    buildLocalNodes(); openLocal();   // entra na cidade de chegada, no terminal (ou na cabine da BR-316)
+    if (city === "belem" && !G.belemVisto) { G.belemVisto = true; save(); setTimeout(() => lh("Primeira vez na capital! Siga a trilha até o Ver-o-Peso: lá dá para vender peles e dormir."), 1300); }
+  };
+  requestAnimationFrame(f);
 }
 // passagem de ônibus para Belém: cara, comprada uma vez só
 function buyTicket() {
   if (!BUS.open || G.passagem || G.money < BUS.price) return;
   G.money -= BUS.price; G.passagem = true; save(); sfx("more");
-  localDone("parada", "Passagem para Belém comprada! Ela vale ida e volta: é só embarcar aqui na cabine.");
+  localDone("parada", "Passagem para Belém comprada! Ela vale ida e volta: embarque aqui na cabine ou direto no mapa do Pará.");
 }
 // compra um item da barraca de comida (vai para a bolsa)
 function buy(id) {

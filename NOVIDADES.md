@@ -3,6 +3,14 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.24.2 — ônibus pelo mapa
+
+- No mapa do Pará, Belém agora fica embaixo e à esquerda de Ananindeua, como no mapa de verdade, e a BR-316 faz
+  uma curva mais comprida entre as duas cidades.
+- Com a passagem comprada, dá para viajar direto pelo mapa do Pará: escolha Belém (ou Ananindeua, estando em Belém)
+  e "Viajar de ônibus". A cabine da BR-316 e o terminal de Belém continuam servindo para embarcar.
+- A viagem agora é o ônibus vermelho andando pela estrada do mapa até a outra cidade.
+
 ## 0.24.1 — controles e tela
 
 - A exploração agora ocupa a tela inteira, com um painel no alto mostrando o lugar, o nível, PV, PE e XP (com
