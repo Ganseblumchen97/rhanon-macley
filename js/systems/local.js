@@ -1,6 +1,6 @@
 /* Ananindeua: mapa local, descanso, feira, peles, roupas e inventário. */
-const defense = () => ["legs", "torso"].reduce((a, k) => a + ((G.equip && EQUIP[k][G.equip[k]] && EQUIP[k][G.equip[k]].def) || 0), 0) + charmStat("def");
-const weaponAtk = () => ((G.equip && EQUIP.weapon[G.equip.weapon] && EQUIP.weapon[G.equip.weapon].atk) || 0) + charmStat("atk");   // com o talismã
+const defense = () => ["legs", "torso"].reduce((a, k) => a + ((G.equip && EQUIP[k][G.equip[k]] && EQUIP[k][G.equip[k]].def) || 0), 0) + charmStat("def") + skillStat("def");
+const weaponAtk = () => ((G.equip && EQUIP.weapon[G.equip.weapon] && EQUIP.weapon[G.equip.weapon].atk) || 0) + charmStat("atk") + skillStat("atk");   // com talismã e habilidades
 const unlocked = k => !NEED[k] || !!BS()[NEED[k]];
 function subPath(a, b) {
   const adj = {}; EDGES.forEach(([x, y]) => { (adj[x] = adj[x] || []).push(y); (adj[y] = adj[y] || []).push(x); });
@@ -309,6 +309,7 @@ function invButtons(i) {
   else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">${t("Nenhuma pele ainda. Vença bichos para conseguir peles.")}</div>`);
   i.appendChild(list);
   btn(t("Equipamento"), () => openEquip(), false, i);   // trocar arma e roupa (systems/equip.js)
+  btn(t("Habilidades") + (skillPoints() ? ` <small>${t("{n} pontos", {n: skillPoints()})}</small>` : ""), () => openSkills(), false, i);   // systems/skills.js
   btn(t("Caderno de bichos"), openJournal, false, i);
 }
 // depois de comer/trocar equipamento: atualiza o inventário de onde veio

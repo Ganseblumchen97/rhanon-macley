@@ -259,11 +259,12 @@ function exMouseWorld(ev) {
 /* esquiva: um rolamento rápido na direção em que anda (ou para onde mira), sem levar bote no caminho; depois espera
    DODGE_COOL segundos (a rodinha ao lado do Rhanon carrega, drawDodgeCool) */
 const DODGE_TIME = .3, DODGE_SPEED = 2.8, DODGE_COOL = 2;
+const dodgeCool = () => hasSkill("mira") ? 1 : DODGE_COOL;   // habilidade Olho de gavião
 function exDodge() {
   if (!EX || EX.locked || EX.dialog || EX.camp || EX.draw || EX.dodge || (EX.dodgeCool || 0) > 0) return;
   const h = EX.hero, ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0), n = Math.hypot(ix, iy);
   const v = n ? {x: ix / n, y: iy / n} : h.aim;
-  EX.dodge = {t: DODGE_TIME, vx: v.x, vy: v.y}; EX.dodgeCool = DODGE_COOL;
+  EX.dodge = {t: DODGE_TIME, vx: v.x, vy: v.y}; EX.dodgeCool = dodgeCool();
   EX.invulnUntil = Math.max(EX.invulnUntil, performance.now() + DODGE_TIME * 1000 + 120);
   exBurst(h.x, h.y - 2, ["#d8c49a", "#a89a72", "#ffffff"], 6); sfx("esquiva");
 }
@@ -374,7 +375,7 @@ function exUpdate(dt, now) {
   }
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
   if (EX.dodge) ix = iy = 0;
-  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden || !$("revela").hidden) ix = iy = 0;
+  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden || !$("habil").hidden || !$("revela").hidden) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     if (!(EX.jab > 0)) {   // durante a estocada a lança e o corpo ficam virados para onde ela foi (a mira do mouse), mesmo andando
@@ -476,7 +477,7 @@ function drawDodgeCool(x, sx, sy, now) {
   const c = EX.dodgeCool || 0;
   if (c <= 0) { if (EX.dodgeReady && now - EX.dodgeReady < 260) { x.fillStyle = "rgba(255,255,255,.85)"; x.beginPath(); x.arc(sx + 9, sy - 30, 3.5, 0, Math.PI * 2); x.fill(); } return; }
   EX.dodgeReady = now;
-  const p = 1 - c / DODGE_COOL, X = sx + 9, Y = sy - 30;
+  const p = 1 - c / dodgeCool(), X = sx + 9, Y = sy - 30;
   x.lineWidth = 1.4; x.strokeStyle = "rgba(0,0,0,.55)"; x.beginPath(); x.arc(X, Y, 3.5, 0, Math.PI * 2); x.stroke();
   x.strokeStyle = "#ffd23a"; x.beginPath(); x.arc(X, Y, 3.5, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); x.stroke();
 }
@@ -603,6 +604,7 @@ function exHud() {
   $("exHud").innerHTML = `<b>${ZONES[EX.zone] ? zoneDef(EX.zone).n : G.night ? t("{zona} à noite", {zona: SUB[EX.zone].n}) : SUB[EX.zone].n}</b><span>${t("Nv")} ${G.lv}</span>`
     + `<span>${t("PV")} ${G.hp}/${maxHP(G.lv)}${bar(G.hp, maxHP(G.lv), "pv")}</span><span>${t("PE")} ${G.sp}/${maxSP(G.lv)}${bar(G.sp, maxSP(G.lv), "pe")}</span>`
     + `<span>XP ${G.xp}/${need(G.lv)}${bar(G.xp, need(G.lv), "xp")}</span><span>R$ ${G.money}</span>`;
+  $("exSkills").classList.toggle("pts", skillPoints() > 0);   // ponto de habilidade para gastar: o botão chama atenção
 }
 function exToast(msg) {
   const el = $("exMsg"); el.textContent = msg; el.classList.add("show");
@@ -629,6 +631,7 @@ function setupExploreInput() {
     else if (ev.key === "Escape") exitExplore();
     else if ((ev.key === "i" || ev.key === "I") && !EX.locked) exOpenDialog("inventario");
     else if ((ev.key === "e" || ev.key === "E") && !EX.locked) openEquip();
+    else if ((ev.key === "h" || ev.key === "H") && !EX.locked) openSkills();
   });
   document.addEventListener("keyup", ev => { const k = DIRS[ev.key]; if (k) exKeys.delete(k); if ((ev.key === "c" || ev.key === "C") && EX) EX.skipHold = 0; });
   // no celular: segurar o próprio aviso "segure C para pular"
@@ -771,7 +774,8 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "comida") { say(t("Barraca de comida"), t("Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!")); foodButtons(d); }
   else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão e tocha pra espantar bicho. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte tu ficar, mais coisa eu te mostro.")); gearButtons(d); }
   else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
-  else if (kind === "xama") { say(t("Xamã"), t("Todo chefe que tu derruba deixa um pedaço da força dele. Me traz as peles do chefe que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem força de chefe nenhum pra eu trabalhar. Vence um chefe e me traz as peles dele."), d); }
+  else if (kind === "xama") { say(t("Xamã"), t("Todo chefe que tu derruba deixa um pedaço da força dele. Me traz as peles do chefe que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem força de chefe nenhum pra eu trabalhar. Vence um chefe e me traz as peles dele."), d);
+    if (Object.keys(G.skills).length) btn(t("Esquecer habilidades · R$ {n}", {n: SKILL_RESET(G.lv)}), ask(t("Esquecer todas as habilidades por R$ {n}? Os pontos voltam para gastar de novo.", {n: SKILL_RESET(G.lv)}), skillReset), G.money < SKILL_RESET(G.lv), d); }
   else if (kind === "inventario") { say(t("Bolsa"), invSummary()); invButtons(d); }
   else if (kind === "lembranca") {   // revanche com o chefe vencido
     const b = rematchBoss(), spot = nearSpot() || EX.spots.find(s => s.kind === "lembranca");

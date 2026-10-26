@@ -46,7 +46,8 @@ const LANG_FIELDS = [
   ["LOC", "*", "@n"], ["LOC", "*", "@s"], ["LOC", "*", "@txt"],
   ["ITEMS", "*", "@n"], ["EQUIP", "*", "*", "@n"], ["CMDS", "*", "@n"], ["CMDS", "*", "@d"], ["SPECIALS", "*", "@n"], ["SPECIALS", "*", "@d"],
   ["QUESTS", "*", "@text"], ["QUESTS", "*", "@thanks"], ["VILLAGER_NAME", "*"], ["VILLAGER_TIPS", "*"], ["BELEM_TIPS", "*"],
-  ["TUTORIAL", "*"], ["SAFE_TIP", "*"], ["SPOT_LABEL", "*"], ["EQ_SLOTS", "*", "@n"], ["EQ_SLOTS", "*", "@none"], ["CHARM_FX", "*"]
+  ["TUTORIAL", "*"], ["SAFE_TIP", "*"], ["SPOT_LABEL", "*"], ["EQ_SLOTS", "*", "@n"], ["EQ_SLOTS", "*", "@none"], ["CHARM_FX", "*"],
+  ["SKILL_TREES", "*", "@n"], ["SKILL_TREES", "*", "@d"], ["SKILL_TREES", "*", "nodes", "*", "@n"], ["SKILL_TREES", "*", "nodes", "*", "@d"]
 ];
 // percorre um caminho de LANG_FIELDS e chama fn(objeto, chave) em cada texto encontrado
 function langWalk(root, path, fn) {

@@ -42,9 +42,9 @@ function openItemMenu() {
   openSubMenu(bagIds().map(k => ({label: ITEMS[k].n, small: "×" + p.items[k], desc: `${ITEMS[k].n}: ${itemEffect(ITEMS[k])}.`, fn: () => useItem(k)})), t("Fecha a bolsa sem gastar o turno."), CMDS.findIndex(c => c.id === "item"));
 }
 // por que um especial ainda não pode ser usado ("" = pode): flecha precisa de arco, os comprados precisam ter sido comprados
-const specialLock = s => s.id === "flecha" && !G.equip.ranged ? t("sem arco") : s.price && !G.owned[s.id] ? t("na feira") : "";
+const specialLock = s => s.id === "flecha" && !G.equip.ranged ? t("sem arco") : s.price && !G.owned[s.id] ? t("na feira") : s.skill && !hasSkill(s.skill) ? t("habilidade") : "";
 function openSpecialMenu() {
-  openSubMenu(SPECIALS.map(s => ({label: s.n, small: specialLock(s) || s.cost + " " + t("PE"), desc: s.d + (s.price && !G.owned[s.id] ? " " + t("À venda no artesão da feira.") : ""), off: !avail(s.id), fn: () => { buildCmds(); act(s.id); }})),
+  openSubMenu(SPECIALS.map(s => ({label: s.n, small: specialLock(s) || s.cost + " " + t("PE"), desc: s.d + (s.price && !G.owned[s.id] ? " " + t("À venda no artesão da feira.") : s.skill && !hasSkill(s.skill) ? " " + t("Aprenda na árvore do Pajé (H).") : ""), off: !avail(s.id), fn: () => { buildCmds(); act(s.id); }})),
     t("Volta aos comandos sem gastar o turno."), CMDS.findIndex(c => c.id === "especial"));
 }// usa um item da bolsa: gasta o turno, como os outros comandos
 function useItem(k) {
@@ -142,7 +142,7 @@ function render() {
   // estados como ícones (ui/theme.js), com os turnos que faltam; o nome aparece ao passar o mouse e para leitores de tela
   $("status").innerHTML = statusList().map(([k, name, n]) => `<span class="st" title="${name}"><img src="${statusIconURL(k)}" alt="${name}">${n ? `<b>${n}</b>` : ""}</span>`).join("");
   $("furia").className = "furia" + (furyReady() ? " cheia" : "");
-  [...$("furia").children].forEach((d, i) => d.classList.toggle("on", i < (p ? p.furia || 0 : 0)));
+  [...$("furia").children].forEach((d, i) => { d.classList.toggle("on", i < (p ? p.furia || 0 : 0)); d.hidden = i >= furyMax(); });
   if (!subMenu) CMDS.forEach((c, i) => {
     const b = $("cmds").children[i];
     if (c.id === "atacar" && b.dataset.f !== String(furyReady())) {   // fúria pronta: a lança vira o golpe da fúria
@@ -179,12 +179,13 @@ function qteTake() { const had = !!qte, ok = !!(qte && qte.ok); qteClear(); if (
 /* fúria: FURY_MAX tempos certos seguidos (golpe perfeito ou bloqueio) enchem a barra; errar ou deixar passar zera.
    Cheia, o comando da lança vira "Fúria!": três estocadas seguidas e a última mais forte. */
 const FURY_MAX = 3;
-const furyReady = () => !!p && p.furia >= FURY_MAX;
+const furyMax = () => hasSkill("furia2") ? 2 : FURY_MAX;   // habilidade Sangue quente: enche com 2
+const furyReady = () => !!p && p.furia >= furyMax();
 function furyNote(ok) {
   if (!p || furyReady()) return;
   if (!ok) { p.furia = 0; return; }
   p.furia++;
-  if (furyReady()) setTimeout(() => { pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t("Três no tempo certo! Fúria pronta: usa a lança.")); render(); }, 420);
+  if (furyReady()) setTimeout(() => { pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t(furyMax() === 2 ? "Dois no tempo certo! Fúria pronta: usa a lança." : "Três no tempo certo! Fúria pronta: usa a lança.")); render(); }, 420);
 }
 function hitBeast() {
   const b = $("beast"); b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit");
@@ -200,7 +201,8 @@ function act(id) {
   let extra = false, wait = 0;   // wait = duração da animação do golpe (o bicho só responde depois)
   if (id === "atacar" && furyReady()) {
     p.furia = 0;
-    const ds = [0, 1, 2].map(i => { let d = rnd(6, 10) + G.lv - 1 + weaponAtk(); if (i === 2) d = Math.round(d * (p.atento ? 2.2 : 1.6)); if (p.weak > 0) d = Math.ceil(d / 2); return d; });
+    const n = hasSkill("furia4") ? 4 : 3;   // habilidade Fúria da onça: uma estocada a mais
+    const ds = [...Array(n).keys()].map(i => { let d = rnd(6, 10) + G.lv - 1 + weaponAtk(); if (i === n - 1) d = Math.round(d * (p.atento ? 2.2 : 1.6)); if (p.weak > 0) d = Math.ceil(d / 2); return d; });
     p.atento = false; e.hp = Math.max(0, e.hp - ds.reduce((a, b) => a + b, 0));
     wait = furyStrike(ds);
   } else if (id === "atacar") {
@@ -217,16 +219,26 @@ function act(id) {
     wait = strike(d, crit ? "crit" : "", "throw", miss ? t("Rhanon joga a lança, mas {bicho} desvia!", {bicho: foe()}) : crit ? t("Arremesso certeiro no ponto fraco: −{n}!", {n: d}) : t("Rhanon joga a lança: −{n}.", {n: d}));
   } else if (id === "tocha") {
     p.sp -= 6;
-    let d = rnd(14, 18) + G.lv - 1 + charmStat("atk"); if (p.weak > 0) d = Math.ceil(d / 2);
+    let d = rnd(14, 18) + G.lv - 1 + charmStat("atk") + skillStat("atk"); if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
     wait = strike(d, "", "fire", t("A tocha cospe fogo em {bicho}: −{n}.", {bicho: foe(), n: d}));
     if (!e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); render(); sfx("more"); pop(t("FRAQUEZA!"), $("beast"), "crit"); }, wait + 200); }
   } else if (id === "flecha") {   // tiro com o arco: menos dano que a lança, mas 40% de chance de crítico
     p.sp -= 3;
-    let d = rnd(5, 9) + G.lv - 1 + ((EQUIP.ranged[G.equip.ranged] || {}).atk || 0) + charmStat("atk"), crit = p.atento || Math.random() < .4;   // arco melhor = flecha mais forte
+    let d = rnd(5, 9) + G.lv - 1 + ((EQUIP.ranged[G.equip.ranged] || {}).atk || 0) + charmStat("atk") + skillStat("atk") + (hasSkill("mira") ? 4 : 0), crit = p.atento || Math.random() < .4;   // arco melhor = flecha mais forte
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
     wait = strike(d, crit ? "crit" : "", "arrow", crit ? t("Flechada certeira no ponto fraco: −{n}!", {n: d}) : t("Flechada: −{n}.", {n: d}));
+  } else if (id === "cura") {   // Reza de cura (árvore do Pajé): recupera parte da vida; Reza forte cura mais e limpa o veneno
+    p.sp -= 6;
+    const strong = hasSkill("cura2"), n = Math.min(p.max - p.hp, Math.round(p.max * (strong ? .45 : .3)));
+    p.hp += n; if (strong) p.dot = null;
+    HERO_A.set("victory"); sfx("heal");
+    const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .4);
+    PFX.burst(12, "heart", ["#7dff9a", "#ffffff", "#c8a0ff"], gx, gy, 22, {life: 1, up: 12});
+    pop("+" + n, $("hero"), "heal");
+    say(strong ? t("Reza forte: +{n} PV, e o corpo fica limpo.", {n}) : t("Reza de cura: +{n} PV.", {n}));
+    wait = 900;
   } else if (id === "observar") {
     e.known = true; p.atento = true; sfx("look");
     say(t("Rhanon estuda {bicho}. Vem aí: {golpe}.", {bicho: foe(), golpe: (e.moves || MOVES)[e.intent]}));
@@ -239,11 +251,13 @@ function act(id) {
     say(p.preso > 0 ? t("Rhanon tá preso, não dá pra fugir!") : t("{bicho} cortou o caminho. Não deu pra fugir!", {bicho: foe(1)}));
   }
   const again = !extra && ["atacar", "arremesso", "tocha", "flecha"].includes(id) && charmRoll("turno");   // talismã: age de novo
+  const bonus = !extra && !again && p.bonus && id !== "fugir"; if (bonus) p.bonus = false;   // contra-ataque perfeito: esta ação não passa a vez
   render();
   setTimeout(() => {
     if (e.hp <= 0) return finish("win");
     if (again) { say(t("O talismã brilha: mais um turno!")); pop(t("DE NOVO!"), $("hero"), "crit"); sfx("more"); }
-    if (extra || again) { busy = false; render(); return; }
+    if (bonus) { say(t("Mais uma ação!")); pop(t("DE NOVO!"), $("hero"), "crit"); sfx("more"); }
+    if (extra || again || bonus) { busy = false; render(); return; }
     setTimeout(enemyTurn, 450);   // respiro antes do bicho reagir
   }, wait + 550);
 }
@@ -315,9 +329,10 @@ function foeAttack(kind, d, sp0) {
     else { anim($("beast"), "lunge"); sfx("claw"); }
   }, prep);
   setTimeout(() => {
-    if (block && qteTake()) {   // bloqueio na hora certa: metade do dano volta
-      const back = Math.floor(d / 2); p.hp += back; d -= back;
+    if (block && qteTake()) {   // bloqueio na hora certa: metade do dano volta (Bloqueio firme: 2/3; Contra-ataque perfeito: tudo)
+      const all = hasSkill("bloqueio2"), back = all ? d : Math.floor(d * (hasSkill("bloqueio") ? 2 / 3 : 1 / 2)); p.hp += back; d -= back;
       if (back) { say(t("Bloqueio! Evitou {n} de dano.", {n: back})); pop(t("BLOQUEIO!"), $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
+      if (all && back) { p.bonus = true; say(t("Contra-ataque perfeito: no próximo turno, o Rhanon age duas vezes!")); }
     }
     if (d > 0 && charmRoll("esquiva")) {   // talismã do Curupira: escapa do golpe inteiro
       p.hp += d; d = 0; say(t("Rhanon desvia no último instante!")); pop(t("DESVIOU!"), $("hero"), "heal"); sfx("esquiva");
@@ -362,7 +377,7 @@ function strike(d, cls, kind, msg) {
   const hit = colors => {   // impacto: barra desce, número salta, registro recebe a mensagem
     const perfect = qteTake() && d > 0;
     if (perfect) {   // apertou Z na hora: golpe perfeito
-      const more = Math.max(2, Math.round(d * .3)); d += more; e.hp = Math.max(0, e.hp - more);
+      const more = Math.max(2, Math.round(d * (hasSkill("perfeito") ? .5 : .3))); d += more; e.hp = Math.max(0, e.hp - more);   // Ponta afiada: +50%
       msg = (msg || "") + " " + t("Perfeito! +{n}.", {n: more});
     }
     const strong = cls === "crit" || perfect || d >= 14;
@@ -434,11 +449,11 @@ function strike(d, cls, kind, msg) {
 function furyStrike(ds) {
   holdE = preE; qteClear();
   const b = pos($("beast")), dx = Math.max(0, b.x - pos($("hero")).x - 70), T0 = REDUCE ? 0 : 900, gap = REDUCE ? 0 : 230;
-  encounterBanner(t("Fúria da mata"), t("três golpes!")); sfx("furia"); musicDuck(1200);
+  encounterBanner(t("Fúria da mata"), t(ds.length === 4 ? "quatro golpes!" : "três golpes!")); sfx("furia"); musicDuck(1200);
   setTimeout(() => {
     HERO_A.set("stab"); sfx("spear");
     $("hero").animate([{transform: "translateX(0)", easing: "cubic-bezier(.6,0,1,.6)"}, {transform: `translateX(${dx}px)`, offset: .2}, {transform: `translateX(${dx}px)`, offset: .82, easing: "cubic-bezier(.2,.7,.3,1)"}, {transform: "translateX(0)"}],
-      {duration: REDUCE ? 1 : 300 + gap * 3 + 250});
+      {duration: REDUCE ? 1 : 300 + gap * ds.length + 250});
   }, T0);
   let shown = preE;
   ds.forEach((d, i) => setTimeout(() => {
@@ -447,10 +462,10 @@ function furyStrike(ds) {
     if (!last) HERO_A.set("stab");
     hitBeast(); slash($("beast")); burst(b, last ? ["#ffd23a", "#ffffff", "#e5001c"] : ["#fff", "#cfd8dc", "#f2a20c"], last ? 20 : 10, last ? 110 : 60);
     pop(String(d), $("beast"), last ? "crit" : "strong"); sfx(last ? "critico" : "hit"); hitImpact(last ? "furia" : "leve");
-    if (last) { say(t("FÚRIA! Três estocadas: −{n}.", {n: ds.join(", −")})); charmOnHit(ds.reduce((a, b) => a + b, 0)); setTimeout(() => pop(t("FÚRIA!"), $("beast"), "crit"), 200); }
+    if (last) { say(t(ds.length === 4 ? "FÚRIA! Quatro estocadas: −{n}." : "FÚRIA! Três estocadas: −{n}.", {n: ds.join(", −")})); charmOnHit(ds.reduce((a, b) => a + b, 0)); setTimeout(() => pop(t("FÚRIA!"), $("beast"), "crit"), 200); }
     render();
   }, T0 + 300 + i * gap));
-  return T0 + 300 + gap * 2 + 400;
+  return T0 + 300 + gap * (ds.length - 1) + 400;
 }
 // barra de XP do painel do Rhanon (quanto falta para o próximo nível)
 function drawXp() { $("xpb").style.width = (100 * G.xp / need(G.lv)) + "%"; $("xpTxt").textContent = G.xp + " / " + need(G.lv); }
@@ -518,6 +533,7 @@ function tick() {
     if (p.dot.n === "Drenagem") { e.hp = Math.min(e.max, e.hp + p.dot.d); say(t("Drenagem: −{n} PV, e {bicho} recupera {n}.", {n: p.dot.d, bicho: foe()})); }
     else say(`${t(p.dot.n)}: −${p.dot.d} ${t("PV")}.`);
   }
+  if (hasSkill("regen") && p.hp > 0) { p.hp = Math.min(p.max, p.hp + 3); p.sp = Math.min(p.msp, p.sp + 1); }   // Proteção dos encantados
   if (p.medo > 0) p.medo--;
   if (p.weak > 0) p.weak--;
   if (p.preso > 0) p.preso--;

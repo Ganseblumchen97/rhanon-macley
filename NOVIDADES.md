@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.33.0 — árvores de habilidade e a reza de cura
+
+- Agora cada nível dá 1 ponto de habilidade. Aperte H na exploração (ou o botão "Habilidades" no topo, ou pela bolsa)
+  e escolha entre três caminhos: Guerreiro (lança e fúria), Caçador (defesa e reflexo) e Pajé (vida e cura). Quem já
+  tinha nível alto recebe todos os pontos de uma vez.
+- Cada caminho tem cinco degraus, aprendidos de cima para baixo. No fim: a fúria com quatro estocadas, o bloqueio
+  perfeito que anula o golpe e deixa o Rhanon agir duas vezes, ou recuperar vida e energia a cada turno.
+- O Pajé libera a Reza de cura, um especial novo de batalha que recupera parte da vida.
+- Quer trocar de caminho? O xamã da aldeia faz o Rhanon esquecer as habilidades e devolve os pontos, por um trocado.
+- Quando sobra ponto para gastar, o botão "Habilidades" fica amarelo, e a subida de nível avisa do ponto novo.
+
 ## 0.32.0 — o xamã e os talismãs dos chefes
 
 - Chegou o xamã na aldeia, perto do caminho do meio. Leve a ele as peles de um chefe que você já venceu e ele faz um

@@ -862,3 +862,28 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .title-art::after{content:"";position:absolute;width:min(30vw,380px);aspect-ratio:64/10;background:var(--titlePlat) center/100% 100% no-repeat;image-rendering:pixelated;left:50%;bottom:0;translate:-50% 45%;z-index:-1}
 @media(min-width:761px){.title-art{position:relative}}
 .t-menu .desc{background:rgba(6,18,10,.85);color:#f6e9c4}
+
+/* ===== árvore de habilidades (systems/skills.js): três colunas com a cor de cada caminho (--sk); degrau aprendido
+   cheio, livre com borda pulsando, sem pontos apagado, trancado (falta o de cima) mais apagado ainda ===== */
+.sk-wrap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:6px 0 10px}
+.sk-tree{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.sk-tree h3{margin:0;font:400 20px var(--display);text-transform:uppercase;color:var(--sk)}
+.sk-tree>small{font:700 11px var(--mono);opacity:.75;margin-top:-6px}
+.sk-node{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:flex;flex-direction:column;gap:1px;padding:7px 10px;border:3px solid var(--wood);border-radius:4px;
+  background:rgba(255,255,255,.35);color:var(--brown);font:11px/1.3 var(--mono);transition:translate .15s}
+.sk-node+.sk-node::before{content:"";position:absolute;left:50%;top:-11px;width:3px;height:8px;background:var(--wood)}
+.sk-node b{font:400 clamp(13px,1.5vw,16px) var(--display);text-transform:uppercase}
+.sk-node span{font-weight:700;opacity:.8}
+.sk-node.learned{background:var(--sk);border-color:#06120a;color:var(--parch)}
+.sk-node.open{border-color:var(--sk);animation:skPulse 1.2s steps(2) infinite}
+.sk-node.short{opacity:.6}
+.sk-node.locked{opacity:.38}
+.sk-node.sel{translate:0 -2px;box-shadow:4px 4px 0 var(--red);outline:3px solid #ffd23a}
+@keyframes skPulse{50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--sk) 40%,transparent)}}
+@media (prefers-reduced-motion:reduce){.sk-node.open{animation:none}}
+.sk-card{border-top:2px dashed var(--wood);padding-top:6px}
+.sk-card h3{margin:0;font:400 18px var(--display);text-transform:uppercase;color:var(--brown)}
+.sk-card p{margin:4px 0;font:13px/1.4 var(--mono);color:var(--brown)}
+.lvup small+small{display:block;color:#ffd23a}
+@media(max-width:560px){.sk-wrap{grid-template-columns:1fr}}
+#exSkills.pts{background:#ffd23a;color:#3a2414;animation:skPulse 1.2s steps(2) infinite;--sk:#ffd23a}

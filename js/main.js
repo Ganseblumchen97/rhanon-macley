@@ -9,7 +9,7 @@ buildLocalNodes();
 setupExploreInput();
 setupMapNav();
 setupOptions();
-setupEquip();
+setupEquip(); setupSkills();
 setupReveal();
 $("stage").addEventListener("pointerdown", () => qtePress());   // no celular: tocar no palco na hora certa
 loadArt();   // imagens de data/art.js (carregam enquanto a tela inicial está aberta)
@@ -58,7 +58,7 @@ document.addEventListener("keydown", ev => {
 });
 document.addEventListener("keydown", ev => { if (ev.key === "m" || ev.key === "M") toggleMute(); });
 // Espaço já confirma ao apertar (painéis, comandos da batalha, equipamento): soltar não pode apertar o botão de novo
-document.addEventListener("keyup", ev => { if (ev.key === " " && ev.target.closest && ev.target.closest("#exDialog, #cmds, #equipar")) ev.preventDefault(); });
+document.addEventListener("keyup", ev => { if (ev.key === " " && ev.target.closest && ev.target.closest("#exDialog, #cmds, #equipar, #habil")) ev.preventDefault(); });
 
 /* ----- áudio ----- */
 // o áudio começa no primeiro gesto do jogador, respeitando a política de autoplay dos navegadores

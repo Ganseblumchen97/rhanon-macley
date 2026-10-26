@@ -7,7 +7,11 @@ const need = l => 20 + 20 * l;                 // XP para passar do nível l
 // talismã em uso (EQUIP.amulet, feito pelo xamã): charmStat("atk" | "def" | "hp" | "sp") soma ao status; charm() = o item inteiro
 const charm = () => (typeof EQUIP !== "undefined" && G.equip && EQUIP.amulet && EQUIP.amulet[G.equip.amulet]) || {};
 const charmStat = k => charm()[k] || 0;
-const maxHP = l => 40 + 6 * (l - 1) + charmStat("hp"), maxSP = l => 20 + 2 * (l - 1) + charmStat("sp");
+// árvore de habilidades (data/skills.js): skillStat soma o status dos degraus aprendidos; hasSkill(fx) = tem o efeito
+const skillsOn = () => typeof SKILL_TREES !== "undefined" && G.skills ? SKILL_TREES.flatMap(tr => tr.nodes).filter(n => G.skills[n.id]) : [];
+const skillStat = k => skillsOn().reduce((a, n) => a + (n[k] || 0), 0);
+const hasSkill = fx => skillsOn().some(n => n.fx === fx);
+const maxHP = l => 40 + 6 * (l - 1) + charmStat("hp") + skillStat("hp"), maxSP = l => 20 + 2 * (l - 1) + charmStat("sp") + skillStat("sp");
 
 let G = {lv: 1, xp: 0, money: 0, loc: "ananindeua"};
 if (!DEBUG) try { Object.assign(G, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (_) {}
@@ -26,6 +30,7 @@ function vit() {
   if (SUB[G.sub] && cityOf(G.sub) !== curCity()) G.sub = CITY[curCity()].home;   // o local guardado tem que ser da cidade atual
   // locais que já apareceram no mapa de Ananindeua; save antigo: tudo o que já está liberado (sem repetir animação)
   if (!G.seen) { G.seen = {}; CITY.ananindeua.route.forEach(k => { if (unlocked(k)) G.seen[k] = true; }); }   // Belém aparece aos poucos na primeira chegada
+  G.skills = G.skills || {};   // degraus aprendidos da árvore de habilidades
   G.owned = G.owned || {tanga: true, lanca: true}; G.equip = G.equip || {legs: "tanga", torso: null, weapon: "lanca"};
 }
 /* Opções do modo de teste (todas opcionais, juntas com &):

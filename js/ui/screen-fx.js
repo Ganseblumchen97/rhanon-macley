@@ -150,7 +150,7 @@ function encounterBanner(name, sub = t("apareceu!")) {
 function levelUpFx(lv) {
   levelUpJingle();
   const b = document.createElement("div"); b.className = "lvup"; b.setAttribute("aria-live", "polite");
-  b.innerHTML = `<span>${t("NÍVEL {n}!", {n: lv})}</span><small>${t("Rhanon ficou mais forte")}</small>`;
+  b.innerHTML = `<span>${t("NÍVEL {n}!", {n: lv})}</span><small>${t("Rhanon ficou mais forte")}</small><small>${t("+1 ponto de habilidade (H)")}</small>`;
   document.body.appendChild(b);
   setTimeout(() => b.remove(), REDUCE ? 1200 : 2200);
 }

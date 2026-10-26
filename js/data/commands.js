@@ -12,6 +12,7 @@ const CMDS = [
 const SPECIALS = [
   {id:"arremesso", n:"Jogar a lança", cost:3, d:"Joga a lança com força: 10 a 15 de dano, mas erra 20% das vezes. 3 PE."},
   {id:"tocha",  n:"Tocha",  cost:6, price:80, lv:2, d:"Uma onda de fogo, mais lenta: 14 a 18 de dano. Se o bicho fraquejar, ganha “Mais uma!”. 6 PE."},
-  {id:"flecha", n:"Flecha", cost:3, d:"Mira com calma: 40% de chance de crítico (dano dobrado). 3 PE. Precisa de arco."}
+  {id:"flecha", n:"Flecha", cost:3, d:"Mira com calma: 40% de chance de crítico (dano dobrado). 3 PE. Precisa de arco."},
+  {id:"cura", n:"Reza de cura", cost:6, skill:"cura", d:"O Rhanon reza para a mata e recupera 30% da vida (com Reza forte, 45% e tira veneno e queimadura). 6 PE."}
 ];
 const MOVES = {arranhao:"Arranhão", bote:"Bote", rugido:"Rugido"};
