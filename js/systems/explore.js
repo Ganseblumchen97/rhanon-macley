@@ -876,9 +876,7 @@ function drawMotelRoom(x, keys, u, now) {
   x.fillStyle = "#6d4329"; x.fillRect(14, 84, 94, 8);
   x.fillStyle = "#f4ecd8"; x.fillRect(22, 74, 84, 10);
   x.fillStyle = "#ffffff"; x.fillRect(24, 68, 20, 9);
-  const breathe = Math.floor(now / 900) % 2, img = rigCanvas("front", {face: "blink"}, rhanonLook(), 1);
-  x.save(); x.translate(27, 72 - breathe); x.rotate(-Math.PI / 2); x.drawImage(img, -img.width / 2, 0); x.restore();   // deitado, cabeça no travesseiro
-  x.fillStyle = "#c8303a"; x.fillRect(46, 70 - breathe, 60, 15); x.fillStyle = "#e85a5a"; x.fillRect(46, 70 - breathe, 60, 3); x.fillStyle = "#9c2028"; for (let k = 52; k < 106; k += 10) x.fillRect(k, 73 - breathe, 1, 12);
+  x.drawImage(rhanonSleeping(Math.floor(now / 900) % 2), 20, 59);   // deitado com a cabeça no travesseiro e o cobertor até os pés
   x.fillStyle = "#6d4329"; x.fillRect(122, 76, 22, 16); x.fillStyle = "#5a3a22"; x.fillRect(122, 76, 22, 2);   // criado-mudo
   x.fillStyle = "#3a2a1a"; x.fillRect(131, 66, 3, 10); x.fillStyle = "#f2c230"; x.fillRect(126, 60, 13, 7);   // abajur
   x.fillStyle = `rgba(8,12,36,${dark * .72})`; x.fillRect(0, 0, 192, 120);   // o quarto escurece junto com o céu

@@ -202,6 +202,28 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   RIG_CACHE.set(key, c);
   return c;
 }
+/* Rhanon dormindo na cama do motel, visto de lado (84x26): cabeça no travesseiro olhando para cima, cobertor até os pés
+   com o relevo do corpo e o braço por cima. breathe (0/1) sobe o peito. Desenho próprio porque ele só respira. */
+const SLEEP_CACHE = {};
+function rhanonSleeping(breathe = 0) {
+  const look = rhanonLook(), key = breathe + JSON.stringify(look);
+  if (SLEEP_CACHE[key]) return SLEEP_CACHE[key];
+  const C = {...RIG_PAL, ...(look.pal || {})}, d = rigGrid(1, 84, 26), b = breathe ? 1 : 0;
+  d.part().ellipse(7, 13, 6, 7, C.h, C.H, .5);                          // cabelo atrás da cabeça
+  d.part().ellipse(12, 13, 6, 6, C.s, C.S, .5);                         // rosto de perfil, virado para cima
+  d.dots([[18, 12], [18, 13]], C.s).dots([[17, 12]], C.S);              // nariz
+  if (!look.noBand) d.part().limb(7, 6, 9, 20, 2, C.g, C.G);            // faixa da cabeça
+  d.part().poly([[8, 6], [13, 6], [12, 8], [10, 7], [9, 9]], C.h);      // franja
+  d.dots([[13, 11], [14, 11]], "#1a1426").dots([[11, 15], [12, 15]], C.r).dots([[16, 16], [17, 16]], C.S);   // olho fechado, pintura na bochecha e boca
+  // cobertor: sobe no peito, desce na cintura, joelhos e pés fazem montinhos
+  const top = [[17, 11], [20, 8 - b], [28, 7 - b], [36, 8 - b], [44, 10], [52, 10], [60, 9], [66, 10], [71, 8], [75, 6], [79, 7], [82, 12]];
+  d.part().poly([[17, 25], ...top, [83, 25]], "#c8303a", "#9c2028", 78);
+  for (let x = 30; x < 78; x += 9) d.rect(x, 12, 1, 12, "#a82430");     // listras do cobertor
+  d.rect(17, 21, 66, 2, "#9c2028");                                       // dobra embaixo
+  d.part().poly([[17, 11], [20, 8 - b], [26, 7 - b], [27, 11], [24, 14], [17, 14]], "#f4ecd8", "#cdbf9a", 25);   // dobra do lençol no pescoço
+  d.part().limb(25, 11 - b, 38, 12, 2.5, C.s, C.S).ellipse(39, 12, 2, 1.8, C.s);   // braço por cima do cobertor
+  return SLEEP_CACHE[key] = d.canvas();
+}
 // visual do Rhanon conforme o que ele veste (G.equip) e o emprego
 function rhanonLook() {
   const q = G?.equip || {}, T = EQUIP.torso[q.torso], L = EQUIP.legs[q.legs], look = {bowBack: !!q.ranged};

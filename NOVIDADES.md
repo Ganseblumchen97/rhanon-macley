@@ -3,6 +3,11 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.30.2 — Rhanon dormindo com cobertinha
+
+- No quarto do motel, o Rhanon agora aparece inteiro deitado na cama: cabeça no travesseiro, braço por cima e o
+  cobertor até os pés, só respirando enquanto dorme.
+
 ## 0.30.1 — motel no Ver-o-Peso e acordar na cidade certa
 
 - Corrigido: quem fechava o jogo em Belém e voltava acordava na aldeia, mas ao sair da fase aparecia no Ver-o-Peso.
