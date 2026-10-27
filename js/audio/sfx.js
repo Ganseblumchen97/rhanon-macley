@@ -248,6 +248,15 @@ function xpFillSound(dur, from = 0, to = 1) {
   o.start(t); lfo.start(t); o.stop(t + dur + .02); lfo.stop(t + dur + .02);
 }
 function xpDing() { if (!AC || muted) return; const t = AC.currentTime + .02; tone(hz(84), t, .09, "square", .04); tone(hz(91), t + .08, .22, "square", .035); }
+// chefe acalmado: um pedaço da luz de Jaci volta. O começo do tema dela (JACI_THEME) em sinos, e um brilho subindo no fim
+function jaciJingle() {
+  if (!AC || muted) return;
+  const t = AC.currentTime + .05;
+  [[67, 0, .14], [76, .14, .34], [74, .48, .14], [72, .62, .34], [74, .96, .9]].forEach(([m, at, d]) => {
+    tone(hz(m), t + at, d + .4, "sine", .07); tone(hz(m + 12), t + at, d * .6 + .2, "sine", .02); tone(hz(m), t + at, d * .8, "triangle", .02);
+  });
+  [86, 91, 93, 98].forEach((m, i) => tone(hz(m), t + 1.1 + i * .07, .35, "sine", .012));   // brilho
+}
 // subiu de nível: as quatro notas do motivo da região, rápidas e brilhantes, e o acorde de casa subindo até a nota final
 function levelUpJingle() {
   if (!AC || muted) return;

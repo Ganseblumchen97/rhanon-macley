@@ -25,7 +25,7 @@ function stepWork(s, t) {
    "localNight" (Ananindeua à noite), "battleCapo" (batalha na mata: a roda de capoeira acelerada), "battleCarimbo"
    (batalha na água: carimbó), "battleGuitarrada" (batalha em Belém: guitarrada), "localNordeste" (São Luís e o
    mapa do Maranhão: toada de bumba-meu-boi com sanfona e triângulo, e o tema do Nordeste), "pytuna" (cenas de Pytuna,
-   com o tema dele), "battleBoss" (chefe: abertura
+   com o tema dele), "jaci" (fim de capítulo: a lua volta a brilhar, com o tema dela), "battleBoss" (chefe: abertura
    sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
@@ -320,6 +320,36 @@ const MUS = (() => {
      que não resolve: a fumaça que nunca assenta. Na segunda frase o salto escorrega meio tom e volta para o ré. */
   const PYTUNA_THEME = [[0, 0, 50, 6], [0, 6, 51, 2], [0, 8, 56, 8], [1, 0, 49, 16],
     [2, 0, 50, 6], [2, 6, 51, 2], [2, 8, 56, 4], [2, 12, 55, 4], [3, 0, 50, 16]];
+  /* Tema do Rhanon (leitmotif do herói, igual em todas as regiões): começa com um salto de quarta para cima, "mi – lá",
+     como a estocada da lança, e segue subindo, "si – dó". A primeira frase para no acorde de mi (em suspenso); a segunda
+     sobe até o lá agudo e volta. abertura = sobre os acordes da tela inicial (lá menor com nona, ré com nona, fá com
+     sétima maior, mi com nona aumentada); viagem = sobre os do mapa do Brasil (fá, sol, mi menor, lá menor) */
+  const RHANON_THEME = {
+    abertura: [[0, 0, 64, 2], [0, 2, 69, 4], [0, 6, 71, 2], [0, 8, 72, 6], [0, 14, 71, 2],
+      [1, 0, 69, 4], [1, 4, 66, 2], [1, 6, 69, 2], [1, 8, 74, 8],
+      [2, 0, 72, 2], [2, 2, 76, 4], [2, 6, 77, 2], [2, 8, 76, 4], [2, 12, 72, 4],
+      [3, 0, 71, 4], [3, 4, 68, 4], [3, 8, 64, 8],
+      [4, 0, 64, 2], [4, 2, 69, 4], [4, 6, 71, 2], [4, 8, 72, 6], [4, 14, 71, 2],
+      [5, 0, 69, 4], [5, 4, 74, 2], [5, 6, 76, 2], [5, 8, 78, 8],
+      [6, 0, 81, 6], [6, 6, 79, 2], [6, 8, 77, 4], [6, 12, 76, 4],
+      [7, 0, 76, 4], [7, 4, 74, 2], [7, 6, 71, 2], [7, 8, 68, 8]],
+    viagem: [[0, 0, 64, 2], [0, 2, 69, 4], [0, 6, 72, 2], [0, 8, 76, 6], [0, 14, 74, 2],
+      [1, 0, 74, 4], [1, 4, 71, 2], [1, 6, 74, 2], [1, 8, 79, 8],
+      [2, 0, 76, 2], [2, 2, 79, 4], [2, 6, 74, 2], [2, 8, 71, 4], [2, 12, 67, 4],
+      [3, 0, 69, 4], [3, 4, 72, 4], [3, 8, 76, 8],
+      [4, 0, 64, 2], [4, 2, 69, 4], [4, 6, 72, 2], [4, 8, 76, 6], [4, 14, 74, 2],
+      [5, 0, 74, 4], [5, 4, 71, 2], [5, 6, 74, 2], [5, 8, 79, 8],
+      [6, 0, 76, 2], [6, 2, 79, 4], [6, 6, 74, 2], [6, 8, 71, 4], [6, 12, 67, 4],
+      [7, 0, 69, 4], [7, 4, 72, 2], [7, 6, 76, 2], [7, 8, 81, 8]]
+  };
+  /* Tema de Jaci (leitmotif da lua, igual em todas as regiões): "sol – mi – ré – dó – ré", um salto de sexta para cima
+     que desce devagar e para num ré que flutua, sem fechar: esperança, não vitória. Em dó maior, um acorde a cada dois
+     compassos (dó – lá menor – fá – sol); a última frase sobe até o fá e volta para o ré. O jingle curto (jaciJingle em
+     sfx.js) usa as cinco primeiras notas. */
+  const JACI_THEME = [[0, 0, 67, 2], [0, 2, 76, 6], [0, 8, 74, 2], [0, 10, 72, 6], [1, 0, 74, 12],
+    [2, 0, 69, 2], [2, 2, 76, 6], [2, 8, 74, 2], [2, 10, 72, 6], [3, 0, 69, 12],
+    [4, 0, 65, 2], [4, 2, 72, 6], [4, 8, 74, 2], [4, 10, 76, 6], [5, 0, 77, 8], [5, 8, 76, 4], [5, 12, 74, 4],
+    [6, 0, 74, 4], [6, 4, 79, 4], [6, 8, 76, 4], [6, 12, 74, 4], [7, 0, 74, 16]];
   // tema → 128 passos (oito compassos); shift muda a oitava (ou o tom: +7 leva para lá menor); com enfeite, as notas
   // longas às vezes ganham um floreio rápido no fim (o sorteio fica só aí: o desenho da frase não muda); upTo = só os
   // primeiros compassos (o resto fica em silêncio)
@@ -353,10 +383,11 @@ const MUS = (() => {
   const BLUES = [69, 72, 74, 75, 76, 79, 81];
 
   const TRACKS = {
-    // Abertura: acid-jazz/funk em Lá menor com balanço, baixo sincopado, acordes em "stab" e frases de improviso
+    // Abertura: acid-jazz/funk em Lá menor com balanço, baixo sincopado, acordes em "stab"; o tema do Rhanon (RHANON_THEME)
+    // a cada oito compassos, alternando com frases de improviso
     title: {
       bpm: 118, wet: .18, level: .5, swing: .18, chords: P5_CHORDS,
-      bassline: [[0, 0], [3, 12], [6, 0], [7, 10], [10, 7], [12, 0], [14, 12]], lick: null,
+      bassline: [[0, 0], [3, 12], [6, 0], [7, 10], [10, 7], [12, 0], [14, 12]], lick: null, theme: null,
       play(i, t, d) {
         const s = i % 16, bar = Math.floor(i / 16), chord = this.chords[bar % 4];
         if (s === 0 || s === 7 || s === 10) kick(t, .13);
@@ -365,33 +396,27 @@ const MUS = (() => {
         const b = this.bassline.find(([at]) => at === s);
         if (b) synth("sawtooth", mtof(chord.bass + b[1]), t, d * 1.5, .05, 700);
         if (s === 2 || s === 9) chord.notes.forEach(m => ep(mtof(m), t, s === 2 ? .3 : .15, .014));
+        // tema do Rhanon (RHANON_THEME) a cada oito compassos, alternando com o improviso de antes
+        if (i % 128 === 0) this.theme = Math.floor(i / 128) % 2 === 0 ? themeLine(RHANON_THEME.abertura, 0, i > 0) : null;
+        if (this.theme) { const m = this.theme[i % 128]; if (m) { synth("square", mtof(m.note), t, m.len * d * .9, .024, 2200); synth("triangle", mtof(m.note - 12), t, m.len * d * .9, .012); } return; }
         if (s === 0) this.lick = bar % 2 && Math.random() < .8 ? makeLick(8) : null;
         const m = this.lick && this.lick[s];
         if (m) synth("square", mtof(m), t, d * 1.4, .02, 1800);
       }
     },
-    // Mapa do Brasil: pop animado de viagem (Fmaj7, G7, Em7, Am7) com piano elétrico no contratempo e refrão gerado
+    // Mapa do Brasil: pop animado de viagem (Fmaj7, G7, Em7, Am7) com piano elétrico no contratempo e o tema do Rhanon
     map: {
-      bpm: 112, wet: .2, level: .45, chords: P4_CHORDS, scale: [72, 74, 76, 79, 81, 84, 86], phrase: [],
+      bpm: 112, wet: .2, level: .45, chords: P4_CHORDS, phrase: [],
       play(i, t, d) {
         const s = i % 16, chord = this.chords[Math.floor(i / 16) % 4];
-        if (i % 64 === 0) this.phrase = this.makePhrase();
+        if (i % 128 === 0) this.phrase = themeLine(RHANON_THEME.viagem, 0, i > 0);   // tema do Rhanon, versão de viagem
         if (s === 0 || s === 8 || (s === 11 && Math.random() < .5)) kick(t, .13);
         if (s === 4 || s === 12) snare(t, .05);
         if (s % 2 === 0) hat(t, s % 4 === 2 ? .022 : .012);
         if (s % 2 === 0) synth("triangle", mtof(chord.bass + (s % 4 === 2 ? 12 : 0)), t, d * 1.8, .09);
         if ([3, 6, 10, 14].includes(s)) chord.notes.forEach(m => ep(mtof(m), t, .22, .016));
-        const m = this.phrase[i % 32];
-        if (m) synth("square", mtof(m), t, d * 1.7, .022, 2400);
-      },
-      makePhrase() {
-        const out = new Array(32).fill(null); let idx = 2;
-        for (let k = 0; k < 28; k++) {
-          if (Math.random() > (k % 2 ? .12 : .5)) continue;
-          idx = Math.max(0, Math.min(this.scale.length - 1, idx + pick([-2, -1, -1, 1, 1, 2])));
-          out[k] = this.scale[idx];
-        }
-        return out;
+        const m = this.phrase[i % 128];
+        if (m) synth("square", mtof(m.note), t, m.len * d * .9, .022, 2400);
       }
     },
     // Ananindeua: toque de capoeira (berimbau, caxixi, atabaque e pandeiro) com pad, baixo e flauta pentatônica.
@@ -532,6 +557,21 @@ const MUS = (() => {
         if (i % 32 === 16) sweep(t, d * 16, .02);   // a fumaça passando
         const m = this.melody && this.melody[i % 64];   // o tema tem 4 compassos
         if (m) { synth("sawtooth", mtof(m.note + 12), t, m.len * d, .02, 700); synth("sine", mtof(m.note), t, m.len * d, .05); synth("triangle", mtof(m.note + 19), t, m.len * d * .6, .004); }
+      }
+    },
+    // Jaci volta a brilhar (fim do capítulo): sinos, pad aberto, harpa em arpejo e o tema de Jaci (JACI_THEME) na flauta,
+    // repetindo uma oitava acima com o sino dobrando. Sem bateria: só o brilho da lua
+    jaci: {
+      bpm: 80, wet: .6, level: .42, melody: null,
+      chords: [{bass: 36, notes: [60, 64, 67, 71]}, {bass: 45, notes: [57, 60, 64, 67]}, {bass: 41, notes: [57, 60, 65, 69]}, {bass: 43, notes: [55, 59, 62, 67]}],
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, lap = Math.floor(i / 128), chord = this.chords[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = themeLine(JACI_THEME, lap % 2 ? 12 : 0);
+        if (s === 0 && barIn % 2 === 0) { pad(chord.notes, t, d * 32, .012); synth("sine", mtof(chord.bass), t, d * 30, .06); }
+        if (s % 2 === 0) { const n = chord.notes[(s / 2) % 4] + 12; synth("triangle", mtof(n), t, d * 3, .008); }   // harpa em arpejo
+        if (s === 0) bell(mtof(chord.notes[3] + 12), t, .014, 2.4);
+        const m = this.melody && this.melody[i % 128];
+        if (m) { flute(mtof(m.note), t, m.len * d * .95, .03); if (lap % 2) bell(mtof(m.note + 12), t, .01, 1.6); }
       }
     },
     // batalha: a roda de capoeira acelerada (toque de São Bento Grande), com atabaque, pandeiro, baixo marcado

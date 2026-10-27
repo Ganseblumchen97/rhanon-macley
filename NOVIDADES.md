@@ -3,6 +3,13 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.46.0 — os temas do Rhanon e de Jaci
+
+- O Rhanon ganhou um tema próprio, que começa com um salto para cima, como a estocada da lança. Ele toca na tela
+  inicial e, numa versão de viagem, no mapa do Brasil.
+- Jaci, a lua, também tem o seu tema. Toda vez que um chefe é acalmado pela primeira vez, uns sinos tocam o começo
+  dele (um pedaço da luz voltou), e no fim do capítulo do Norte a música inteira acompanha a lua voltando a brilhar.
+
 ## 0.45.0 — o tema de Pytuna e as fanfarras
 
 - Pytuna ganhou um tema próprio: uma frase grave e instável, com coro, vento e batida de coração, que toca toda vez

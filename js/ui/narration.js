@@ -94,8 +94,8 @@ function bossStory(id, done) {
   const steps = [];
   if (NARRA_PYT[id] && !G.narrated["pyt_" + id]) steps.push(next => { G.narrated["pyt_" + id] = true; save(); pytunaScene(NARRA_PYT[id], next); });
   if (jaciLight() >= 1 && !G.narrated.norte_fim) steps.push(next => {
-    G.narrated.norte_fim = true; save();
-    narrate(NARRA_PYT.norte, () => { chapterBanner(t("Fim do Norte"), t(G.portfolio.site_feira ? "A história continua no Nordeste: o voo sai do Aeroporto de Belém." : "A história continua no Nordeste. Antes, entregue o site da Dona Graça no Ver-o-Peso.")); setTimeout(next, 1500); });
+    G.narrated.norte_fim = true; save(); musicStart("jaci");   // a lua volta inteira: o tema de Jaci
+    narrate(NARRA_PYT.norte, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Norte"), t(G.portfolio.site_feira ? "A história continua no Nordeste: o voo sai do Aeroporto de Belém." : "A história continua no Nordeste. Antes, entregue o site da Dona Graça no Ver-o-Peso.")); setTimeout(next, 1500); });
   });
   const run = () => steps.length ? steps.shift()(run) : done && done();
   run();

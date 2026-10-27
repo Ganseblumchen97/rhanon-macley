@@ -229,6 +229,7 @@ function resumeExplore(result) {
   const reveal = () => { if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); } };   // o mapa mostra o caminho novo
   if (en && result === "win" && en.boss && !en.rematch && NARRA_BOSS[en.a.id] && !G.narrated[en.a.id]) {
     G.narrated[en.a.id] = true; save(); EX.locked = true;
+    setTimeout(jaciJingle, 300);   // um pedaço da luz de Jaci volta
     setTimeout(() => narrate(NARRA_BOSS[en.a.id], () => bossStory(en.a.id, () => { if (EX) EX.locked = false; reveal(); })), 900);
   } else reveal();
 }
