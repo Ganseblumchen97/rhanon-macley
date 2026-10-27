@@ -1167,6 +1167,22 @@ TX.fr = {
     "O resto dessa história fica pra outra noite. Agora dorme.": "La suite de cette histoire, ce sera pour une autre nuit. Maintenant dors.",
     "Fim do Norte": "Fin du Nord",
     "A história continua no Nordeste... em breve.": "L'histoire continue dans le Nordeste... bientôt.",
-    "Luz de Jaci: {n} de {total} chefes do Norte acalmados": "Lumière de Jaci : {n} chefs du Nord calmés sur {total}"
+    "Luz de Jaci: {n} de {total} chefes do Norte acalmados": "Lumière de Jaci : {n} chefs du Nord calmés sur {total}",
+    "Mapa do Brasil": "Carte du Brésil",
+    "em breve": "bientôt",
+    "Norte": "Nord",
+    "Nordeste": "Nordeste",
+    "Centro-Oeste": "Centre-Ouest",
+    "Sudeste": "Sud-Est",
+    "Sul": "Sud",
+    "Aeroporto de Belém": "Aéroport de Belém",
+    "Onde tudo começou: a aldeia, Ananindeua e Belém. Os bichos e encantados da floresta ficaram bravos com a fumaça de Pytuna.": "Là où tout a commencé : le village, Ananindeua et Belém. Les animaux et les esprits de la forêt sont devenus furieux à cause de la fumée de Pytuna.",
+    "Sertão, dunas e mangue. Dizem que lá a fumaça secou tudo, e a Comadre Fulozinha anda perdida na mata.": "Sertão, dunes et mangroves. On dit que là-bas la fumée a tout asséché, et que la Comadre Fulozinha erre perdue dans la forêt.",
+    "O Pantanal, o cerrado e Brasília. Um céu tão grande que a lua devia brilhar mais.": "Le Pantanal, le cerrado et Brasília. Un ciel si grand que la lune devrait briller davantage.",
+    "Cidades que não dormem e mata atlântica nas serras. Mais luz de poste que de lua.": "Des villes qui ne dorment jamais et la forêt atlantique dans les montagnes. Plus de lampadaires que de lune.",
+    "Onde a mata de pinheiro acaba. Foi pra lá que a fumaça fugiu. E é lá que fica Curitiba.": "Là où finit la forêt de pins. C'est là que la fumée s'est enfuie. Et c'est là que se trouve Curitiba.",
+    "Entre as cidades da região, vai de ônibus (rodoviária da BR-316).": "Entre les villes de la région, on voyage en bus (gare routière de la BR-316).",
+    "{aero}: os voos de ida e volta abrem quando o Rhanon chegar na próxima região.": "{aero} : les vols aller-retour ouvrent quand Rhanon atteindra la région suivante.",
+    "Ainda não dá pra ir. A história chega lá em breve.": "Impossible d'y aller pour l'instant. L'histoire y arrive bientôt."
   }
 };

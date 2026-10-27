@@ -1164,6 +1164,22 @@ TX.es = {
     "O resto dessa história fica pra outra noite. Agora dorme.": "El resto de esta historia queda para otra noche. Ahora a dormir.",
     "Fim do Norte": "Fin del Norte",
     "A história continua no Nordeste... em breve.": "La historia sigue en el Nordeste... pronto.",
-    "Luz de Jaci: {n} de {total} chefes do Norte acalmados": "Luz de Jaci: {n} de {total} jefes del Norte calmados"
+    "Luz de Jaci: {n} de {total} chefes do Norte acalmados": "Luz de Jaci: {n} de {total} jefes del Norte calmados",
+    "Mapa do Brasil": "Mapa de Brasil",
+    "em breve": "pronto",
+    "Norte": "Norte",
+    "Nordeste": "Nordeste",
+    "Centro-Oeste": "Centro-Oeste",
+    "Sudeste": "Sudeste",
+    "Sul": "Sur",
+    "Aeroporto de Belém": "Aeropuerto de Belém",
+    "Onde tudo começou: a aldeia, Ananindeua e Belém. Os bichos e encantados da floresta ficaram bravos com a fumaça de Pytuna.": "Donde todo empezó: la aldea, Ananindeua y Belém. Los animales y encantados de la selva se pusieron bravos con el humo de Pytuna.",
+    "Sertão, dunas e mangue. Dizem que lá a fumaça secou tudo, e a Comadre Fulozinha anda perdida na mata.": "Sertón, dunas y manglares. Dicen que allí el humo secó todo, y la Comadre Fulozinha anda perdida en el monte.",
+    "O Pantanal, o cerrado e Brasília. Um céu tão grande que a lua devia brilhar mais.": "El Pantanal, el cerrado y Brasilia. Un cielo tan grande que la luna debería brillar más.",
+    "Cidades que não dormem e mata atlântica nas serras. Mais luz de poste que de lua.": "Ciudades que no duermen y mata atlántica en las sierras. Más luz de farol que de luna.",
+    "Onde a mata de pinheiro acaba. Foi pra lá que a fumaça fugiu. E é lá que fica Curitiba.": "Donde termina el bosque de pinos. Allá huyó el humo. Y allá está Curitiba.",
+    "Entre as cidades da região, vai de ônibus (rodoviária da BR-316).": "Entre las ciudades de la región, se va en autobús (terminal de la BR-316).",
+    "{aero}: os voos de ida e volta abrem quando o Rhanon chegar na próxima região.": "{aero}: los vuelos de ida y vuelta se abren cuando Rhanon llegue a la próxima región.",
+    "Ainda não dá pra ir. A história chega lá em breve.": "Todavía no se puede ir. La historia llega allá pronto."
   }
 };

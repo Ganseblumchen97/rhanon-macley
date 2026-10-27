@@ -950,3 +950,20 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .chapter.out{opacity:0}
 .chapter h2{font-size:clamp(40px,8vw,96px);rotate:-4deg;margin:0}
 .chapter p{font:700 16px var(--mono);color:#f6e9c4;background:#06120a;padding:6px 14px}
+/* mapa do Brasil (openBrasil em systems/world-map.js): contorno com um ponto por região e a lista ao lado */
+.br-wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-items:start}
+.br-wrap svg{width:100%;max-height:60vh}
+.br-wrap .land path{fill:#3f6a3a;stroke:#06120a;stroke-width:3}
+.br-trail{fill:none;stroke:#f6e9c4;stroke-width:3;stroke-dasharray:6 7;opacity:.6}
+.br-dot circle{fill:#5a5a5a;stroke:#06120a;stroke-width:3}
+.br-dot text{font:400 15px var(--display);fill:#f6e9c4;paint-order:stroke;stroke:#06120a;stroke-width:4px;text-transform:uppercase}
+.br-dot.open circle{fill:var(--rc);animation:brPulse 1.4s steps(2) infinite}
+.br-dot.sel circle{stroke:#ffd23a;stroke-width:5}
+@keyframes brPulse{50%{r:19px}}
+.br-smoke circle{fill:#2a2a34;stroke:#06120a;stroke-width:2}
+.br-smoke rect{fill:#ff2a2a}
+.br-card{border-top:2px dashed var(--wood);padding-top:6px;margin-top:6px}
+.br-card h3{margin:0;font:400 22px var(--display);text-transform:uppercase}
+.br-card p{margin:4px 0;font:13px/1.45 var(--mono);color:var(--brown)}
+@media(max-width:640px){.br-wrap{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.br-dot.open circle{animation:none}}

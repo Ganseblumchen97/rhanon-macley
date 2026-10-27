@@ -15,6 +15,21 @@ const MAP_REGIONS = {
     land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
     route: ["ananindeua", "curitiba"], pos: {ananindeua: [322, 168], curitiba: [315, 478]}}
 };
+/* Regiões do Brasil (mapa do Brasil, systems/world-map.js; ver HISTORIA.md): a viagem vai do Norte ao Sul. pos = ponto no
+   contorno de MAP_REGIONS.brasil (viewBox 600x620); map = mapa grande da região (por enquanto só o Pará, no Norte);
+   airport = aeroporto que abre os voos de ida e volta para as regiões já visitadas (G.regions). open: false = em breve. */
+const REGIONS = {
+  norte:       {n: "Norte", pos: [215, 200], color: "#3f9a5c", open: true, map: "para", airport: "Aeroporto de Belém",
+    txt: "Onde tudo começou: a aldeia, Ananindeua e Belém. Os bichos e encantados da floresta ficaram bravos com a fumaça de Pytuna."},
+  nordeste:    {n: "Nordeste", pos: [385, 245], color: "#e8a020", open: false,
+    txt: "Sertão, dunas e mangue. Dizem que lá a fumaça secou tudo, e a Comadre Fulozinha anda perdida na mata."},
+  centroeste:  {n: "Centro-Oeste", pos: [262, 335], color: "#c8603a", open: false,
+    txt: "O Pantanal, o cerrado e Brasília. Um céu tão grande que a lua devia brilhar mais."},
+  sudeste:     {n: "Sudeste", pos: [352, 410], color: "#3a7ab8", open: false,
+    txt: "Cidades que não dormem e mata atlântica nas serras. Mais luz de poste que de lua."},
+  sul:         {n: "Sul", pos: [300, 490], color: "#7a4ac8", open: false,
+    txt: "Onde a mata de pinheiro acaba. Foi pra lá que a fumaça fugiu. E é lá que fica Curitiba."}
+};
 const LOC = {
   ananindeua: {n: "Ananindeua (PA)", s: "Ananindeua", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor anda brava, e cada lembrança que os bichos deixam rende uns trocados."},
   belem: {n: "Belém (PA)", s: "Belém", txt: "A capital do Pará, na beira da baía do Guajará. Prédios, casarões de azulejo, o Ver-o-Peso... e bicho e malandro bem mais fortes que os da mata."},

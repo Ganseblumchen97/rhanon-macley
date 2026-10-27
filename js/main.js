@@ -9,7 +9,7 @@ buildLocalNodes();
 setupExploreInput();
 setupMapNav(); setupGamepad(); setupNarration();
 setupOptions();
-setupEquip(); setupSkills();
+setupEquip(); setupSkills(); setupBrasil();
 setupReveal();
 $("stage").addEventListener("pointerdown", () => qtePress());   // no celular: tocar no palco na hora certa
 loadArt();   // imagens de data/art.js (carregam enquanto a tela inicial está aberta)

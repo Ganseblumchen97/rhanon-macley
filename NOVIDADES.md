@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.39.0 — o mapa do Brasil
+
+- No mapa do Pará há um botão novo, "Mapa do Brasil", que mostra as cinco regiões da viagem do Rhanon: Norte,
+  Nordeste, Centro-Oeste, Sudeste e Sul, ligadas por uma trilha até Curitiba.
+- O Norte é onde a aventura acontece agora. As outras regiões aparecem como "em breve", cada uma com um pouco do que
+  espera o Rhanon por lá. Depois que Pytuna foge, dá para ver a fumaça dele no Sul.
+- O Norte mostra quantos chefes já devolveram a luz de Jaci, e o Aeroporto de Belém já está lá, esperando a próxima
+  região para abrir os voos.
+
 ## 0.38.0 — Jaci e Pytuna: a história do Norte
 
 - A lua da noite agora é Jaci, e ela está coberta por uma fumaça com olhos vermelhos: Pytuna, a Noite sem Lua. Cada

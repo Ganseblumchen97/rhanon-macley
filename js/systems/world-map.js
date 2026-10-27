@@ -68,7 +68,45 @@ function select(id) {
     i.insertAdjacentHTML("beforeend", `<p class="hint">Passagem: R$ ${cost}</p>`);
     btn(miss > 0 ? t("Faltam R$ {n}", {n: miss}) : t("Viajar"), () => go(id, cost), miss > 0);
   }
+  btn(t("Mapa do Brasil"), () => openBrasil());   // as cinco regiões da viagem
   resetButton(i, () => { drawMap(); select(G.loc); });
+}
+/* ---------- mapa do Brasil: as cinco regiões (REGIONS), do Norte ao Sul ----------
+   À esquerda o contorno com um ponto por região (a aberta pulsa, as outras ficam apagadas) e a fumaça de Pytuna no Sul
+   depois que ele foge; à direita a lista (setas escolhem, Z abre, X fecha) e o painel da região escolhida. */
+let BR_SEL = "norte";
+function openBrasil() {
+  vit(); audio();
+  const o = $("brasil"), box = o.querySelector(".info"), B = MAP_REGIONS.brasil, fled = G.narrated.pyt_jacare_canal || G.narrated.pyt_bufalo_touro;
+  const dots = Object.entries(REGIONS).map(([k, r]) => `<g class="br-dot${r.open ? " open" : ""}${k === BR_SEL ? " sel" : ""}" transform="translate(${r.pos[0]} ${r.pos[1]})" style="--rc:${r.color}"><circle r="${r.open ? 16 : 12}"/><text y="34" text-anchor="middle">${r.n}</text></g>`).join("");
+  const smoke = fled ? `<g class="br-smoke" transform="translate(${REGIONS.sul.pos[0] + 30} ${REGIONS.sul.pos[1] - 26})"><circle r="11" cx="-6"/><circle r="13" cx="6" cy="-4"/><circle r="9" cx="2" cy="6"/><rect x="-6" y="-4" width="4" height="3"/><rect x="3" y="-4" width="4" height="3"/></g>` : "";
+  box.innerHTML = `<h2>${t("Mapa do Brasil")}</h2><div class="br-wrap"><svg viewBox="80 80 400 480" aria-hidden="true"><g class="land">${B.land.map(d => `<path d="${d}"/>`).join("")}</g>` +
+    `<path class="br-trail" d="M${REGIONS.norte.pos} L${REGIONS.nordeste.pos} L${REGIONS.centroeste.pos} L${REGIONS.sudeste.pos} L${REGIONS.sul.pos}"/>${dots}${smoke}</svg><div class="br-side"></div></div>`;
+  const side = box.querySelector(".br-side");
+  Object.entries(REGIONS).forEach(([k, r]) => btn(r.n + (r.open ? "" : ` <small>${t("em breve")}</small>`), () => { BR_SEL = k; sfx("blip"); openBrasil(); }, false, side));
+  side.querySelectorAll(".cmd").forEach((b, j) => b.classList.toggle("sel", Object.keys(REGIONS)[j] === BR_SEL));
+  const r = REGIONS[BR_SEL], card = document.createElement("div"); card.className = "br-card";
+  card.innerHTML = `<h3 style="color:${r.color}">${r.n}</h3><p>${r.txt}</p>` + (r.open
+    ? `<p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p>` +
+      `<p class="hint">${t("Entre as cidades da região, vai de ônibus (rodoviária da BR-316).")}</p>` +
+      `<p class="hint">${t("{aero}: os voos de ida e volta abrem quando o Rhanon chegar na próxima região.", {aero: r.airport})}</p>`
+    : `<p class="hint">${t("Ainda não dá pra ir. A história chega lá em breve.")}</p>`);
+  side.append(card);
+  btn(t("Fechar"), closeBrasil, false, side);
+  if (o.hidden) { o.hidden = false; sfx("look"); }
+  menuSelect(side, Object.keys(REGIONS).indexOf(BR_SEL));
+}
+function closeBrasil() { $("brasil").hidden = true; sfx("blip"); }
+function setupBrasil() {
+  $("brasil").addEventListener("click", ev => { if (ev.target === $("brasil")) closeBrasil(); });
+  document.addEventListener("keydown", ev => {
+    if ($("brasil").hidden || ev.ctrlKey || ev.altKey || ev.metaKey) return;
+    ev.stopImmediatePropagation();
+    const keys = Object.keys(REGIONS), i = keys.indexOf(BR_SEL);
+    if (ev.key === "ArrowDown" || ev.key === "ArrowUp") { ev.preventDefault(); BR_SEL = keys[(i + (ev.key === "ArrowDown" ? 1 : keys.length - 1)) % keys.length]; sfx("blip"); openBrasil(); }
+    else if (["Escape", "x", "X"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); closeBrasil(); }
+    else if (["z", "Z", "Enter", " "].includes(ev.key)) ev.preventDefault();
+  }, true);
 }
 // "Zerar progresso" (pede um segundo clique para confirmar); after = redesenha a tela de onde veio
 function resetButton(host, after) {

@@ -1161,6 +1161,22 @@ TX.en = {
     "O resto dessa história fica pra outra noite. Agora dorme.": "The rest of this story is for another night. Now sleep.",
     "Fim do Norte": "End of the North",
     "A história continua no Nordeste... em breve.": "The story continues in the Northeast... soon.",
-    "Luz de Jaci: {n} de {total} chefes do Norte acalmados": "Jaci's light: {n} of {total} North bosses calmed"
+    "Luz de Jaci: {n} de {total} chefes do Norte acalmados": "Jaci's light: {n} of {total} North bosses calmed",
+    "Mapa do Brasil": "Map of Brazil",
+    "em breve": "soon",
+    "Norte": "North",
+    "Nordeste": "Northeast",
+    "Centro-Oeste": "Center-West",
+    "Sudeste": "Southeast",
+    "Sul": "South",
+    "Aeroporto de Belém": "Belém Airport",
+    "Onde tudo começou: a aldeia, Ananindeua e Belém. Os bichos e encantados da floresta ficaram bravos com a fumaça de Pytuna.": "Where it all began: the village, Ananindeua and Belém. The forest's animals and spirits turned angry from Pytuna's smoke.",
+    "Sertão, dunas e mangue. Dizem que lá a fumaça secou tudo, e a Comadre Fulozinha anda perdida na mata.": "Backlands, dunes and mangroves. They say the smoke dried everything out there, and Comadre Fulozinha is lost in the woods.",
+    "O Pantanal, o cerrado e Brasília. Um céu tão grande que a lua devia brilhar mais.": "The Pantanal, the cerrado and Brasília. A sky so big the moon should shine brighter.",
+    "Cidades que não dormem e mata atlântica nas serras. Mais luz de poste que de lua.": "Cities that never sleep and Atlantic forest in the hills. More streetlight than moonlight.",
+    "Onde a mata de pinheiro acaba. Foi pra lá que a fumaça fugiu. E é lá que fica Curitiba.": "Where the pine forest ends. That's where the smoke fled. And that's where Curitiba is.",
+    "Entre as cidades da região, vai de ônibus (rodoviária da BR-316).": "Between the region's cities, you travel by bus (BR-316 bus station).",
+    "{aero}: os voos de ida e volta abrem quando o Rhanon chegar na próxima região.": "{aero}: round-trip flights open when Rhanon reaches the next region.",
+    "Ainda não dá pra ir. A história chega lá em breve.": "You can't go yet. The story gets there soon."
   }
 };
