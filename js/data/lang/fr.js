@@ -1148,6 +1148,25 @@ TX.fr = {
     "O menino apanhou até lembrar que o armeiro da feira fazia arco. De longe, bicho bravo não morde.": "Le garçon a pris des coups jusqu'à se souvenir que l'armurier du marché faisait des arcs. De loin, une bête furieuse ne mord pas.",
     "Eu tinha luar de chefe guardado pra fazer talismã pra ele. Mas o teimoso não vinha falar comigo.": "J'avais de la lueur de chef de côté pour lui faire un talisman. Mais ce têtu ne venait pas me parler.",
     "Às vezes ele voltava pras trilhas de antes, pra ficar mais forte. Não tem vergonha nisso.": "Parfois il retournait sur les sentiers d'avant pour devenir plus fort. Il n'y a pas de honte à ça.",
-    "Ele aprendeu a apertar Z na hora certa: golpe perfeito e bloqueio. Quem acerta o tempo acalma até onça.": "Il a appris à appuyer sur Z au bon moment : coup parfait et parade. Qui trouve le bon tempo calme même un jaguar."
+    "Ele aprendeu a apertar Z na hora certa: golpe perfeito e bloqueio. Quem acerta o tempo acalma até onça.": "Il a appris à appuyer sur Z au bon moment : coup parfait et parade. Qui trouve le bon tempo calme même un jaguar.",
+    "Foi na primeira noite que ele viu. A fumaça desceu do céu, devagar, e ficou olhando pra ele.": "C'est la première nuit qu'il l'a vue. La fumée est descendue du ciel, lentement, et l'a regardé.",
+    "Então tu é o curumim da lança de pedra da lua... Some daqui. A noite é minha.": "Alors c'est toi, le petit à la lance en pierre de lune... Disparais. La nuit est à moi.",
+    "Quem é tu?": "Qui es-tu ?",
+    "Pytuna. A noite sem lua. Quando Jaci apagar de vez, ninguém vai ver o que eu levo da mata.": "Pytuna. La nuit sans lune. Quand Jaci s'éteindra pour de bon, personne ne verra ce que je prends à la forêt.",
+    "E sumiu no escuro, deixando um cheiro de mato queimado.": "Et elle a disparu dans le noir, laissant une odeur de brousse brûlée.",
+    "Quando o último bicho de Ananindeua voltou a si, a fumaça apareceu de novo. Mais fina. Mais brava.": "Quand la dernière bête d'Ananindeua a repris ses esprits, la fumée est revenue. Plus fine. Plus furieuse.",
+    "Tu acalma um, acalma dez... A fumaça não acaba, curumim. Ela vem de toda parte.": "Tu en calmes un, tu en calmes dix... La fumée ne s'arrête pas, petit. Elle vient de partout.",
+    "Então eu vou atrás de onde ela vem.": "Alors j'irai chercher d'où elle vient.",
+    "Vem. Te espero na cidade grande.": "Viens. Je t'attends dans la grande ville.",
+    "Em Belém ela já não falava tão alto. Jaci estava voltando, e a fumaça sabia.": "À Belém, elle ne parlait plus aussi fort. Jaci revenait, et la fumée le savait.",
+    "A capital também não te segurou... Tá bom. Lá pro Sul, onde a mata de pinheiro acaba, eu sou maior que tu.": "La capitale non plus ne t'a pas arrêté... Très bien. Là-bas au Sud, où finit la forêt de pins, je suis plus grande que toi.",
+    "E o vento levou ela pro Sul. Foi a última vez que o Norte viu Pytuna.": "Et le vent l'a emportée vers le Sud. Ce fut la dernière fois que le Nord vit Pytuna.",
+    "E foi assim que o Norte voltou a ver Jaci inteira, curumim. Olha lá em cima.": "Et c'est ainsi que le Nord a revu Jaci entière, petit. Regarde là-haut.",
+    "Mas a fumaça não acabou. Foi embora pro Sul, devagarinho, como quem não quer nada.": "Mais la fumée n'a pas disparu. Elle est partie vers le Sud, tout doucement, l'air de rien.",
+    "Então é pra lá que eu vou, vô.": "Alors c'est là que j'irai, grand-père.",
+    "O resto dessa história fica pra outra noite. Agora dorme.": "La suite de cette histoire, ce sera pour une autre nuit. Maintenant dors.",
+    "Fim do Norte": "Fin du Nord",
+    "A história continua no Nordeste... em breve.": "L'histoire continue dans le Nordeste... bientôt.",
+    "Luz de Jaci: {n} de {total} chefes do Norte acalmados": "Lumière de Jaci : {n} chefs du Nord calmés sur {total}"
   }
 };

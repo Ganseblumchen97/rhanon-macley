@@ -71,17 +71,21 @@ function sunCanvas() {
   d.dots([[13, 22], [27, 22]], "#ff7a5a");
   return d.canvas();
 }
-// lua do mal (estilo Majora's Mask): olhos arregalados, sobrancelhas bravas e um sorriso cheio de dentes
+// Jaci, a lua: rosto calmo de olhos fechados; a fumaça de Pytuna (com olhos vermelhos) cobre o pedaço que ainda falta
+// voltar (jaciLight em ui/narration.js: um pedaço a cada chefe acalmado no Norte)
 function moonCanvas() {
-  const d = rigGrid(1, 40, 40);
-  d.part().ellipse(20, 20, 17, 17, "#e6d49a", "#b49a5c", .5).dots([[9, 10], [10, 10], [30, 28], [31, 29], [27, 9], [8, 27]], "#c8b47a");   // crateras
-  d.part().ellipse(13, 16, 4.5, 3.5, "#ffcc33").ellipse(27, 16, 4.5, 3.5, "#ffcc33");
-  d.ellipse(13, 16, 1.6, 2.4, "#1a1426").ellipse(27, 16, 1.6, 2.4, "#1a1426").dots([[12, 15], [26, 15]], "#ffffff");
-  d.limb(8, 10, 17, 13, 1.5, "#4a3420").limb(32, 10, 23, 13, 1.5, "#4a3420");   // sobrancelhas
-  d.part().poly([[8, 24], [32, 24], [26, 31], [14, 31]], "#3a1a1a");
-  for (let x = 10; x < 31; x += 3) d.rect(x, 24, 2, 2, "#f4ecd8");   // dentes de cima
-  for (let x = 15; x < 26; x += 3) d.rect(x, 29, 2, 2, "#f4ecd8");   // dentes de baixo
-  return d.canvas();
+  const d = rigGrid(1, 40, 40), light = typeof jaciLight === "function" ? jaciLight() : 0;
+  d.part().ellipse(20, 20, 17, 17, "#f4ecc0", "#c8b47a", .5).dots([[9, 10], [10, 10], [30, 28], [31, 29], [27, 9], [8, 27]], "#d8c890");   // crateras
+  d.limb(11, 17, 15, 17, 1, "#8a7a4a").limb(25, 17, 29, 17, 1, "#8a7a4a").dots([[16, 25], [17, 26], [18, 26], [19, 26], [20, 26], [21, 26], [22, 26], [23, 25]], "#8a7a4a");   // olhos fechados e sorriso
+  const c = d.canvas(), x = c.getContext("2d"), cover = 1 - light;
+  if (cover > 0) {   // a fumaça cobre da direita para a esquerda, do tamanho do que falta
+    x.save(); x.beginPath(); x.arc(20, 20, 18, 0, Math.PI * 2); x.clip();
+    x.fillStyle = "#2a2a34"; x.fillRect(Math.round(40 - 40 * cover), 0, 40, 40);
+    x.fillStyle = "#3a3a46"; for (let i = 0; i < 6; i++) { x.beginPath(); x.arc(40 - 40 * cover + (i % 2) * 2, 4 + i * 6.5, 4, 0, Math.PI * 2); x.fill(); }
+    x.restore();
+    if (cover > .25) { x.fillStyle = "#ff2a2a"; const ex = Math.round(40 - 40 * cover / 2); x.fillRect(ex - 4, 16, 2, 2); x.fillRect(ex + 2, 16, 2, 2); }   // olhos de Pytuna
+  }
+  return c;
 }
 // lobo-guará sentado; howl = cabeça para cima, uivando
 function wolfCanvas(howl) {
@@ -99,7 +103,7 @@ function wolfCanvas(howl) {
   return d.canvas();
 }
 // mid = chamado quando a faixa cobre a tela (troca a noite pelo dia ou o dia pela noite);
-// de dia o galo canta com o sol no canto; night = anoitecer, com a lua do mal e um lobo uivando
+// de dia o galo canta com o sol no canto; night = anoitecer, com Jaci (meio coberta pela fumaça) e um lobo uivando
 function dawnWipe(mid, label, night) {
   let w = $("dawnWipe");
   if (!w) {

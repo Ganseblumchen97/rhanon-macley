@@ -38,6 +38,35 @@ const NARRA_BOSS = {
   cobra_norato: ["A Cobra Norato é encantado bom, gente. A fumaça tinha prendido ele na forma de cobra. Foi ele quem disse que a fumaça vinha de longe, lá do Sul."],
   visagem_mare: ["A Visagem da maré molhou o menino da cabeça aos pés. Depois pediu desculpa. Visagem educada é raro."]
 };
+/* Pytuna, a Noite sem Lua (a fumaça que apaga Jaci): {p: "..."} é a fala dele, com o retrato de fumaça e olhos vermelhos.
+   NARRA_PYT: noite = primeira noite na exploração; os outros, depois do chefe com esse id (último de dia de cada cidade).
+   norte = fim do capítulo, quando os 20 chefes do Norte estão acalmados (Jaci inteira de novo). */
+const NARRA_PYT = {
+  noite: [
+    "Foi na primeira noite que ele viu. A fumaça desceu do céu, devagar, e ficou olhando pra ele.",
+    {p: "Então tu é o curumim da lança de pedra da lua... Some daqui. A noite é minha."},
+    {r: "Quem é tu?"},
+    {p: "Pytuna. A noite sem lua. Quando Jaci apagar de vez, ninguém vai ver o que eu levo da mata."},
+    "E sumiu no escuro, deixando um cheiro de mato queimado."
+  ],
+  bufalo_touro: [
+    "Quando o último bicho de Ananindeua voltou a si, a fumaça apareceu de novo. Mais fina. Mais brava.",
+    {p: "Tu acalma um, acalma dez... A fumaça não acaba, curumim. Ela vem de toda parte."},
+    {r: "Então eu vou atrás de onde ela vem."},
+    {p: "Vem. Te espero na cidade grande."}
+  ],
+  jacare_canal: [
+    "Em Belém ela já não falava tão alto. Jaci estava voltando, e a fumaça sabia.",
+    {p: "A capital também não te segurou... Tá bom. Lá pro Sul, onde a mata de pinheiro acaba, eu sou maior que tu."},
+    "E o vento levou ela pro Sul. Foi a última vez que o Norte viu Pytuna."
+  ],
+  norte: [
+    "E foi assim que o Norte voltou a ver Jaci inteira, curumim. Olha lá em cima.",
+    "Mas a fumaça não acabou. Foi embora pro Sul, devagarinho, como quem não quer nada.",
+    {r: "Então é pra lá que eu vou, vô."},
+    "O resto dessa história fica pra outra noite. Agora dorme."
+  ]
+};
 const NARRA_HINT = {
   pontos: "Foi aí que ele lembrou: tinha aprendido coisa nova e nem tinha usado. Aperta H, curumim.",
   arco: "O menino apanhou até lembrar que o armeiro da feira fazia arco. De longe, bicho bravo não morde.",

@@ -6,7 +6,7 @@ function setBattleDecor(zone) {
   stage.classList.add("zone-" + (zone || curZone || "mata"));
   // à noite: um véu azul-escuro com a lua por cima do cenário (embaixo das plataformas e dos personagens)
   if (!stage.querySelector(".night-shade")) decor.insertAdjacentHTML("afterend", '<div class="night-shade" aria-hidden="true"></div>');
-  stage.classList.toggle("night", !!G.night);
+  stage.classList.toggle("night", !!G.night); stage.style.setProperty("--jaci", jaciLight().toFixed(2));   // Jaci voltando clareia a noite
   decor.innerHTML = "";
   setScenery(zone || curZone || "mata");   // cenário em pixel art (gfx/scenery.js)
 }

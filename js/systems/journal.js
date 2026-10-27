@@ -36,7 +36,7 @@ function openJournal() {
   vit();
   const o = $("caderno"), box = o.querySelector(".info"), seen = ANIMALS.filter(a => G.bestiary[a.id] && G.bestiary[a.id].seen).length;
   o.classList.toggle("papel", !G.nb.on);   // antes do notebook ligar, o caderno é de papel (desenho à mão); depois, digital
-  box.innerHTML = `<h2>${t(G.nb.on ? "Caderno de bichos · digital" : "Caderno de bichos")}</h2><p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><div class="cad-grid"></div>`;
+  box.innerHTML = `<h2>${t(G.nb.on ? "Caderno de bichos · digital" : "Caderno de bichos")}</h2><p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p><p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><div class="cad-grid"></div>`;
   const grid = box.querySelector(".cad-grid");
   ANIMALS.forEach(a => grid.append(journalCard(a)));
   btn("Fechar", closeJournal, false, box);

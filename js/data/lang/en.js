@@ -1142,6 +1142,25 @@ TX.en = {
     "O menino apanhou até lembrar que o armeiro da feira fazia arco. De longe, bicho bravo não morde.": "The boy took a beating until he remembered the market smith made bows. From far away, an angry animal can't bite.",
     "Eu tinha luar de chefe guardado pra fazer talismã pra ele. Mas o teimoso não vinha falar comigo.": "I had boss moonglow saved up to make him a talisman. But the stubborn boy wouldn't come talk to me.",
     "Às vezes ele voltava pras trilhas de antes, pra ficar mais forte. Não tem vergonha nisso.": "Sometimes he went back to the earlier trails to get stronger. There's no shame in that.",
-    "Ele aprendeu a apertar Z na hora certa: golpe perfeito e bloqueio. Quem acerta o tempo acalma até onça.": "He learned to press Z at the right moment: perfect strikes and blocks. Get the timing right and you can calm even a jaguar."
+    "Ele aprendeu a apertar Z na hora certa: golpe perfeito e bloqueio. Quem acerta o tempo acalma até onça.": "He learned to press Z at the right moment: perfect strikes and blocks. Get the timing right and you can calm even a jaguar.",
+    "Foi na primeira noite que ele viu. A fumaça desceu do céu, devagar, e ficou olhando pra ele.": "It was on the first night that he saw it. The smoke came down from the sky, slowly, and stared at him.",
+    "Então tu é o curumim da lança de pedra da lua... Some daqui. A noite é minha.": "So you're the kid with the moonstone spear... Get out of here. The night is mine.",
+    "Quem é tu?": "Who are you?",
+    "Pytuna. A noite sem lua. Quando Jaci apagar de vez, ninguém vai ver o que eu levo da mata.": "Pytuna. The moonless night. When Jaci goes out for good, no one will see what I take from the forest.",
+    "E sumiu no escuro, deixando um cheiro de mato queimado.": "And it vanished into the dark, leaving a smell of burned brush.",
+    "Quando o último bicho de Ananindeua voltou a si, a fumaça apareceu de novo. Mais fina. Mais brava.": "When the last creature of Ananindeua came back to its senses, the smoke showed up again. Thinner. Angrier.",
+    "Tu acalma um, acalma dez... A fumaça não acaba, curumim. Ela vem de toda parte.": "You calm one, you calm ten... The smoke never ends, kid. It comes from everywhere.",
+    "Então eu vou atrás de onde ela vem.": "Then I'll go after where it comes from.",
+    "Vem. Te espero na cidade grande.": "Come, then. I'll be waiting in the big city.",
+    "Em Belém ela já não falava tão alto. Jaci estava voltando, e a fumaça sabia.": "In Belém it no longer spoke so loudly. Jaci was coming back, and the smoke knew it.",
+    "A capital também não te segurou... Tá bom. Lá pro Sul, onde a mata de pinheiro acaba, eu sou maior que tu.": "The capital couldn't hold you either... Fine. Down South, where the pine forest ends, I'm bigger than you.",
+    "E o vento levou ela pro Sul. Foi a última vez que o Norte viu Pytuna.": "And the wind carried it South. It was the last time the North saw Pytuna.",
+    "E foi assim que o Norte voltou a ver Jaci inteira, curumim. Olha lá em cima.": "And that's how the North saw Jaci whole again, little one. Look up there.",
+    "Mas a fumaça não acabou. Foi embora pro Sul, devagarinho, como quem não quer nada.": "But the smoke didn't end. It drifted South, slowly, like it had nothing to hide.",
+    "Então é pra lá que eu vou, vô.": "Then that's where I'm going, Grandpa.",
+    "O resto dessa história fica pra outra noite. Agora dorme.": "The rest of this story is for another night. Now sleep.",
+    "Fim do Norte": "End of the North",
+    "A história continua no Nordeste... em breve.": "The story continues in the Northeast... soon.",
+    "Luz de Jaci: {n} de {total} chefes do Norte acalmados": "Jaci's light: {n} of {total} North bosses calmed"
   }
 };

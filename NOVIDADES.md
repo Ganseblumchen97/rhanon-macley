@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.38.0 — Jaci e Pytuna: a história do Norte
+
+- A lua da noite agora é Jaci, e ela está coberta por uma fumaça com olhos vermelhos: Pytuna, a Noite sem Lua. Cada
+  chefe acalmado no Norte (são 20, de dia e de noite) devolve um pedaço da luz de Jaci. A lua do anoitecer vai
+  aparecendo, e as noites ficam menos escuras.
+- Pytuna aparece em pessoa: na primeira noite, depois do último chefe de Ananindeua e depois do último chefe de Belém.
+  Ele fala com o Rhanon e foge para o Sul.
+- Com os 20 chefes do Norte acalmados, o Pajé fecha o capítulo, e a história continua no Nordeste (em breve).
+- O caderno de bichos mostra quantos chefes do Norte já devolveram a luz de Jaci.
+
 ## 0.37.0 — o Pajé conta a história
 
 - Agora o Pajé narra o jogo, anos depois, na fogueira da aldeia. Num jogo novo, ele abre a história antes do tutorial:

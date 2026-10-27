@@ -939,3 +939,14 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .narra.rhanon canvas{order:2}
 .narra.rhanon b{color:#25663a}
 .narra.rhanon p{font-style:normal;font-family:var(--mono)}
+/* noite da batalha mais clara conforme a luz de Jaci volta (--jaci de 0 a 1, combat.js) */
+.stage .night-shade{background:radial-gradient(circle at 86% 13%,#fff4c8 0 3.2%,rgba(255,236,170,calc(.2 + var(--jaci,0) * .3)) 4%,rgba(255,236,170,.06) 10%,transparent 18%),rgba(8,12,44,calc(.68 - var(--jaci,0) * .24))}
+/* fala de Pytuna: painel escuro, nome vermelho */
+.narra.pytuna{background:linear-gradient(180deg,#24242e,#14141c);color:#d8d8e8;box-shadow:6px 6px 0 #6a1010}
+.narra.pytuna b{color:#ff4a4a}
+.narra.pytuna p{font-style:normal;letter-spacing:.02em}
+/* fim de capítulo */
+.chapter{position:fixed;inset:0;z-index:1600;display:grid;place-content:center;justify-items:center;gap:10px;background:rgba(6,18,10,.82);pointer-events:none;animation:rpop .4s var(--pop) backwards;transition:opacity .8s}
+.chapter.out{opacity:0}
+.chapter h2{font-size:clamp(40px,8vw,96px);rotate:-4deg;margin:0}
+.chapter p{font:700 16px var(--mono);color:#f6e9c4;background:#06120a;padding:6px 14px}

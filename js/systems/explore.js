@@ -192,6 +192,8 @@ function startExplore(zone, after, from) {
     exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || t(" · lembranças, comida, artesão e armeiro: chega perto de uma barraca e aperta Z")) : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? t(" · dizem que algo do folclore ronda o fim da trilha...") : t(" · o chefe espera no fim da trilha")));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
+    else if (G.night && !G.tutorial && !G.narrated.pyt_noite) { G.narrated.pyt_noite = true; save(); setTimeout(() => pytunaScene(NARRA_PYT.noite), 700); }   // primeira noite: Pytuna aparece
+    else if (jaciLight() >= 1 && !G.narrated.norte_fim) { EX.locked = true; setTimeout(() => bossStory("", () => { if (EX) EX.locked = false; }), 700); }   // save que já acalmou o Norte todo
     else if (cityOf(zone) === "belem" && !G.narrated.belem) { G.narrated.belem = true; save(); setTimeout(() => narrate(NARRA.belem), 600); }   // primeira vez na capital
     else if (G.loseStreak >= 2) { G.loseStreak = 0; save(); setTimeout(() => narrate([pajeHint()]), 600); }   // perdeu duas seguidas: o Pajé "lembra" de algo
   });
@@ -223,7 +225,7 @@ function resumeExplore(result) {
   const reveal = () => { if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); } };   // o mapa mostra o caminho novo
   if (en && result === "win" && en.boss && !en.rematch && NARRA_BOSS[en.a.id] && !G.narrated[en.a.id]) {
     G.narrated[en.a.id] = true; save(); EX.locked = true;
-    setTimeout(() => narrate(NARRA_BOSS[en.a.id], () => { if (EX) EX.locked = false; reveal(); }), 900);
+    setTimeout(() => narrate(NARRA_BOSS[en.a.id], () => bossStory(en.a.id, () => { if (EX) EX.locked = false; reveal(); })), 900);
   } else reveal();
 }
 
@@ -617,6 +619,7 @@ function exDraw(now) {
   }
   drawAmbient(x, cx, cy, now, false);
   if (EX.night) drawNightShade(x, cx, cy, now);
+  drawPytuna(x, cx, cy, now);   // fumaça de Pytuna nas cenas dele (ui/narration.js)
   drawAmbient(x, cx, cy, now, true);
   if (EX.camp && EX.camp.kind !== "fogueira") drawCampSky(x, cx, cy, now);
   for (const s of EX.spits) {   // jato d'água: gota com rastro
@@ -1096,6 +1099,7 @@ function campSkip() {
 // fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
   const kind = EX.camp.kind; EX.camp = null; EX.dialog = null; exKeys.clear();
+  if (G.night && !G.tutorial && !G.narrated.pyt_noite && (kind === "noite")) { G.narrated.pyt_noite = true; save(); setTimeout(() => pytunaScene(NARRA_PYT.noite), 500); }   // anoiteceu pela primeira vez
   if (kind === "intro" && G.tutorial && !G.narrated.prologo) { G.narrated.prologo = true; save(); return narrate(NARRA.prologo, startTutorial); }   // o Pajé abre a história
   if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast(t("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata."));
   exToast(rest(kind, true, true)); exHud();
@@ -1136,11 +1140,11 @@ function drawNightShade(x, cx, cy, now) {
   const c = NIGHT_CV || (NIGHT_CV = document.createElement("canvas"));
   c.width = VIEW_W; c.height = VIEW_H;
   const g = c.getContext("2d");
-  g.fillStyle = "rgba(6,8,32,.7)"; g.fillRect(0, 0, VIEW_W, VIEW_H);
+  const jl = jaciLight(); g.fillStyle = `rgba(6,8,32,${(.74 - jl * .28).toFixed(2)})`; g.fillRect(0, 0, VIEW_W, VIEW_H);   // Jaci voltando = noite menos escura
   g.globalCompositeOperation = "destination-out";
   const light = (px, py, r) => { const gr = g.createRadialGradient(px, py, r * .25, px, py, r); gr.addColorStop(0, "#000"); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(px - r, py - r, r * 2, r * 2); };
   const h = EX.camp || EX.hero;
-  light(h.x - cx, h.y - cy - 12, 50);
+  light(h.x - cx, h.y - cy - 12, 50 + jl * 18);
   const t0x = Math.floor(cx / TILE), t0y = Math.floor(cy / TILE), [nx, ny] = viewTiles();
   for (let ty = t0y - 3; ty <= t0y + ny + 3; ty++) for (let tx = t0x - 3; tx <= t0x + nx + 3; tx++)
     if (stageTile(tx, ty) === "F") light(tx * TILE + 8 - cx, ty * TILE + 8 - cy, 46 + Math.sin(now / 110 + tx) * 2.5);
