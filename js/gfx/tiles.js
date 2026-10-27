@@ -17,6 +17,10 @@ const TILE_PAL = {
   // cidade: chão de pedra/calçada, rua de asfalto ou paralelepípedo, telhado de telha (porto: zinco); walls = cores das fachadas
   veropeso: {g1: "#b0a898", g2: "#9a9282", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7a7268", path2: "#5e574e", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#8a96a0", roof2: "#5e6a74", walls: ["#3a7ab8", "#5aa06a"]},
   cidadevelha: {g1: "#a8a090", g2: "#948c7c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7e786c", path2: "#625c52", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22"},
+  // caatinga: chão de terra clara rachada, capim seco, mandacaru e árvore seca (cactus: o T vira um ou outro)
+  caatinga: {g1: "#d8c08a", g2: "#c8ae78", tall: "#a89a5a", tallHi: "#d8c87a", path: "#b8865a", path2: "#9a6a42", leaf: "#4a8a5a", leaf2: "#2e6a3e", leafHi: "#7ab884", trunk: "#8a8478", rock: "#b0a090", rock2: "#7a6a58", water: "#4a8aa8", water2: "#8ac0d0", wood: "#9c6339", wood2: "#6d4329", cactus: true},
+  // Petrolina: a orla do São Francisco, calçada clara e casario baixo de cores quentes
+  orla: {g1: "#c8b898", g2: "#b8a888", tall: "#8a9a4a", tallHi: "#b8c86a", path: "#8a7a68", path2: "#6e604e", leaf: "#3a7a3a", leaf2: "#2a5a2a", leafHi: "#5a9a4a", trunk: "#6d4329", rock: "#a89a88", rock2: "#7a6a58", water: "#3a7aa0", water2: "#7ab8d0", wood: "#9c6339", wood2: "#6d4329", roof: "#c06a3a", roof2: "#8a4422", walls: ["#e8d090", "#e89a5a", "#f0e6d0", "#d8705a", "#8ac0a0"]},
   olinda: {g1: "#a8a090", g2: "#948c7c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7e786c", path2: "#625c52", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22", walls: ["#e86a8a", "#f0c840", "#4aa8d8", "#8ad86a", "#f08a3a", "#e8e4d8"]},   // Olinda: o casario colonial colorido
   praiagrande: {g1: "#a8a090", g2: "#948c7c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7e786c", path2: "#625c52", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22", walls: ["#3a6ab8", "#e8e4d8", "#4a8ad8", "#f0d890", "#e8e4d8"]},   // casarões de azulejo (azul, branco e amarelo)
   recifeantigo: {g1: "#a8a090", g2: "#948c7c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7e786c", path2: "#625c52", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22", walls: ["#e86a8a", "#f0c840", "#4aa8d8", "#8ad86a", "#f08a3a", "#e8e4d8"]},   // Recife Antigo: casarões coloridos
@@ -80,6 +84,20 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
     grass();
     fillEllipse(x, ox + 8, oy + 9, 7, 6, OUTLINE); fillEllipse(x, ox + 8, oy + 9, 6, 5, P.rock2); fillEllipse(x, ox + 7, oy + 8, 5, 4, P.rock);
     x.fillStyle = "#ffffff40"; x.fillRect(ox + 5, oy + 6, 3, 1);
+  } else if (ch === "T" && P.cactus) {   // caatinga: mandacaru (cacto de braços) ou árvore seca de galho cinza, sorteado pelo lugar
+    grass();
+    if (r(90) < .5) {
+      x.fillStyle = OUTLINE; x.fillRect(ox + 6, oy + 1, 5, 15); x.fillRect(ox + 1, oy + 4, 4, 8); x.fillRect(ox + 12, oy + 3, 4, 7); x.fillRect(ox + 2, oy + 9, 6, 4); x.fillRect(ox + 9, oy + 7, 6, 4);
+      x.fillStyle = P.leaf; x.fillRect(ox + 7, oy + 2, 3, 13); x.fillRect(ox + 2, oy + 5, 2, 6); x.fillRect(ox + 13, oy + 4, 2, 5); x.fillRect(ox + 3, oy + 10, 4, 2); x.fillRect(ox + 10, oy + 8, 4, 2);
+      x.fillStyle = P.leafHi; x.fillRect(ox + 7, oy + 3, 1, 10); x.fillRect(ox + 2, oy + 6, 1, 3);
+    } else {
+      x.fillStyle = OUTLINE; x.fillRect(ox + 6, oy + 8, 4, 8);
+      x.fillStyle = P.trunk; x.fillRect(ox + 7, oy + 8, 2, 7);
+      for (const [a, b, c, d] of [[7, 9, 2, 3], [8, 9, 13, 2], [7, 7, 4, 1], [8, 6, 11, 0], [8, 10, 14, 7], [7, 10, 1, 7]]) {   // galhos secos
+        const n = Math.max(Math.abs(c - a), Math.abs(d - b));
+        for (let k = 0; k <= n; k++) x.fillRect(ox + Math.round(a + (c - a) * k / n), oy + Math.round(b + (d - b) * k / n), 1, 1);
+      }
+    }
   } else if (ch === "T" && P.dune) {   // dunas dos Lençóis: montinho de areia branca com a crista clara, sem tronco
     grass();
     fillEllipse(x, ox + 8, oy + 10, 9, 6, P.leaf2); fillEllipse(x, ox + 7, oy + 9, 8, 5, P.leaf); fillEllipse(x, ox + 5, oy + 7, 4, 1.5, P.leafHi);

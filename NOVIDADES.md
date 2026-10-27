@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.52.0 — o sertão e a Comadre Fulozinha
+
+- O Nordeste ganhou a quarta cidade: Petrolina, no sertão de Pernambuco, na beira do rio São Francisco. Depois de
+  acalmar o Teiú-rei de Olinda, o mapa vende a passagem de ônibus de Recife para Petrolina por R$ 1.100, de ida e volta.
+- A chegada é na orla do Velho Chico, com pensão, comida, comprador de lembranças e moradores que falam do queijo
+  coalho, das carrancas dos barcos e das lendas do sertão.
+- Saindo da orla, a Caatinga, para quem está perto do nível 42: chão seco, mandacaru e árvore sem folha. Bichos novos:
+  preá, tatu-bola, periquito-da-caatinga, jiboia e bode bravo. De noite aparece também a rasga-mortalha, a coruja
+  branca de grito que parece pano rasgando.
+- De dia, o chefe é o Bode-rei, o pai do rebanho, de chifre torto e barba até o peito. De noite aparece a Comadre
+  Fulozinha, a dona da mata, de cabelo até o pé, que dá surra de cipó e assobia de longe.
+- Por enquanto Petrolina tem só a Caatinga. A serra e a beira do rio vêm nas próximas versões.
+
 ## 0.51.0 — Olinda e o Homem da Meia-Noite
 
 - Saindo do Recife Antigo pela esquerda, as ladeiras de Olinda: casario colorido, igreja no alto e quintal cheio de

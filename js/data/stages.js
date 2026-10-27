@@ -126,6 +126,59 @@ const STAGES = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
+  // Petrolina (sertão): a orla do São Francisco, com a pensão (O), barracas e moradores; G leva à Caatinga
+  orla: {
+    safe: true, next: "caatinga",
+    rows: [
+      "########################",
+      "########################",
+      "#..f....-.......OOO...f#",
+      "#.KKK...-..KKK..OOO....#",
+      "#..V....-...C..........#",
+      "G--------------....P..SE",
+      "#..P....-.......-......#",
+      "#.T.....-...T...-...T..#",
+      "#.......-.......-.P....#",
+      "#..o....-.......-......#",
+      "~~~~~~~~=~~~~~~~=~~~~~~~"
+    ]
+  },
+  // Petrolina: a Caatinga (gerado por tools/gerar_mapas.py)
+  caatinga: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TT..T.T....f.,fT..T,T..TTTT.,.TT.TTT.T.,To..T,T.o.TT..T,.TTT",
+      "TTT.T.,..,......,,..ToT.T.,TTo..TTTT.T.TT.T.,.TT.T....TTTTTT",
+      "TTTTT.-------------.TT,TTTTTT.TT..T...TT..,,.....,.,,TTTTTTT",
+      "TTT.T.-...,......,-...T,.TTTT..TT.T,TT..,,,..,.......,...TTT",
+      "TT.,T.-.TT,o.....,-.,.f,.,..T..TT..a..T.-----------------.TT",
+      "TTo..,-....,.T.ao.-......,.o.,..TT,TT.T.-.....,.........-,.T",
+      "TTT..,-...T.TTT...-,...,.....TT.T.......-......a..o.o...-.,T",
+      "TT.,..-,..,T.T.,o.--------B.oTTTT,TT,.o.-,...TTT..T.TT..-..T",
+      "TT.f..-...T....TTT,..a.....,.TTT..T.T.o.-...TT..TTTaT..,-..T",
+      "TTo,.,-...To...T..,,T...f..,T..TT.a,....-.,.T.,.TTTTT.o.-.,T",
+      "TTT..,-..,,TT,T.....T,.....TTT.,.....T.a-..TaTT,.T,T....-.,T",
+      "TT..,.-.f,oTTT,T.T,TTTT.T.T..T.....,....-.TT..TTTTT.T,..-.,T",
+      "TTT...-..,.......TTTTTTT......-----------..TT..TTT,TTT..-..T",
+      "TTTTT.-........a.TT,T,TT.TTa,.-..,...,.,.T........T.....-..T",
+      "TT..T.-----------.T.T.T,T..TT.-.,...,T,...,TTT..........-,TT",
+      "TTTTT........,.,-..T.T,TToTT.,-...TTTT.,....T...........-.TT",
+      "TT.,,T..,.......-...,,T.T,....-...T.T..,.,.TT,-----------.TT",
+      "TT.T...T.TTTTf,.-...Ta.T..,...-.,.,..T,.TT....-,...,.....,TT",
+      "TTT.TT...TTT....-..,TTT.......F,...TT.T.T,....-..a..o.,,,.TT",
+      "TT.TTT.T.T..T..,-.,..T..T....,-....,T,..TTTf.,-,.,..TTa..TTT",
+      "TTT..o,..TT,...,-..T..T,T.....-...TT.,..T,T,f,-...TTT..TT,TT",
+      "TT.TT..TT,T.....-....,,....T..-......TT.T.....-,,oTT.TT.T.TT",
+      "TTT..,TT.,T..T..-....,........-.TaT.T.T.,TTT,.-,..,..,,.TTTT",
+      "TTTTTTT..T.T..T.---------------.T..T.TT,T.T...-a,....,o...TT",
+      "TT..TTTT..T,.,.T.......,.,,,,.aTTTTT..TT...T..-.,.,.,......T",
+      "TT....T.,T.T.,T...,,..fa..oT.T.T,...TT.T.T.T..-----------S-E",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.....,.......T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Recife (Nordeste): o Recife Antigo, com a pensão (O), barracas, moradores e o Seu Dedé (W), cliente do freela do cordel
   recifeantigo: {
     safe: true, next: "olinda",

@@ -33,7 +33,7 @@ function vit() {
   G.skills = G.skills || {};   // degraus aprendidos da árvore de habilidades
   // notebook: jogo novo começa sem ele (missão do começo); save antigo já tem tudo ligado
   if (!G.nb) G.nb = G.tutorial ? {} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};
-  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC;
+  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET;
   G.regions = G.regions || {norte: true};   // regiões já visitadas (o aeroporto voa entre elas)
   if (!G.narrated) G.narrated = G.belemVisto ? {belem: true} : {};   // falas do Pajé já contadas (prólogo, Belém, cada chefe)
   G.loseStreak = G.loseStreak || 0;   // lutas perdidas seguidas (2 = o Pajé dá uma dica)   // bugs resolvidos por freela; freelas entregues
@@ -62,8 +62,9 @@ function debugSetup() {
     route.slice(0, upto < 0 ? route.length : upto + (DEBUG.has("chefe") ? 1 : 0)).forEach(z => { if (ZONES[z]) BS()[z] = true; });
     route.slice(0, upto + 1).forEach(z => { if (cityOf(z) === city) G.seen[z] = true; });
     if (city !== "ananindeua") { G.loc = city; G.passagem = true; G.belemVisto = true; }
-    if (city === "teresina" || city === "recife") G.passagemTHE = true;
-    if (city === "recife") G.passagemREC = true;
+    if (city === "teresina" || city === "recife" || city === "petrolina") G.passagemTHE = true;
+    if (city === "recife" || city === "petrolina") G.passagemREC = true;
+    if (city === "petrolina") G.passagemPET = true;
     if (CITY[city].map === "nordeste") { NORTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.site_feira = true; G.narrated.norte_fim = true; G.regions = {norte: true, nordeste: true}; syncRegion(); buildLocalNodes(); }   // chegou de avião: o Norte está completo
     G.sub = fase;
   }

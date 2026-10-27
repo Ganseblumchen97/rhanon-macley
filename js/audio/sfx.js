@@ -120,6 +120,7 @@ function galo(t) {
 const CRIES = {
   felino: (t, k) => { voice(95, t, .75, "sawtooth", .16 * k, 62, 26, 14); hum(t, .65, .14 * k, 380, 1.5, .1); },
   felinoP: (t, k) => { voice(170, t, .5, "sawtooth", .12 * k, 110, 30, 18); hum(t, .4, .1 * k, 700, 1.5, .06); },
+  bode: (t, k) => voice(560, t, .7, "sawtooth", .09 * k, 500, 22, 45),   // béééé tremido
   roedor: (t, k) => [0, .11, .24].forEach((o, i) => voice(1800 + i * 200, t + o, .07, "triangle", .08 * k, 2500 - i * 300)),
   porco: (t, k) => [0, .16, .3].forEach(o => { voice(130, t + o, .12, "sawtooth", .12 * k, 85); hum(t + o, .1, .1 * k, 300, 2); }),
   macaco: (t, k) => { voice(380, t, .12, "triangle", .1 * k, 420); voice(420, t + .16, .12, "triangle", .1 * k, 470); voice(650, t + .34, .32, "triangle", .12 * k, 950, 9, 30); },
@@ -145,6 +146,7 @@ const CRIES = {
 };
 CRIES.gente = (t, k) => { voice(240, t, .12, "square", .09 * k, 300); voice(330, t + .14, .2, "square", .09 * k, 260); };   // "Ei!"
 CRIES.visagem = (t, k) => { voice(520, t, 1.1, "sine", .08 * k, 900, 5, 40); hum(t, 1, .06 * k, 1200, 3, .3); };   // lamento que sobe
+CRIES.assobio = (t, k) => [0, .5].forEach((o, i) => voice(i ? 2100 : 1700, t + o, .45, "sine", .07 * k, i ? 2700 : 2300, 7, 25));   // assobio fino, duas vezes (Comadre Fulozinha)
 const CRY_OF = {onca: "felino", jaguatirica: "felinoP", cotia: "roedor", cassaco: "roedor", quati: "roedor", queixada: "porco", macaco: "macaco",
   harpia: "ave", sucuri: "cobra", surucucu: "cobra", jacare: "jacare", calango: "calango", anta: "anta", capivara: "capivara", ariranha: "ariranha",
   preguica: "preguica", tamandua: "fungada", tatu: "tatu", piranha: "piranha", poraque: "eletrico", caranguejeira: "aranha",
@@ -154,7 +156,7 @@ const CRY_OF = {onca: "felino", jaguatirica: "felinoP", cotia: "roedor", cassaco
   urubu: "ave", gaviao_real: "ave", cobra_cipo: "cobra", ourico: "fungada", curupira: "macaco",
   bufalo: "anta", bufalo_touro: "anta", soco: "ave", jararaca: "cobra", mapinguari: "felino",
   pombo: "ave", gato: "felinoP", iguana: "calango", iguana_rei: "calango", caramelo: "lobo", cachorro_bravo: "lobo", batedor: "gente", golpista: "gente", ladrao_bike: "gente",
-  mulher_branco: "visagem", visagem_mare: "visagem", ratazana: "roedor", ratao: "roedor", rato_dagua: "roedor", mucura: "roedor", urubu_porto: "ave", gaivota: "ave", sagui: "macaco", maracaja: "felinoP", teiu: "calango", galo_campina: "ave", teiu_rei: "calango", meia_noite: "gente", lontra: "ariranha", jacare_papo: "jacare", cagado: "tatu", bigua: "ave", surubim: "piranha", cabeca_cuia: "visagem", tatupeba: "tatu", cascavel: "cobra", raposa: "lobo", traira: "piranha", asa_branca: "ave", sucuarana: "felino", boi_bumba: "anta", guara: "ave", garca_moura: "ave", carcara: "ave", siri: "aranha", mero: "piranha", serpente: "cobra",
+  mulher_branco: "visagem", visagem_mare: "visagem", ratazana: "roedor", ratao: "roedor", rato_dagua: "roedor", mucura: "roedor", urubu_porto: "ave", gaivota: "ave", prea: "roedor", tatu_bola: "tatu", periquito: "ave", jiboia: "cobra", bode: "bode", rasga_mortalha: "coruja", bode_rei: "bode", fulozinha: "assobio", sagui: "macaco", maracaja: "felinoP", teiu: "calango", galo_campina: "ave", teiu_rei: "calango", meia_noite: "gente", lontra: "ariranha", jacare_papo: "jacare", cagado: "tatu", bigua: "ave", surubim: "piranha", cabeca_cuia: "visagem", tatupeba: "tatu", cascavel: "cobra", raposa: "lobo", traira: "piranha", asa_branca: "ave", sucuarana: "felino", boi_bumba: "anta", guara: "ave", garca_moura: "ave", carcara: "ave", siri: "aranha", mero: "piranha", serpente: "cobra",
   cobra_norato: "boitata", jacare_canal: "jacare"};
 // grito do bicho (chefe soma um rugido grave por baixo)
 function animalCry(id, boss = false, k = 1) {

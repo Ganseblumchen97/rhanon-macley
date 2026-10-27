@@ -21,6 +21,12 @@ const NARRA = {
     {r: "Vô, o Seu Dedé fez um cordel sobre mim depois."},
     "Fez mesmo? Então tu é famoso no Nordeste inteiro. Mas aqui na aldeia continua lavando a panela."
   ],
+  petrolina: [
+    "Petrolina, no sertão. Depois de tanto mar e tanto mangue, o menino desceu do ônibus e só viu poeira, sol e mandacaru.",
+    "Mas lá passa o São Francisco, o Velho Chico. No meio da seca, um rio que nunca para. O povo de lá chama ele de pai.",
+    {r: "E tinha bode pra todo lado, vô. Um deles comeu minha corda do arco."},
+    "Bode come tudo, curumim. Até corda de arco. Agora deixa eu contar da caatinga."
+  ],
   teresina: [
     "Teresina! A cidade mais quente do Brasil. O menino suava até a lança.",
     "Ela fica entre dois rios, o Parnaíba e o Poti. E no encontro deles mora uma assombração que os pescadores respeitam.",
@@ -35,6 +41,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  bode_rei: ["O Bode-rei era o pai de todo o rebanho solto da caatinga. Chifre torto, barba comprida e cabeça mais dura que pedra.", {r: "Ele me deu três cabeçadas, vô. Três!"}, "E tu deu quantas nele? Pois é. Bode não guarda rancor: depois foi comer uma palma ali do lado."],
+  fulozinha: ["A Comadre Fulozinha é a dona da mata do sertão, curumim. Menina pequena, cabelo comprido até o pé, e um assobio que se ouve de longe.", "Ela protege os bichos de caçador. A fumaça fez ela achar que todo mundo era caçador, até o menino.", {r: "Eu deixei fumo e mingau pra ela, vô. Do jeito que o povo ensinou."}, "Fez certo. Ela agradeceu com uma trança no teu cabelo, lembra? Tu ficou dias sem conseguir desfazer."],
   teiu_rei: ["O Teiú-rei tomava sol no alto da Sé desde o tempo dos holandeses, diz o povo de Olinda.", "A fumaça não deixava ele dormir. O menino acalmou o bicho e ele voltou pra pedra quentinha."],
   meia_noite: ["O Homem da Meia-Noite é o boneco gigante mais antigo de Olinda. Sai no Carnaval e dança até o sol nascer.", "A fumaça fez ele dançar fora de hora, de cara fechada. O menino acalmou o boneco, e ele voltou a sorrir.", {r: "Ele me ensinou o passo do frevo, vô."}, "Tu? Dançando frevo? Isso eu queria ter visto."],
   surubim: ["O Surubim é o rei do fundo do Parnaíba, curumim. Pintado igual onça, com bigode de velho.", {r: "Ele fez cócegas com o bigode, vô."}, "Era agradecimento. Peixe não sabe abraçar."],

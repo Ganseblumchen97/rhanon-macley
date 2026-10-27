@@ -16,6 +16,7 @@ const SCENES = {
   lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
+  caatinga:    {sky: ["#f0d8a0", "#e8c890", "#d8b8a0"], far: "#8a7a62", trees: "caatinga", plat: "areia"},   // sertão: céu de poeira, serra ao longe
   olinda:      {sky: ["#f8c890", "#f0a878", "#c88aa8"], far: "#8a6a9a", trees: "casario", plat: "pedra"},   // Olinda: pôr do sol no alto da Sé
   cidadevelha: {sky: ["#f0b080", "#e8a070", "#b88a9a"], far: "#7a6a8a", trees: "casario", plat: "pedra"},
   porto:       {sky: ["#b8c4cc", "#a0b0ba", "#8a9aa6"], far: "#6a7a86", trees: "galpao", plat: "tabua", water: true},
@@ -144,6 +145,7 @@ function sceneSkyline(x, S, P, rnd, W, top, st) {
     rect(c, 0, base - 3, W, 4);
   }
   if (S.trees === "campo") return;   // várzea: campo aberto, só a mata baixa ao longe
+  if (S.trees === "caatinga") { sceneCaatinga(x, P, rnd, W, top, st, rect); return; }
   // árvores grandes na frente da mata: tronco e copa com luz em cima; mangue com raízes em arco; seringueira clara com cortes
   const count = Math.ceil(W / 34);
   for (let i = 0; i < count; i++) {
@@ -161,6 +163,33 @@ function sceneSkyline(x, S, P, rnd, W, top, st) {
     [[0, 0, 1], [-.7, .35, .8], [.7, .35, .8], [-.3, -.5, .75], [.4, -.45, .7]].forEach(([dx, dy, s]) => blob(tx + tw / 2 + dx * cr, cy + dy * cr, cr * s, P.leaf));
     blob(tx + tw / 2 + cr * .25, cy + cr * .45, cr * .55, P.leaf2);
     blob(tx + tw / 2 - cr * .35, cy - cr * .45, cr * .38, P.leafHi);
+  }
+}
+// caatinga: mandacaru (cacto de braços para cima) e árvore seca de galho cinza, sem folha, na frente da serra
+function sceneCaatinga(x, P, rnd, W, top, st, rect) {
+  const count = Math.ceil(W / 30), skyH = top - st.y;
+  for (let i = 0; i < count; i++) {
+    const tx = Math.round((i + .2 + rnd() * .6) * W / count), tb = top + 1;
+    if (tx > st.x + st.w * .45 && tx < st.x + st.w * .95 && rnd() < .6) continue;   // o lugar do bicho fica limpo
+    if (rnd() < .5) {   // mandacaru
+      const h = Math.round(skyH * (.25 + rnd() * .15)), tt = tb - h;
+      rect(OUTLINE, tx - 1, tt - 1, 6, h + 1); rect(P.leaf, tx, tt, 4, h); rect(P.leafHi, tx + 1, tt + 1, 1, h - 2);
+      for (const s of [-1, 1]) if (rnd() < .8) {
+        const ay = tt + Math.round(h * (.3 + rnd() * .25)), ah = Math.round(h * (.25 + rnd() * .15)), ax = s < 0 ? tx - 5 : tx + 5;
+        rect(OUTLINE, Math.min(tx, ax) - 1, ay - 1, 7, 5); rect(P.leaf, Math.min(tx, ax), ay, 5, 3);   // cotovelo
+        rect(OUTLINE, ax - 1, ay - ah - 1, 5, ah + 2); rect(P.leaf, ax, ay - ah, 3, ah + 2); rect(P.leafHi, ax, ay - ah + 1, 1, ah - 1);
+      }
+      if (rnd() < .4) rect("#f4f0e0", tx + 1, tt - 2, 2, 2);   // a flor branca no alto
+    } else {   // árvore seca: tronco torto e galhos finos abrindo em leque
+      const h = Math.round(skyH * (.3 + rnd() * .18)), tt = tb - h;
+      x.strokeStyle = P.trunk; x.lineWidth = 2; x.beginPath(); x.moveTo(tx, tb); x.lineTo(tx + 1, tt + h * .45); x.stroke();
+      x.lineWidth = 1;
+      for (let k = 0; k < 5; k++) {
+        const a = -Math.PI / 2 + (k - 2) * .45 + (rnd() - .5) * .3, l = h * (.35 + rnd() * .25), bx = tx + 1, by = tt + h * .45;
+        x.beginPath(); x.moveTo(bx, by); x.lineTo(bx + Math.cos(a) * l, by + Math.sin(a) * l); x.stroke();
+        x.beginPath(); x.moveTo(bx + Math.cos(a) * l * .6, by + Math.sin(a) * l * .6); x.lineTo(bx + Math.cos(a + .5) * l * .9, by + Math.sin(a + .5) * l * .9); x.stroke();
+      }
+    }
   }
 }
 // rua da cidade: paralelepípedo (Cidade Velha) ou tábuas do cais (Porto)

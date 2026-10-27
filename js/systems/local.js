@@ -46,6 +46,10 @@ function selectSub(id, msg) {
     btn(t("Voltar para Ananindeua"), () => busRide("ananindeua"), false, i);
     lh(t("A passagem vale ida e volta. Na aldeia tem a fogueira e as matas de sempre."));
   }
+  else if (id === "orla") {
+    btn(t("Entrar na orla"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo do sertão."));
+  }
   else if (id === "recifeantigo") {
     btn(t("Entrar no Recife Antigo"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o Seu Dedé, cordelista, que precisa de um programador."));
@@ -101,8 +105,8 @@ function busRide(city, toStage) {
   const at = k => { const n = R.indexOf(k); if (R.length === 2) return n ? L : 0; let s = 0; for (let j = 1; j <= n; j++) s += Math.hypot(LOC[R[j]].x - LOC[R[j - 1]].x, LOC[R[j]].y - LOC[R[j - 1]].y); return s; };
   const L0 = at(G.loc), L1 = at(city);
   $("mk").style.display = "none"; $("mkbus").style.display = "";
-  const volta = G.loc === "recife";   // de Recife para Teresina, o ônibus volta pelo sertão
-  $("info").innerHTML = `<h2>${t("Na estrada…")}</h2><p>${t({belem: "O ônibus segue pela BR-316 rumo a Belém.", ananindeua: "O ônibus volta pela BR-316 para Ananindeua.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: "O ônibus atravessa o sertão rumo a Recife."}[city])}</p>`;
+  const volta = G.loc === "recife" || G.loc === "petrolina";   // voltando para o litoral (Teresina, Recife) pelo sertão
+  $("info").innerHTML = `<h2>${t("Na estrada…")}</h2><p>${t({belem: "O ônibus segue pela BR-316 rumo a Belém.", ananindeua: "O ônibus volta pela BR-316 para Ananindeua.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: volta ? "O ônibus desce do sertão de volta para Recife." : "O ônibus atravessa o sertão rumo a Recife.", petrolina: "O ônibus sobe pelo agreste e pelo sertão rumo a Petrolina."}[city])}</p>`;
   let t0 = 0, last = null, vrum = 0;
   const f = ts => {
     t0 = t0 || ts;

@@ -198,6 +198,7 @@ function startExplore(zone, after, from) {
     else if (jaciLight() >= 1 && !G.narrated.norte_fim) { EX.locked = true; setTimeout(() => bossStory("", () => { if (EX) EX.locked = false; }), 700); }   // save que já acalmou o Norte todo
     else if (cityOf(zone) === "belem" && !G.narrated.belem) { G.narrated.belem = true; save(); setTimeout(() => narrate(NARRA.belem), 600); }   // primeira vez na capital
     else if (cityOf(zone) === "saoluis" && !G.narrated.saoluis) { G.narrated.saoluis = true; save(); setTimeout(() => narrate(NARRA.saoluis), 600); }   // chegou no Nordeste
+    else if (cityOf(zone) === "petrolina" && !G.narrated.petrolina) { G.narrated.petrolina = true; save(); setTimeout(() => narrate(NARRA.petrolina), 600); }
     else if (cityOf(zone) === "recife" && !G.narrated.recife) { G.narrated.recife = true; save(); setTimeout(() => narrate(NARRA.recife), 600); }
     else if (cityOf(zone) === "teresina" && !G.narrated.teresina) { G.narrated.teresina = true; save(); setTimeout(() => narrate(NARRA.teresina), 600); }
     else if (G.loseStreak >= 2) { G.loseStreak = 0; save(); setTimeout(() => narrate([pajeHint()]), 600); }   // perdeu duas seguidas: o Pajé "lembra" de algo
@@ -206,6 +207,7 @@ function startExplore(zone, after, from) {
 const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira",
   praiagrande: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   trocatroca: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
+  orla: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   recifeantigo: " · lembranças, comida, rede na pensão e o Seu Dedé, que tem um freela: chega perto e aperta Z",
   parada: " · compra a passagem na cabine e embarca no ônibus", terminal: " · o ônibus volta pra Ananindeua; a trilha da esquerda vai pro Ver-o-Peso"};
 function exitExplore() {
@@ -559,7 +561,7 @@ function drawAnimalEnt(x, en, cx, cy, now) {
 }
 // bicho acalmado (golpe só ou vitória na batalha): agradece num balãozinho e corre para longe do Rhanon, para o mato
 const CALM_WAIT = 700, CALM_SPEED = 120, CALM_RUN = 1000;   // ms parado agradecendo, pixels/s correndo, ms correndo até sumir
-const BIRDS = new Set(["galo_campina", "bigua", "asa_branca", "guara", "garca_moura", "carcara", "harpia", "coruja", "garca", "macarico", "urubu", "soco", "pombo", "urubu_porto", "gaivota", "gaviao_real"]);
+const BIRDS = new Set(["periquito", "rasga_mortalha", "galo_campina", "bigua", "asa_branca", "guara", "garca_moura", "carcara", "harpia", "coruja", "garca", "macarico", "urubu", "soco", "pombo", "urubu_porto", "gaivota", "gaviao_real"]);
 function exCalm(en, now = performance.now()) {
   const h = EX.hero, dx = en.x - h.x, dy = en.y - h.y, n = Math.hypot(dx, dy) || 1;
   en.alive = false; en.calm = {t0: now, x0: en.x, y0: en.y, vx: dx / n, vy: dy / n}; en.face = dx > 0 ? 1 : -1;
@@ -758,9 +760,19 @@ const SPOT_LABEL = {segredo: "examinar", bau: "abrir o baú", fogueira: "descans
 const VILLAGER_NAME = {aldeao1: "Mateiro", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 // pensões das cidades (fase com O): nome do painel; dormir passa pela cena do quarto (motelScene)
-const PENSAO_NAME = {veropeso: "Pensão do Ver-o-Peso", praiagrande: "Pensão da Praia Grande", trocatroca: "Pensão do Troca-Troca", recifeantigo: "Pensão do Recife Antigo"};
+const PENSAO_NAME = {veropeso: "Pensão do Ver-o-Peso", praiagrande: "Pensão da Praia Grande", trocatroca: "Pensão do Troca-Troca", recifeantigo: "Pensão do Recife Antigo", orla: "Pensão da Orla"};
 // aviso de quando o Rhanon acorda na cidade (abertura do jogo, startIntro)
-const CITY_WAKE = {belem: "Belém · manhã no Ver-o-Peso...", saoluis: "São Luís · manhã na Praia Grande...", teresina: "Teresina · manhã no Troca-Troca...", recife: "Recife · manhã no Recife Antigo..."};
+const CITY_WAKE = {belem: "Belém · manhã no Ver-o-Peso...", saoluis: "São Luís · manhã na Praia Grande...", teresina: "Teresina · manhã no Troca-Troca...", recife: "Recife · manhã no Recife Antigo...", petrolina: "Petrolina · manhã na beira do Velho Chico..."};
+// Petrolina: quem é cada morador da orla do São Francisco e o que eles contam
+const PETROLINA_NAME = {urbano1: "Vendedora de queijo coalho", urbano2: "Artesão de carranca", urbano3: "Vaqueiro"};
+const PETROLINA_TIPS = [
+  "Oxe, chegou do litoral? Aqui é sertão, meu filho: sol de rachar e o Velho Chico pra refrescar. Prova o queijo coalho na brasa.",
+  "A carranca vai na proa do barco pra espantar o Nego d'água. Cara feia de madeira, coração bom.",
+  "Na caatinga tudo tem espinho: mandacaru, xique-xique, até o bode tem cara de poucos amigos. Vai de gibão, se puder.",
+  "De noite, quem anda na caatinga ouve um assobio fino. É a Comadre Fulozinha. Ela protege a mata e dá surra de cipó em caçador.",
+  "Pra agradar a Comadre, o povo deixa fumo e mingau no pé do pau. Mas esse ano nem isso tá acalmando ela.",
+  "Dizem que lá pra serra, nas noites de lua cheia de sexta-feira, anda um lobisomem. Vixe, nem quero saber."
+];
 // Recife: quem é cada morador do Recife Antigo e o que eles contam
 const RECIFE_NAME = {urbano1: "Passista de frevo", urbano2: "Vendedora de bolo de rolo", urbano3: "Batuqueiro do maracatu"};
 const RECIFE_TIPS = [
@@ -790,7 +802,7 @@ const SAOLUIS_TIPS = [
   "De noite, dizem que a carruagem de Ana Jansen passa nas ruas de pedra, puxada por cavalo sem cabeça. Vixe, nem quero ver."
 ];
 // moradores de cada cidade do Nordeste: nomes e falas (journal.js, villagerTalk)
-const CITY_FOLK = () => ({saoluis: [SAOLUIS_NAME, SAOLUIS_TIPS], teresina: [TERESINA_NAME, TERESINA_TIPS], recife: [RECIFE_NAME, RECIFE_TIPS]})[curCity()];
+const CITY_FOLK = () => ({saoluis: [SAOLUIS_NAME, SAOLUIS_TIPS], teresina: [TERESINA_NAME, TERESINA_TIPS], recife: [RECIFE_NAME, RECIFE_TIPS], petrolina: [PETROLINA_NAME, PETROLINA_TIPS]})[curCity()];
 const BELEM_TIPS = [
   "Aqui na capital tem malandro esperto, segura a bolsa! Se um fi de rapariga desses levar teu dinheiro, vence ele que ele devolve.",
   "Os urubus do Ver-o-Peso tão aqui desde antes de mim. Não mexe com eles que eles não mexem contigo.",

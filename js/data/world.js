@@ -12,12 +12,12 @@ const MAP_REGIONS = {
     // a BR-316 sai de Ananindeua para o sudoeste e faz uma volta antes de chegar a Belém (curve: os dois pontos de controle)
     route: ["ananindeua", "belem"], pos: {ananindeua: [494, 238], belem: [398, 312]}, curve: [18, 74, 86, -2]},
   // Nordeste: o contorno da região (a partir de longitude/latitude), a ilha de São Luís e o rio São Francisco; a estrada
-  // liga as cidades em ordem (São Luís, Teresina, Recife)
-  nordeste: {n: "Nordeste", aria: "Mapa estilizado do Nordeste, com São Luís, Teresina e Recife",
+  // liga as cidades em ordem (São Luís, Teresina, Recife e Petrolina, que volta para o sertão na beira do São Francisco)
+  nordeste: {n: "Nordeste", aria: "Mapa estilizado do Nordeste, com São Luís, Teresina, Recife e Petrolina",
     land: ["M150 63 L215 103 L314 116 L439 144 L542 184 L580 249 L576 280 L545 330 L492 370 L439 432 L420 488 L393 596 L367 584 L222 491 L143 500 L154 370 L150 345 L105 286 L97 200 L51 190 L116 169 L135 128Z",
       "M210 100 L222 94 L230 103 L220 110Z"],   // continente e a ilha de São Luís
     river: "M230 494 C250 440 300 360 363 320 S470 320 519 354",   // rio São Francisco
-    route: ["saoluis", "teresina", "recife"], pos: {saoluis: [222, 112], teresina: [276, 188], recife: [564, 280]}},
+    route: ["saoluis", "teresina", "recife", "petrolina"], pos: {saoluis: [222, 112], teresina: [276, 188], recife: [564, 280], petrolina: [362, 326]}},
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre Ananindeua e Curitiba",
     land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
     route: ["ananindeua", "curitiba"], pos: {ananindeua: [322, 168], curitiba: [315, 478]}}
@@ -41,6 +41,7 @@ const LOC = {
   ananindeua: {n: "Ananindeua (PA)", s: "Ananindeua", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor anda brava, e cada lembrança que os bichos deixam rende uns trocados."},
   belem: {n: "Belém (PA)", s: "Belém", txt: "A capital do Pará, na beira da baía do Guajará. Prédios, casarões de azulejo, o Ver-o-Peso... e bicho e malandro bem mais fortes que os da mata."},
   teresina: {n: "Teresina (PI)", s: "Teresina", txt: "A capital mais quente do Brasil, entre dois rios: o Parnaíba e o Poti. No encontro das águas, dizem, mora o Cabeça de Cuia."},
+  petrolina: {n: "Petrolina (PE)", s: "Petrolina", txt: "O sertão de Pernambuco, na beira do Velho Chico: caatinga seca, bode solto, carranca na proa dos barcos e um rio que nunca deixa a cidade sem água."},
   recife: {n: "Recife (PE)", s: "Recife", txt: "A Veneza brasileira, cortada por rios e pontes: frevo, maracatu, cordel na feira e Olinda logo ali, no alto da ladeira."},
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
@@ -62,6 +63,8 @@ const SUB = {
   /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
      pela Cidade Velha, pelo Porto e pelas Baixadas, cada vez mais difícil */
   terminal: {city: "belem", n: "Terminal rodoviário", s: "Terminal", x: 392, y: 262, txt: "O ônibus da BR-316 para aqui. A passagem vale ida e volta: dá pra voltar pra Ananindeua quando quiser."},
+  caatinga: {city: "petrolina", n: "Caatinga", x: 120, y: 110, txt: "A mata branca do sertão: galho seco, mandacaru e chão rachado. Bode, preá, tatu-bola... e, de noite, um assobio fino no meio dos espinhos."},
+  orla: {city: "petrolina", n: "Orla do Velho Chico", s: "Orla", x: 300, y: 210, txt: "A beira do São Francisco em Petrolina: barquinho de carranca, feira de bode e de queijo, pensão e o povo do sertão, que ri de tudo."},
   olinda: {city: "recife", n: "Olinda", x: 250, y: 70, txt: "A cidade alta, vizinha do Recife: ladeira de pedra, igreja no alto, casario colorido e quintal cheio de bicho. De noite, dizem, um boneco gigante desce a ladeira sozinho."},
   recifeantigo: {city: "recife", n: "Recife Antigo", x: 300, y: 170, txt: "O bairro do Recife Antigo, no Marco Zero: casarão colorido, rua de pedra, o rio Capibaribe chegando no mar e um cordelista que precisa de um programador."},
   trocatroca: {city: "teresina", n: "Troca-Troca", x: 260, y: 170, txt: "O mercado do Troca-Troca, no centro de Teresina: rede, cerâmica, cajuína gelada e gente pechinchando. Tem pensão e comida."},
@@ -97,7 +100,12 @@ const CITY = {
   recife: {n: "Recife", map: "nordeste", route: ["recifeantigo", "olinda"], cabin: false,
     land: "20,40 160,20 330,30 420,80 430,200 400,290 260,316 120,312 30,270 10,160",
     bay: "M330,0 L440,0 L440,325 L410,325 C400,240 420,160 380,90 C360,50 340,20 330,0Z",   // o mar
-    river: "M0,200 C80,190 160,210 240,180 C300,160 330,170 370,150", road: "M120,200 C80,230 40,250 -6,262", sign: [8, 300, "← Teresina"], home: "recifeantigo", gate: "recifeantigo"}
+    river: "M0,200 C80,190 160,210 240,180 C300,160 330,170 370,150", road: "M120,200 C80,230 40,250 -6,262", sign: [8, 300, "← Teresina"], home: "recifeantigo", gate: "recifeantigo"},
+  // Petrolina (Nordeste, sertão): a orla do São Francisco, embaixo, e a caatinga subindo para o norte; a estrada vai para Recife
+  petrolina: {n: "Petrolina", map: "nordeste", route: ["orla", "caatinga"], cabin: false,
+    land: "30,30 170,16 320,26 420,70 432,190 400,250 300,262 160,266 40,250 12,140",
+    bay: "M0,250 C80,268 180,272 300,262 C360,256 400,262 440,250 L440,325 L0,325Z",   // o rio São Francisco
+    river: "M0,262 C80,280 180,284 300,274 C360,268 400,274 440,262", road: "M300,210 C350,190 400,170 446,160", sign: [356, 150, "Recife →"], home: "orla", gate: "orla"}
 };
 /* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
    que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
@@ -137,12 +145,13 @@ const WEATHER = {
 const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15], ["mormaco", 12], ["ventania", 8]],
   belem: [["limpo", 25], ["chuva", 45], ["neblina", 8], ["mormaco", 14], ["ventania", 8]],
   saoluis: [["limpo", 30], ["chuva", 25], ["neblina", 5], ["mormaco", 25], ["ventania", 15]],   // ilha de muito sol e vento
+  petrolina: [["limpo", 45], ["chuva", 5], ["neblina", 5], ["mormaco", 40], ["ventania", 5]],   // sertão: sol e calor quase todo dia
   recife: [["limpo", 30], ["chuva", 35], ["neblina", 5], ["mormaco", 20], ["ventania", 10]],   // litoral: chuva de verão e brisa do mar
   teresina: [["limpo", 35], ["chuva", 10], ["neblina", 5], ["mormaco", 45], ["ventania", 5]]};   // a capital mais quente do Brasil
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
-  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
   for (const [k, w] of odds) if ((r -= w) < 0) return k;
   return "limpo";
 }
@@ -163,7 +172,8 @@ const BUS = {price: 800, open: true};
    (pass = campo em G), vendida no mapa do Nordeste depois de acalmar o chefe de dia da cidade de onde sai (open) */
 const BUS_LINES = {
   teresina: {from: "saoluis", price: 900, pass: "passagemTHE", open: () => !!BS().lencois, lock: "O ônibus para Teresina sai depois que a Suçuarana dos Lençóis for acalmada."},
-  recife:   {from: "teresina", price: 1000, pass: "passagemREC", open: () => !!BS().encontro, lock: "O ônibus para Recife sai depois que o Surubim do Encontro dos rios for acalmado."}
+  recife:   {from: "teresina", price: 1000, pass: "passagemREC", open: () => !!BS().encontro, lock: "O ônibus para Recife sai depois que o Surubim do Encontro dos rios for acalmado."},
+  petrolina: {from: "recife", price: 1100, pass: "passagemPET", open: () => !!BS().olinda, lock: "O ônibus para Petrolina sai depois que o Teiú-rei de Olinda for acalmado."}
 };
 // linha de ônibus entre as cidades a e b (em qualquer sentido), ou nada
 const busLine = (a, b) => (BUS_LINES[b] && BUS_LINES[b].from === a && BUS_LINES[b]) || (BUS_LINES[a] && BUS_LINES[a].from === b && BUS_LINES[a]) || null;
@@ -193,7 +203,7 @@ const FREELAS = {
 };
 const PENSAO = {noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

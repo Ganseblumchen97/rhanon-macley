@@ -363,6 +363,19 @@ const QUADS = {
     },
     tail: (d, P, C) => { const x = P.cx + P.rx - 1, y = P.cy - 3; bChain(d, [[x, y], [x + 3, y + 6], [x + 3, y + 12]], [2, 1.5], C.B); d.ellipse(x + 3, y + 13, 1.5, 2, BN); },
     pattern: (d, P, C) => d.dots([[P.cx - 8, P.cy - 7], [P.cx - 2, P.cy - 8], [P.cx + 5, P.cy - 7], [P.cx + 11, P.cy - 5]], "#5a5658")},
+  // bode do sertão (e o Bode-rei): pelo claro malhado, chifre curvado para trás, orelha de lado e barbicha
+  bode: {W: 54, H: 40, cx: 30, rx: 13, ry: 7, leg: 11, lw: 3, neck: 4, hu: 8, hr: 5,
+    C: {b: "#d8ccb4", B: "#a89a80", l: "#ece4d2", k: "#6a4a32"}, legC: ["#c8bca4", "#988a70"], paw: ["#3a2a1e", "#22180e"],
+    head: (d, x, y, o, C) => {
+      d.part().poly([[x + 1, y - 4], [x + 4, y - 11], [x + 10, y - 13], [x + 13, y - 9], [x + 9, y - 10], [x + 5, y - 8], [x + 3, y - 3]], "#8a7a62", "#5e5040", x + 9);   // chifre
+      d.part().ellipse(x + 4, y - 1, 3.5, 1.6, C.B);   // orelha de lado
+      d.part().ellipse(x, y, 5, 4.5, C.b, C.B, .6).poly([[x - 3, y - 2], [x - 10, y + 2], [x - 9, y + 5], [x - 2, y + 4]], C.b, C.B, x - 6);   // cara comprida
+      d.part().poly([[x - 7, y + 4], [x - 4, y + 5], [x - 6, y + 11]], C.k);   // barbicha
+      d.dots([[x - 10, y + 2], [x - 9, y + 3]], BN); bEye(d, x - 1, y - 1, {eye: o.eye === "open" ? "angry" : o.eye});
+      if (o.mouth) bMouth(d, x - 9, y + 4, 4, false); if (o.tongue) d.dots([[x - 8, y + 5]], BR);
+    },
+    tail: (d, P, C) => { const x = P.cx + P.rx - 1, y = P.cy - 4; d.limb(x, y, x + 3, y + (P.pose === "ko" ? 2 : -4), 2, C.k); },
+    pattern: (d, P, C) => { d.ellipse(P.cx + 4, P.cy - 2, 4, 3, C.k); d.ellipse(P.cx - 6, P.cy + 1, 3, 2.5, C.k); }},
   // rato (ratazana do porto, rato-d'água e o Ratão): cinza, orelhas redondas rosadas e rabo comprido pelado
   rato: {W: 48, H: 24, cx: 24, rx: 10, ry: 5.5, leg: 4, lw: 2.5, neck: 2, hu: 2, hr: 4,
     C: {b: "#6a6a70", B: "#4a4a50", l: "#9a9aa0"}, legC: ["#d89a9a", "#b87878"],
@@ -891,6 +904,34 @@ function cabecaCuia(pose, f) {
   if (at) d.ellipse(X(20), Y(17), 2.5, 2, BN); else d.rect(X(17), Y(17), 6, 1, BN);
   return {c: d.canvas(), head: [X(20), Y(11)]};
 }
+// Comadre Fulozinha (caatinga, à noite): cabocla pequena, de pé descalço, com o cabelo preto comprido até o chão cobrindo o
+// corpo, olhos verdes acesos e um cipó na mão (a surra de cipó); desmaiada, senta no chão enrolada no cabelo
+function fulozinha(pose, f) {
+  const d = rigGrid(1, 40, 48), sk = "#a8703e", Sk = "#74482a", h = "#1a1420", H = "#0c0a10", ci = "#5a8a2a", Ci = "#3a5a1a", fl = "#f0d040";
+  if (pose === "ko") {
+    d.part().poly([[8, 46], [12, 30], [28, 30], [34, 46]], h, H, 26);
+    d.part().ellipse(20, 28, 6, 6, sk, Sk, .7).poly([[13, 24], [27, 24], [27, 29], [24, 26], [16, 26], [13, 30]], h);
+    d.dots([[17, 29], [18, 29], [22, 29], [23, 29]], BN).dots([[25, 23], [26, 23]], fl);
+    return {c: d.canvas(), head: [20, 28]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (pose === "idle" ? f : 0) + (cr ? 3 : 0), bx = at ? -3 : hu ? 3 : 0;
+  const X = v => v + bx, Y = v => v + by;
+  d.part().limb(X(18), Y(38), X(17), Y(46), 2.5, sk, Sk); d.limb(X(22), Y(38), X(23), Y(46), 2.5, sk, Sk);   // pernas finas, pé no chão
+  d.part().poly([[X(13), Y(12)], [X(27), Y(12)], [X(31), Y(42)], [X(26), Y(40)], [X(22), Y(44)], [X(18), Y(40)], [X(14), Y(44)], [X(9), Y(42)]], h, H, X(25));   // o cabelo cobre o corpo
+  d.dots([[X(12), Y(30)], [X(16), Y(36)], [X(25), Y(28)], [X(28), Y(38)]], "#3a3248");   // brilho nas mechas
+  const hand = at ? [X(6), Y(17)] : cr ? [X(8), Y(30)] : [X(9), Y(28)];
+  d.part().limb(X(14), Y(18), ...hand, 2, sk, Sk);
+  if (at) d.part().limb(hand[0], hand[1], X(4), Y(2), 1.2, ci).limb(X(4), Y(2), X(10), Y(1), 1.2, ci).dots([[X(5), Y(9)], [X(4), Y(5)]], Ci);   // o cipó estalando no alto
+  else d.part().limb(hand[0], hand[1], hand[0] - 2, hand[1] + 12, 1.2, ci).dots([[hand[0] - 1, hand[1] + 6]], Ci);
+  d.part().limb(X(26), Y(18), X(30), Y(27), 2, sk, Sk);
+  d.part().ellipse(X(20), Y(10), 5.5, 6, sk, Sk, .7);
+  d.part().poly([[X(14), Y(4)], [X(26), Y(4)], [X(27), Y(11)], [X(24), Y(7)], [X(16), Y(7)], [X(13), Y(12)]], h);   // franja
+  d.part().ellipse(X(25), Y(4), 2, 2, fl).dots([[X(25), Y(4)]], "#e86a2a");   // a flor no cabelo
+  if (hu) d.dots([[X(17), Y(10)], [X(18), Y(10)], [X(22), Y(10)], [X(23), Y(10)]], BN);
+  else d.ellipse(X(17.5), Y(10), 1.4, 1.6, "#9bf04a").ellipse(X(22.5), Y(10), 1.4, 1.6, "#9bf04a");
+  if (at) d.ellipse(X(20), Y(14), 1.2, 1.5, BN);   // assobiando
+  return {c: d.canvas(), head: [X(20), Y(10)]};
+}
 // visagem (assombração de Belém): vestido comprido sem pés, flutuando, cabelo escuro e olhos acesos; C troca as cores
 function visagem(C) {
   return (pose, f) => {
@@ -934,7 +975,8 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   guara: (pose, f) => garca(pose, f, {b: "#e8402a", B: "#b02818", y: "#3a2418", Y: "#22140c", k: "#5a2a1a"}),   // guará: a garça em vermelho
   garca_moura: (pose, f) => garca(pose, f, {b: "#8a96a8", B: "#5e6a7a", y: "#e8b030", Y: "#b88a20", k: "#2a3038"}),   // garça-moura: cinza-azulada
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
-  cabeca_cuia: cabecaCuia,
+  cabeca_cuia: cabecaCuia, fulozinha,
+  jiboia: cobra({b: "#a8885a", B: "#74583a", k: "#4a3220"}, false),   // jiboia: parda, com as manchas escuras em sela
   meia_noite: pessoa({pal: {s: "#5e3a1e", S: "#3a2412", h: "#1a1420"}, shirt: ["#1a1a22", "#0e0e14"], pants: ["#1a1a22", "#0e0e14"], noBand: true, cap: ["#1a1a22", "#0e0e14"]}),   // Homem da Meia-Noite: o boneco de fraque e cartola
   cascavel: cobra({b: "#b89a5a", B: "#7a6234", k: "#4a3a1a"}, true),   // cascavel: cabeça triangular, cor de areia com losangos escuros
   serpente: cobra({b: "#c8a030", B: "#8a6a18", k: "#fff2a0", eye: "#ff8a3a"}, false),   // Serpente encantada da ilha: dourada
