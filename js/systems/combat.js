@@ -13,8 +13,13 @@ function setBattleDecor(zone) {
   setScenery(zone || curZone || "mata");   // cenário em pixel art (gfx/scenery.js)
 }
 
-// batalha comum: a roda de capoeira acelerada; chefe: a versão tensa
-function getBattleTrackFor(animal) { return animal.boss ? "battleBoss" : "battleCapo"; }
+// batalha comum: o tema do Norte num arranjo do lugar (mata: roda de capoeira; água: carimbó; Belém: guitarrada);
+// chefe: a versão pesada; bug do freela: a roda
+const BATTLE_WATER = new Set(["rio", "igarape", "manguezal", "varzea"]), BATTLE_CITY = new Set(["cidadevelha", "porto", "baixadas"]);
+function getBattleTrackFor(animal) {
+  if (animal.boss) return "battleBoss";
+  return animal.bug ? "battleCapo" : BATTLE_CITY.has(curZone) ? "battleGuitarrada" : BATTLE_WATER.has(curZone) ? "battleCarimbo" : "battleCapo";
+}
 
 /* ---------- comandos: lista principal e submenus (Especial e Itens) ---------- */
 let subMenu = null, subFrom = 0;   // opções do submenu aberto no lugar dos comandos; subFrom = comando que o abriu

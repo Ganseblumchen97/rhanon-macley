@@ -19,9 +19,11 @@ function stepWork(s, t) {
 /* ===== Música (motor da vitrine) =====
    Cada faixa passa por um barramento com reverb e compressor, entra e sai com transição suave
    e é composta por instrumentos sintetizados (sino, flauta, piano elétrico, pad, baixo, bateria,
-   berimbau, atabaque, caxixi). As melodias são refeitas a cada trecho, então a música não fica igual.
+   berimbau, atabaque, caxixi). As faixas do Norte (batalha, chefe, aldeia e mapa do Pará) tocam o tema fixo da região
+   (NORTE_THEME), cada uma com a sua roupa; os enfeites e os solos da parte B do mapa ainda são sorteados.
    Faixas: "title" (abertura), "map" (mapa grande: Pará/Brasil), "local" (Ananindeua, toque de capoeira com flauta),
-   "localNight" (Ananindeua à noite), "battleCapo" (batalha: a roda de capoeira acelerada), "battleBoss" (chefe: abertura
+   "localNight" (Ananindeua à noite), "battleCapo" (batalha na mata: a roda de capoeira acelerada), "battleCarimbo"
+   (batalha na água: carimbó), "battleGuitarrada" (batalha em Belém: guitarrada), "battleBoss" (chefe: abertura
    sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
@@ -244,6 +246,60 @@ const MUS = (() => {
     out[112] = {note: last[2] + shift, len: 12};
     return out;
   }
+  /* Tema do Norte (leitmotif da região): uma frase fixa que volta sempre igual, para ficar na cabeça.
+     [compasso, passo, nota, duração], em semicolcheias. O motivo é "lá–ré–dó–lá" no ritmo 3-3-2 da roda (tresillo).
+     A = a frase sobre ré menor–dó–si bemol–lá (a cadência andaluza dos acordes da batalha); B = a resposta sobre sol menor–
+     fá–mi bemol–lá, que fecha com o mesmo 3-3-2 subindo pelo acorde de lá. Cada região nova terá o seu tema. */
+  const NORTE_THEME = {
+    A: [[0, 0, 69, 3], [0, 3, 74, 3], [0, 6, 72, 2], [0, 8, 69, 6], [0, 14, 67, 2],
+        [1, 0, 67, 3], [1, 3, 69, 3], [1, 6, 72, 2], [1, 8, 67, 8],
+        [2, 0, 65, 3], [2, 3, 67, 3], [2, 6, 69, 2], [2, 8, 70, 4], [2, 12, 69, 4],
+        [3, 0, 69, 3], [3, 3, 73, 3], [3, 6, 76, 2], [3, 8, 73, 8],
+        [4, 0, 69, 3], [4, 3, 74, 3], [4, 6, 72, 2], [4, 8, 69, 6], [4, 14, 72, 2],
+        [5, 0, 76, 3], [5, 3, 74, 3], [5, 6, 72, 2], [5, 8, 67, 8],
+        [6, 0, 74, 3], [6, 3, 72, 3], [6, 6, 70, 2], [6, 8, 69, 4], [6, 12, 67, 4],
+        [7, 0, 69, 4], [7, 4, 73, 4], [7, 8, 69, 8]],
+    B: [[0, 0, 74, 6], [0, 6, 72, 2], [0, 8, 70, 4], [0, 12, 67, 4],
+        [1, 0, 72, 6], [1, 6, 69, 2], [1, 8, 65, 8],
+        [2, 0, 70, 6], [2, 6, 67, 2], [2, 8, 63, 4], [2, 12, 67, 4],
+        [3, 0, 69, 3], [3, 3, 73, 3], [3, 6, 76, 2], [3, 8, 79, 4], [3, 12, 76, 4],
+        [4, 0, 74, 6], [4, 6, 72, 2], [4, 8, 70, 4], [4, 12, 74, 4],
+        [5, 0, 77, 6], [5, 6, 76, 2], [5, 8, 72, 8],
+        [6, 0, 75, 6], [6, 6, 74, 2], [6, 8, 70, 4], [6, 12, 67, 4],
+        [7, 0, 69, 3], [7, 3, 73, 3], [7, 6, 76, 2], [7, 8, 69, 8]],
+    // o mesmo motivo alongado (6-6-4, um acorde a cada dois compassos), para a aldeia e o mapa: lentoA sobre ré menor–
+    // si bemol–dó–lá menor, lentoB sobre sol menor–fá–mi bemol–lá
+    lentoA: [[0, 0, 69, 6], [0, 6, 74, 6], [0, 12, 72, 4], [1, 0, 69, 12],
+        [2, 0, 65, 6], [2, 6, 69, 6], [2, 12, 70, 4], [3, 0, 69, 12],
+        [4, 0, 67, 6], [4, 6, 72, 6], [4, 12, 74, 4], [5, 0, 76, 8], [5, 8, 74, 4], [5, 12, 72, 4],
+        [6, 0, 69, 6], [6, 6, 72, 6], [6, 12, 76, 4], [7, 0, 69, 12]],
+    lentoB: [[0, 0, 74, 6], [0, 6, 72, 6], [0, 12, 70, 4], [1, 0, 67, 12],
+        [2, 0, 72, 6], [2, 6, 69, 6], [2, 12, 65, 4], [3, 0, 69, 12],
+        [4, 0, 70, 6], [4, 6, 67, 6], [4, 12, 70, 4], [5, 0, 74, 12],
+        [6, 0, 69, 6], [6, 6, 73, 6], [6, 12, 76, 4], [7, 0, 76, 8], [7, 8, 73, 8]],
+    // chefe: o motivo alongado no modo frígio da faixa do chefe (ré menor–mi bemol–dó menor–dó sustenido diminuto–lá)
+    chefeA: [[0, 0, 69, 6], [0, 6, 74, 6], [0, 12, 72, 4], [1, 0, 69, 12],
+        [2, 0, 67, 6], [2, 6, 70, 6], [2, 12, 72, 4], [3, 0, 70, 12],
+        [4, 0, 67, 6], [4, 6, 72, 6], [4, 12, 75, 4], [5, 0, 74, 8], [5, 8, 72, 4], [5, 12, 70, 4],
+        [6, 0, 70, 6], [6, 6, 73, 6], [6, 12, 76, 4], [7, 0, 69, 12]],
+    chefeB: [[0, 0, 74, 6], [0, 6, 72, 6], [0, 12, 70, 4], [1, 0, 65, 12],
+        [2, 0, 69, 6], [2, 6, 73, 6], [2, 12, 76, 4], [3, 0, 73, 12],
+        [4, 0, 70, 6], [4, 6, 74, 6], [4, 12, 79, 4], [5, 0, 77, 12],
+        [6, 0, 76, 6], [6, 6, 73, 6], [6, 12, 69, 4], [7, 0, 69, 12]]
+  };
+  // tema → 128 passos (oito compassos); shift muda a oitava (ou o tom: +7 leva para lá menor); com enfeite, as notas
+  // longas às vezes ganham um floreio rápido no fim (o sorteio fica só aí: o desenho da frase não muda); upTo = só os
+  // primeiros compassos (o resto fica em silêncio)
+  function themeLine(theme, shift = 0, enfeite = false, upTo = 8) {
+    const out = new Array(128).fill(null);
+    for (const [bar, at, note, len] of theme) {
+      if (bar >= upTo) continue;
+      const i = bar * 16 + at;
+      if (enfeite && len >= 6 && Math.random() < .5) { out[i] = {note: note + shift, len: len - 2}; out[i + len - 2] = {note: note + shift + pick([2, 3, -2]), len: 2}; }
+      else out[i] = {note: note + shift, len};
+    }
+    return out;
+  }
   // camada de percussão da mata por cima das batalhas (caxixi e atabaque), bem baixinha
   function mataLayer(s, t, bar, intensity) {
     if (s % 2 === 1) caxixi(t, (s % 4 === 3 ? .012 : .006) * intensity);
@@ -330,7 +386,7 @@ const MUS = (() => {
         const list = part === "B" ? this.chordsB : this.chords, chord = list[Math.floor(barIn / 2)];
         const notes = chord.resolve && barIn % 2 ? chord.resolve : chord.notes;
         const rest = part === "A3" && barIn >= 6;
-        if (i % 128 === 0) this.melody = part === "A" ? null : this.makeMelody(list, part === "A3" ? 12 : 0);
+        if (i % 128 === 0) this.melody = part === "A" ? null : themeLine(NORTE_THEME[part === "B" ? "lentoB" : "lentoA"], part === "A3" ? 12 : 0, part === "A3");   // tema do Norte, devagar
         // harmonia: pad e baixo a cada acorde (2 compassos)
         if (s === 0 && barIn % 2 === 0) { pad(notes, t, d * 32, rest ? .008 : .011); synth("sine", mtof(chord.bass), t, d * 30, .07); }
         // berimbau: dong (corda solta), ding (com a moeda) e chiado
@@ -391,7 +447,7 @@ const MUS = (() => {
         const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
         const list = part === "B" ? this.chordsB : this.chords, chord = list[Math.floor(barIn / 2)];
         const notes = chord.resolve && barIn % 2 ? chord.resolve : chord.notes;
-        if (i % 128 === 0) this.melody = part === "A" ? null : TRACKS.local.makeMelody(list, -12);
+        if (i % 128 === 0) this.melody = part === "A" || part === "B" ? null : themeLine(NORTE_THEME.lentoA, -12, false, 4);   // meia frase do tema, grave; depois só grilos
         if (s === 0 && barIn % 2 === 0) { pad(notes, t, d * 32, .012); synth("sine", mtof(chord.bass), t, d * 30, .06); }
         const b = this.toque[bar % 2][s];
         if (b === "c") chi(t, .014); else if (b === "d") berimbau(50, t, .04); else if (b === "h") berimbau(52, t, .035);
@@ -406,7 +462,8 @@ const MUS = (() => {
       }
     },
     // batalha: a roda de capoeira acelerada (toque de São Bento Grande), com atabaque, pandeiro, baixo marcado
-    // e flauta mais agitada. Forma A - B - A' - C (C = ponte só de percussão com virada crescente)
+    // e a flauta tocando o tema do Norte (NORTE_THEME). Forma A - B - A' (tema uma oitava acima, com floreios) - C
+    // (C = ponte só de percussão com virada crescente)
     battleCapo: {
       bpm: 132, wet: .24, level: .32, swing: .08,
       chords: [{bass: 38, notes: [50, 53, 57, 62]}, {bass: 36, notes: [48, 52, 55, 60]}, {bass: 46, notes: [50, 53, 58, 62]}, {bass: 45, notes: [49, 52, 57, 61]}],
@@ -418,7 +475,7 @@ const MUS = (() => {
         const list = part === "B" ? this.chordsB : this.chords, chord = list[barIn % 4];
         const notes = chord.resolve && s >= 8 ? chord.resolve : chord.notes;
         const bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
-        if (i % 128 === 0) { this.melody = part === "C" ? null : battleMelody(list, this.scale, part === "A2" ? 12 : 0); hat(t, .02, true); }
+        if (i % 128 === 0) { this.melody = part === "C" ? null : themeLine(NORTE_THEME[part === "B" ? "B" : "A"], part === "A2" ? 12 : 0, part === "A2"); hat(t, .02, true); }   // tema do Norte
         // berimbau sempre; na ponte ele puxa a roda sozinho com o atabaque
         const b = this.toque[bar % 2][s];
         if (b === "c") chi(t, .02); else if (b === "d") berimbau(50, t, .05); else if (b === "h") berimbau(52, t, .045);
@@ -434,7 +491,61 @@ const MUS = (() => {
         if (s === 6 || s === 14) notes.slice(1, 4).forEach(m => ep(mtof(m + 12), t, .14, .01));
         if (s === 0) bell(mtof(notes[3] + 12), t, .016, .8);
         const m = this.melody && this.melody[i % 128];
-        if (m) flute(mtof(m.note), t, m.len * d * .9, part === "A2" ? .032 : .028);
+        if (m) flute(mtof(m.note), t, m.len * d * .9, part === "A2" ? .038 : .034);   // o tema na frente da mistura
+      }
+    },
+    // batalha na água (rio, igarapé, manguezal, várzea): carimbó, com curimbó grave e agudo, maracas sem parar, banjo
+    // no contratempo e o tema do Norte na flauta saltitada, com a guitarra segurando as notas por baixo. Mesmos acordes
+    // e forma da roda (A - B - A' - C), para o tema ser o mesmo
+    battleCarimbo: {
+      bpm: 138, wet: .26, level: .32, swing: .1, form: ["A", "B", "A2", "C"], melody: null,
+      curimbo: "g..a..a.g.a.a..a", bassline: [[0, 0], [3, 7], [6, 12], [8, 0], [11, 7], [14, 10]],
+      play(i, t, d) {
+        const C = TRACKS.battleCapo, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const list = part === "B" ? C.chordsB : C.chords, chord = list[barIn % 4], notes = chord.resolve && s >= 8 ? chord.resolve : chord.notes;
+        const bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "C" ? null : themeLine(NORTE_THEME[part === "B" ? "B" : "A"], part === "A2" ? 12 : 0, part === "A2"); hat(t, .02, true); }   // tema do Norte
+        const c = this.curimbo[s];   // curimbó: g = grave, a = agudo
+        if (c === "g") atabaque(t, .1); else if (c === "a") atabaque(t, .065, true);
+        caxixi(t, s % 4 === 2 ? .014 : .006);   // maracas
+        if (bridge) { if (s === 4 || s === 12) clap(t); return; }
+        if (s === 0 || s === 8) kick(t, .09);
+        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) tapa(t, .028);
+        const bl = this.bassline.find(([at]) => at === s);
+        if (bl) synth("triangle", mtof(chord.bass + bl[1]), t, d * 1.4, .1);
+        if (s % 4 === 2) notes.slice(1, 4).forEach(m => guitar(mtof(m + 12), t, d * .7, .006, 3400));   // banjo no contratempo
+        if (s === 0) pad(notes, t, d * 16, .006);
+        if (Math.random() < .01) drop(t);
+        const m = this.melody && this.melody[i % 128];
+        if (m) { flute(mtof(m.note), t, Math.min(m.len, 3) * d * .8, part === "A2" ? .038 : .034); guitar(mtof(m.note - 12), t, m.len * d, .007, 1800); }
+      }
+    },
+    // batalha em Belém (Cidade Velha, Porto, Baixadas): guitarrada acelerada, com bateria de cidade, baixo andando,
+    // curimbó e maracas por baixo, piano elétrico no contratempo e o tema do Norte na guitarra, com repique nas notas
+    // longas (na volta A', a flauta dobra uma oitava acima). Mesmos acordes e forma da roda
+    battleGuitarrada: {
+      bpm: 144, wet: .22, level: .32, swing: .06, form: ["A", "B", "A2", "C"], melody: null,
+      bassline: [[0, 0], [3, 7], [6, 12], [8, 0], [10, 7], [13, 10], [14, 12]],
+      play(i, t, d) {
+        const C = TRACKS.battleCapo, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const list = part === "B" ? C.chordsB : C.chords, chord = list[barIn % 4], notes = chord.resolve && s >= 8 ? chord.resolve : chord.notes;
+        const bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "C" ? null : themeLine(NORTE_THEME[part === "B" ? "B" : "A"], 0, part === "A2"); hat(t, .03, true); }   // tema do Norte
+        if (s === 0 || s === 8 || (s === 6 && bar % 2) || s === 11) kick(t, .12);
+        if (s % 2 === 0) hat(t, s % 4 === 2 ? .018 : .009, s === 14 && barIn === 7);
+        if ([0, 3, 6, 10].includes(s)) atabaque(t, s === 0 ? .08 : .055, s === 3 || s === 10);   // curimbó
+        if (s % 2 === 1) caxixi(t, .008);
+        if (bridge) { if (s === 4 || s === 12) snare(t, .04); return; }
+        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) { snare(t, .05); if (part === "B") clap(t); }
+        const bl = this.bassline.find(([at]) => at === s);
+        if (bl) synth("triangle", mtof(chord.bass + bl[1]), t, d * 1.4, .11);
+        if (s === 2 || s === 6 || s === 10 || s === 14) notes.slice(1, 4).forEach(m => ep(mtof(m + 12), t, .12, .01));   // piano no contratempo
+        if (s === 0) pad(notes, t, d * 16, .006);
+        const m = this.melody && this.melody[i % 128];
+        if (m) {
+          guitar(mtof(m.note), t, m.len * d, .022); if (m.len >= 6) guitar(mtof(m.note), t + d * 2, d * 2, .009);   // repique de guitarrada
+          if (part === "A2") flute(mtof(m.note + 12), t, m.len * d * .9, .012);
+        }
       }
     },
     // chefe: começa com um zumbido grave, badalada e tambores (o chefe se apresenta); depois tambores de guerra, riff
@@ -458,7 +569,7 @@ const MUS = (() => {
         const list = part === "B" ? this.chordsB : this.chords, chord = list[Math.floor(barIn / 2)];
         const notes = chord.resolve && barIn % 2 ? chord.resolve : chord.notes;
         const half = part === "B", brk = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
-        if (j % 128 === 0) { this.melody = part === "C" ? null : TRACKS.local.makeMelody(list, 0); hat(t, .03, true); }
+        if (j % 128 === 0) { this.melody = part === "C" ? null : themeLine(NORTE_THEME[part === "B" ? "chefeB" : "chefeA"], 0, part === "A2"); hat(t, .03, true); }   // tema do Norte, pesado
         if (s === 0 && barIn % 2 === 0) { choir(notes.slice(0, 3).map(n => n - 12), t, d * 32, brk ? .02 : .013); toll(notes[0] + 12, t, .03); }
         if (brk || build) {   // ponte: coração batendo, tambores e o coro; a virada cresce no fim
           if (s === 0 || s === 3) kick(t, .14); if (s === 8 || s === 14) surdo(t, .12);
@@ -494,7 +605,7 @@ const MUS = (() => {
         const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
         const list = part === "B" ? this.chordsB : this.chords, chord = list[Math.floor(barIn / 2)];
         const notes = chord.resolve && barIn % 2 ? chord.resolve : chord.notes;
-        if (i % 128 === 0) this.melody = part === "A" ? null : TRACKS.local.makeMelody(list, part === "A3" ? 12 : 0);
+        if (i % 128 === 0) this.melody = part === "A" ? null : part === "B" ? TRACKS.local.makeMelody(list, 0) : themeLine(NORTE_THEME.lentoA, part === "A2" ? 7 : -5, part === "A3");   // tema do Norte em lá menor; no B a guitarra improvisa
         // bateria de cidade
         if (s === 0 || s === 8 || (s === 6 && bar % 2)) kick(t, .12);
         if (s === 4 || s === 12) { snare(t, .045); if (part === "B") clap(t); }
@@ -523,7 +634,7 @@ const MUS = (() => {
         const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
         const list = part === "B" ? this.chordsB : this.chords, chord = list[Math.floor(barIn / 2)];
         const notes = chord.resolve && barIn % 2 ? chord.resolve : chord.notes;
-        if (i % 128 === 0) this.melody = part === "A" ? null : TRACKS.local.makeMelody(list, -12);
+        if (i % 128 === 0) this.melody = part === "A" ? null : part === "B" ? TRACKS.local.makeMelody(list, -12) : themeLine(NORTE_THEME.lentoA, -5, false, 6);   // tema do Norte (a guitarra toca uma oitava acima)
         if (s === 0 || (s === 10 && bar % 2)) kick(t, .07);
         if (s === 8) noiseHit(t, .06, .02, "bandpass", 2400, 2);   // aro da caixa
         if (s % 4 === 2) noiseHit(t, .07, .006, "highpass", 5000);   // vassourinha
@@ -688,21 +799,25 @@ const MUS = (() => {
     schedule();
     timer = setInterval(schedule, 100);
   }
-  // teste: renderiza alguns segundos de uma faixa fora do tempo real e devolve o pico e o volume médio
-  async function measure(id, sec = 20) {
+  // teste: renderiza alguns segundos de uma faixa fora do tempo real (devolve o AudioBuffer, para ouvir ou gravar)
+  async function render(id, sec = 20, rate = 44100) {
     const save = {X, DEST, bus, track, step, nextTime};
-    const off = new OfflineAudioContext(2, Math.floor(44100 * sec), 44100);
+    const off = new OfflineAudioContext(2, Math.floor(rate * sec), rate);
     X = off; DEST = off.destination; track = ALL[id]; bus = build(track); step = 0; nextTime = .05;
     bus.master.gain.setValueAtTime(track.level, 0);
     schedule(sec - .5);
     ({X, DEST, bus, track, step, nextTime} = save);
-    const buf = await off.startRendering(), a = buf.getChannelData(0);
+    return off.startRendering();
+  }
+  // teste: pico e volume médio de alguns segundos da faixa
+  async function measure(id, sec = 20) {
+    const buf = await render(id, sec), a = buf.getChannelData(0);
     let peak = 0, sum = 0; for (let i = 0; i < a.length; i++) { const v = Math.abs(a[i]); if (v > peak) peak = v; sum += a[i] * a[i]; }
     return {peak: +peak.toFixed(3), rms: +Math.sqrt(sum / a.length).toFixed(4)};
   }
   // tempo da música tocando agora, em batidas (para os aldeões dançarem no ritmo); null sem música
   function beat() { if (!track || !X || X.state !== "running") return null; const d = 60 / track.bpm / 4; return (step - (nextTime - X.currentTime) / d) / 4; }
-  return {has: id => !!ALL[id], play, stop: (sec = .6) => { if (X) fadeOut(sec); }, measure, beat, get current() { return trackId; }};
+  return {has: id => !!ALL[id], play, stop: (sec = .6) => { if (X) fadeOut(sec); }, measure, render, beat, get current() { return trackId; }};
 })();
 
 /* ----- motor antigo: só as faixas de entrevista e trabalho ----- */

@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.43.0 — o tema do Norte
+
+- O Norte ganhou uma música própria: um tema que volta sempre igual, para você sair cantarolando. Antes a melodia
+  das batalhas era sorteada a cada trecho e nenhuma ficava na cabeça.
+- O tema toca em toda parte, cada vez de um jeito: rápido na batalha, pesado e lento contra os chefes, calmo na
+  aldeia (de noite, só um pedacinho, no meio dos grilos) e na guitarra no mapa do Pará.
+- A batalha muda de arranjo conforme o lugar, com a mesma melodia: roda de capoeira na mata, carimbó nas lutas na
+  beira da água (rio, igarapé, manguezal e várzea) e guitarrada em Belém.
+
 ## 0.42.0 — os cantos escondidos do Norte
 
 - Cada trilha do Norte agora esconde um canto secreto no meio da mata (ou entre os casarões, em Belém). A entrada fica
