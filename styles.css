@@ -88,7 +88,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
 .stage{--plat:46%}
 .stage.zone-fechada{--plat:42%}
-.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
 .stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
@@ -113,7 +113,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage:is(.zone-manguezal,.zone-mangueilha)::before{background:#6a6248;right:9%;top:var(--plat)}
 .stage:is(.zone-manguezal,.zone-mangueilha)::after{background:#6a6248;left:4%;bottom:7%}
 /* Belém: céu de fim de tarde e casarões coloridos (Cidade Velha), galpões cinza (Porto) e palafitas sobre a água (Baixadas) */
-.stage.zone-cidadevelha{background:linear-gradient(180deg,#e8a070 0 18%,#9a7a9a 18% 46%,#8a8478 46% 100%)}
+.stage:is(.zone-cidadevelha,.zone-olinda){background:linear-gradient(180deg,#e8a070 0 18%,#9a7a9a 18% 46%,#8a8478 46% 100%)}
 .stage.zone-porto{background:linear-gradient(180deg,#9aa8b0 0 30%,#7a8a96 30% 46%,#6a6a6e 46% 100%)}
 .stage.zone-baixadas{background:linear-gradient(180deg,#c89a8a 0 22%,#8a8aa0 22% 34%,#4a6a5a 34% 46%,#5e5e48 46% 100%)}
 .stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas)::before{background:#6e685c;right:9%;top:var(--plat)}

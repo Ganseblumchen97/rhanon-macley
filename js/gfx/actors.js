@@ -207,7 +207,7 @@ function makeBeastActor() {
   const set = (s) => { state = s; since = animNow(); lastFx = 0; };
   function mount(el, src, opts = {}) {
     // w/h em pixels do jogo; k = resolução extra da arte em imagem (data-scale)
-    k = +src.dataset.scale || 1; base = src; w = src.width / k; h = src.height / k; f = opts.boss ? 1.35 : 1; kind = opts.id || ""; info = opts;
+    k = +src.dataset.scale || 1; base = src; w = src.width / k; h = src.height / k; f = opts.boss ? opts.scale || 1.35 : 1; kind = opts.id || ""; info = opts;
     // bicho alto demais para o palco (harpia, chefes): diminui um pouco para os pés ficarem na plataforma e a cabeça aparecer
     if (opts.fit) {
       const st = $("stage"), unit = src.getBoundingClientRect().width / w;   // tamanho de 1 pixel do desenho, já com o tamanho de chefe

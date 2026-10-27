@@ -3,6 +3,14 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.51.0 — Olinda e o Homem da Meia-Noite
+
+- Saindo do Recife Antigo pela esquerda, as ladeiras de Olinda: casario colorido, igreja no alto e quintal cheio de
+  bicho. É para quem está perto do nível 38.
+- Bichos novos: o sagui, que tenta pegar a bolsa, o gato-maracajá, que pula do telhado, o teiú e o galo-de-campina.
+- De dia, o chefe é o Teiú-rei, que toma sol no alto da Sé. De noite, quando o sino bate doze vezes, desce a
+  ladeira o Homem da Meia-Noite, o boneco gigante de fraque e cartola do Carnaval de Olinda.
+
 ## 0.50.0 — Recife e o app de cordel
 
 - O mapa de São Luís e Teresina virou o mapa do Nordeste inteiro, com uma estrada só ligando São Luís, Teresina e

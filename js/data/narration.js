@@ -35,6 +35,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  teiu_rei: ["O Teiú-rei tomava sol no alto da Sé desde o tempo dos holandeses, diz o povo de Olinda.", "A fumaça não deixava ele dormir. O menino acalmou o bicho e ele voltou pra pedra quentinha."],
+  meia_noite: ["O Homem da Meia-Noite é o boneco gigante mais antigo de Olinda. Sai no Carnaval e dança até o sol nascer.", "A fumaça fez ele dançar fora de hora, de cara fechada. O menino acalmou o boneco, e ele voltou a sorrir.", {r: "Ele me ensinou o passo do frevo, vô."}, "Tu? Dançando frevo? Isso eu queria ter visto."],
   surubim: ["O Surubim é o rei do fundo do Parnaíba, curumim. Pintado igual onça, com bigode de velho.", {r: "Ele fez cócegas com o bigode, vô."}, "Era agradecimento. Peixe não sabe abraçar."],
   cabeca_cuia: ["O Cabeça de Cuia foi gente: um pescador que maltratou a mãe e ficou com a cabeça pesada de remorso, assombrando o rio.", "A fumaça deixou ele mais bravo ainda. O menino acalmou o homem, e pela primeira vez em muito tempo ele chorou.", {r: "Ele disse que ia pedir perdão pra mãe dele, vô."}, "Então a maldição já tá ficando mais leve."],
   sucuarana: ["A suçuarana é prima da onça, curumim, só que da cor da areia. Nas dunas ninguém via ela chegar.", "O menino só viu porque ela fez sombra. E lá no Lençóis quase não tem sombra."],

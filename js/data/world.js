@@ -62,6 +62,7 @@ const SUB = {
   /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
      pela Cidade Velha, pelo Porto e pelas Baixadas, cada vez mais difícil */
   terminal: {city: "belem", n: "Terminal rodoviário", s: "Terminal", x: 392, y: 262, txt: "O ônibus da BR-316 para aqui. A passagem vale ida e volta: dá pra voltar pra Ananindeua quando quiser."},
+  olinda: {city: "recife", n: "Olinda", x: 250, y: 70, txt: "A cidade alta, vizinha do Recife: ladeira de pedra, igreja no alto, casario colorido e quintal cheio de bicho. De noite, dizem, um boneco gigante desce a ladeira sozinho."},
   recifeantigo: {city: "recife", n: "Recife Antigo", x: 300, y: 170, txt: "O bairro do Recife Antigo, no Marco Zero: casarão colorido, rua de pedra, o rio Capibaribe chegando no mar e um cordelista que precisa de um programador."},
   trocatroca: {city: "teresina", n: "Troca-Troca", x: 260, y: 170, txt: "O mercado do Troca-Troca, no centro de Teresina: rede, cerâmica, cajuína gelada e gente pechinchando. Tem pensão e comida."},
   encontro: {city: "teresina", n: "Encontro dos rios", x: 120, y: 120, txt: "Onde o Poti deságua no Parnaíba: praia de rio, mata ciliar, lontra, jacaré... e, nas noites de cheia, o Cabeça de Cuia."},
@@ -93,7 +94,7 @@ const CITY = {
     land: "40,40 180,20 320,30 420,90 430,200 400,290 280,316 150,312 50,280 20,170",
     river: "M60,320 C90,240 70,160 110,100 C130,70 150,40 160,0", road: "M300,200 C350,220 400,250 446,270", sign: [340, 300, "São Luís →"], home: "trocatroca", gate: "trocatroca"},
   // Recife (Nordeste): o Recife Antigo, numa ilha entre o Capibaribe e o mar; a estrada vai para Teresina. Olinda vem depois
-  recife: {n: "Recife", map: "nordeste", route: ["recifeantigo"], cabin: false,
+  recife: {n: "Recife", map: "nordeste", route: ["recifeantigo", "olinda"], cabin: false,
     land: "20,40 160,20 330,30 420,80 430,200 400,290 260,316 120,312 30,270 10,160",
     bay: "M330,0 L440,0 L440,325 L410,325 C400,240 420,160 380,90 C360,50 340,20 330,0Z",   // o mar
     river: "M0,200 C80,190 160,210 240,180 C300,160 330,170 370,150", road: "M120,200 C80,230 40,250 -6,262", sign: [8, 300, "← Teresina"], home: "recifeantigo", gate: "recifeantigo"}
@@ -192,7 +193,7 @@ const FREELAS = {
 };
 const PENSAO = {noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

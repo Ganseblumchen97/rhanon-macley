@@ -154,7 +154,7 @@ const CRY_OF = {onca: "felino", jaguatirica: "felinoP", cotia: "roedor", cassaco
   urubu: "ave", gaviao_real: "ave", cobra_cipo: "cobra", ourico: "fungada", curupira: "macaco",
   bufalo: "anta", bufalo_touro: "anta", soco: "ave", jararaca: "cobra", mapinguari: "felino",
   pombo: "ave", gato: "felinoP", iguana: "calango", iguana_rei: "calango", caramelo: "lobo", cachorro_bravo: "lobo", batedor: "gente", golpista: "gente", ladrao_bike: "gente",
-  mulher_branco: "visagem", visagem_mare: "visagem", ratazana: "roedor", ratao: "roedor", rato_dagua: "roedor", mucura: "roedor", urubu_porto: "ave", gaivota: "ave", lontra: "ariranha", jacare_papo: "jacare", cagado: "tatu", bigua: "ave", surubim: "piranha", cabeca_cuia: "visagem", tatupeba: "tatu", cascavel: "cobra", raposa: "lobo", traira: "piranha", asa_branca: "ave", sucuarana: "felino", boi_bumba: "anta", guara: "ave", garca_moura: "ave", carcara: "ave", siri: "aranha", mero: "piranha", serpente: "cobra",
+  mulher_branco: "visagem", visagem_mare: "visagem", ratazana: "roedor", ratao: "roedor", rato_dagua: "roedor", mucura: "roedor", urubu_porto: "ave", gaivota: "ave", sagui: "macaco", maracaja: "felinoP", teiu: "calango", galo_campina: "ave", teiu_rei: "calango", meia_noite: "gente", lontra: "ariranha", jacare_papo: "jacare", cagado: "tatu", bigua: "ave", surubim: "piranha", cabeca_cuia: "visagem", tatupeba: "tatu", cascavel: "cobra", raposa: "lobo", traira: "piranha", asa_branca: "ave", sucuarana: "felino", boi_bumba: "anta", guara: "ave", garca_moura: "ave", carcara: "ave", siri: "aranha", mero: "piranha", serpente: "cobra",
   cobra_norato: "boitata", jacare_canal: "jacare"};
 // grito do bicho (chefe soma um rugido grave por baixo)
 function animalCry(id, boss = false, k = 1) {
