@@ -3,6 +3,13 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.45.0 — o tema de Pytuna e as fanfarras
+
+- Pytuna ganhou um tema próprio: uma frase grave e instável, com coro, vento e batida de coração, que toca toda vez
+  que a fumaça aparece em cena.
+- A vitória, a derrota e a subida de nível agora tocam o motivo da região. No Norte é o tema do Norte; em São Luís,
+  o do Nordeste. A música da batalha fica sempre em suspenso, e só a vitória resolve a melodia.
+
 ## 0.44.0 — de avião para São Luís
 
 - O Nordeste abriu! Com o site da Dona Graça entregue e os 20 chefes do Norte acalmados, o mapa do Pará mostra o

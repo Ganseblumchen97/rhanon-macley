@@ -69,11 +69,11 @@ function pytunaScene(lines, done) {
   if (!EX) return narrate(lines, done);
   EX.locked = true; exKeys.clear();
   EX.pyt = {t0: performance.now(), x: EX.hero.x + 28, y: EX.hero.y - 26};
-  sfx("rugidoChefe");
+  sfx("rugidoChefe"); musicStart("pytuna");   // o tema de Pytuna toca enquanto ele está em cena
   setTimeout(() => narrate(lines, () => {
     if (!EX || !EX.pyt) return done && done();
     EX.pyt.leave = performance.now(); sfx("esquiva");
-    setTimeout(() => { if (EX) { EX.pyt = null; EX.locked = false; } if (done) done(); }, 1200);
+    setTimeout(() => { if (EX) { EX.pyt = null; EX.locked = false; musicStart("local"); } if (done) done(); }, 1200);
   }), 900);
 }
 // desenho na exploração (chamado no fim do quadro): chega crescendo, fica, e sai voando para baixo (para o Sul)

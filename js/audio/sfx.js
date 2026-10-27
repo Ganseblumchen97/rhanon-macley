@@ -167,6 +167,12 @@ function toggleMute() {
   $("mute").setAttribute("aria-pressed", muted);
 }
 /* ----- fanfarra de vitória, derrota e fuga (curtas e suaves, como na vitrine) ----- */
+/* motivo da região onde o Rhanon está (o mesmo dos temas da música: NORTE_THEME e NORDESTE_THEME em music.js), para os
+   jingles de vitória, derrota e subida de nível: as quatro notas do motivo, a nota "de casa" do tema, o acorde maior
+   dela (o fim triunfal) e o baixo. A batalha nunca resolve; a vitória resolve. */
+const JINGLE = {norte: {motif: [69, 74, 72, 69], home: 74, chord: [62, 66, 69], bass: 50},
+  nordeste: {motif: [74, 71, 74, 76], home: 79, chord: [67, 71, 74], bass: 43}};
+const jingleMotif = () => JINGLE[regionOfCity(curCity())] || JINGLE.norte;
 function fanfare(kind) {
   if (!AC) return;
   const t = AC.currentTime + .05, out = AC.createGain(), lp = AC.createBiquadFilter();
@@ -180,14 +186,16 @@ function fanfare(kind) {
     o.connect(g).connect(lp); o.start(when); o.stop(when + dur + .01);
   };
   const S = .075;
-  if (kind === "win") {   // vitória: só um "tum-tum" grave e macio; a festa fica com a barra de XP enchendo (xpFillSound)
-    note(48, 0, .16, .1, "triangle"); note(55, .14, .3, .08, "triangle"); note(67, .14, .3, .025, "triangle");
+  const J = jingleMotif();
+  if (kind === "win") {   // vitória: o motivo da região no 3-3-2 e, enfim, a nota de casa com o acorde maior (curto: a festa segue com a barra de XP)
+    J.motif.slice(0, 3).forEach((m, i) => { note(m, [0, .2, .4][i], [.19, .19, .13][i], .05, "triangle"); note(m + 12, [0, .2, .4][i], .1, .012); });
+    note(J.home, .55, .75, .06, "triangle", true); J.chord.forEach(m => note(m, .55, .75, .022, "triangle")); note(J.bass - 12, .55, .6, .1, "triangle");
   } else if (kind === "flee") {
     [72, 74, 76, 79].forEach((m, i) => note(m, i * .06, .08, .045, "triangle"));
     note(84, .26, .25, .03, "triangle", true);
-  } else {
-    [[67, 0], [66, 1], [65, 2]].forEach(([m, at]) => note(m, at * .16, .15, .05, "triangle"));
-    note(64, .5, .7, .05, "triangle", true); note(40, .5, .7, .08, "triangle");
+  } else {   // derrota: o motivo lento e uma oitava abaixo, parando na última nota sem resolver
+    J.motif.forEach((m, i) => note(m - 12, i * .26, i === 3 ? .9 : .24, .05, "triangle", i === 3));
+    note(J.motif[3] - 24, .78, .9, .08, "triangle");
   }
 }
 // impacto da faixa de encontro: subida rápida de notas e uma lâmina cravando (inspirado na abertura do menu da vitrine)
@@ -240,11 +248,14 @@ function xpFillSound(dur, from = 0, to = 1) {
   o.start(t); lfo.start(t); o.stop(t + dur + .02); lfo.stop(t + dur + .02);
 }
 function xpDing() { if (!AC || muted) return; const t = AC.currentTime + .02; tone(hz(84), t, .09, "square", .04); tone(hz(91), t + .08, .22, "square", .035); }
+// subiu de nível: as quatro notas do motivo da região, rápidas e brilhantes, e o acorde de casa subindo até a nota final
 function levelUpJingle() {
   if (!AC || muted) return;
-  const t = AC.currentTime + .05, S = .1;
-  [[67, 0, .09], [72, 1, .09], [76, 2, .09], [79, 3, .36], [77, 6.6, .12], [76, 7.8, .12], [74, 9, .12], [76, 10.2, .65]]   // [nota, início (x S), duração]
-    .forEach(([m, at, d]) => { tone(hz(m), t + at * S, d + .05, "square", .07); tone(hz(m + 12), t + at * S, d, "triangle", .025); });
-  [[48, 0], [55, 3], [53, 6.6], [48, 10.2]].forEach(([m, at]) => tone(hz(m), t + at * S, .5, "triangle", .12));
-  [60, 64, 67, 72].forEach((m, i) => tone(hz(m), t + 10.2 * S + i * .02, .9, "triangle", .03));
+  const J = jingleMotif(), t = AC.currentTime + .05, S = .09, up = [...J.chord.map(m => m + 12), J.home + 12];
+  J.motif.forEach((m, i) => { tone(hz(m + 12), t + i * S, S + .03, "square", .06); tone(hz(m + 24), t + i * S, S, "triangle", .02); });
+  up.slice(0, -1).forEach((m, i) => tone(hz(m), t + (4.6 + i * .7) * S, .1, "square", .055));
+  const end = t + (4.6 + (up.length - 1) * .7) * S;
+  tone(hz(up.at(-1)), end, .7, "square", .07); tone(hz(up.at(-1) + 12), end, .6, "triangle", .025);
+  J.chord.forEach((m, i) => tone(hz(m), end + i * .02, .9, "triangle", .03)); tone(hz(J.bass - 12), end, .6, "triangle", .12);
+  tone(hz(J.bass - 12), t, .4, "triangle", .1);
 }

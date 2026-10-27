@@ -24,7 +24,8 @@ function stepWork(s, t) {
    Faixas: "title" (abertura), "map" (mapa grande: Pará/Brasil), "local" (Ananindeua, toque de capoeira com flauta),
    "localNight" (Ananindeua à noite), "battleCapo" (batalha na mata: a roda de capoeira acelerada), "battleCarimbo"
    (batalha na água: carimbó), "battleGuitarrada" (batalha em Belém: guitarrada), "localNordeste" (São Luís e o
-   mapa do Maranhão: toada de bumba-meu-boi com sanfona e triângulo, e o tema do Nordeste), "battleBoss" (chefe: abertura
+   mapa do Maranhão: toada de bumba-meu-boi com sanfona e triângulo, e o tema do Nordeste), "pytuna" (cenas de Pytuna,
+   com o tema dele), "battleBoss" (chefe: abertura
    sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
@@ -314,6 +315,11 @@ const MUS = (() => {
         [4, 0, 76, 4], [4, 4, 72, 2], [4, 6, 76, 2], [4, 8, 79, 4], [4, 12, 77, 4], [5, 0, 76, 8], [5, 8, 74, 4], [5, 12, 72, 4],
         [6, 0, 74, 4], [6, 4, 78, 2], [6, 6, 81, 2], [6, 8, 79, 4], [6, 12, 78, 4], [7, 0, 74, 12]]
   };
+  /* Tema de Pytuna (leitmotif do vilão, igual em todas as regiões): "ré – mi bemol – lá bemol – dó sustenido", grave e
+     lento. Sobe meio tom, salta o trítono (ré a lá bemol, o intervalo mais instável que existe) e cai num dó sustenido
+     que não resolve: a fumaça que nunca assenta. Na segunda frase o salto escorrega meio tom e volta para o ré. */
+  const PYTUNA_THEME = [[0, 0, 50, 6], [0, 6, 51, 2], [0, 8, 56, 8], [1, 0, 49, 16],
+    [2, 0, 50, 6], [2, 6, 51, 2], [2, 8, 56, 4], [2, 12, 55, 4], [3, 0, 50, 16]];
   // tema → 128 passos (oito compassos); shift muda a oitava (ou o tom: +7 leva para lá menor); com enfeite, as notas
   // longas às vezes ganham um floreio rápido no fim (o sorteio fica só aí: o desenho da frase não muda); upTo = só os
   // primeiros compassos (o resto fica em silêncio)
@@ -511,6 +517,21 @@ const MUS = (() => {
         if (Math.random() < .004) bird(t);
         const m = this.melody && this.melody[i % 128];
         if (m) { sanfona(mtof(m.note), t, m.len * d * .92, .016); if (part === "A2") flute(mtof(m.note + 12), t, m.len * d * .9, .016); }   // tema na sanfona
+      }
+    },
+    // Pytuna em cena: zumbido grave do coro, vento, coração batendo e a badalada; o tema de Pytuna (PYTUNA_THEME) numa voz
+    // de fumaça (serra abafada com o grave por baixo), repetindo uma oitava acima na segunda volta. Toca nas cenas dele
+    pytuna: {
+      bpm: 70, wet: .55, level: .42, melody: null,
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), lap = Math.floor(i / 64);
+        if (i % 64 === 0) { this.melody = themeLine(PYTUNA_THEME, lap % 2 ? 12 : 0); choir([26, 33, 38], t, d * 64, .022); sweep(t, d * 32, .03); }
+        if (s === 0 && bar % 2 === 0) toll(38, t, .035);
+        if (s === 0 || s === 3) kick(t, s ? .06 : .09);   // coração
+        if (s === 8 && bar % 2 === 1) surdo(t, .07);
+        if (i % 32 === 16) sweep(t, d * 16, .02);   // a fumaça passando
+        const m = this.melody && this.melody[i % 64];   // o tema tem 4 compassos
+        if (m) { synth("sawtooth", mtof(m.note + 12), t, m.len * d, .02, 700); synth("sine", mtof(m.note), t, m.len * d, .05); synth("triangle", mtof(m.note + 19), t, m.len * d * .6, .004); }
       }
     },
     // batalha: a roda de capoeira acelerada (toque de São Bento Grande), com atabaque, pandeiro, baixo marcado
