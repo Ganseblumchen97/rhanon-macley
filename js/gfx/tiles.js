@@ -138,7 +138,7 @@ function drawStageMap(rows, zone) {
   P.at = at;   // o asfalto olha os vizinhos para pintar as faixas
   rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
     const ox = tx * TILE, oy = ty * TILE;
-    if ("HKFNVPCRMXQO".includes(ch)) {
+    if ("HKFNVPCRMXLWQO".includes(ch)) {
       drawTile(x, "KVCRM".includes(ch) ? "-" : ".", ox, oy, P, tx, ty);
       if (ch === "H") x.drawImage(hut, (at(tx - 1, ty) === "H" ? (at(tx - 2, ty) === "H" ? 2 : 1) : 0) * 16, at(tx, ty - 1) === "H" ? 16 : 0, 16, 16, ox, oy, 16, 16);
       else if (ch === "K") drawStall(x, ox, oy, tx, at(tx - 1, ty) !== "K", at(tx + 1, ty) !== "K");

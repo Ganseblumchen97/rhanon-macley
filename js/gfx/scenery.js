@@ -15,7 +15,8 @@ const SCENES = {
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
   cidadevelha: {sky: ["#f0b080", "#e8a070", "#b88a9a"], far: "#7a6a8a", trees: "casario", plat: "pedra"},
   porto:       {sky: ["#b8c4cc", "#a0b0ba", "#8a9aa6"], far: "#6a7a86", trees: "galpao", plat: "tabua", water: true},
-  baixadas:    {sky: ["#d8a898", "#c89a8a", "#a8949a"], far: "#5a6a5a", trees: "palafita", plat: "tabua", water: true}
+  baixadas:    {sky: ["#d8a898", "#c89a8a", "#a8949a"], far: "#5a6a5a", trees: "palafita", plat: "tabua", water: true},
+  codigo:      {sky: ["#060a18", "#0a1228", "#0e1a36"], far: "#13304a", trees: "codigo", plat: "pixel"}   // dentro do notebook (freela)
 };
 const sceneOf = z => SCENES[z] || SCENES.mata;
 const scenePal = z => TILE_PAL[z] || TILE_PAL.mata;
@@ -53,6 +54,7 @@ function drawScenery(force) {
     const lx = rnd() * W, lw = 2 + rnd() * 5; x.fillStyle = "rgba(220,255,200,.07)";
     x.beginPath(); x.moveTo(lx, 0); x.lineTo(lx + lw, 0); x.lineTo(lx + lw + top * .35, top); x.lineTo(lx + top * .35, top); x.fill();
   }
+  if (S.trees === "codigo") { sceneCode(x, rnd, W, H, G0, top); drawSceneryShade(x, st, W, H, night); return; }
   // mata (ou cidade) de fundo: silhueta irregular perto do horizonte
   sceneSkyline(x, S, P, rnd, W, top, st);
   // água
@@ -83,10 +85,25 @@ function drawScenery(force) {
     for (let y = 0; y < vl; y++) rect(y % 5 === 4 ? P.leafHi : P.leaf2, vx + Math.round(Math.sin(y / 6) * 1.2), y, 1, 1);
     rect(P.leaf, vx - 1, vl, 3, 2);
   }
-  // fora do palco: mais escuro (o olho fica na luta) e, à noite, azul; o palco tem o próprio véu da noite
+  drawSceneryShade(x, st, W, H, night);
+}
+// fora do palco: mais escuro (o olho fica na luta) e, à noite, azul; o palco tem o próprio véu da noite
+function drawSceneryShade(x, st, W, H, night) {
   x.fillStyle = night ? "rgba(6,10,40,.74)" : "rgba(4,14,8,.55)";
   x.fillRect(0, 0, W, Math.max(0, st.y)); x.fillRect(0, st.y + st.h, W, H);
   x.fillRect(0, st.y, Math.max(0, st.x), st.h); x.fillRect(st.x + st.w, st.y, W, st.h);
+}
+// dentro do notebook: linhas de código coloridas no alto e um chão de grade azul que some no horizonte
+function sceneCode(x, rnd, W, H, G0, top) {
+  const rect = (c, a, b, w, h) => { x.fillStyle = c; x.fillRect(Math.round(a), Math.round(b), Math.round(w), Math.round(h)); };
+  const cols = ["#3fd87a", "#5ac8ff", "#ff7ab8", "#ffd23a", "#c8d0e0"];
+  for (let y = 4; y < top - 4; y += 5) {
+    let cx = 6 + Math.floor(rnd() * 4) * 6;   // recuo como num código de verdade
+    while (cx < W - 10 && rnd() < .9) { const w = 3 + rnd() * 14; rect(cols[Math.floor(rnd() * cols.length)] + "88", cx, y, w, 2); cx += w + 3; if (rnd() < .15) break; }
+  }
+  rect("#0a1a30", 0, G0, W, H - G0);
+  for (let y = G0, k = 1; y < H; y += k, k += 1) rect("#1e4a7a", 0, y, W, 1);   // linhas do chão mais espaçadas perto
+  for (let i = -20; i < 20; i++) { x.strokeStyle = "#1e4a7a"; x.beginPath(); x.moveTo(W / 2 + i * 6, G0); x.lineTo(W / 2 + i * 60, H); x.stroke(); }
 }
 // mata de fundo (copas arredondadas em duas fileiras), seringueiras, mangue, campo aberto ou prédios
 function sceneSkyline(x, S, P, rnd, W, top, st) {
@@ -178,8 +195,8 @@ function sceneryPlat(zone, wet) {
   const c = document.createElement("canvas"); c.width = PLAT_W; c.height = PLAT_H;
   const x = c.getContext("2d"), cx = PLAT_W / 2, rx = PLAT_W / 2 - 1, ry = PLAT_TOP / 2, cy = ry + .5;
   const surf = {grama: [P.g1, P.g2], musgo: [P.g1, P.leaf], areia: [P.path, P.path2], barro: [P.path2, P.trunk], lama: [P.g1, P.g2], folhas: [P.path, P.trunk],
-    flores: [P.g1, P.g2], pedra: [P.rock, P.rock2], tabua: [P.wood, P.wood2], agua: [P.water2, P.water]}[kind] || [P.g1, P.g2];
-  const side = kind === "agua" ? "#14304a" : kind === "tabua" ? P.wood2 : kind === "pedra" ? P.rock2 : P.trunk;
+    flores: [P.g1, P.g2], pedra: [P.rock, P.rock2], tabua: [P.wood, P.wood2], agua: [P.water2, P.water], pixel: ["#1e4a7a", "#5ac8ff"]}[kind] || [P.g1, P.g2];
+  const side = kind === "agua" ? "#14304a" : kind === "pixel" ? "#0a1a30" : kind === "tabua" ? P.wood2 : kind === "pedra" ? P.rock2 : P.trunk;
   const half = y => rx * Math.sqrt(Math.max(0, 1 - ((y + .5 - cy) / ry) ** 2));
   for (let y = 0; y < PLAT_H; y++) {
     const hw = y < PLAT_TOP ? half(y) : half(Math.min(y - (PLAT_H - PLAT_TOP), PLAT_TOP - 1)) * (1 - (y - PLAT_TOP) * .06);

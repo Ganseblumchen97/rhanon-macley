@@ -144,7 +144,7 @@ function goSub(id) {
   requestAnimationFrame(f);
 }
 const peltName = id => PELT[id] || t("Lembrança de {bicho}", {bicho: ANIMALS.find(a => a.id === id).name.toLowerCase()});
-const peltValue = id => { const g = ANIMALS.find(a => a.id === id).gold; return Math.round((g[0] + g[1]) / 2); };
+const peltValue = id => { const g = ANIMALS.find(a => a.id === id).gold; return Math.round((g[0] + g[1]) / 2 * (G.portfolio?.site_feira ? 1.2 : 1)); };   // freela do site: +20%
 const peltIds = () => Object.keys(G.pelts).filter(k => G.pelts[k] > 0);
 const peltsTotal = () => peltIds().reduce((a, k) => a + G.pelts[k] * peltValue(k), 0);
 // receitas com peles: as do armeiro (CRAFT) e os talismãs do Pajé (CHARMS), como [id, item]
@@ -285,9 +285,11 @@ function buyGear(slot, id) {
 
 /* ---------- inventário (no mapa de Ananindeua e, com I, dentro das fases) ---------- */
 // resumo da bolsa: roupa e arma ficam no Equipamento (E); aqui só a defesa, o pedido e o valor das peles
+// situação do notebook na bolsa (enquanto não liga)
+const nbLine = () => !G.nb.tem || G.nb.on ? "" : " · " + (nbReady() ? t("Notebook: pronto, falta só uma tomada (rodoviária da BR-316)") : t("Notebook: falta {pecas}", {pecas: nbMissing().map(nbPartName).join(", ")}));
 function invSummary() {
   const ids = peltIds();
-  return t("Defesa: {def} · Dinheiro: R$ {n}", {def: defense(), n: G.money}) + (ids.length ? " · " + t("Lembranças valem R$ {n} na feira", {n: peltsTotal()}) : "") + questLine();
+  return t("Defesa: {def} · Dinheiro: R$ {n}", {def: defense(), n: G.money}) + (ids.length ? " · " + t("Lembranças valem R$ {n} na feira", {n: peltsTotal()}) : "") + nbLine() + questLine();
 }
 /* lista da bolsa: comida (Z come) e materiais (peles), mostrando BAG_ROWS linhas e rolando com as setas */
 const BAG_ROWS = 10;

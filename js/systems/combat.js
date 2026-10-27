@@ -25,7 +25,7 @@ function cmdButton(html, desc, fn, off) {
 }
 function buildCmds() {
   subMenu = null; const box = $("cmds"); box.innerHTML = ""; box.style.minHeight = ""; box.classList.remove("scroll");
-  CMDS.forEach((c, n) => cmdButton(`<i class="key">${n + 1}</i>${c.n}<small></small>`, c.d, () => act(c.id)));   // o número é a tecla de atalho (1-6)
+  CMDS.forEach((c, n) => cmdButton(`<i class="key">${n + 1}</i>${cmdName(c)}<small></small>`, c.d, () => act(c.id)));   // o número é a tecla de atalho (1-6)
   box.style.minHeight = box.offsetHeight + "px"; box.style.setProperty("--cmdsH", box.offsetHeight + "px");   // a lista principal fixa a altura: Especial/Itens abrem no mesmo espaço
 }
 // opts: [{label, small, desc, fn, off}]; números escolhem, Esc volta sem gastar o turno
@@ -58,7 +58,12 @@ function useItem(k) {
 }
 
 // opts: animal (bicho escolhido), firstHit (dano do golpe de abertura na exploração), enemyFirst (o bicho começa)
+// contra bug do freela os comandos mudam de nome (a luta é a mesma): Lança = Depurar, Observar = Testar...
+let bugMode = false;
+const BUG_CMD = {atacar: "Depurar", observar: "Testar", defender: "Respirar", item: "Café e açaí", fugir: "Fechar o notebook"};
+const cmdName = c => bugMode && BUG_CMD[c.id] ? t(BUG_CMD[c.id]) : c.n;
 function init(opts = {}) {
+  bugMode = !!(opts.animal && opts.animal.bug);
   $("homeButton").hidden = true; $("map").hidden = true; $("local").hidden = true;
   $("game").classList.remove("working-mode", "challenge-mode"); $("stage").classList.remove("working"); $("workScene").hidden = true; $("beast").style.display = ""; $("hero").style.display = "";
   setBattleDecor(curZone);
@@ -147,7 +152,7 @@ function render() {
     const b = $("cmds").children[i];
     if (c.id === "atacar" && b.dataset.f !== String(furyReady())) {   // fúria pronta: a lança vira o golpe da fúria
       b.dataset.f = furyReady(); b.classList.toggle("furia-cmd", furyReady());
-      b.firstChild.innerHTML = `<i class="key">1</i>${furyReady() ? t("Fúria!") : c.n}<small></small>`;
+      b.firstChild.innerHTML = `<i class="key">1</i>${furyReady() ? t(bugMode ? "Estado de flow!" : "Fúria!") : cmdName(c)}<small></small>`;
     }
     b.setAttribute("aria-disabled", avail(c.id) ? "false" : "true");
     b.querySelector("small").textContent = c.id === "item" ? "×" + itemCount(p.items) : c.id === "especial" ? t("PE") : "";
@@ -300,7 +305,7 @@ function finish(kind) {
   // cartão: título, uma frase curta e, embaixo, o que ganhou ou perdeu (um item por linha)
   const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = curCity() === "belem" ? t("Acordou no Ver-o-Peso, com metade das forças") : t("Acordou na aldeia, com metade das forças");
   const T = {
-    win:  e.boss ? [t(ending(e, "Chefe acalmado!", "Chefe acalmada!")), t("{bicho} voltou a si. A trilha está livre.", {bicho: O})]
+    win:  e.bug ? [t("Bug resolvido!"), t("{bicho} sumiu do código.", {bicho: O})] : e.boss ? [t(ending(e, "Chefe acalmado!", "Chefe acalmada!")), t("{bicho} voltou a si. A trilha está livre.", {bicho: O})]
       : [t(pick(["Vitória!", "Mandou bem!", "É isso aí!"])), t(WATER_BATTLE.has(e.id) ? "{bicho} sumiu na água." : pick(["{bicho} saiu correndo.", "{bicho} desistiu da briga.", "{bicho} não quer mais conversa."]), {bicho: O})],
     flee: [t("Fugiu!"), t("{bicho} fica pra próxima.", {bicho: O})],
     lose: [t("Desmaiou..."), t("{bicho} levou a melhor.", {bicho: O})]
@@ -344,6 +349,7 @@ function overXp(from) {
 function beastThanks() {
   const id = e.id, g = id === "macaco" ? "thumb" : BIRDS.has(id) ? "note" : "heart", person = MOTION[id] === "person";
   BEAST_A.set("idle");
+  if (e.bug) return setTimeout(() => $("beast").classList.add("glitch"), 300);   // bug: pisca em pedaços e some
   const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .15);
   if (!person) setTimeout(() => PFX.burst(g === "heart" ? 6 : 3, g, {heart: ["#ff6b8a", "#ff9fb4"], note: ["#5a6ad8", "#ffffff"], thumb: ["#ffd23a", "#c8902a"]}[g], gx, gy, 14, {life: 1, up: 12}), 200);
   if (e.boss) return;
@@ -582,7 +588,9 @@ function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: 
   noteWin(a.id);   // caderno de bichos e pedido de "vencer"
   const back = a.stolen || 0; if (back) { G.money += back; a.stolen = 0; }   // dinheiro que o malandro levou volta
   if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit();
-  const got = drop ? 0 : a.boss ? rnd(1, 3) : 1;   // chefe deixa de 1 a 3 (o Pajé faz talismã com elas)
+  const got = drop || a.bug ? 0 : a.boss ? rnd(1, 3) : 1;   // chefe deixa de 1 a 3 (o Pajé faz talismã com elas); bug não deixa nada
+  const part = NB_DROP[a.id] && G.nb.tem && !G.nb[NB_DROP[a.id]] ? NB_DROP[a.id] : null;   // macaco e ariranha largam peças do notebook
+  if (part) G.nb[part] = true;
   if (got) G.pelts[a.id] = (G.pelts[a.id] || 0) + got;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }
@@ -594,7 +602,8 @@ function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: 
   return [
     back && t("R$ {n} de volta no bolso", {n: back}),
     xp ? `+${xp} XP` : drop && t("Sem XP (fraco demais)"),
-    drop ? t("{pele} no chão: passa por cima", {pele: peltName(a.id)}) : got > 1 ? t("{pele} ×{q} (R$ {n} cada na feira)", {pele: peltName(a.id), q: got, n: peltValue(a.id)}) : t("{pele} (R$ {n} na feira)", {pele: peltName(a.id), n: peltValue(a.id)}),
+    part && t(part === "teclado" ? "O macaco largou o teclado do notebook!" : "A ariranha largou o carregador do notebook!"),
+    a.bug ? null : drop ? t("{pele} no chão: passa por cima", {pele: peltName(a.id)}) : got > 1 ? t("{pele} ×{q} (R$ {n} cada na feira)", {pele: peltName(a.id), q: got, n: peltValue(a.id)}) : t("{pele} (R$ {n} na feira)", {pele: peltName(a.id), n: peltValue(a.id)}),
     G.lv > L0 && t("Nível {n}!", {n: G.lv}),
     CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv && t("Destino novo no mapa"),
     a.boss && NEXT_Z[curZone] ? t("Liberou: {lugar}", {lugar: ZONES[NEXT_Z[curZone]].n}) : a.boss && NEED.parada === curZone && !G.night && t("Liberou: {lugar}", {lugar: "BR-316"}),

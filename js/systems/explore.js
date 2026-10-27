@@ -206,7 +206,8 @@ function resumeExplore(result) {
   if (!EX || result === "lose") { $("explore").hidden = true; EX = null; return showLocal(); }
   const en = EX.fighting, now = performance.now();
   EX.fighting = null; EX.locked = false; exKeys.clear();
-  if (en && result === "win" && !en.boss) exCalm(en);   // agradece e corre para o mato
+  if (en && result === "win" && en.a.bug) { en.alive = false; freelaBugDone(); }   // bug do freela resolvido
+  else if (en && result === "win" && !en.boss) exCalm(en);   // agradece e corre para o mato
   if (en && result === "win" && en.boss) {   // chefe acalmado fica no lugar como aliado (ponto de treino)
     en.alive = false;
     if (!EX.spots.some(s => s.kind === "lembranca")) EX.spots.push({kind: "lembranca", x: en.homeX, y: en.homeY - 4, tx: Math.floor(en.homeX / TILE), ty: Math.floor(en.homeY / TILE)});
@@ -316,7 +317,7 @@ function exStartBattle(en, opts) {
   if (EX.locked) return;
   EX.locked = true; EX.fighting = en; exKeys.clear();
   setTimeout(() => battleCutin(opts.enemyFirst ? "ambush" : "first", () => {
-    $("explore").hidden = true; fromExplore = true; curZone = EX.zone; bossFight = en.boss;
+    $("explore").hidden = true; fromExplore = true; curZone = en.a.bug ? "codigo" : EX.zone; bossFight = en.boss;   // bug do freela: luta dentro do código
     init({animal: en.a, ...opts});
   }), opts.enemyFirst ? 0 : 160);
 }
@@ -730,9 +731,9 @@ function drawMemento(x, s, cx, cy, now) {
   const p = (now / 1400) % 1;
   if (!REDUCE && p < .7) { x.fillStyle = p < .35 ? "#ffd23a" : "#fff3c4"; x.fillRect(sx + 4 - Math.round(p * 4), sy - 18 - Math.round(p * 10), 1, 1); }
 }
-const SPOTS = {F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", X: "xama", P: "aldeao", Q: "cabine", U: "onibus"};
-const PEOPLE = ["peles", "comida", "artesao", "armeiro", "xama", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "falar com o chefe"};
+const SPOTS = {F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", X: "xama", L: "tecnico", W: "cliente", P: "aldeao", Q: "cabine", U: "onibus"};
+const PEOPLE = ["peles", "comida", "artesao", "armeiro", "xama", "tecnico", "cliente", "aldeao"];
+const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", tecnico: "falar com o técnico", cliente: "falar com a Dona Graça", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "falar com o chefe"};
 const VILLAGER_NAME = {aldeao1: "Mateiro", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 const BELEM_TIPS = [
@@ -826,6 +827,8 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
   else if (kind === "xama") { say(t("Pajé"), t("Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem luar de chefe nenhum pra eu trabalhar. Acalma um chefe e me traz o luar dele."), d);
     if (Object.keys(G.skills).length) btn(t("Esquecer habilidades · R$ {n}", {n: SKILL_RESET(G.lv)}), ask(t("Esquecer todas as habilidades por R$ {n}? Os pontos voltam para gastar de novo.", {n: SKILL_RESET(G.lv)}), skillReset), G.money < SKILL_RESET(G.lv), d); }
+  else if (kind === "tecnico") nbTechnician(say, d);
+  else if (kind === "cliente") freelaClient(say, d);
   else if (kind === "inventario") { say(t("Bolsa"), invSummary()); invButtons(d); }
   else if (kind === "lembranca") {   // revanche com o chefe vencido
     const b = rematchBoss(), spot = nearSpot() || EX.spots.find(s => s.kind === "lembranca");
@@ -840,10 +843,65 @@ function exOpenDialog(kind, msg, look) {
   d.hidden = false; EX.confirming = null; EX.dialogT = performance.now();
   if (kind !== "armeiro" && !(kind === "xama" && d.querySelector(".forge")) && kind !== "tutorial") { menuSelect(d, EX.keepSel ?? menuFirst(d)); EX.keepSel = null; }   // já começa com uma opção escolhida
 }
+/* ---------- notebook do Rhanon (NB_PARTS em data/world.js) e o freela (FREELAS) ---------- */
+const nbMissing = () => NB_PARTS.filter(k => !G.nb[k]);
+const nbReady = () => G.nb.tem && !nbMissing().length;
+const nbPartName = k => ({bateria: t("bateria"), teclado: t("teclado"), carregador: t("carregador")})[k];
+// técnico da lan house (feira): diz o que falta, vende a bateria e dá a pista das outras peças
+function nbTechnician(say, d) {
+  if (!G.nb.tem) return say(t("Técnico"), t("Conserto computador, celular, rádio... Se um dia aparecer contigo um notebook, me traz."));
+  if (G.nb.on) return say(t("Técnico"), t("E aí, programador! O notebook tá aguentando? Cuida da bateria, viu."));
+  if (nbReady()) return say(t("Técnico"), t("Tá tudo aí! Agora só falta tomada. Na rodoviária da BR-316, do lado da cabine, tem uma."));
+  const miss = nbMissing().map(nbPartName).join(", ");
+  say(t("Técnico"), t("Égua, um notebook! Falta {pecas}.", {pecas: miss}) + (G.nb.teclado ? "" : " " + t("Teclado? Vi um macaco-prego na mata correndo com um debaixo do braço.")) +
+    (G.nb.carregador ? "" : " " + t("Carregador... as ariranhas do rio vivem brincando com fio que a cheia leva.")));
+  if (!G.nb.bateria) btn(t("Comprar bateria · R$ {n}", {n: NB_BATTERY}), ask(t("Comprar a bateria do notebook por R$ {n}?", {n: NB_BATTERY}), () => {
+    if (G.money < NB_BATTERY || G.nb.bateria) return;
+    G.money -= NB_BATTERY; G.nb.bateria = true; save(); sfx("more"); exHud();
+    exOpenDialog("tecnico", t("Bateria nova no lugar!"));
+  }), G.money < NB_BATTERY, d);
+}
+// liga o notebook na tomada da rodoviária: a tela acende, chega o e-mail do primeiro freela e o caderno vira digital
+function nbTurnOn() {
+  G.nb.on = true; save(); sfx("more"); exCloseDialog();
+  exToast(t("A tela acende! Chegou um e-mail: \"Freela no Ver-o-Peso: um site para a feira. Procura a Dona Graça, perto da banca do açaí.\" O caderno de bichos agora é digital."));
+}
+// próximo bug do freela em andamento (ou nada)
+const freelaNext = id => FREELAS[id].bugs[G.freela[id] || 0];
+// Dona Graça (Ver-o-Peso): pede o site, solta os bugs um por vez e paga na entrega
+function freelaClient(say, d) {
+  const id = "site_feira", f = FREELAS[id], done = G.freela[id] || 0;
+  if (G.portfolio[id]) return say(f.client, t("O site tá bombando, menino! Todo mundo agora sabe o preço das coisas antes de chegar."));
+  if (!G.nb.on) return say(f.client, t("Tu que é o menino que mexe com computador? Arruma um notebook que eu tenho trabalho pra ti."));
+  if (done >= f.bugs.length) {
+    say(f.client, t("Égua, ficou lindo! Toma, tá pago, e com gorjeta."));
+    btn(t("Entregar o site · R$ {n}", {n: f.pay}), () => {
+      G.portfolio[id] = true; G.money += f.pay; save(); sfx("more"); exHud();
+      exOpenDialog("cliente", t("Freela entregue! +R$ {n}. Programa novo no notebook: {prog}", {n: f.pay, prog: t(f.prog)}));
+    }, false, d);
+    return;
+  }
+  say(f.client, t("Preciso de um site pra feira, com o preço das coisas. Pago R$ {n}. Só que o código tá cheio de bug...", {n: f.pay}) + " " + t("Bugs resolvidos: {n} de {total}.", {n: done, total: f.bugs.length}));
+  btn(t("Depurar o próximo bug"), () => {
+    exCloseDialog();
+    const b = BUGS.find(x => x.id === freelaNext(id)), en = makeAnimalEnt(b, Math.floor(EX.hero.x / TILE), Math.floor(EX.hero.y / TILE));
+    exStartBattle(en, {});
+  }, false, d);
+}
+function freelaBugDone() {
+  const id = "site_feira", f = FREELAS[id];
+  G.freela[id] = Math.min(f.bugs.length, (G.freela[id] || 0) + 1); save();
+  exToast(G.freela[id] >= f.bugs.length ? t("Último bug resolvido! Fala com a Dona Graça pra entregar o site.") : t("Bug resolvido! Faltam {n}.", {n: f.bugs.length - G.freela[id]}));
+}
 /* ---------- BR-316: cabine do cobrador e o ônibus (fases parada e terminal) ---------- */
 const busDest = () => EX.zone === "parada" ? "belem" : "ananindeua";
 const busSide = () => EX.zone === "parada" ? -1 : 1;   // a estrada sai pela esquerda rumo a Belém e pela direita rumo a Ananindeua
 function busCabin(say, d) {
+  if (EX.zone === "parada" && nbReady() && !G.nb.on) {   // tomada do lado da cabine: o notebook liga aqui
+    say(t("Cobrador"), t("Tomada? Tem ali do lado da cabine, pode usar à vontade."));
+    btn(t("Ligar o notebook"), nbTurnOn, false, d);
+    return;
+  }
   if (EX.zone === "terminal") return say(t("Guichê do terminal"), G.passagem ? t("Tua passagem vale ida e volta. O ônibus pra Ananindeua sai assim que tu subir.") : t("Sem passagem não embarca, maninho."));
   if (G.passagem) return say(t("Cobrador"), t("Passagem na mão! É só subir no ônibus. Vale ida e volta: do terminal de Belém tu volta quando quiser."));
   if (!BUS.open) return say(t("Cobrador"), t("O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!"));
@@ -1018,7 +1076,8 @@ function showTutorial() {
   d.hidden = false;
 }
 function endTutorial() {
-  G.tutorial = false; save();
+  G.tutorial = false; if (!G.nb.tem) { G.nb.tem = true; setTimeout(() => exToast(t("O Mateiro te deu um notebook que a cheia trouxe. Não liga: falta bateria, teclado e carregador. O técnico da feira entende disso.")), 2600); }
+  save();
   $("exDialog").hidden = true; EX.dialog = null; $("explore").classList.remove("no-help"); sfx("more");
   exToast(t("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata."));
 }

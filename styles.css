@@ -920,3 +920,9 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .over-xp[hidden]{display:none}
 /* bicho de água acalmado (beastThanks): afunda devagar e some */
 #beast.submerged.dive canvas.actor{transition:translate .8s steps(8),opacity .8s steps(8);translate:0 40%;opacity:0}
+/* caderno de papel (antes do notebook ligar): folha pautada, letra à mão; depois vira o caderno digital de sempre */
+#caderno.papel .info{background:repeating-linear-gradient(180deg,#f6ecd2 0 22px,#c8d8e8 22px 23px) center/calc(100% - 16px) calc(100% - 16px) no-repeat border-box}
+#caderno.papel .info h2{font-family:"Comic Sans MS","Segoe Print",cursive;transform:rotate(-1.5deg)}
+/* bug do freela resolvido: treme em degraus, perde a cor e some */
+#beast.glitch canvas.actor{animation:glitchOut .9s steps(6) forwards}
+@keyframes glitchOut{30%{translate:6px 0;filter:hue-rotate(90deg)}60%{translate:-8px 2px;opacity:.6;filter:grayscale(1)}100%{translate:0 0;opacity:0;filter:grayscale(1)}}

@@ -12,7 +12,8 @@ const WORKER = [
 const ART = {queixada_chefe: "queixada", cobra_grande: "sucuri", onca_rei: "onca", morcego_vampiro: "morcego", morcego_pescador: "morcego",
   jacaretinga: "jacare", caranguejo_rei: "caranguejo", urubu: "harpia", gaviao_real: "harpia", bufalo_touro: "bufalo",
   gato: "jaguatirica", iguana: "calango", iguana_rei: "calango", caramelo: "lobo", cachorro_bravo: "lobo", urubu_porto: "harpia",
-  ratazana: "rato", ratao: "rato", rato_dagua: "rato", mucura: "cassaco", jacare_canal: "jacare"};
+  ratazana: "rato", ratao: "rato", rato_dagua: "rato", mucura: "cassaco", jacare_canal: "jacare",
+  bug_loop: "sucuri", bug_404: "morcego", bug_prazo: "caranguejo"};   // bugs do freela usam o desenho desses bichos
 const FLAME = ["...r....","..rr.r..","..rrrr..",".rroorr.",".rooyor.","rooyyyor","rooyyyor",".rooyor.","..rooor."], PAL_F = {r:"#d62828", o:"#f2740c", y:"#ffd23a"};
 const GL = {"0":"111101101101111","1":"010110010010111","2":"111001111100111","3":"111001111001111","4":"101101111001001","5":"111100111001111","6":"111100111101111","7":"111001001010010","8":"111101111101111","9":"111101111001111","+":"000010111010000","-":"000000111000000"};
 
@@ -40,5 +41,8 @@ const VILLAGER_LOOK = {
   urbano3: {pal: {r: "#1a1426", s: "#9a6236", S: "#6e4424"}, shirt: ["#c8402a", "#8a2a1a"], pants: ["#26364a", "#18222f"], noBand: true, prop: "pelt"},
   // Pajé: cabelo branco comprido, cocar roxo com pena azul, pintura de jenipapo, colar e o cajado com maracá
   xama: {pal: {h: "#d8d0c4", H: "#f4ecd8", g: "#7a2a8a", G: "#4e1a5a", r: "#1a1426", s: "#9a6236", S: "#6e4424", t: "#2a2230", T: "#17121c"}, feather: "#3fb0d8", longHair: true, charm: "#f4ecd8", prop: "staff"},
+  // técnico da lan house (feira) e a Dona Graça, cliente do freela no Ver-o-Peso
+  tecnico: {pal: {g: "#2a6ab8", G: "#1a4a8a", r: "#ffd23a", s: "#a86f40", S: "#7d4f2c"}, shirt: ["#3a3a44", "#24242c"], glasses: true, prop: "cloth"},
+  cliente: {pal: {g: "#7a2a8a", G: "#4e1a5a", r: "#1a1426", s: "#9a6236", S: "#6e4424", h: "#3a2a22"}, shirt: ["#6a2a8a", "#4a1a6a"], pants: ["#e8c040", "#b8902a"], longHair: true, prop: "basket"},
   armeiro: {pal: {h: "#3a2a22", g: "#e5741c", G: "#a8480e", r: "#2a2230", s: "#9a6236", S: "#6e4424", t: "#5a4a40", T: "#3a2e28"}, feather: "#ffffff", top: "#7d4f2c", prop: "spear"}
 };

@@ -60,6 +60,18 @@ const EDGES = Object.values(CITY).flatMap(c => c.route.slice(1).map((k, i) => [c
 /* ônibus da BR-316 entre Ananindeua (cabine da parada) e Belém (terminal): a passagem é comprada uma vez na cabine
    (G.passagem) e vale ida e volta. open = false fecharia Belém de novo (a cabine só mostraria o preço). */
 const BUS = {price: 800, open: true};
+/* Notebook do Rhanon (missão do começo, só em jogo novo; ver HISTORIA.md): o Mateiro entrega quebrado depois do tutorial,
+   o técnico da feira vende a BATERIA, o macaco-prego larga o TECLADO e a ariranha o CARREGADOR quando são acalmados, e
+   ele liga na tomada da cabine da BR-316. Ligado, chega o primeiro freela e o caderno vira digital. */
+const NB_PARTS = ["bateria", "teclado", "carregador"];
+const NB_BATTERY = 40;                                     // preço da bateria no técnico
+const NB_DROP = {macaco: "teclado", ariranha: "carregador"};   // bicho que larga a peça ao ser acalmado
+/* Freelas: um por capital. bugs = lutas em sequência (BUGS em data/animals.js), pay = R$ na entrega, prog = programa que
+   fica no notebook (G.portfolio[id]) e dá uma vantagem no jogo. */
+const FREELAS = {
+  site_feira: {n: "Site da feira do Ver-o-Peso", client: "Dona Graça", bugs: ["bug_loop", "bug_404", "bug_prazo"], pay: 300,
+    prog: "Lembranças valem 20% a mais na feira (o site mostra o preço certo)."}
+};
 const PENSAO = {noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
 const NEED = {fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};

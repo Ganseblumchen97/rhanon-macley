@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.36.0 — o notebook do Rhanon e o primeiro freela
+
+- Num jogo novo, o Mateiro entrega ao Rhanon um notebook que a cheia trouxe, mas ele não liga: falta bateria, teclado e
+  carregador. O técnico da feira (perto do armeiro) vende a bateria e dá a pista do resto: um macaco-prego da mata
+  e as ariranhas do rio andam com as peças. Com tudo junto, ligue o notebook na tomada da rodoviária da BR-316.
+- Antes do notebook, o caderno de bichos é de papel; depois que ele liga, o caderno vira digital.
+- Primeiro freela: no Ver-o-Peso, a Dona Graça quer um site para a feira e paga R$ 300. O código está cheio de bugs, e
+  cada um é uma luta dentro do computador: o Loop Infinito, o Erro 404 e O Prazo. Os comandos mudam de nome (Depurar,
+  Testar, Respirar...), mas a luta é a mesma.
+- Site entregue, o notebook ganha um programa: as lembranças passam a valer 20% a mais na feira.
+- Quem já tinha passado do começo do jogo recebe o notebook pronto e ligado, e já pode fazer o freela em Belém.
+
 ## 0.35.0 — ninguém morre: o Rhanon acalma os bichos
 
 - Uma fumaça escura está deixando os bichos bravos, e a lança do Rhanon tira essa fumaça deles. Vencer uma luta agora

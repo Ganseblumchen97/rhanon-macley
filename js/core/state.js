@@ -31,6 +31,9 @@ function vit() {
   // locais que já apareceram no mapa de Ananindeua; save antigo: tudo o que já está liberado (sem repetir animação)
   if (!G.seen) { G.seen = {}; CITY.ananindeua.route.forEach(k => { if (unlocked(k)) G.seen[k] = true; }); }   // Belém aparece aos poucos na primeira chegada
   G.skills = G.skills || {};   // degraus aprendidos da árvore de habilidades
+  // notebook: jogo novo começa sem ele (missão do começo); save antigo já tem tudo ligado
+  if (!G.nb) G.nb = G.tutorial ? {} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};
+  G.freela = G.freela || {}; G.portfolio = G.portfolio || {};   // bugs resolvidos por freela; freelas entregues
   G.owned = G.owned || {tanga: true, lanca: true}; G.equip = G.equip || {legs: "tanga", torso: null, weapon: "lanca"};
 }
 /* Opções do modo de teste (todas opcionais, juntas com &):
@@ -38,6 +41,7 @@ function vit() {
    chefe         também conta o chefe dessa fase como vencido (a passagem G já abre)
    nv=16         nível do Rhanon (PV e PE cheios)      dinheiro=500   R$ na bolsa
    noite         começa à noite                         arco           com o arco equipado (flecha no X)
+   notebook      notebook quebrado (sem bateria, teclado e carregador), para testar a missão
    tela=mapa | cidade   sem fase: abre o mapa grande ou o mapa da cidade da fase */
 function debugSetup() {
   if (!DEBUG) return;
@@ -48,6 +52,7 @@ function debugSetup() {
   if (money) G.money = money;
   vit();
   if (DEBUG.has("arco")) { G.owned.arco = true; G.equip.ranged = "arco"; }
+  G.nb = DEBUG.has("notebook") ? {tem: true} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};   // "notebook": começa sem as peças
   if (fase) {
     const city = cityOf(fase), route = city === "belem" ? [...CITY.ananindeua.route, ...CITY.belem.route] : CITY.ananindeua.route;
     const upto = route.indexOf(fase);
