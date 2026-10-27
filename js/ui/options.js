@@ -21,7 +21,8 @@ function openOptions() {
     <label class="opt-row">${t("Efeitos")} <input type="range" min="0" max="100" step="5" value="${Math.round(OPT.sfx * 100)}" data-k="sfx"><output>${Math.round(OPT.sfx * 100)}%</output></label>
     <label class="opt-row">${t("Idioma")} <select data-k="lang">${Object.entries(LANGS).map(([k, n]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${n}</option>`).join("")}</select></label>
     ${LANG !== "pt" ? `<p class="hint lang-note">${t(LANG_NOTE)}</p>` : ""}
-    <p class="hint">${t("Durante as cenas, segure C para pular.")}</p>`;
+    <p class="hint">${t("Durante as cenas, segure C para pular.")}</p>
+    <p class="hint">${t("Controle: A/✕ golpe e confirma · B/◯ flecha e volta · X/▢ esquiva · Y/△ bolsa · LB equipar · RB habilidades · Start começa · Select (segurar) pula cena")}</p>`;
   box.querySelector("select").addEventListener("change", ev => setLang(ev.target.value));   // recarrega o jogo no idioma novo
   box.querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => {
     setVolume(inp.dataset.k, inp.value / 100); inp.nextElementSibling.textContent = inp.value + "%";

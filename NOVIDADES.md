@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.34.0 — jogue com controle
+
+- Agora dá para jogar com controle de Xbox, PlayStation, Switch Pro ou genérico: é só ligar no computador e apertar
+  um botão. Aparece "Controle conectado" no canto da tela.
+- A/✕ golpeia, conversa e confirma (e vale como o Z na hora certa da batalha). B/◯ atira flecha e volta, X/▢ esquiva,
+  Y/△ abre a bolsa, LB equipa, RB abre as habilidades, Start começa o jogo e Select (segurando) pula as cenas.
+  A cruz ou o analógico andam e escolhem nos menus.
+- O controle treme nos golpes, mais forte nos golpes fortes e na fúria.
+- A lista dos botões fica nas Opções (a engrenagem). Algum botão veio trocado no seu controle? Conta pra gente qual
+  controle é.
+
 ## 0.33.0 — árvores de habilidade e a reza de cura
 
 - Agora cada nível dá 1 ponto de habilidade. Aperte H na exploração (ou o botão "Habilidades" no topo, ou pela bolsa)

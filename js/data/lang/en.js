@@ -1019,6 +1019,10 @@ TX.en = {
     "Reza forte": "Strong prayer",
     "A Reza de cura recupera 45% da vida e tira veneno, queimadura e sangramento.": "Healing prayer recovers 45% of health and removes poison, burns and bleeding.",
     "Proteção dos encantados": "Protection of the enchanted",
-    "No fim de cada turno da luta, recupera 3 PV e 1 PE.": "At the end of each battle turn, recovers 3 HP and 1 EP."
+    "No fim de cada turno da luta, recupera 3 PV e 1 PE.": "At the end of each battle turn, recovers 3 HP and 1 EP.",
+    "Controle conectado: {nome}": "Controller connected: {nome}",
+    "controle": "controller",
+    "Controle desconectado": "Controller disconnected",
+    "Controle: A/✕ golpe e confirma · B/◯ flecha e volta · X/▢ esquiva · Y/△ bolsa · LB equipar · RB habilidades · Start começa · Select (segurar) pula cena": "Controller: A/✕ strike and confirm · B/◯ arrow and back · X/▢ dodge · Y/△ bag · LB equip · RB skills · Start begins · Select (hold) skips scene"
   }
 };

@@ -51,7 +51,7 @@ function shake(cls = "gshake") { const g = $("game"); g.classList.remove("gshake
 const IMPACT = {leve: {stop: 55, shake: "gshake-s"}, forte: {stop: 110, shake: "gshake", flash: .45, punch: true}, furia: {stop: 170, shake: "gshake", flash: .7, punch: true}};
 function hitImpact(level) {
   const o = IMPACT[level] || IMPACT.leve;
-  hitStop(o.stop); shake(o.shake);
+  hitStop(o.stop); shake(o.shake); padRumble(level);   // controle treme junto (ui/gamepad.js)
   if (REDUCE) return;
   if (o.flash) rm(el$("flash", {}), 160, [{opacity: o.flash}, {opacity: 0}], "steps(3)");
   if (o.punch) anim($("stage"), "punch");

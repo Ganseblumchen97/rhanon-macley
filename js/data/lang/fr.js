@@ -1025,6 +1025,10 @@ TX.fr = {
     "Reza forte": "Prière puissante",
     "A Reza de cura recupera 45% da vida e tira veneno, queimadura e sangramento.": "La Prière de soin récupère 45 % de la vie et retire poison, brûlure et saignement.",
     "Proteção dos encantados": "Protection des enchantés",
-    "No fim de cada turno da luta, recupera 3 PV e 1 PE.": "À la fin de chaque tour de combat, récupère 3 PV et 1 PE."
+    "No fim de cada turno da luta, recupera 3 PV e 1 PE.": "À la fin de chaque tour de combat, récupère 3 PV et 1 PE.",
+    "Controle conectado: {nome}": "Manette connectée : {nome}",
+    "controle": "manette",
+    "Controle desconectado": "Manette déconnectée",
+    "Controle: A/✕ golpe e confirma · B/◯ flecha e volta · X/▢ esquiva · Y/△ bolsa · LB equipar · RB habilidades · Start começa · Select (segurar) pula cena": "Manette : A/✕ frapper et valider · B/◯ flèche et retour · X/▢ esquive · Y/△ sac · LB équiper · RB compétences · Start commence · Select (maintenir) passe la scène"
   }
 };

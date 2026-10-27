@@ -7,7 +7,7 @@ setupMapRegion();
 buildMapNodes();
 buildLocalNodes();
 setupExploreInput();
-setupMapNav();
+setupMapNav(); setupGamepad();
 setupOptions();
 setupEquip(); setupSkills();
 setupReveal();

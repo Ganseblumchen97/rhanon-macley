@@ -1022,6 +1022,10 @@ TX.es = {
     "Reza forte": "Rezo fuerte",
     "A Reza de cura recupera 45% da vida e tira veneno, queimadura e sangramento.": "El Rezo de cura recupera el 45% de la vida y quita veneno, quemaduras y sangrado.",
     "Proteção dos encantados": "Protección de los encantados",
-    "No fim de cada turno da luta, recupera 3 PV e 1 PE.": "Al final de cada turno de la pelea, recupera 3 PV y 1 PE."
+    "No fim de cada turno da luta, recupera 3 PV e 1 PE.": "Al final de cada turno de la pelea, recupera 3 PV y 1 PE.",
+    "Controle conectado: {nome}": "Mando conectado: {nome}",
+    "controle": "mando",
+    "Controle desconectado": "Mando desconectado",
+    "Controle: A/✕ golpe e confirma · B/◯ flecha e volta · X/▢ esquiva · Y/△ bolsa · LB equipar · RB habilidades · Start começa · Select (segurar) pula cena": "Mando: A/✕ golpe y confirmar · B/◯ flecha y volver · X/▢ esquivar · Y/△ bolsa · LB equipar · RB habilidades · Start empieza · Select (mantener) salta la escena"
   }
 };
