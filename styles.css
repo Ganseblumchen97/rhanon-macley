@@ -88,7 +88,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
 .stage{--plat:46%}
 .stage.zone-fechada{--plat:42%}
-.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
 .stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
@@ -104,6 +104,10 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-igarape{background:linear-gradient(180deg,#24563a 0 24%,#6a7a3a 24% 25%,#4a5a2a 25% 33%,#3a4a22 33% 40%,#22462c 40% 100%)}
 .stage.zone-igarape::before{background:#6a5a36;right:9%;top:var(--plat)}
 .stage.zone-igarape::after{background:#6a5a36;left:4%;bottom:7%}
+/* Lençóis: céu limpo, dunas brancas e lagoa azul */
+.stage.zone-lencois{background:linear-gradient(180deg,#5ab8f0 0 22%,#f2ead2 22% 30%,#3aa8e0 30% 38%,#efe4c8 38% 100%)}
+.stage.zone-lencois::before{background:#e6d8b4;right:9%;top:var(--plat)}
+.stage.zone-lencois::after{background:#e6d8b4;left:4%;bottom:7%}
 /* manguezal: mangue escuro, água salobra e lama */
 .stage:is(.zone-manguezal,.zone-mangueilha){background:linear-gradient(180deg,#2e4a2c 0 22%,#7a9a8a 22% 23%,#4a6a6a 23% 31%,#3e5a58 31% 38%,#5a5440 38% 100%)}
 .stage:is(.zone-manguezal,.zone-mangueilha)::before{background:#6a6248;right:9%;top:var(--plat)}

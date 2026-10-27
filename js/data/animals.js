@@ -90,6 +90,15 @@ const ANIMALS = [
   {id:"carcara", lv:30, name:"Carcará", hp:190, xp:200, gold:[76,104], damage:[17,26], size:"médio", tint:"sepia(.7) saturate(1.3) brightness(.85)", special:"mergulho", moves:MV("Garras","Voo rasante","Pega, mata e come"), intro:"\"Carcará, pega, mata e come\"... só que esse aí tá é bravo com a fumaça. Ele desce do galho seco."},
   {id:"mero", lv:32, boss:true, name:"Mero", hp:380, xp:680, gold:[310,390], damage:[18,28], size:"chefe", tint:"brightness(.7) sepia(.5) saturate(.8) hue-rotate(-15deg)", special:["estouro", "prender"], moves:MV("Bocada","Rabanada","Sugada"), intro:"A água do canal escurece. Um peixe do tamanho de uma canoa abre a boca: o Mero, o velho do mangue."},
   {id:"serpente", lv:33, boss:true, name:"Serpente encantada", hp:390, xp:720, gold:[320,400], damage:[18,29], size:"chefe", special:["constricao", "assobio"], moves:MV("Mordida","Bote","Abraço da ilha"), intro:"A lama treme. Dizem que uma serpente dorme debaixo de São Luís inteira. Hoje ela acordou."},
+  // São Luís: os Lençóis (níveis 30-32), dunas brancas e lagoas de chuva; a Suçuarana de chefe de dia e o Boi Bumbá
+  // encantado de noite
+  {id:"tatupeba", lv:30, name:"Tatu-peba", hp:190, xp:196, gold:[74,100], damage:[17,25], size:"médio", tint:"sepia(.6) saturate(1.4) brightness(1.15)", special:"casco", moves:MV("Arranhão","Cavada","Enrolar-se"), intro:"A areia mexe e um tatu-peba sai de dentro da duna, de unha afiada."},
+  {id:"cascavel", lv:31, name:"Cascavel", hp:196, xp:204, gold:[76,104], damage:[18,26], size:"médio", special:["chocalho", "picada"], moves:MV("Mordida","Bote","Chocalho"), intro:"Um chiado seco no capim da restinga. Uma cascavel ergue o chocalho."},
+  {id:"raposa", lv:30, name:"Raposa", hp:188, xp:196, gold:[74,100], damage:[17,25], size:"médio", tint:"grayscale(.5) sepia(.3) brightness(.95)", special:"frenesi", moves:MV("Mordida","Bote","Mordidas rápidas"), intro:"Uma raposa (o cachorro-do-mato daqui) corre pela crista da duna e para encarando o Rhanon."},
+  {id:"traira", lv:31, name:"Traíra", hp:192, xp:200, gold:[76,102], damage:[18,26], size:"médio", tint:"hue-rotate(40deg) saturate(.7) brightness(.8)", special:"frenesi", moves:MV("Mordida","Bote","Dentada sem largar"), intro:"Na lagoa de água azul, uma traíra dentuça espera parada. Ela não tem medo de ninguém."},
+  {id:"asa_branca", lv:30, name:"Asa-branca", hp:184, xp:192, gold:[72,98], damage:[17,24], size:"pequeno", tint:"sepia(.35) brightness(1.1)", special:"mergulho", moves:MV("Bicada","Revoada","Mergulho"), intro:"Uma asa-branca, a pomba do sertão, desce sozinha. Quando ela voa embora, dizem, é porque a seca vem."},
+  {id:"sucuarana", lv:34, boss:true, name:"Suçuarana", hp:400, xp:760, gold:[330,410], damage:[19,30], size:"chefe", tint:"sepia(.8) saturate(1.5) hue-rotate(-12deg) brightness(.95)", special:["salto", "frenesi"], moves:MV("Arranhão","Bote","Salto da duna"), intro:"Do alto da maior duna, uma onça da cor da areia desce sem fazer barulho: a suçuarana."},
+  {id:"boi_bumba", lv:35, boss:true, name:"Boi Bumbá encantado", hp:410, xp:800, gold:[340,420], damage:[19,31], size:"chefe", special:["estouro", "encanto"], moves:MV("Chifrada","Investida","Toada encantada"), intro:"Uma toada toca sozinha nas dunas. Um boi preto bordado de estrelas aparece na lagoa de lua: o Boi Bumbá encantado."},
   {id:"onca_rei", lv:9, boss:true, name:"Onça-Rei", hp:140, xp:150, gold:[100,140], damage:[9,15], size:"chefe", tint:"hue-rotate(-20deg) saturate(1.5) brightness(.8)", moves:MV("Arranhão","Bote","Rugido"), intro:"A mata fica em silêncio. A Onça-Rei desce da pedra, e não está de passagem."}
 ];
 /* Elementos (ELEMENTS em data/commands.js): [fraqueza, ...resistências]. Na batalha, o especial do elemento da fraqueza
@@ -111,6 +120,7 @@ const ELEM_OF = {
   bufalo: ["fogo"], soco: ["planta", "vento"], jararaca: ["agua"], bufalo_touro: ["raio", "agua", "fogo"], mapinguari: ["vento", "raio"],
   pombo: ["planta", "vento"], gato: ["agua"], iguana: ["agua"], caramelo: ["fogo"], batedor: ["raio"], iguana_rei: ["agua", "fogo"], mulher_branco: ["fogo", "vento"],
   ratazana: ["fogo"], urubu_porto: ["planta", "vento"], gaivota: ["planta", "vento"], golpista: ["raio"], ratao: ["fogo", "agua"], cobra_norato: ["raio", "agua", "fogo"],
+  tatupeba: ["agua", "fogo"], cascavel: ["agua"], raposa: ["fogo"], traira: ["raio", "agua", "fogo"], asa_branca: ["planta", "vento"], sucuarana: ["agua", "fogo"], boi_bumba: ["vento", "fogo"],
   guara: ["planta", "vento"], garca_moura: ["planta", "vento"], siri: ["raio", "agua", "fogo"], carcara: ["planta", "vento"], mero: ["raio", "agua", "fogo"], serpente: ["vento", "agua", "fogo"],
   mucura: ["fogo"], rato_dagua: ["raio", "agua", "fogo"], cachorro_bravo: ["agua"], ladrao_bike: ["vento"], jacare_canal: ["raio", "agua", "fogo"], visagem_mare: ["fogo", "agua"]
 };
@@ -128,6 +138,7 @@ const ZONES = {
   igarape: {n: "Igarapé", lv: 10, pool: [["tracaja",3],["garca",3],["jacaretinga",2],["ariranha",2],["boto",3],["piranha",1]], boss: "pirarucu"},
   cidadevelha: {n: "Cidade Velha", lv: 20, pool: [["pombo",3],["gato",3],["iguana",3],["caramelo",2],["batedor",3]], boss: "iguana_rei"},
   porto: {n: "Porto e Docas", lv: 22, pool: [["ratazana",3],["urubu_porto",3],["gaivota",3],["golpista",3]], boss: "ratao"},
+  lencois: {n: "Lençóis", lv: 30, pool: [["tatupeba",3],["cascavel",2],["raposa",3],["asa_branca",3],["traira",2]], boss: "sucuarana"},
   mangueilha: {n: "Manguezal da ilha", lv: 28, pool: [["guara",3],["garca_moura",2],["siri",3],["carcara",2]], boss: "mero"},
   baixadas: {n: "Baixadas", lv: 24, pool: [["mucura",3],["rato_dagua",3],["cachorro_bravo",3],["ladrao_bike",3]], boss: "jacare_canal"},
   varzea: {n: "Várzea dos búfalos", lv: 16, pool: [["bufalo",3],["soco",3],["jararaca",3],["capivara",1],["jacaretinga",1]], boss: "bufalo_touro"},
@@ -136,7 +147,7 @@ const ZONES = {
   fechada: {n: "Mata fechada", lv: 3, pool: [["surucucu",3],["onca",2],["harpia",2],["queixada",2],["jaguatirica",3],["anta",1],["caranguejeira",3]], boss: "onca_rei"}
 };
 // na batalha, estes bichos ficam meio dentro de um laguinho (os outros, no chão de terra)
-const WATER_BATTLE = new Set(["mero", "serpente", "cobra_norato", "jacare_canal", "piranha", "poraque", "jacare", "ariranha", "sucuri", "cobra_grande", "boitata", "boto", "jacaretinga", "pirarucu", "boto_encantado", "tracaja"]);
+const WATER_BATTLE = new Set(["traira", "mero", "serpente", "cobra_norato", "jacare_canal", "piranha", "poraque", "jacare", "ariranha", "sucuri", "cobra_grande", "boitata", "boto", "jacaretinga", "pirarucu", "boto_encantado", "tracaja"]);
 // à noite (G.night) cada zona tem outros bichos e um chefe do folclore; o resto (mapa, passagem) é o mesmo
 const NIGHT_ZONES = {
   mata:    {pool: [["morcego",3],["coruja",3],["lobo",2],["cassaco",2],["tatu",1]], boss: "chupacabra"},
@@ -148,6 +159,7 @@ const NIGHT_ZONES = {
   varzea: {pool: [["bufalo",3],["jararaca",3],["morcego_vampiro",2],["sapo",2],["boto",1]], boss: "mapinguari"},
   cidadevelha: {pool: [["gato",3],["caramelo",3],["batedor",3],["morcego_vampiro",1]], boss: "mulher_branco"},
   porto: {pool: [["ratazana",3],["golpista",3],["urubu_porto",2],["morcego_pescador",1]], boss: "cobra_norato"},
+  lencois: {pool: [["cascavel",3],["raposa",3],["tatupeba",2],["traira",2]], boss: "boi_bumba"},
   mangueilha: {pool: [["siri",3],["garca_moura",2],["rato_dagua",2],["carcara",1]], boss: "serpente"},
   baixadas: {pool: [["rato_dagua",3],["cachorro_bravo",3],["ladrao_bike",3],["mucura",2]], boss: "visagem_mare"}
 };
@@ -157,8 +169,8 @@ const bossKey = z => G.night && NIGHT_ZONES[z] ? z + ":noite" : z;
 // gênero e nome próprio, para as frases: "a onça-pintuda saiu correndo", "o Curupira caiu" (bicho novo feminino: id em FEM)
 const FEM = new Set(["onca", "preguica", "sucuri", "surucucu", "harpia", "cotia", "jaguatirica", "anta", "caranguejeira", "capivara", "ariranha",
   "cobra_grande", "coruja", "mula", "garca", "matinta", "cobra_cipo", "jararaca", "iguana", "iguana_rei", "mulher_branco", "ratazana", "gaivota",
-  "cobra_norato", "mucura", "visagem_mare", "onca_rei", "garca_moura", "serpente"]);
-const PROPER = new Set(["serpente", "cobra_grande", "chupacabra", "mula", "boitata", "boto_encantado", "matinta", "curupira", "mapinguari", "mulher_branco", "cobra_norato", "onca_rei", "bug_loop", "bug_404", "bug_prazo"]);
+  "cobra_norato", "mucura", "visagem_mare", "onca_rei", "garca_moura", "serpente", "cascavel", "raposa", "traira", "asa_branca", "sucuarana"]);
+const PROPER = new Set(["boi_bumba", "serpente", "cobra_grande", "chupacabra", "mula", "boitata", "boto_encantado", "matinta", "curupira", "mapinguari", "mulher_branco", "cobra_norato", "onca_rei", "bug_loop", "bug_404", "bug_prazo"]);
 const theName = (a, cap) => { if (LANG !== "pt" && TX[LANG] && TX[LANG].article) return TX[LANG].article(a, cap); const t = (FEM.has(a.id) ? "a " : "o ") + (PROPER.has(a.id) ? a.name : a.name.toLowerCase()); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
 const ending = (a, m, f) => FEM.has(a.id) ? f : m;   // "vencido"/"vencida"
 /* Bugs do freela: lutam como bicho (mesma batalha), com o desenho de um bicho de base (ART) em cores de tela.
@@ -170,7 +182,7 @@ const BUGS = [
 ];
 // lembrança que cada bicho deixa quando é acalmado (o que ele perde de natural: pena, pele trocada, dente, espinho...);
 // os chefes deixam o luar que a fumaça tinha prendido neles (material dos talismãs do Pajé). Sem nome aqui: "Lembrança de <bicho>"
-const PELT = {guara: "Pena de guará", garca_moura: "Pena de garça-moura", siri: "Casca trocada de siri", carcara: "Pena de carcará", mero: "Luar do Mero", serpente: "Luar da Serpente", queixada_chefe: "Luar do Queixada-chefe", onca_rei: "Luar da Onça-Rei", cobra_grande: "Luar da Cobra-Grande", chupacabra: "Luar do Chupa-cabra", mula: "Luar da Mula", boitata: "Luar do Boitatá", pirarucu: "Luar do Pirarucu", boto_encantado: "Luar do Boto", caranguejo_rei: "Luar do Caranguejo-rei", matinta: "Luar da Matinta", gaviao_real: "Luar do Gavião-real", curupira: "Luar do Curupira", bufalo_touro: "Luar do Búfalo-touro", mapinguari: "Luar do Mapinguari", iguana_rei: "Luar da Iguana-rei", mulher_branco: "Luar da Mulher de Branco", ratao: "Luar do Ratão", cobra_norato: "Luar da Cobra Norato", jacare_canal: "Luar do Jacaré do canal", visagem_mare: "Luar da Visagem", onca: "Tufo de pelo de onça", calango: "Pele trocada de calango", tatu: "Terra da toca do tatu", jacare: "Dente de jacaré", preguica: "Pelo de preguiça com musgo", cassaco: "Pelo de cassaco", macaco: "Castanha do macaco-prego", queixada: "Cerda de queixada", piranha: "Dente de piranha", sucuri: "Pele trocada de sucuri", surucucu: "Pele trocada de surucucu", harpia: "Pena de harpia", cotia: "Castanha da cotia", quati: "Pelo de quati", tamandua: "Pelos de tamanduá", jaguatirica: "Pelo de jaguatirica", anta: "Pelo de anta", caranguejeira: "Pele trocada de caranguejeira", capivara: "Pelo de capivara", ariranha: "Pelo de ariranha", poraque: "Faísca de poraquê", morcego: "Fruta mordida pelo morcego", coruja: "Pena de coruja", lobo: "Pelo de lobo-guará", morcego_vampiro: "Pelo de morcego-vampiro", morcego_pescador: "Peixinho do morcego-pescador", tracaja: "Placa de casco de tracajá", garca: "Pena de garça", boto: "Concha que o boto achou", jacaretinga: "Dente de jacaretinga", sapo: "Pele trocada de sapo-cururu", caranguejo: "Casca trocada de caranguejo", guaxinim: "Pelo de mão-pelada", macarico: "Pena de maçarico", urubu: "Pena de urubu-rei", cobra_cipo: "Pele trocada de cobra-cipó", ourico: "Espinho de ouriço", bufalo: "Pelo de búfalo", soco: "Pena de socó", jararaca: "Pele trocada de jararaca", pombo: "Pena de pombo", gato: "Pelo de gato de rua", iguana: "Pele trocada de iguana", caramelo: "Coleira de caramelo", batedor: "Relógio recuperado", ratazana: "Pelo de ratazana", urubu_porto: "Pena de urubu do porto", gaivota: "Pena de gaivota", golpista: "Bilhete premiado falso", mucura: "Pelo de mucura", rato_dagua: "Pelo de rato-d'água", cachorro_bravo: "Corrente arrebentada", ladrao_bike: "Campainha de bicicleta"};
+const PELT = {tatupeba: "Areia da toca do tatu-peba", cascavel: "Pele trocada de cascavel", raposa: "Pelo de raposa", traira: "Escama de traíra", asa_branca: "Pena de asa-branca", sucuarana: "Luar da Suçuarana", boi_bumba: "Luar do Boi Bumbá", guara: "Pena de guará", garca_moura: "Pena de garça-moura", siri: "Casca trocada de siri", carcara: "Pena de carcará", mero: "Luar do Mero", serpente: "Luar da Serpente", queixada_chefe: "Luar do Queixada-chefe", onca_rei: "Luar da Onça-Rei", cobra_grande: "Luar da Cobra-Grande", chupacabra: "Luar do Chupa-cabra", mula: "Luar da Mula", boitata: "Luar do Boitatá", pirarucu: "Luar do Pirarucu", boto_encantado: "Luar do Boto", caranguejo_rei: "Luar do Caranguejo-rei", matinta: "Luar da Matinta", gaviao_real: "Luar do Gavião-real", curupira: "Luar do Curupira", bufalo_touro: "Luar do Búfalo-touro", mapinguari: "Luar do Mapinguari", iguana_rei: "Luar da Iguana-rei", mulher_branco: "Luar da Mulher de Branco", ratao: "Luar do Ratão", cobra_norato: "Luar da Cobra Norato", jacare_canal: "Luar do Jacaré do canal", visagem_mare: "Luar da Visagem", onca: "Tufo de pelo de onça", calango: "Pele trocada de calango", tatu: "Terra da toca do tatu", jacare: "Dente de jacaré", preguica: "Pelo de preguiça com musgo", cassaco: "Pelo de cassaco", macaco: "Castanha do macaco-prego", queixada: "Cerda de queixada", piranha: "Dente de piranha", sucuri: "Pele trocada de sucuri", surucucu: "Pele trocada de surucucu", harpia: "Pena de harpia", cotia: "Castanha da cotia", quati: "Pelo de quati", tamandua: "Pelos de tamanduá", jaguatirica: "Pelo de jaguatirica", anta: "Pelo de anta", caranguejeira: "Pele trocada de caranguejeira", capivara: "Pelo de capivara", ariranha: "Pelo de ariranha", poraque: "Faísca de poraquê", morcego: "Fruta mordida pelo morcego", coruja: "Pena de coruja", lobo: "Pelo de lobo-guará", morcego_vampiro: "Pelo de morcego-vampiro", morcego_pescador: "Peixinho do morcego-pescador", tracaja: "Placa de casco de tracajá", garca: "Pena de garça", boto: "Concha que o boto achou", jacaretinga: "Dente de jacaretinga", sapo: "Pele trocada de sapo-cururu", caranguejo: "Casca trocada de caranguejo", guaxinim: "Pelo de mão-pelada", macarico: "Pena de maçarico", urubu: "Pena de urubu-rei", cobra_cipo: "Pele trocada de cobra-cipó", ourico: "Espinho de ouriço", bufalo: "Pelo de búfalo", soco: "Pena de socó", jararaca: "Pele trocada de jararaca", pombo: "Pena de pombo", gato: "Pelo de gato de rua", iguana: "Pele trocada de iguana", caramelo: "Coleira de caramelo", batedor: "Relógio recuperado", ratazana: "Pelo de ratazana", urubu_porto: "Pena de urubu do porto", gaivota: "Pena de gaivota", golpista: "Bilhete premiado falso", mucura: "Pelo de mucura", rato_dagua: "Pelo de rato-d'água", cachorro_bravo: "Corrente arrebentada", ladrao_bike: "Campainha de bicicleta"};
 // curiosidades do caderno de bichos (fauna de verdade; os chefes do folclore ganham a lenda)
 const ANIMAL_FACTS = {
   onca: "Maior felino das Américas. Nada muito bem e tem a mordida mais forte entre os felinos.",
@@ -239,6 +251,13 @@ const ANIMAL_FACTS = {
   gaivota: "Gaivota come quase tudo: peixe, caranguejo... e o salgado de quem bobear no cais.",
   golpista: "O golpe do bilhete premiado é velho: alguém diz que tem um bilhete ganhador e pede dinheiro para \"ajudar\". Desconfie de sorte fácil.",
   ratao: "Os estivadores contam de um rato do tamanho de um cachorro que vive no galpão mais velho do porto.",
+  tatupeba: "Tatu de casco amarelado que cava rápido e come quase tudo, até bicho morto. Vive em lugar seco e aberto.",
+  cascavel: "Cobra venenosa que avisa antes: o chocalho na ponta do rabo cresce um gomo a cada troca de pele.",
+  raposa: "No Nordeste, \"raposa\" é o cachorro-do-mato: um canídeo esperto que caça de noite e come de fruta a caranguejo.",
+  traira: "Peixe dentuço que fica parado esperando a presa. Aguenta lagoa quase seca, enterrado na lama, até a chuva voltar.",
+  asa_branca: "Pomba grande do sertão. Virou música de Luiz Gonzaga: quando a asa-branca vai embora, é sinal de seca.",
+  sucuarana: "A onça-parda, ou puma: o felino que vive no maior número de lugares das Américas, do Canadá à Patagônia.",
+  boi_bumba: "Lenda e festa do Maranhão: no bumba-meu-boi, o boi morre e ressuscita com a ajuda do pajé. Em junho, a ilha inteira dança com ele.",
   guara: "O vermelho do guará vem dos caranguejinhos que ele come no mangue. O Maranhão tem alguns dos maiores bandos do Brasil.",
   garca_moura: "A maior garça do Brasil. Pesca sozinha, parada na beira d'água, e voa com o pescoço dobrado em S.",
   siri: "Primo do caranguejo, mas nada: as patas de trás são remos achatados. Vive na água salobra do mangue.",
@@ -263,10 +282,11 @@ const MOTION = {
   urubu: "hover", gaviao_real: "hover", cobra_cipo: "sway", ourico: "curl", curupira: "hop",
   bufalo: "snort", bufalo_touro: "snort", jararaca: "sway", mapinguari: "slow",
   pombo: "hop", gaivota: "hover", urubu_porto: "hover", iguana: "slow2", iguana_rei: "slow2", cobra_norato: "sway",
+  tatupeba: "curl", cascavel: "sway", traira: "swim", asa_branca: "hop", boi_bumba: "snort",
   guara: "hop", garca_moura: "hop", siri: "jitter", carcara: "hover", mero: "swim", serpente: "sway",
   batedor: "person", golpista: "person", ladrao_bike: "person", mulher_branco: "hover", visagem_mare: "hover",
 };
-const AURA = {queixada_chefe: ["#ff8a3a", "#ffd23a"], cobra_grande: ["#7cf2ff", "#b06ad6"], onca_rei: ["#e5001c", "#ffd23a"],
+const AURA = {boi_bumba: ["#ff3a8a", "#ffd23a"], queixada_chefe: ["#ff8a3a", "#ffd23a"], cobra_grande: ["#7cf2ff", "#b06ad6"], onca_rei: ["#e5001c", "#ffd23a"],
   chupacabra: ["#e5001c", "#7a1a2a"], mula: ["#ff8a3a", "#ffd23a"], boitata: ["#ffd23a", "#ff5a1c"],
   pirarucu: ["#e5001c", "#ff8a3a"], boto_encantado: ["#ff9fd0", "#ffffff"], caranguejo_rei: ["#7cf2ff", "#ffffff"], matinta: ["#b06ad6", "#2a2230"],
   gaviao_real: ["#ffd23a", "#ffffff"], curupira: ["#ff5a1c", "#ffd23a"], bufalo_touro: ["#e5001c", "#ffffff"], mapinguari: ["#9bd34a", "#7a4a2a"],

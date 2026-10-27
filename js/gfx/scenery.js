@@ -12,6 +12,7 @@ const SCENES = {
   igarape:     {sky: ["#5a9a62", "#4a8a52", "#3c7a46"], far: "#24603a", trees: "copa", plat: "barro", water: true, vines: true},
   manguezal:   {sky: ["#a8b8a0", "#8aa08a", "#6e8a70"], far: "#3a5a32", trees: "mangue", plat: "lama", water: true},
   mangueilha:  {sky: ["#d8e4c0", "#b4ccac", "#86a88a"], far: "#3a5a32", trees: "mangue", plat: "lama", water: true},   // São Luís: o mangue com o sol do Nordeste
+  lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
   cidadevelha: {sky: ["#f0b080", "#e8a070", "#b88a9a"], far: "#7a6a8a", trees: "casario", plat: "pedra"},

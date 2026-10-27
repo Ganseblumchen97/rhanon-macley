@@ -13,6 +13,7 @@ const ART = {queixada_chefe: "queixada", cobra_grande: "sucuri", onca_rei: "onca
   jacaretinga: "jacare", caranguejo_rei: "caranguejo", urubu: "harpia", gaviao_real: "harpia", bufalo_touro: "bufalo",
   gato: "jaguatirica", iguana: "calango", iguana_rei: "calango", caramelo: "lobo", cachorro_bravo: "lobo", urubu_porto: "harpia",
   ratazana: "rato", ratao: "rato", rato_dagua: "rato", mucura: "cassaco", jacare_canal: "jacare",
+  tatupeba: "tatu", raposa: "lobo", traira: "piranha", asa_branca: "pombo", sucuarana: "onca",
   siri: "caranguejo", carcara: "harpia", mero: "pirarucu",
   bug_loop: "sucuri", bug_404: "morcego", bug_prazo: "caranguejo"};   // bugs do freela usam o desenho desses bichos
 const FLAME = ["...r....","..rr.r..","..rrrr..",".rroorr.",".rooyor.","rooyyyor","rooyyyor",".rooyor.","..rooor."], PAL_F = {r:"#d62828", o:"#f2740c", y:"#ffd23a"};

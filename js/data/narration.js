@@ -23,6 +23,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  sucuarana: ["A suçuarana é prima da onça, curumim, só que da cor da areia. Nas dunas ninguém via ela chegar.", "O menino só viu porque ela fez sombra. E lá no Lençóis quase não tem sombra."],
+  boi_bumba: ["O Boi Bumbá! No Maranhão o boi morre e ressuscita todo ano, na festa. Mas a fumaça deixou ele preso no meio do caminho.", {r: "Ele dançou comigo antes de ir embora, vô."}, "Dançou mesmo? Então tu acalmou direito. Boi que dança tá em paz."],
   mero: ["O Mero é o avô dos peixes do mangue, curumim. Tão velho que já viu a ilha nascer. Bravo assim, só de fumaça.", {r: "Ele me olhou com cara de quem pedia desculpa, vô."}, "Pedia mesmo. Bicho velho tem educação."],
   serpente: ["Dizem que a Serpente dorme debaixo de São Luís, e no dia em que morder o rabo a ilha afunda.", "A fumaça fez ela se mexer no sono. O menino acalmou a bicha, e a ilha ficou no lugar.", {r: "Vô, ela ficou me encarando um tempão depois."}, "Encantado não esquece quem ajudou."],
   queixada_chefe: ["O primeiro chefe foi o queixada mais velho do bando. Quando a fumaça saiu dele, espirrou três vezes e voltou pro mato com os filhotes."],

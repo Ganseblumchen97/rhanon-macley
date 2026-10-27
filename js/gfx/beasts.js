@@ -330,6 +330,29 @@ const QUADS = {
     tail: (d, P, C) => { const x = P.cx + P.rx - 2, y = P.cy, pts = P.pose === "ko" ? [[x, y], [x + 5, y + 2], [x + 10, y + 4]] : [[x, y], [x + 5, y + 2], [x + 9, y + 6], [x + 11, y + 11]];
       for (let i = 0; i + 1 < pts.length; i++) d.limb(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], 4.5, i % 2 ? "#3a3a36" : "#b8b8ac"); }},
   // búfalo: grandão cinza-escuro, chifres largos curvados para trás e focinho claro
+  // Boi Bumbá encantado (Lençóis à noite): o corpo do búfalo vestido de boi de São João. Couro de veludo preto bordado de
+  // flores e estrelas, saia de fitas coloridas na barriga, estrela na testa e fitas penduradas nos chifres
+  boi_bumba: {W: 66, H: 40, cx: 36, rx: 18, ry: 10, leg: 9, lw: 5, neck: 1, hu: 3, hr: 7,
+    C: {b: "#2a2036", B: "#170f20", l: "#342a46"}, paw: ["#1a1618", "#121012"],
+    pattern: (d, P) => {
+      [[-10, -4, "#ff5a8a"], [-2, -6, "#3ad8ff"], [6, -4, "#ffffff"], [13, -2, "#ff8a3a"], [-6, 1, "#ffd23a"], [2, 0, "#ff5a8a"], [10, 2, "#3ad8ff"]]
+        .forEach(([dx, dy, c]) => { const x = Math.round(P.cx + dx), y = Math.round(P.cy + dy); d.dots([[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]], c); d.dots([[x, y]], "#ffd23a"); });   // flores bordadas
+      d.dots([[P.cx - 14, P.cy - 2], [P.cx + 16, P.cy - 5], [P.cx - 1, P.cy - 8], [P.cx + 9, P.cy - 8]].map(([x, y]) => [Math.round(x), Math.round(y)]), "#fff2a0");   // estrelinhas
+      const fitas = ["#e5401c", "#ffd23a", "#3a8ad8", "#3f9a3a", "#ff8ac8", "#ff8a3a"], y0 = Math.round(P.cy + P.ry * .45);
+      for (let x = Math.round(P.cx - P.rx + 2), k = 0; x <= P.cx + P.rx - 2; x += 2, k++) d.rect(x, y0, 2, 6 + (k % 2), fitas[k % fitas.length]);   // saia de fitas
+    },
+    head: (d, x, y, o, C) => {
+      d.part().ellipse(x, y, 7, 6, C.b, C.B, .6).ellipse(x - 5, y + 3, 4, 3, "#e8e0d8");   // focinho claro
+      d.part().poly([[x - 3, y - 4], [x - 6, y - 11], [x - 3, y - 12], [x, y - 5]], "#f0e8d8", "#b8b0a0");   // chifres para cima
+      d.part().poly([[x + 3, y - 5], [x + 5, y - 12], [x + 8, y - 11], [x + 6, y - 4]], "#f0e8d8", "#b8b0a0");
+      d.part().rect(x - 6, y - 11, 1, 8, "#e5401c").rect(x - 5, y - 11, 1, 7, "#ffd23a").rect(x - 4, y - 11, 1, 9, "#3a8ad8");   // fitas nos chifres
+      d.rect(x + 6, y - 11, 1, 8, "#3f9a3a").rect(x + 7, y - 11, 1, 7, "#ff8ac8").rect(x + 8, y - 10, 1, 9, "#ff8a3a");
+      d.dots([[x + 1, y - 4], [x, y - 3], [x + 2, y - 3], [x + 1, y - 2]], "#ffd23a");   // estrela na testa
+      d.dots([[x - 8, y + 2], [x - 7, y + 3]], BN); bEye(d, x - 1, y - 2, o);
+      if (o.mouth) bMouth(d, x - 8, y + 5, 4, false); if (o.tongue) d.dots([[x - 7, y + 6]], BR);
+    },
+    tail: (d, P, C) => { const x = P.cx + P.rx - 1, y = P.cy - 3; bChain(d, [[x, y], [x + 3, y + 6], [x + 3, y + 12]], [2, 1.5], C.B); d.ellipse(x + 3, y + 13, 1.5, 2, "#ffd23a"); }
+  },
   bufalo: {W: 66, H: 40, cx: 36, rx: 18, ry: 10, leg: 9, lw: 5, neck: 1, hu: 3, hr: 7,
     C: {b: "#3a3638", B: "#242022", l: "#4a4648"}, paw: ["#1a1618", "#121012"],
     head: (d, x, y, o, C) => {
@@ -884,6 +907,7 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   macarico: (pose, f) => garca(pose, f, {b: "#a8906a", B: "#7a6446", y: "#3a2a1a", Y: "#22180e", k: "#4a3a2a"}),   // maçarico: a garça em tons de areia
   guara: (pose, f) => garca(pose, f, {b: "#e8402a", B: "#b02818", y: "#3a2418", Y: "#22140c", k: "#5a2a1a"}),   // guará: a garça em vermelho
   garca_moura: (pose, f) => garca(pose, f, {b: "#8a96a8", B: "#5e6a7a", y: "#e8b030", Y: "#b88a20", k: "#2a3038"}),   // garça-moura: cinza-azulada
+  cascavel: cobra({b: "#b89a5a", B: "#7a6234", k: "#4a3a1a"}, true),   // cascavel: cabeça triangular, cor de areia com losangos escuros
   serpente: cobra({b: "#c8a030", B: "#8a6a18", k: "#fff2a0", eye: "#ff8a3a"}, false),   // Serpente encantada da ilha: dourada
   boto: (pose, f) => boto(pose, f, false), boto_encantado: (pose, f) => boto(pose, f, true),
   boitata: cobra({b: "#e8601c", B: "#a8300c", k: "#ffd23a", eye: "#fff3a0", flame: true, rattle: ["#e8d8a0", "#a89870"]}, false),

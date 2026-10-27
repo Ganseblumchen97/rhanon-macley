@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.48.0 — os Lençóis e o Boi Bumbá
+
+- Depois de acalmar o Mero, a passagem do manguezal da ilha leva aos Lençóis: dunas brancas até onde a vista alcança
+  e lagoas azuis de chuva entre elas. É para quem está perto do nível 30.
+- Bichos novos: o tatu-peba, a cascavel (cuidado com o chocalho, que dá medo), a raposa, que no Nordeste é o
+  cachorro-do-mato, a asa-branca e a traíra, que nada nas lagoas.
+- De dia, o chefe é a Suçuarana, a onça da cor da areia. De noite aparece o Boi Bumbá encantado, todo enfeitado:
+  couro preto bordado de flores e estrelas, saia de fitas coloridas e fitas nos chifres.
+
 ## 0.47.0 — o manguezal da ilha
 
 - São Luís ganhou a primeira trilha para lutar: o manguezal da ilha, saindo da Praia Grande pela esquerda. É para

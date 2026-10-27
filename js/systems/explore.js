@@ -95,7 +95,7 @@ function drawAmbient(x, cx, cy, now, night) {
   x.globalAlpha = 1;
 }
 // peixes vivem só na água: nadam de um lado para o outro, cospem água quando veem o Rhanon e só a flecha alcança
-const AQUATIC = new Set(["piranha", "poraque", "boto"]);
+const AQUATIC = new Set(["piranha", "poraque", "boto", "traira"]);
 // where: "terra" (sem peixes, para os "a" do mapa), "agua" (só peixes) ou nada (qualquer um, usado na batalha)
 function pickFromPool(zone, where) {
   const z = zoneDef(zone), pool = where ? z.pool.filter(([id]) => (where === "agua") === AQUATIC.has(id)) : z.pool;
@@ -555,7 +555,7 @@ function drawAnimalEnt(x, en, cx, cy, now) {
 }
 // bicho acalmado (golpe só ou vitória na batalha): agradece num balãozinho e corre para longe do Rhanon, para o mato
 const CALM_WAIT = 700, CALM_SPEED = 120, CALM_RUN = 1000;   // ms parado agradecendo, pixels/s correndo, ms correndo até sumir
-const BIRDS = new Set(["guara", "garca_moura", "carcara", "harpia", "coruja", "garca", "macarico", "urubu", "soco", "pombo", "urubu_porto", "gaivota", "gaviao_real"]);
+const BIRDS = new Set(["asa_branca", "guara", "garca_moura", "carcara", "harpia", "coruja", "garca", "macarico", "urubu", "soco", "pombo", "urubu_porto", "gaivota", "gaviao_real"]);
 function exCalm(en, now = performance.now()) {
   const h = EX.hero, dx = en.x - h.x, dy = en.y - h.y, n = Math.hypot(dx, dy) || 1;
   en.alive = false; en.calm = {t0: now, x0: en.x, y0: en.y, vx: dx / n, vy: dy / n}; en.face = dx > 0 ? 1 : -1;

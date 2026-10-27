@@ -59,6 +59,7 @@ const SUB = {
   /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
      pela Cidade Velha, pelo Porto e pelas Baixadas, cada vez mais difícil */
   terminal: {city: "belem", n: "Terminal rodoviário", s: "Terminal", x: 392, y: 262, txt: "O ônibus da BR-316 para aqui. A passagem vale ida e volta: dá pra voltar pra Ananindeua quando quiser."},
+  lencois: {city: "saoluis", n: "Lençóis", x: 186, y: 64, txt: "Dunas brancas até onde a vista alcança e, entre elas, lagoas azuis de água da chuva. Pouca sombra e muito bicho bravo com o sol."},
   mangueilha: {city: "saoluis", n: "Manguezal da ilha", x: 104, y: 214, txt: "O mangue da ilha de São Luís, onde a maré sobe e desce metros: guará vermelho, siri, carcará... e um peixe do tamanho de uma canoa no canal."},
   praiagrande: {city: "saoluis", n: "Praia Grande", x: 214, y: 168, txt: "O centro histórico de São Luís: ladeira de pedra, casarão coberto de azulejo português e a feira da praia. Tem pensão, comida e gente que conta história."},
   veropeso: {city: "belem", n: "Ver-o-Peso", x: 252, y: 250, txt: "A feira mais famosa do Pará, na beira da baía: peixe, açaí, erva de cheiro, urubu no telhado de ferro... e rede na pensão."},
@@ -76,8 +77,8 @@ const CITY = {
     land: "40,40 150,14 300,10 400,40 432,130 430,240 400,300 300,316 160,316 40,300 22,230 36,150 20,90",
     bay: "M0,0 L44,0 C28,40 46,80 28,110 C40,150 22,200 38,240 C28,270 34,300 46,325 L0,325Z",   // baía do Guajará
     river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Ananindeua →"], home: "veropeso", gate: "terminal"},
-  // São Luís (Nordeste): a ilha, com o rio Anil e a estrada para o aeroporto; a Praia Grande e o manguezal da ilha
-  saoluis: {n: "São Luís", map: "maranhao", route: ["praiagrande", "mangueilha"], cabin: false,
+  // São Luís (Nordeste): a ilha, com o rio Anil e a estrada para o aeroporto; a Praia Grande, o manguezal e os Lençóis
+  saoluis: {n: "São Luís", map: "maranhao", route: ["praiagrande", "mangueilha", "lencois"], cabin: false,
     land: "30,120 80,60 170,30 280,26 370,56 420,120 426,210 390,280 300,312 180,316 80,290 26,220",
     bay: "M0,0 L120,0 C90,30 60,60 34,96 C20,130 12,170 0,190Z",   // baía de São Marcos
     river: "M260,40 C250,90 236,120 226,150 C214,186 236,230 230,290", road: "M262,200 C320,230 380,250 446,262", sign: [350, 290, "✈ Aeroporto"], home: "praiagrande", gate: "praiagrande"}
@@ -154,7 +155,7 @@ const FREELAS = {
 };
 const PENSAO = {noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

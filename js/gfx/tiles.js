@@ -10,6 +10,7 @@ const TILE_PAL = {
   // manguezal: chão de lama cinza-marrom, mangue de folha escura, água salobra esverdeada
   manguezal: {g1: "#7a7458", g2: "#6a6448", tall: "#5a5a3a", tallHi: "#8a8a5a", path: "#a08a62", path2: "#86704c", leaf: "#3a5a32", leaf2: "#2a4424", leafHi: "#5a7a44", trunk: "#5a4a3a", rock: "#8a8478", rock2: "#5e5a50", water: "#4a6a6a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30"},
   mangueilha: {g1: "#7a7458", g2: "#6a6448", tall: "#5a5a3a", tallHi: "#8a8a5a", path: "#a08a62", path2: "#86704c", leaf: "#3a5a32", leaf2: "#2a4424", leafHi: "#5a7a44", trunk: "#5a4a3a", rock: "#8a8478", rock2: "#5e5a50", water: "#4a6a6a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30"},   // São Luís: o mesmo mangue
+  lencois: {g1: "#f0e6cc", g2: "#e6dabc", tall: "#9ab86a", tallHi: "#c8e08a", path: "#d8c8a0", path2: "#c4b28a", leaf: "#f8f2e2", leaf2: "#e0d2ae", leafHi: "#ffffff", trunk: "#d8c8a0", rock: "#e8dcc0", rock2: "#c8b890", water: "#2a9ad8", water2: "#7ad0f0", wood: "#b08a5a", wood2: "#6a4e30", dune: true},   // Lençóis: areia branca e lagoa azul
   // seringal: chão de folha seca, seringueiras de casca clara e copa verde-escura
   seringal: {g1: "#7a9a4a", g2: "#8a8a42", tall: "#5a7a32", tallHi: "#a8b85a", path: "#b8925a", path2: "#9a7844", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#c8b89a", rock: "#9a948a", rock2: "#6a645a", water: "#3a6a8a", water2: "#6a9ab8", wood: "#9c6339", wood2: "#6d4329"},
   // cidade: chão de pedra/calçada, rua de asfalto ou paralelepípedo, telhado de telha (porto: zinco); walls = cores das fachadas
@@ -75,6 +76,9 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
     grass();
     fillEllipse(x, ox + 8, oy + 9, 7, 6, OUTLINE); fillEllipse(x, ox + 8, oy + 9, 6, 5, P.rock2); fillEllipse(x, ox + 7, oy + 8, 5, 4, P.rock);
     x.fillStyle = "#ffffff40"; x.fillRect(ox + 5, oy + 6, 3, 1);
+  } else if (ch === "T" && P.dune) {   // dunas dos Lençóis: montinho de areia branca com a crista clara, sem tronco
+    grass();
+    fillEllipse(x, ox + 8, oy + 10, 9, 6, P.leaf2); fillEllipse(x, ox + 7, oy + 9, 8, 5, P.leaf); fillEllipse(x, ox + 5, oy + 7, 4, 1.5, P.leafHi);
   } else if (ch === "T") {
     grass();
     x.fillStyle = OUTLINE; x.fillRect(ox + 5, oy + 11, 6, 5);
