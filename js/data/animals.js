@@ -85,6 +85,34 @@ const ANIMALS = [
   {id:"visagem_mare", lv:29, boss:true, name:"Visagem da maré", hp:360, xp:640, gold:[300,380], damage:[17,27], size:"chefe", special:["assobio", "drenar"], moves:MV("Toque gelado","Vulto","Assobio da maré"), intro:"A maré sobe sem vento. Um vulto molhado na ponte some e aparece mais perto."},
   {id:"onca_rei", lv:9, boss:true, name:"Onça-Rei", hp:140, xp:150, gold:[100,140], damage:[9,15], size:"chefe", tint:"hue-rotate(-20deg) saturate(1.5) brightness(.8)", moves:MV("Arranhão","Bote","Rugido"), intro:"A mata fica em silêncio. A Onça-Rei desce da pedra, e não está de passagem."}
 ];
+/* Elementos (ELEMENTS em data/commands.js): [fraqueza, ...resistências]. Na batalha, o especial do elemento da fraqueza
+   tira 1,5× e dá "Mais uma!"; o de uma resistência tira metade. Cada um só aparece depois de usado no bicho (elemKnown).
+   Mais ou menos: pelo seco e mata = fraco a fogo; quem voa = fraco a planta e resiste a vento; quem vive na água = fraco a
+   raio e resiste a água e fogo; quem é de fogo ou de sol = fraco a água
+   (os de fogo e o Curupira, dono da mata, resistem a planta).
+   Bicho novo: uma linha aqui (o teste geral confere que nenhum ficou sem). */
+const ELEM_OF = {
+  preguica: ["fogo"], cassaco: ["vento"], calango: ["agua"], tatu: ["agua", "fogo"], macaco: ["vento"], cotia: ["fogo"], quati: ["fogo"], tamandua: ["fogo"],
+  queixada_chefe: ["fogo"], morcego: ["planta", "vento"], coruja: ["planta", "vento"], lobo: ["fogo"], chupacabra: ["fogo"],
+  surucucu: ["agua"], onca: ["fogo"], harpia: ["planta", "vento"], queixada: ["fogo"], jaguatirica: ["agua"], anta: ["raio"], caranguejeira: ["fogo"],
+  onca_rei: ["agua", "fogo"], morcego_vampiro: ["planta", "vento"], mula: ["agua", "fogo", "planta"],
+  jacare: ["raio", "agua", "fogo"], piranha: ["raio", "agua", "fogo"], sucuri: ["raio", "agua", "fogo"], capivara: ["fogo"], ariranha: ["raio", "agua", "fogo"], poraque: ["vento", "raio", "fogo"],
+  cobra_grande: ["raio", "agua", "fogo"], morcego_pescador: ["planta", "vento"], boitata: ["agua", "fogo", "planta"],
+  tracaja: ["raio", "agua", "fogo"], garca: ["planta", "vento"], boto: ["raio", "agua", "fogo"], jacaretinga: ["raio", "agua", "fogo"], sapo: ["fogo", "agua"], pirarucu: ["raio", "agua", "fogo"], boto_encantado: ["vento", "agua", "fogo"],
+  caranguejo: ["raio", "agua", "fogo"], guaxinim: ["fogo"], macarico: ["planta", "vento"], caranguejo_rei: ["raio", "agua", "fogo"], matinta: ["fogo", "vento"],
+  urubu: ["planta", "vento"], cobra_cipo: ["fogo"], ourico: ["agua"], gaviao_real: ["planta", "vento"], curupira: ["agua", "fogo", "planta"],
+  bufalo: ["fogo"], soco: ["planta", "vento"], jararaca: ["agua"], bufalo_touro: ["raio", "agua", "fogo"], mapinguari: ["vento", "raio"],
+  pombo: ["planta", "vento"], gato: ["agua"], iguana: ["agua"], caramelo: ["fogo"], batedor: ["raio"], iguana_rei: ["agua", "fogo"], mulher_branco: ["fogo", "vento"],
+  ratazana: ["fogo"], urubu_porto: ["planta", "vento"], gaivota: ["planta", "vento"], golpista: ["raio"], ratao: ["fogo", "agua"], cobra_norato: ["raio", "agua", "fogo"],
+  mucura: ["fogo"], rato_dagua: ["raio", "agua", "fogo"], cachorro_bravo: ["agua"], ladrao_bike: ["vento"], jacare_canal: ["raio", "agua", "fogo"], visagem_mare: ["fogo", "agua"]
+};
+// quanto o elemento k pesa contra o bicho a: 1.5 (fraqueza), .5 (uma das resistências) ou 1
+const elemMult = (a, k) => { const [w, ...r] = ELEM_OF[a.id] || []; return k && k === w ? 1.5 : k && r.includes(k) ? .5 : 1; };
+/* como no Persona: o Rhanon só descobre o que o elemento k faz no bicho a usando o golpe nele (G.bestiary[id].el[k]).
+   Com o app de cordel no notebook (freela do Recife, G.portfolio.app_cordel), vê tudo dos bichos que já enfrentou. */
+const elemApp = () => !!G.portfolio?.app_cordel;
+const elemKnown = (a, k) => !a.bug && !!ELEM_OF[a.id] && (!!G.bestiary[a.id]?.el?.[k] || (elemApp() && !!G.bestiary[a.id]?.seen));
+function elemLearn(a, k) { if (a.bug) return; noteSeen(a.id); const b = G.bestiary[a.id]; (b.el || (b.el = {}))[k] = true; }
 // zonas de caça: nível mínimo, sorteio com peso [id, peso] e o chefe (aparece após 4 vitórias)
 const ZONES = {
   mata:    {n: "Mata", lv: 1, pool: [["preguica",3],["cassaco",3],["calango",3],["tatu",3],["macaco",2],["cotia",3],["quati",2],["tamandua",1]], boss: "queixada_chefe"},

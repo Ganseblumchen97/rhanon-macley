@@ -331,6 +331,12 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .plate>*{transform:none}
 .plate b{font-family:var(--display);font-size:26px;text-transform:uppercase;letter-spacing:.02em}
 .plate .lv{display:inline-block;background:var(--ink);color:var(--paper);padding:2px 9px;font:700 11px var(--mono);margin-left:10px;rotate:-2deg;vertical-align:middle}
+/* fraqueza (▼) e resistência (▲) do bicho, na placa da batalha e no caderno: só depois de vencer ele uma vez */
+.elem{display:flex;gap:6px;flex-wrap:wrap}.elem:empty{display:none}.plate .elem{margin-top:6px}
+.elem i{font:700 11px var(--mono);font-style:normal;padding:2px 7px;color:#fff;background:var(--ec);border:2px solid var(--ink)}
+.elem i.resiste{background:var(--paper);color:var(--ink);border-color:var(--ec)}
+.elem i.normal{background:var(--paper);color:var(--ink);border-color:var(--ink);opacity:.75}.elem i.nao-sei{background:none;color:var(--ink);border:2px dashed var(--ink);opacity:.45}
+.elem.cad{gap:4px;margin:4px 0}.elem.cad i{font-size:10px;padding:1px 5px}
 .bar{height:14px;background:#d8d8d8;border:3px solid var(--ink);margin-top:6px}
 .bar i{background:var(--ink)}
 .bar.pv i{background:var(--accent-ink)}
@@ -627,6 +633,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 #beast.submerged.surge{animation:none}
 #beast.submerged.surge canvas.actor{animation:surgeW .5s steps(8)!important}
 @keyframes surgeW{30%{translate:4px -4px;scale:1.03}60%{translate:-10px -8px;scale:1.06}}
+.fx-cipo{position:absolute;display:block;height:6px;transform-origin:0 50%;margin-top:-3px;pointer-events:none;background:repeating-linear-gradient(90deg,#3f9a3a 0 10px,#2a6a2a 10px 13px);box-shadow:0 0 0 2px rgba(10,30,10,.55)}
 .fx-jato{position:absolute;display:block;box-shadow:0 0 0 2px rgba(10,26,40,.55);image-rendering:pixelated;pointer-events:none}
 #beast.submerged.hit canvas.actor{animation:shakeW .35s,flashf .35s steps(1)!important}
 /* (translate/scale separados: a entrada do bicho deixa o transform do desenho preso) */

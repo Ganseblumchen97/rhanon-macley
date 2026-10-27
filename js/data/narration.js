@@ -72,5 +72,10 @@ const NARRA_HINT = {
   arco: "O menino apanhou até lembrar que o armeiro da feira fazia arco. De longe, bicho bravo não morde.",
   talisma: "Eu tinha luar de chefe guardado pra fazer talismã pra ele. Mas o teimoso não vinha falar comigo.",
   nivel: "Às vezes ele voltava pras trilhas de antes, pra ficar mais forte. Não tem vergonha nisso.",
-  tempo: "Ele aprendeu a apertar Z na hora certa: golpe perfeito e bloqueio. Quem acerta o tempo acalma até onça."
+  tempo: "Ele aprendeu a apertar Z na hora certa: golpe perfeito e bloqueio. Quem acerta o tempo acalma até onça.",
+  fogo: "O bicho daquela trilha tinha medo de fogo. E o menino lá, sem tocha. O artesão da feira vendia uma.",
+  agua: "Bicho de fogo e bicho de sol não aguentam água. Foi o artesão da feira que fez uma cuia pra ele.",
+  vento: "Tinha bicho ali que não aguentava vento. Eu ensinei o sopro pra ele, depois que ele aprendeu o Espírito da mata.",
+  planta: "Bicho que voa se enrosca no cipó. O artesão da feira trançava um chicote, e o menino lá, batendo de lança em morcego.",
+  raio: "Bicho de água não gosta de raio. O artesão da feira fazia um com faísca de poraquê, e o menino nem sabia."
 };

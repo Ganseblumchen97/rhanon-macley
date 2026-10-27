@@ -104,8 +104,9 @@ function bossStory(id, done) {
 function pajeHint() {
   const z = G.loseZone && ZONES[G.loseZone] && zoneDef(G.loseZone);
   const luar = Object.entries(CHARMS).some(([id, it]) => !G.owned[id] && Object.entries(it.craft).every(([k, n]) => (G.pelts[k] || 0) >= n));   // dá para fazer um talismã
+  const w = z && (ELEM_OF[z.boss] || [])[0], sp = w && SPECIALS.find(q => q.elem === w);   // o chefe dali é fraco contra um elemento que o Rhanon ainda não tem
   return skillPoints() ? NARRA_HINT.pontos : !G.equip.ranged && G.lv >= 4 ? NARRA_HINT.arco : luar && !G.equip.amulet ? NARRA_HINT.talisma
-    : z && G.lv < (z.lv || 1) + 1 ? NARRA_HINT.nivel : NARRA_HINT.tempo;
+    : sp && specialLock(sp) && NARRA_HINT[w] ? NARRA_HINT[w] : z && G.lv < (z.lv || 1) + 1 ? NARRA_HINT.nivel : NARRA_HINT.tempo;
 }
 function setupNarration() {
   $("narra").addEventListener("click", narraPress);

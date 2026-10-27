@@ -3,7 +3,7 @@
    atk/def/hp/sp somam ao status (skillStat em core/state.js); fx é um efeito que o código procura com hasSkill(fx):
    perfeito (golpe perfeito +50%), furia2 (fúria com 2 acertos), furia4 (quatro estocadas), bloqueio (bloqueio evita 2/3),
    mira (flecha +4 e esquiva da exploração em 1 s), bloqueio2 (bloqueio perfeito anula o golpe e dá um turno a mais),
-   cura (especial Reza de cura), cura2 (reza mais forte e que limpa veneno/queimadura), regen (+3 PV e +1 PE por turno).
+   cura (especial Reza de cura), vento (especial Sopro de vento), cura2 (reza mais forte e que limpa veneno/queimadura), regen (+3 PV e +1 PE por turno).
    O Pajé da aldeia faz o Rhanon esquecer tudo e devolve os pontos (SKILL_RESET). */
 const SKILL_TREES = [
   {id: "guerreiro", n: "Guerreiro", d: "Lança e fúria", color: "#e2363d", nodes: [
@@ -23,7 +23,7 @@ const SKILL_TREES = [
   {id: "paje", n: "Pajé", d: "Vida e cura", color: "#7a4ac8", nodes: [
     {id: "p1", n: "Fôlego", d: "PV +12.", cost: 1, hp: 12},
     {id: "p2", n: "Reza de cura", d: "Libera o especial Reza de cura: 6 PE para recuperar 30% da vida.", cost: 1, fx: "cura"},
-    {id: "p3", n: "Espírito da mata", d: "PE +8.", cost: 1, sp: 8},
+    {id: "p3", n: "Espírito da mata", d: "PE +8 e libera o especial Sopro de vento.", cost: 1, sp: 8, fx: "vento"},
     {id: "p4", n: "Reza forte", d: "A Reza de cura recupera 45% da vida e tira veneno, queimadura e sangramento.", cost: 2, fx: "cura2"},
     {id: "p5", n: "Proteção dos encantados", d: "No fim de cada turno da luta, recupera 3 PV e 1 PE.", cost: 2, fx: "regen"}
   ]}

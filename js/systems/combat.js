@@ -71,7 +71,7 @@ function init(opts = {}) {
   buildCmds();
   const animal = opts.animal || pickAnimal();
   noteSeen(animal.id);   // entra no caderno de bichos
-  $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = t("Nv") + " " + (animal.lv || 1);
+  $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = t("Nv") + " " + (animal.lv || 1); plateElem(animal);
   $("beast").innerHTML = ""; $("beast").appendChild(animalSprite(animal)); refreshHero();
   const spr = $("beast").firstChild;
   $("beast").style.top = `calc(var(--plat) - ${spr.height / (+spr.dataset.scale || 1) * (animal.boss ? 1.35 : 1)} * var(--px) + 12px)`; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", animal.name); $("hero").style.display = ""; $("intent").style.display = ""; $("ehp").parentElement.style.display = ""; $("spTxt").parentElement.style.display = ""; $("sp").parentElement.style.display = "";
@@ -116,6 +116,12 @@ function bossIntro(done) {
   at(BOSS_INTRO.ready, () => { HERO_A.set("ready"); sfx("spear"); setTimeout(() => sfx("bloqueio"), 600); });
   at(BOSS_INTRO.name, () => encounterBanner(e.name, t("chefe!")));
   at(BOSS_INTRO.go, done);
+}
+// etiquetas de fraqueza e resistência na placa do bicho: só as que o Rhanon já descobriu usando o elemento nele
+function plateElem(a) {
+  const el = $("plate").querySelector(".elem") || $("plate").appendChild(document.createElement("span")), [w, ...r] = ELEM_OF[a.id] || [];
+  el.className = "elem"; el.innerHTML = !w ? "" : [[w, false], ...r.map(k => [k, true])].filter(([k]) => elemKnown(a, k))
+    .map(([k, res]) => `<i class="${res ? "resiste" : "fraco"}" style="--ec:${ELEMENTS[k].c}" title="${t(res ? "Resiste: {elemento}" : "Fraco: {elemento}", {elemento: ELEMENTS[k].n})}">${res ? "▲" : "▼"} ${ELEMENTS[k].n}</i>`).join("");
 }
 function pick() {
   const r = Math.random() * 100;
@@ -222,12 +228,19 @@ function act(id) {
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
     wait = strike(d, crit ? "crit" : "", "throw", miss ? t("Rhanon joga a lança, mas {bicho} desvia!", {bicho: foe()}) : crit ? t("Arremesso certeiro no ponto fraco: −{n}!", {n: d}) : t("Rhanon joga a lança: −{n}.", {n: d}));
-  } else if (id === "tocha") {
+  } else if (SPECIALS.find(s => s.id === id && s.elem)) {   // especial de elemento (tocha, cuia, vento, raio): fraqueza 1,5× e "Mais uma!", resistência metade
+    const k = SPECIALS.find(s => s.id === id).elem, m = bugMode ? 1 : elemMult(e, k), fresh = !bugMode && !elemKnown(e, k);
+    elemLearn(e, k);
     p.sp -= 6;
-    let d = rnd(14, 18) + G.lv - 1 + charmStat("atk") + skillStat("atk"); if (p.weak > 0) d = Math.ceil(d / 2);
+    let d = Math.round((rnd(14, 18) + G.lv - 1 + charmStat("atk") + skillStat("atk")) * m); if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
-    wait = strike(d, "", "fire", t("A tocha cospe fogo em {bicho}: −{n}.", {bicho: foe(), n: d}));
-    if (!e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); render(); sfx("more"); pop(t("FRAQUEZA!"), $("beast"), "crit"); }, wait + 200); }
+    const v = {bicho: foe(), n: d}, msg = {fogo: t("A tocha cospe fogo n{bicho}: −{n}.", v), agua: t("A cuia joga um jato d'água n{bicho}: −{n}.", v), vento: t("Um sopro de vento acerta {bicho}: −{n}.", v), raio: t("Um raio cai n{bicho}: −{n}.", v),
+      cipo: t("Um chicote de cipó estala n{bicho}: −{n}.", v), folhas: t("Folhas afiadas cortam {bicho}: −{n}.", v)};
+    const kind = k === "fogo" ? "fire" : k === "planta" ? (Math.random() < .5 ? "cipo" : "folhas") : k;   // planta: sorteia o chicote ou as folhas
+    wait = strike(d, m > 1 ? "crit" : "", kind, msg[kind === "fire" ? "fogo" : kind]);
+    if (m < 1) setTimeout(() => { say(t("{bicho} resistiu ao golpe.", {bicho: foe(1)})); pop(t("RESISTIU!"), $("beast")); render(); }, wait + 200);
+    if (fresh) setTimeout(() => { plateElem(e); if (m === 1) say(t("{elemento} não faz nada de especial n{bicho}. Anotado no caderno.", {elemento: ELEMENTS[k].n, bicho: foe()})); render(); }, wait + 250);   // descobriu: a placa mostra (e o caderno anota)
+    if (m > 1 && !e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); render(); sfx("more"); pop(t("FRAQUEZA!"), $("beast"), "crit"); }, wait + 200); }
   } else if (id === "flecha") {   // tiro com o arco: menos dano que a lança, mas 40% de chance de crítico
     p.sp -= 3;
     let d = rnd(5, 9) + G.lv - 1 + ((EQUIP.ranged[G.equip.ranged] || {}).atk || 0) + charmStat("atk") + skillStat("atk") + (hasSkill("mira") ? 4 : 0), crit = p.atento || Math.random() < .4;   // arco melhor = flecha mais forte
@@ -255,7 +268,7 @@ function act(id) {
     if (Math.random() * 100 < chance) { render(); return finish("flee"); }
     say(p.preso > 0 ? t("Rhanon tá preso, não dá pra fugir!") : t("{bicho} cortou o caminho. Não deu pra fugir!", {bicho: foe(1)}));
   }
-  const again = !extra && ["atacar", "arremesso", "tocha", "flecha"].includes(id) && charmRoll("turno");   // talismã: age de novo
+  const again = !extra && (["atacar", "arremesso", "flecha"].includes(id) || SPECIALS.some(s => s.id === id && s.elem)) && charmRoll("turno");   // talismã: age de novo
   const bonus = !extra && !again && p.bonus && id !== "fugir"; if (bonus) p.bonus = false;   // contra-ataque perfeito: esta ação não passa a vez
   render();
   setTimeout(() => {
@@ -468,6 +481,16 @@ function strike(d, cls, kind, msg) {
     }, 1700);
     return 1950;
   }
+  if (kind === "cipo") {   // chicote de cipó: o cipó estica do Rhanon até o bicho, estala e volta
+    HERO_A.set("cast"); const at = cipoWhip(a, b); qteArm(at, $("beast"));
+    setTimeout(() => { hit(["#7ac84a", "#ffffff", "#3f9a3a"]); slash($("beast")); }, at);
+    return at + 200;
+  }
+  if (kind === "agua" || kind === "vento" || kind === "raio" || kind === "folhas") {   // especiais de elemento: o Rhanon ergue a lança e o elemento atravessa até o bicho
+    HERO_A.set("cast"); const fly = elemFly(kind, a, b); qteArm(fly, $("beast"));
+    setTimeout(() => { hit({agua: ["#86d6ff", "#ffffff", "#2a8ad8"], vento: ["#e8f4f8", "#ffffff", "#6aa8b8"], raio: ["#fff27a", "#ffffff", "#d8a80c"], folhas: ["#7ac84a", "#ffffff", "#3f9a3a"]}[kind]); if (kind === "folhas") slash($("beast")); }, fly);
+    return fly;
+  }
   // tocha: ergue, assopra (baforadas) e uma onda de chamas atravessa até o bicho
   HERO_A.set("blow"); qteArm(900 + 8 * 70 + 650, $("beast"));
   setTimeout(() => {
@@ -488,6 +511,37 @@ function strike(d, cls, kind, msg) {
   }, start + i * 70);
   setTimeout(() => hit(["#ffd23a", "#f2740c", "#d62828"]), start + (N - 1) * 70 + fly);
   return start + (N - 1) * 70 + fly;   // ~2,1 s
+}
+/* água, vento, raio e folhas saindo do Rhanon até o bicho (quadradinhos de pixel, como o jato do bicho na água):
+   água faz um arco, vento e folhas vão em espiral (as folhas girando), raio em zigue-zague e rápido. Devolve quando chega (ms). */
+function elemFly(kind, a, b) {
+  const T = {agua: [600, 16, 34], vento: [600, 18, 40], raio: [500, 12, 22], folhas: [600, 14, 45]}[kind], [start, N, gap] = T, fly = kind === "raio" ? 160 : 420;
+  const cols = {agua: ["#86d6ff", "#d2f0ff", "#2a8ad8"], vento: ["#ffffff", "#e8f4f8", "#9ac8d8"], raio: ["#fff27a", "#ffd23a", "#ffffff"], folhas: ["#3f9a3a", "#7ac84a", "#2a6a2a"]}[kind];
+  setTimeout(() => sfx(kind === "agua" ? "agua" : kind === "raio" ? "choque" : kind === "folhas" ? "planta" : "vento"), start);
+  for (let i = 0; i < N; i++) setTimeout(() => {
+    const c = document.createElement("i"), sz = 8 + (i % 3) * 4, sx = a.x + 30, sy = a.y - 24;
+    c.className = "fx-jato"; c.style.cssText = `left:${sx}px;top:${sy}px;width:${sz}px;height:${sz}px;background:${cols[i % 3]}`;
+    $("fx").appendChild(c);
+    const mid = kind === "agua" ? -60 - (i % 3) * 8 : kind === "raio" ? (i % 2 ? 26 : -26) : Math.sin(i * 1.3) * 40, spin = kind === "folhas" ? 540 : 0;   // folha gira no ar
+    if (kind === "folhas") c.style.height = Math.round(sz / 2) + "px";
+    c.animate([{transform: "translate(-50%,-50%) scale(.6)"}, {transform: `translate(calc(-50% + ${(b.x - sx) / 2}px),calc(-50% + ${(b.y - sy) / 2 + mid}px)) rotate(${spin / 2}deg)`, offset: .5},
+      {transform: `translate(calc(-50% + ${b.x - sx}px),calc(-50% + ${b.y - sy}px)) rotate(${spin}deg) scale(1.5)`, opacity: .5}], {duration: fly, easing: "steps(8)", fill: "forwards"}).onfinish = () => c.remove();
+    if (kind === "raio" && i % 4 === 0) sfx("choque");
+  }, start + i * gap);
+  return start + (N - 1) * gap + fly;
+}
+// chicote de cipó: uma corda verde de gomos sai da mão do Rhanon, estica até o bicho, estala e recolhe. Devolve quando estala (ms).
+function cipoWhip(a, b) {
+  const start = 550, reach = 260, sx = a.x + 24, sy = a.y - 20, dx = b.x - sx, dy = b.y - sy, len = Math.hypot(dx, dy), ang = Math.atan2(dy, dx);
+  setTimeout(() => {
+    sfx("planta");
+    const c = document.createElement("i");
+    c.className = "fx-cipo"; c.style.cssText = `left:${sx}px;top:${sy}px;width:${len}px;transform:rotate(${ang}rad)`;
+    $("fx").appendChild(c);
+    c.animate([{clipPath: "inset(0 100% 0 0)"}, {clipPath: "inset(0 0 0 0)", offset: .45}, {clipPath: "inset(0 0 0 0)", offset: .7}, {clipPath: "inset(0 100% 0 0)"}],
+      {duration: reach * 2.2, easing: "steps(10)"}).onfinish = () => c.remove();
+  }, start);
+  return start + reach;
 }
 // fúria: faixa "FÚRIA!", Rhanon corre até o bicho e dá três estocadas (a última mais forte). Devolve quanto dura (ms).
 function furyStrike(ds) {

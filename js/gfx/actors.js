@@ -93,6 +93,11 @@ function makeHeroActor() {
         pose.weapon = "torchup"; pose.f = Math.floor(t / 70) % 3; pose.lean = el > 450 && el < 1100 ? 1 : 0;
         if (el > 2100) set("idle");
         break;
+      case "cast":    // especial de água, vento ou raio: ergue a lança, segura no alto e aponta para o bicho
+        pose.weapon = el < 650 ? "up" : el < 1100 ? "diag" : "guard"; pose.lean = el > 650 && el < 1100 ? 1 : 0; pose.dy = el < 650 ? 1 : 0;
+        if (!lastFx && el > 450) { lastFx = 1; const [gx, gy] = grid(SX + 27, SY + 2); PFX.burst(6, "star", ["#ffffff", "#bff3ff"], gx, gy, 12, {life: .5}); }
+        if (el > 1400) set("idle");
+        break;
       case "ready": {   // chefe apareceu: gira a lança (para cima, diagonal, para trás...), firma a guarda e a ponta brilha
         const spin = ["up", "diag", "raise", "diag", "up", "guard"], k = Math.min(spin.length - 1, Math.floor(el / 95));
         if (weaponOn) pose.weapon = spin[k]; pose.dy = k === spin.length - 1 ? 1 : 0; pose.lean = k === spin.length - 1 ? 1 : 0;

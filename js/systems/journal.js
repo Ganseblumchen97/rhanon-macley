@@ -19,6 +19,15 @@ function habitat(id) {
   }
   return out.join(", ") || "?";
 }
+// os cinco elementos no caderno, como a análise do Persona: ▼ fraco, ▲ resiste, = normal e ? (ainda não usou esse nele)
+function elemTags(a) {
+  const [w, ...r] = ELEM_OF[a.id] || [];
+  if (!w) return "";
+  return `<span class="elem cad">${Object.entries(ELEMENTS).map(([k, el]) => {
+    const cls = !elemKnown(a, k) ? "nao-sei" : k === w ? "fraco" : r.includes(k) ? "resiste" : "normal";
+    return `<i class="${cls}" style="--ec:${el.c}">${{"nao-sei": "?", fraco: "▼", resiste: "▲", normal: "="}[cls]} ${el.n}</i>`;
+  }).join("")}</span>`;
+}
 function journalCard(a) {
   const b = G.bestiary[a.id], seen = b && b.seen, src = beastFrame(a.id), c = document.createElement("canvas");
   c.width = src ? src.width : 20; c.height = src ? src.height : 20;
@@ -28,7 +37,7 @@ function journalCard(a) {
   const card = document.createElement("div"); card.className = "cad-card" + (seen ? "" : " nao-visto");
   card.append(c);
   card.insertAdjacentHTML("beforeend", seen
-    ? `<b>${a.name}</b><small>${t("Nv")} ${a.lv}${a.boss ? " · " + t("chefe") : ""} · ${t("vencidos: {n}", {n: b.wins})}</small><small>${habitat(a.id)}</small><p>${ANIMAL_FACTS[a.id] || ""}</p>`
+    ? `<b>${a.name}</b><small>${t("Nv")} ${a.lv}${a.boss ? " · " + t("chefe") : ""} · ${t("vencidos: {n}", {n: b.wins})}</small><small>${habitat(a.id)}</small>${elemTags(a)}<p>${ANIMAL_FACTS[a.id] || ""}</p>`
     : `<b>???</b><small>${habitat(a.id)}</small>`);
   return card;
 }
@@ -36,7 +45,7 @@ function openJournal() {
   vit();
   const o = $("caderno"), box = o.querySelector(".info"), seen = ANIMALS.filter(a => G.bestiary[a.id] && G.bestiary[a.id].seen).length;
   o.classList.toggle("papel", !G.nb.on);   // antes do notebook ligar, o caderno é de papel (desenho à mão); depois, digital
-  box.innerHTML = `<h2>${t(G.nb.on ? "Caderno de bichos · digital" : "Caderno de bichos")}</h2><p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p><p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><div class="cad-grid"></div>`;
+  box.innerHTML = `<h2>${t(G.nb.on ? "Caderno de bichos · digital" : "Caderno de bichos")}</h2><p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p><p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><p class="hint">${t("Elementos: ▼ fraco · ▲ resiste · = normal · ? use o golpe no bicho pra descobrir")}</p><div class="cad-grid"></div>`;
   const grid = box.querySelector(".cad-grid");
   ANIMALS.forEach(a => grid.append(journalCard(a)));
   btn("Fechar", closeJournal, false, box);

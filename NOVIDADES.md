@@ -3,6 +3,22 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.40.0 — os cinco elementos
+
+- Agora a batalha tem elementos: fogo, água, vento, raio e planta. Cada bicho é fraco contra um deles e alguns
+  resistem a outros. Acertou a fraqueza? O golpe tira mais, aparece "FRAQUEZA!" e você ataca de novo na hora. Bateu
+  numa resistência? Sai "RESISTIU!" e o golpe tira só metade.
+- Os elementos ficam só nos especiais; a lança e a flecha continuam sem elemento. Fogo é a tocha de sempre. No artesão
+  da feira há três novos: a Cuia d'água (R$ 140, nível 6), o Chicote de cipó (R$ 90, nível 3), que bate com o cipó ou
+  lança folhas que cortam, e o Raio do poraquê (R$ 120, nível 9, com 2 Faíscas de poraquê). O Sopro de vento vem com a
+  habilidade Espírito da mata, na árvore do Pajé (quem já tinha aprendido ganha na hora).
+- Uma dica: quem voa é fraco contra planta e resiste a vento; quem vive na água é fraco contra raio e resiste a água e
+  fogo; os bichos de fogo, como a Mula sem cabeça, não aguentam água.
+- Como no Persona, você só descobre o que cada elemento faz num bicho usando o golpe nele. A fraqueza e as resistências
+  descobertas aparecem embaixo do nome do bicho na batalha, e o caderno mostra os cinco elementos de cada um, com "?"
+  nos que você ainda não testou.
+- A tocha mudou: antes ela dava "Mais uma!" contra qualquer bicho; agora só contra quem é fraco a fogo.
+
 ## 0.39.0 — o mapa do Brasil
 
 - No mapa do Pará há um botão novo, "Mapa do Brasil", que mostra as cinco regiões da viagem do Rhanon: Norte,

@@ -4,7 +4,7 @@
    S início do Rhanon   E volta (fase anterior ou mapa)   a bicho da zona (sorteado ao entrar)
    B chefe da zona   G passagem para a próxima fase (abre quando o chefe cai)
    Aldeia e feira (safe: sem bichos): H oca (3x2, porta no quadrado do meio)   K barraca   F fogueira   N tenda   P aldeão
-   V comprador de lembranças   C barraca de comida   R artesão (roupas e tocha)   M armeiro (armas e armaduras)
+   V comprador de lembranças   C barraca de comida   R artesão (roupas e especiais)   M armeiro (armas e armaduras)
    X Pajé (talismãs com o luar dos chefes)   L técnico da lan house (notebook)   W cliente do freela
    Cidade (Belém): # prédio/casarão (bloqueia; fachada desenhada onde a quadra termina embaixo)
    Rodovia (BR-316 e terminal): r asfalto   U ônibus (bloco 4x2)   Q cabine do cobrador (bloco 2x2)

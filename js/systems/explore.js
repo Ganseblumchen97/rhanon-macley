@@ -763,7 +763,8 @@ const VILLAGER_TIPS = [
   "Acerta o bicho primeiro, na lança (Z) ou na flecha (X), que o primeiro turno da briga é teu.",
   "Três tempos certos seguidos na briga, golpe perfeito ou bloqueio, enchem a Fúria: a lança vira três estocadas de uma vez. Pai d'égua!",
   "Se o bicho te pegar antes, quem bate primeiro é ele. Viu o \"!\"? Moscou, dançou.",
-  "A tocha do artesão assusta os bichos: eles fraquejam e tu ataca de novo na mesma hora.",
+  "Todo bicho tem um elemento que ele não aguenta: fogo, água, vento, raio ou planta. Acerta esse que ele fraqueja e tu bate de novo na hora.",
+  "Usou um elemento num bicho? O caderno anota se ele é fraco, se resiste ou se nem liga. A fraqueza que tu descobrir aparece embaixo do nome dele.",
   "Sem arco? Joga a lança (Especial). Bate forte, mas às vezes erra.",
   "O chefe de cada mata fica no fim da trilha. Vence ele que abre o caminho pra próxima.",
   "Na fogueira da aldeia tu descansa até a noite ou dorme até o outro dia. As fogueiras das trilhas recuperam tudo.",
@@ -832,7 +833,7 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "tenda") { say(t("Tenda"), t("A tenda do Rhanon. Dormir recupera tudo, mas o dia passa.")); btn(t("Dormir"), () => exNap("dormir"), false, d); }
   else if (kind === "peles") { say(t("Comprador de lembranças"), t("Pena, dente, pele que a cobra largou... tudo vira artesanato. Mostra aí o que a mata te deu.")); peltButtons(d); }
   else if (kind === "comida") { say(t("Barraca de comida"), t("Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!")); foodButtons(d); }
-  else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão e tocha pra espantar bicho. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte tu ficar, mais coisa eu te mostro.")); gearButtons(d); }
+  else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão, tocha, cuia d'água e chicote de cipó pra espantar bicho. Me traz faísca de poraquê que eu te faço coisa melhor. Arma e armadura é com o armeiro, ali na barraca do meio.")); gearButtons(d); }
   else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
   else if (kind === "xama") { say(t("Pajé"), t("Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem luar de chefe nenhum pra eu trabalhar. Acalma um chefe e me traz o luar dele."), d);
     if (Object.keys(G.skills).length) btn(t("Esquecer habilidades · R$ {n}", {n: SKILL_RESET(G.lv)}), ask(t("Esquecer todas as habilidades por R$ {n}? Os pontos voltam para gastar de novo.", {n: SKILL_RESET(G.lv)}), skillReset), G.money < SKILL_RESET(G.lv), d); }
