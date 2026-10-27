@@ -4,8 +4,8 @@
    S início do Rhanon   E volta (fase anterior ou mapa)   a bicho da zona (sorteado ao entrar)
    B chefe da zona   G passagem para a próxima fase (abre quando o chefe cai)
    Aldeia e feira (safe: sem bichos): H oca (3x2, porta no quadrado do meio)   K barraca   F fogueira   N tenda   P aldeão
-   V comprador de peles   C barraca de comida   R artesão (roupas e tocha)   M armeiro (armas e armaduras)
-   X xamã (talismãs com as peles dos chefes)
+   V comprador de lembranças   C barraca de comida   R artesão (roupas e tocha)   M armeiro (armas e armaduras)
+   X Pajé (talismãs com o luar dos chefes)
    Cidade (Belém): # prédio/casarão (bloqueia; fachada desenhada onde a quadra termina embaixo)
    Rodovia (BR-316 e terminal): r asfalto   U ônibus (bloco 4x2)   Q cabine do cobrador (bloco 2x2)
    Ver-o-Peso: O motel onde o Rhanon dorme (bloco 3x2; a conversa é na porta, embaixo do meio dele)

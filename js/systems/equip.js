@@ -4,7 +4,7 @@
 const EQ_SLOTS = [
   {slot: "weapon", n: "Arma"}, {slot: "ranged", n: "Arco", none: "Sem arco"},       // coluna da esquerda
   {slot: "torso", n: "Tronco", none: "Sem camisa"}, {slot: "legs", n: "Pernas"},     // coluna da direita
-  {slot: "amulet", n: "Talismã", none: "Sem talismã"}                                 // embaixo, na esquerda (feito pelo xamã)
+  {slot: "amulet", n: "Talismã", none: "Sem talismã"}                                 // embaixo, na esquerda (feito pelo Pajé)
 ];
 let EQ_SEL = 0;   // espaço escolhido (índice em EQ_SLOTS)
 const EQ_POSE = {lh: [3, 24], rh: [29, 24], lf: [10, 40], rf: [22, 40]};   // braços na horizontal, pernas um pouco abertas
@@ -46,7 +46,7 @@ function openEquip(msg) {
   EQ_SLOTS.forEach((s, i) => {
     const it = q[s.slot] && EQUIP[s.slot][q[s.slot]], b = document.createElement("button");
     b.type = "button"; b.className = "eq-slot" + (i === EQ_SEL ? " sel" : "");
-    b.innerHTML = `<small>${s.n}</small><b>${it ? it.n : s.none || "—"}</b><i>${it ? gearBonus(s.slot, it) : s.slot === "ranged" ? t("o armeiro da feira faz") : s.slot === "amulet" ? t("o xamã da aldeia faz") : ""}</i>`;
+    b.innerHTML = `<small>${s.n}</small><b>${it ? it.n : s.none || "—"}</b><i>${it ? gearBonus(s.slot, it) : s.slot === "ranged" ? t("o armeiro da feira faz") : s.slot === "amulet" ? t("o Pajé da aldeia faz") : ""}</i>`;
     b.prepend(gearIcon(s.slot, it));
     b.addEventListener("click", () => { EQ_SEL = i; sfx("blip"); openEquip(); });
     cols[i < 2 || i > 3 ? 0 : 1].append(b);

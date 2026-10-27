@@ -16,7 +16,7 @@ const MAP_REGIONS = {
     route: ["ananindeua", "curitiba"], pos: {ananindeua: [322, 168], curitiba: [315, 478]}}
 };
 const LOC = {
-  ananindeua: {n: "Ananindeua (PA)", s: "Ananindeua", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor está cheia de perigo, e cada pele rende uns trocados."},
+  ananindeua: {n: "Ananindeua (PA)", s: "Ananindeua", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor anda brava, e cada lembrança que os bichos deixam rende uns trocados."},
   belem: {n: "Belém (PA)", s: "Belém", txt: "A capital do Pará, na beira da baía do Guajará. Prédios, casarões de azulejo, o Ver-o-Peso... e bicho e malandro bem mais fortes que os da mata."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
@@ -25,13 +25,13 @@ const LOC = {
    e no fim, lá em cima, a cabine do cobrador na BR-316, de onde sai o ônibus para a capital. */
 const SUB = {
   aldeia:  {n: "Aldeia", x: 48, y: 242, txt: "A casa do Rhanon. Fogueira pra descansar, tenda pra dormir e gente conhecida."},
-  feira:   {n: "Feira", x: 122, y: 262, txt: "Mandioca, peixe assado, açaí e maniçoba. Aqui se vende pele e se compra comida."},
+  feira:   {n: "Feira", x: 122, y: 262, txt: "Mandioca, peixe assado, açaí e maniçoba. Aqui se vende lembrança e se compra comida."},
   mata:    {n: "Mata", x: 188, y: 236, txt: "Trilhas conhecidas. Bichos pequenos e médios, bons para começar."},
   fechada: {n: "Mata fechada", x: 254, y: 264, txt: "Folhas altas, pouca luz e predadores de verdade."},
   rio:     {n: "Beira do rio", x: 376, y: 240, txt: "Do outro lado da ponte: água, lama e dentes. Olho no que se mexe na margem."},
   igarape: {n: "Igarapé", x: 402, y: 156, txt: "Rio acima, a água entra na mata em canais estreitos. Tracajá, garça, boto... e algo enorme lá no fundo."},
   manguezal: {n: "Manguezal", x: 290, y: 128, txt: "A mata vira lama e raiz. Caranguejo, mão-pelada e, de noite, um assobio que ninguém quer ouvir."},
-  seringal: {n: "Seringal", x: 212, y: 160, txt: "Seringueiras velhas com marca de faca e a casa do seringueiro caindo aos pedaços. Lá ninguém caça de noite."},
+  seringal: {n: "Seringal", x: 212, y: 160, txt: "Seringueiras velhas com marca de faca e a casa do seringueiro caindo aos pedaços. Lá ninguém anda de noite."},
   varzea: {n: "Várzea", x: 120, y: 134, txt: "Campo alagado de capim alto, como no Marajó. Búfalo, socó escondido e, dizem os vaqueiros, um gigante que fede de longe."},
   parada: {n: "Cabine da BR-316", s: "BR-316", x: 52, y: 62, txt: "No fim da trilha, a estrada. Na cabine de madeira, o cobrador vende a passagem do ônibus pra Belém."},
   /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
@@ -71,18 +71,18 @@ const ITEMS = {
   acai:     {n: "Açaí", price: 15, hp: 0, sp: 10},
   manicoba: {n: "Maniçoba", price: 45, hp: 30, sp: 15}
 };
-/* Pedidos dos aldeões (um por vez). giver = aldeão que pede (aldeao1 Caçador, aldeao2 Ancião, aldeao3 Aldeã);
+/* Pedidos dos aldeões (um por vez). giver = aldeão que pede (aldeao1 Mateiro, aldeao2 Ancião, aldeao3 Aldeã);
    need: {kill: bicho, n} (vencer, conta a partir do aceite) ou {pelt: bicho, n} (entregar peles);
    night = só aparece à noite; reward: dinheiro e itens da bolsa. */
 const QUESTS = [
   {id: "cotias", giver: "aldeao1", need: {pelt: "cotia", n: 3}, reward: {money: 40, items: {mandioca: 2}},
-    text: "As cotias tão roendo a mandioca da roça. Me traz 3 peles de cotia que eu te pago.", thanks: "Égua, isso! Agora a roça descansa. Toma, é teu."},
+    text: "As cotias tão roendo a mandioca da roça. Acalma elas e me traz 3 castanhas que elas guardam, que eu te pago.", thanks: "Égua, isso! Agora a roça descansa. Toma, é teu."},
   {id: "chocalho", giver: "aldeao2", need: {pelt: "tatu", n: 2}, reward: {money: 55},
     text: "Quero fazer um chocalho novo pra roda. Preciso de 2 cascos de tatu.", thanks: "Que cascos bonitos! Esse chocalho vai soar longe."},
   {id: "cesta", giver: "aldeao3", need: {kill: "macaco", n: 2}, reward: {money: 30, items: {manicoba: 1}},
     text: "Um macaco-prego roubou minha cesta de novo! Dá um susto em 2 macacos lá na mata, por favor.", thanks: "Agora eles pensam duas vezes antes de voltar. Valeu, maninho!"},
   {id: "queixadas", giver: "aldeao1", lv: 5, need: {kill: "queixada", n: 3}, reward: {money: 90},
-    text: "Tem um bando de queixada passando perto da aldeia. Vence 3 deles lá na mata fechada.", thanks: "Pai d'égua, caçador! A aldeia dorme mais tranquila."},
+    text: "Tem um bando de queixada passando perto da aldeia. Vence 3 deles lá na mata fechada.", thanks: "Pai d'égua, guardião! A aldeia dorme mais tranquila."},
   {id: "piranhas", giver: "aldeao3", lv: 7, need: {kill: "piranha", n: 2}, reward: {money: 70, items: {peixe: 2}},
     text: "As piranhas não deixam ninguém lavar roupa no rio. Acerta 2 delas com flecha.", thanks: "O rio é nosso de novo! Leva esses peixes assados."},
   {id: "morcegos", giver: "aldeao2", night: true, need: {kill: "morcego", n: 3}, reward: {money: 50, items: {acai: 2}},
@@ -108,23 +108,23 @@ const EQUIP = {
    EQUIP do slot e depois aparecem no inventário para vestir/usar como os outros. */
 const CRAFT = {
   weapon: {lanca_dente: {n: "Lança de dente de jacaré", atk: 3, lv: 6, craft: {jacare: 2}, cost: 60, look: {tip: "dente", m: "#f2e6c4", band: "#5a8a3a"}},
-           lanca_presa: {n: "Lança com presa de onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120, look: {tip: "presa", m: "#fff8e0", band: "#e0a030", long: true}},
-           lanca_pirarucu: {n: "Lança de osso de pirarucu", atk: 8, lv: 13, craft: {pirarucu: 1, tracaja: 2}, cost: 160, look: {tip: "osso", m: "#eef0e8", band: "#c8303a", p: "#c9a46a", P: "#8a6a3a", long: true}},
-           lanca_chifre: {n: "Lança com chifre de búfalo", atk: 11, lv: 18, craft: {bufalo_touro: 1, bufalo: 2}, cost: 260, look: {tip: "chifre", m: "#4a4044", band: "#d9b25a", p: "#a07a40", P: "#6b4e26", long: true}},
+           lanca_presa: {n: "Lança da onça", atk: 5, lv: 9, craft: {onca: 2, queixada: 1}, cost: 120, look: {tip: "presa", m: "#fff8e0", band: "#e0a030", long: true}},
+           lanca_pirarucu: {n: "Lança de escama de pirarucu", atk: 8, lv: 13, craft: {pirarucu: 1, tracaja: 2}, cost: 160, look: {tip: "osso", m: "#eef0e8", band: "#c8303a", p: "#c9a46a", P: "#8a6a3a", long: true}},
+           lanca_chifre: {n: "Lança do Búfalo-touro", atk: 11, lv: 18, craft: {bufalo_touro: 1, bufalo: 2}, cost: 260, look: {tip: "chifre", m: "#4a4044", band: "#d9b25a", p: "#a07a40", P: "#6b4e26", long: true}},
            lanca_aco: {n: "Lança com ponta de aço do porto", atk: 15, lv: 24, craft: {ratao: 1, ratazana: 3}, cost: 380, look: {tip: "aco", m: "#a8bccb", band: "#5a6670", p: "#6b4a2a", P: "#45301a", long: true}}},
-  torso:  {colete_sucuri: {n: "Colete de couro de sucuri", def: 4, lv: 8, craft: {sucuri: 2}, cost: 90, color: "#5a7a3a", shade: "#3a5a24"},
-           colete_tracaja: {n: "Colete de casco de tracajá", def: 6, lv: 12, craft: {tracaja: 3}, cost: 140, color: "#4a5a3a", shade: "#2e3a24"},
-           gibao_bufalo: {n: "Gibão de couro de búfalo", def: 9, lv: 17, craft: {bufalo: 3, jararaca: 1}, cost: 240, color: "#3a3234", shade: "#221c1e"},
-           jaqueta_jacare: {n: "Jaqueta de couro do Jacaré do canal", def: 13, lv: 26, craft: {jacare_canal: 1, cachorro_bravo: 2}, cost: 440, color: "#4a4a2e", shade: "#2e2e1a"}},
-  legs:   {calca_anta: {n: "Calça de couro de anta", def: 3, lv: 7, craft: {anta: 1, capivara: 1}, cost: 70, color: "#5a4a40", shade: "#3a2e28"},
-           calca_jacaretinga: {n: "Calça de couro de jacaretinga", def: 5, lv: 13, craft: {jacaretinga: 2, caranguejo: 1}, cost: 130, color: "#6a7a4a", shade: "#4a5632"},
-           perneira_jararaca: {n: "Perneira de couro de jararaca", def: 7, lv: 16, craft: {jararaca: 2, ourico: 1}, cost: 200, color: "#7a6a4a", shade: "#54482e"}},
+  torso:  {colete_sucuri: {n: "Colete de pele trocada de sucuri", def: 4, lv: 8, craft: {sucuri: 2}, cost: 90, color: "#5a7a3a", shade: "#3a5a24"},
+           colete_tracaja: {n: "Colete de placas de tracajá", def: 6, lv: 12, craft: {tracaja: 3}, cost: 140, color: "#4a5a3a", shade: "#2e3a24"},
+           gibao_bufalo: {n: "Gibão de pelo de búfalo", def: 9, lv: 17, craft: {bufalo: 3, jararaca: 1}, cost: 240, color: "#3a3234", shade: "#221c1e"},
+           jaqueta_jacare: {n: "Jaqueta do Jacaré do canal", def: 13, lv: 26, craft: {jacare_canal: 1, cachorro_bravo: 2}, cost: 440, color: "#4a4a2e", shade: "#2e2e1a"}},
+  legs:   {calca_anta: {n: "Calça de pelo de anta", def: 3, lv: 7, craft: {anta: 1, capivara: 1}, cost: 70, color: "#5a4a40", shade: "#3a2e28"},
+           calca_jacaretinga: {n: "Calça com dentes de jacaretinga", def: 5, lv: 13, craft: {jacaretinga: 2, caranguejo: 1}, cost: 130, color: "#6a7a4a", shade: "#4a5632"},
+           perneira_jararaca: {n: "Perneira de pele trocada de jararaca", def: 7, lv: 16, craft: {jararaca: 2, ourico: 1}, cost: 200, color: "#7a6a4a", shade: "#54482e"}},
   ranged: {arco_harpia: {n: "Arco com penas de harpia", atk: 3, lv: 7, craft: {harpia: 1}, cost: 60, look: {b: "#b8844a", fl: "#9aa0a8"}},
            arco_gaviao: {n: "Arco com penas de gavião-real", atk: 6, lv: 17, craft: {gaviao_real: 1, urubu: 2}, cost: 220, look: {b: "#5a3a2a", fl: "#f4f4f4"}},
            arco_gaivota: {n: "Arco de fibra com penas de gaivota", atk: 9, lv: 23, craft: {gaivota: 2, iguana_rei: 1}, cost: 320, look: {b: "#d8c49a", fl: "#ffffff"}}}
 };
 for (const s in CRAFT) Object.assign(EQUIP[s], CRAFT[s]);
-/* Talismãs do xamã da aldeia (espaço "amulet" do equipamento, um por vez). Cada um sai das peles de um chefe
+/* Talismãs do Pajé da aldeia (espaço "amulet" do equipamento, um por vez). Cada um sai das peles de um chefe
    (o chefe deixa de 1 a 3 por luta, então dá umas duas ou três revanches) mais um trocado (cost).
    Os dos chefes de dia dão status (atk, def, hp = PV máximo, sp = PE máximo); os da noite dão um efeito (fx, com
    a chance ou a parte em % em ch) e os noturnos mais fortes juntam um status com o efeito. Efeitos (charmFx, combat.js):

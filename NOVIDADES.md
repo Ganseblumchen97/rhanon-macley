@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.35.0 — ninguém morre: o Rhanon acalma os bichos
+
+- Uma fumaça escura está deixando os bichos bravos, e a lança do Rhanon tira essa fumaça deles. Vencer uma luta agora
+  é acalmar: o bicho agradece (um coraçãozinho, uma notinha nos passarinhos e... repara no macaco) e corre de volta
+  para o mato.
+- No lugar das peles, os bichos deixam lembranças do que perdem naturalmente: penas, pele que a cobra trocou, dente de
+  jacaré, espinho de ouriço, a castanha que a cotia guardava. A feira compra lembranças, e algumas roupas mudaram de
+  nome.
+- Os chefes deixam luar, o material dos talismãs. E não somem mais: acalmados, ficam no fim da trilha como aliados.
+  Fale com eles para treinar: de 1 a 3 luares e metade do XP, como a revanche de antes.
+- O xamã agora é o Pajé da aldeia, o caçador virou o Mateiro e o caminho de habilidade "Caçador" virou "Rastreador".
+  Seu progresso, suas lembranças e seus talismãs continuam todos lá.
+
 ## 0.34.2 — vitória com barra de XP
 
 - A fanfarra da vitória saiu. Agora o cartão de vitória mostra a barra de XP enchendo, com um som que sobe junto

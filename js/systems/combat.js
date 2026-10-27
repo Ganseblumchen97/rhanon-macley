@@ -289,7 +289,7 @@ function enemyTurn() {
   }, foeImpact + 150);
 }
 function finish(kind) {
-  if (kind === "win") { $("beast").classList.remove("submerged"); BEAST_A.set("defeat"); setTimeout(() => HERO_A.set("victory"), 250); }
+  if (kind === "win") { beastThanks(); setTimeout(() => HERO_A.set("victory"), 250); }
   else if (kind === "lose") HERO_A.set("defeat");
   else if (kind === "flee") { HERO_A.set("flee"); HERO_A.slide("0px", "-60vw", 1000); }
   // depois da fanfarra, a música do lugar volta baixinho enquanto o cartão de resultado está na tela
@@ -300,7 +300,7 @@ function finish(kind) {
   // cartão: título, uma frase curta e, embaixo, o que ganhou ou perdeu (um item por linha)
   const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = curCity() === "belem" ? t("Acordou no Ver-o-Peso, com metade das forças") : t("Acordou na aldeia, com metade das forças");
   const T = {
-    win:  e.boss ? [t(ending(e, "Chefe vencido!", "Chefe vencida!")), t("{bicho} caiu. Agora a trilha é do Rhanon.", {bicho: O})]
+    win:  e.boss ? [t(ending(e, "Chefe acalmado!", "Chefe acalmada!")), t("{bicho} voltou a si. A trilha está livre.", {bicho: O})]
       : [t(pick(["Vitória!", "Mandou bem!", "É isso aí!"])), t(WATER_BATTLE.has(e.id) ? "{bicho} sumiu na água." : pick(["{bicho} saiu correndo.", "{bicho} desistiu da briga.", "{bicho} não quer mais conversa."]), {bicho: O})],
     flee: [t("Fugiu!"), t("{bicho} fica pra próxima.", {bicho: O})],
     lose: [t("Desmaiou..."), t("{bicho} levou a melhor.", {bicho: O})]
@@ -338,6 +338,17 @@ function overXp(from) {
     requestAnimationFrame(step);
   };
   setTimeout(run, 350);
+}
+/* vitória: o bicho volta a si, agradece (coração; passarinho, nota; macaco, joinha) e corre para o mato pela direita;
+   peixe afunda na água; o chefe fica, calmo, porque vira aliado (ponto de treino na exploração) */
+function beastThanks() {
+  const id = e.id, g = id === "macaco" ? "thumb" : BIRDS.has(id) ? "note" : "heart", person = MOTION[id] === "person";
+  BEAST_A.set("idle");
+  const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .15);
+  if (!person) setTimeout(() => PFX.burst(g === "heart" ? 6 : 3, g, {heart: ["#ff6b8a", "#ff9fb4"], note: ["#5a6ad8", "#ffffff"], thumb: ["#ffd23a", "#c8902a"]}[g], gx, gy, 14, {life: 1, up: 12}), 200);
+  if (e.boss) return;
+  if ($("beast").classList.contains("submerged")) return setTimeout(() => $("beast").classList.add("dive"), 700);
+  setTimeout(() => BEAST_A.slide("0px", "60vw", 800), 750);
 }
 // golpe do bicho: anima, e o dano aparece na barra só quando o golpe "chega"
 const FOE_PREP = 650;   // o bicho se prepara antes do golpe: tempo de reagir com o Z
@@ -536,7 +547,7 @@ function special() {
   else if (s === "constricao") { const n = hit(d); p.preso = 2; p.dot = {d: 3, t: 2, n: "Aperto"}; say(t("{bicho} enrola Rhanon! −{n} PV, e nada de fugir.", {bicho: foe(1), n})); }
   else if (s === "picada") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Veneno"}; say(t("{bicho} pica Rhanon! −{n} PV e veneno por 3 turnos.", {bicho: foe(1), n})); }
 }
-/* ---------- talismãs do xamã (CHARMS em data/world.js) ---------- */
+/* ---------- talismãs do Pajé (CHARMS em data/world.js) ---------- */
 const charmRoll = k => charm().fx === k && Math.random() * 100 < charm().ch;   // sorteia o efeito do talismã em uso
 // golpe do Rhanon acertou: o dreno cura parte do dano; sangra/queima podem deixar o bicho perdendo PV por 3 turnos
 function charmOnHit(d) {
@@ -571,7 +582,7 @@ function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: 
   noteWin(a.id);   // caderno de bichos e pedido de "vencer"
   const back = a.stolen || 0; if (back) { G.money += back; a.stolen = 0; }   // dinheiro que o malandro levou volta
   if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit();
-  const got = drop ? 0 : a.boss ? rnd(1, 3) : 1;   // chefe deixa de 1 a 3 (o xamã faz talismã com elas)
+  const got = drop ? 0 : a.boss ? rnd(1, 3) : 1;   // chefe deixa de 1 a 3 (o Pajé faz talismã com elas)
   if (got) G.pelts[a.id] = (G.pelts[a.id] || 0) + got;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }

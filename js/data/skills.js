@@ -4,7 +4,7 @@
    perfeito (golpe perfeito +50%), furia2 (fúria com 2 acertos), furia4 (quatro estocadas), bloqueio (bloqueio evita 2/3),
    mira (flecha +4 e esquiva da exploração em 1 s), bloqueio2 (bloqueio perfeito anula o golpe e dá um turno a mais),
    cura (especial Reza de cura), cura2 (reza mais forte e que limpa veneno/queimadura), regen (+3 PV e +1 PE por turno).
-   O xamã da aldeia faz o Rhanon esquecer tudo e devolve os pontos (SKILL_RESET). */
+   O Pajé da aldeia faz o Rhanon esquecer tudo e devolve os pontos (SKILL_RESET). */
 const SKILL_TREES = [
   {id: "guerreiro", n: "Guerreiro", d: "Lança e fúria", color: "#e2363d", nodes: [
     {id: "g1", n: "Braço forte", d: "ATQ +2.", cost: 1, atk: 2},
@@ -13,7 +13,7 @@ const SKILL_TREES = [
     {id: "g4", n: "Sangue quente", d: "A fúria enche com 2 acertos no tempo certo (antes 3).", cost: 2, fx: "furia2"},
     {id: "g5", n: "Fúria da onça", d: "A fúria dá quatro estocadas em vez de três.", cost: 2, fx: "furia4"}
   ]},
-  {id: "cacador", n: "Caçador", d: "Defesa e reflexo", color: "#3f9a5c", nodes: [
+  {id: "cacador", n: "Rastreador", d: "Defesa e reflexo", color: "#3f9a5c", nodes: [
     {id: "c1", n: "Couro grosso", d: "DEF +2.", cost: 1, def: 2},
     {id: "c2", n: "Bloqueio firme", d: "Bloqueio no tempo certo evita 2/3 do dano (antes metade).", cost: 1, fx: "bloqueio"},
     {id: "c3", n: "Casca dura", d: "DEF +3.", cost: 1, def: 3},
@@ -28,4 +28,4 @@ const SKILL_TREES = [
     {id: "p5", n: "Proteção dos encantados", d: "No fim de cada turno da luta, recupera 3 PV e 1 PE.", cost: 2, fx: "regen"}
   ]}
 ];
-const SKILL_RESET = lv => 30 + lv * 5;   // preço para esquecer as habilidades no xamã
+const SKILL_RESET = lv => 30 + lv * 5;   // preço para esquecer as habilidades no Pajé

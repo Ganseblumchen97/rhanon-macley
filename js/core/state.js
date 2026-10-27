@@ -4,7 +4,7 @@
 const DEBUG = /[?&]debug(&|=|$)/.test(location.search) ? new URLSearchParams(location.search) : null;
 const KEY = DEBUG ? "rhanon-save-debug" : "rhanon-save-v1";
 const need = l => 20 + 20 * l;                 // XP para passar do nível l
-// talismã em uso (EQUIP.amulet, feito pelo xamã): charmStat("atk" | "def" | "hp" | "sp") soma ao status; charm() = o item inteiro
+// talismã em uso (EQUIP.amulet, feito pelo Pajé): charmStat("atk" | "def" | "hp" | "sp") soma ao status; charm() = o item inteiro
 const charm = () => (typeof EQUIP !== "undefined" && G.equip && EQUIP.amulet && EQUIP.amulet[G.equip.amulet]) || {};
 const charmStat = k => charm()[k] || 0;
 // árvore de habilidades (data/skills.js): skillStat soma o status dos degraus aprendidos; hasSkill(fx) = tem o efeito

@@ -189,7 +189,7 @@ function startExplore(zone, after, from) {
     $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false; exFit();
     musicStart("local"); exHud();
-    exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || t(" · peles, comida, artesão e armeiro: chega perto de uma barraca e aperta Z")) : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? t(" · dizem que algo do folclore ronda o fim da trilha...") : t(" · o chefe espera no fim da trilha")));
+    exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || t(" · lembranças, comida, artesão e armeiro: chega perto de uma barraca e aperta Z")) : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? t(" · dizem que algo do folclore ronda o fim da trilha...") : t(" · o chefe espera no fim da trilha")));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
   });
@@ -206,12 +206,16 @@ function resumeExplore(result) {
   if (!EX || result === "lose") { $("explore").hidden = true; EX = null; return showLocal(); }
   const en = EX.fighting, now = performance.now();
   EX.fighting = null; EX.locked = false; exKeys.clear();
-  if (en && result === "win") { en.alive = false; exBurst(en.x, en.y - 6, ["#d8d2c0", "#a89f8a", "#fff"], 14); }
+  if (en && result === "win" && !en.boss) exCalm(en);   // agradece e corre para o mato
+  if (en && result === "win" && en.boss) {   // chefe acalmado fica no lugar como aliado (ponto de treino)
+    en.alive = false;
+    if (!EX.spots.some(s => s.kind === "lembranca")) EX.spots.push({kind: "lembranca", x: en.homeX, y: en.homeY - 4, tx: Math.floor(en.homeX / TILE), ty: Math.floor(en.homeY / TILE)});
+  }
   if (en && result === "flee") { en.stunUntil = now + 3500; EX.invulnUntil = now + 2500; }
   $("explore").hidden = false; $("homeButton").hidden = true;
   musicStart("local"); exHud();
-  if (en && result === "win" && en.rematch) exToast(t("Revanche vencida: {chefe} caiu de novo!", {chefe: theName(en.a)}));
-  else if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? t("{chefe} já era! A aldeia vai falar disso por muitas noites.", {chefe: theName(en.a, true)})
+  if (en && result === "win" && en.rematch) exToast(t("Treino vencido: {chefe} gostou da luta!", {chefe: theName(en.a)}));
+  else if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? t("{chefe} voltou a si! A aldeia vai falar disso por muitas noites.", {chefe: theName(en.a, true)})
     : EX.st.next === "parada" ? t("Último chefe de Ananindeua vencido! A passagem leva à BR-316.") : EX.st.next ? t("Caminho livre: {lugar}! Segue a trilha até a passagem.", {lugar: SUB[EX.st.next].n}) : t("Último chefe daqui vencido!"));
   if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); }   // o mapa mostra o caminho novo
 }
@@ -272,16 +276,20 @@ function exDodge() {
   EX.invulnUntil = Math.max(EX.invulnUntil, performance.now() + DODGE_TIME * 1000 + 120);
   exBurst(h.x, h.y - 2, ["#d8c49a", "#a89a72", "#ffffff"], 6); sfx("esquiva");
 }
-// pega a pele do chão: vai para a bolsa (vende na feira)
+// pega a lembrança do chão: vai para a bolsa (vende na feira)
 function pickLoot(l) {
   EX.loot = EX.loot.filter(q => q !== l); vit();
   G.pelts[l.id] = (G.pelts[l.id] || 0) + 1; save(); sfx("heal");
   exBurst(l.x, l.y - 4, ["#ffffff", "#ffd23a"], 8);
   exToast(t("Pegou: {pele} (R$ {n} na feira).", {pele: peltName(l.id).toLowerCase(), n: peltValue(l.id)})); exHud();
 }
-// pele no chão: trouxinha com a cor do tipo (couro, escamas, penas, casco, presas), pulando e brilhando
+// cor da trouxinha pelo tipo da lembrança: pena, pele trocada, dente/espinho, luar de chefe ou pelo
+const SHED = new Set(["calango", "sucuri", "surucucu", "caranguejeira", "sapo", "cobra_cipo", "jararaca", "iguana", "caranguejo", "tracaja"]);
+const TEETH = new Set(["jacare", "piranha", "jacaretinga", "ourico"]);
+const lootColor = id => ANIMALS.find(a => a.id === id)?.boss ? ["#fff6c8", "#c8d8ff"] : BIRDS.has(id) ? ["#ececf0", "#a8a8b4"]
+  : SHED.has(id) ? ["#d8d0a8", "#a8a07a"] : TEETH.has(id) ? ["#f4ecd8", "#c8bca0"] : ["#a86f40", "#7a4a2a"];
 function drawLoot(x, l, cx, cy, now) {
-  const n = peltName(l.id), col = /Escamas/.test(n) ? ["#b8c4c8", "#7e8c92"] : /Penas/.test(n) ? ["#ececf0", "#a8a8b4"] : /Casco/.test(n) ? ["#9a8a7a", "#6a5c4e"] : /Presas/.test(n) ? ["#f4ecd8", "#c8bca0"] : ["#a86f40", "#7a4a2a"];
+  const col = lootColor(l.id);
   const sx = Math.round(l.x - cx), sy = Math.round(l.y - cy) - (Math.floor(now / 300) % 2);
   x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(sx - 4, Math.round(l.y - cy), 8, 1);
   x.fillStyle = OUTLINE; x.fillRect(sx - 4, sy - 6, 8, 6); x.fillRect(sx - 3, sy - 7, 6, 8);
@@ -293,11 +301,11 @@ function exHit(en) {
   const a = en.a, d = rnd(6, 10) + G.lv - 1 + weaponAtk();
   exBurst(en.x, en.y - entH(en) / 2, ["#ffffff", "#ffd23a"], 8);
   if (!a.boss && (G.lv - (a.lv || 1) >= ONE_HIT_LEVELS || d >= a.hp)) {
-    en.alive = false; en.koUntil = performance.now() + 1100; sfx("crit");
-    exBurst(en.x, en.y - 6, ["#d8d2c0", "#a89f8a", "#ffffff"], 14);
+    exCalm(en); sfx("crit");
+    exBurst(en.x, en.y - 6, ["#ffffff", "#ffd23a", "#c8e8ff"], 14);   // a fumaça sai como brilho
     curZone = EX.zone;
-    exToast(t("Derrubou {bicho} num golpe só!", {bicho: theName(a)}) + " " + reward(a, G.lv - (a.lv || 1) >= ONE_HIT_LEVELS ? WEAK_XP : ONE_HIT_XP, !en.aquatic).join(" · "));
-    if (!en.aquatic) EX.loot.push({id: a.id, x: en.x, y: en.y, t0: performance.now()});   // a pele fica no chão até ele passar por cima (peixe: vai direto para a bolsa)
+    exToast(t("Acalmou {bicho} num golpe só!", {bicho: theName(a)}) + " " + reward(a, G.lv - (a.lv || 1) >= ONE_HIT_LEVELS ? WEAK_XP : ONE_HIT_XP, !en.aquatic).join(" · "));
+    if (!en.aquatic) EX.loot.push({id: a.id, x: en.x, y: en.y, t0: performance.now()});   // a lembrança fica no chão até ele passar por cima (peixe: vai direto para a bolsa)
     exHud();
     return;
   }
@@ -502,12 +510,18 @@ function drawAimBow(x, X, Y, a, pull, nocked, now) {
   }
 }
 function drawAnimalEnt(x, en, cx, cy, now) {
+  const c = en.calm, el = c ? now - c.t0 : 0, run = c && !en.aquatic ? Math.max(0, el - CALM_WAIT) / 1000 * CALM_SPEED : 0;
+  if (c) { en.x = c.x0 + c.vx * run; en.y = c.y0 + c.vy * run; }   // acalmado: agradece parado e depois corre para longe do Rhanon
   const sx = snap(en.x - cx), sy = snap(en.y - cy), w = en.w, hg = en.h;
   if (sx < -40 || sx > VIEW_W + 40 || sy < -8 || sy > VIEW_H + 40) return;
   let bob = (en.vx || en.vy || en.state === "chase") ? Math.floor(en.walk / 5) % 2 : Math.floor(now / 500) % 2, img = en.img;
-  if (!en.alive) { img = en.ko; bob = 0; if (en.koUntil - now < 400 && Math.floor(now / 80) % 2) return; }   // desmaiado, pisca e some
+  if (c) bob = run ? Math.floor(run / 4) % 2 : Math.floor(el / 160) % 2;   // pulinho de alegria, depois as patas correndo
+  if (c && en.koUntil - now < 350 && Math.floor(now / 70) % 2) return;   // já longe: pisca e some no mato
+  if (c) { if (bob && en.img2) img = en.img2; bob = run ? 0 : bob * 2; }
+  else if (!en.alive) { img = en.ko; bob = 0; if (en.koUntil - now < 400 && Math.floor(now / 80) % 2) return; }   // desmaiado, pisca e some
   else if (en.img2) { if (bob) img = en.img2; bob = 0; if (en.blink && (now + en.homeX * 7) % 3600 < 140) img = en.blink; }   // traço novo: troca de quadro e pisca
-  if (en.aquatic && en.alive) {   // na água: só a parte de cima aparece, com marolinhas em volta
+  if (c && el < CALM_WAIT + 300) drawThanks(x, en, sx, sy - hg - 6 - Math.min(4, el / 120), el);
+  if (en.aquatic && (en.alive || c)) {   // na água: só a parte de cima aparece, com marolinhas em volta
     const vis = Math.round(hg * .6), top = sy - vis + 2 + (Math.floor(now / 400 + en.x) % 2), sh = img.height * .6;
     x.save(); if (en.a.tint) x.filter = en.a.tint;
     if (en.face > 0) { x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, 0, 0, img.width, sh, -Math.round(w / 2), top, w, vis); }
@@ -524,6 +538,23 @@ function drawAnimalEnt(x, en, cx, cy, now) {
   else x.drawImage(img, sx - Math.round(w / 2), sy - hg - bob, w, hg);
   x.restore();
   grassOver(x, en, cx, cy);
+}
+// bicho acalmado (golpe só ou vitória na batalha): agradece num balãozinho e corre para longe do Rhanon, para o mato
+const CALM_WAIT = 700, CALM_SPEED = 120, CALM_RUN = 1000;   // ms parado agradecendo, pixels/s correndo, ms correndo até sumir
+const BIRDS = new Set(["harpia", "coruja", "garca", "macarico", "urubu", "soco", "pombo", "urubu_porto", "gaivota", "gaviao_real"]);
+function exCalm(en, now = performance.now()) {
+  const h = EX.hero, dx = en.x - h.x, dy = en.y - h.y, n = Math.hypot(dx, dy) || 1;
+  en.alive = false; en.calm = {t0: now, x0: en.x, y0: en.y, vx: dx / n, vy: dy / n}; en.face = dx > 0 ? 1 : -1;
+  en.koUntil = now + CALM_WAIT + (en.aquatic ? 500 : CALM_RUN);
+}
+// balãozinho de agradecimento: coração; passarinho canta (nota); o macaco faz joinha; gente (malandro) não agradece
+function drawThanks(x, en, sx, top, el) {
+  if (MOTION[en.a.id] === "person") return;
+  const g = en.a.id === "macaco" ? "thumb" : BIRDS.has(en.a.id) ? "note" : "heart", col = {heart: "#e5001c", note: "#3a4ac8", thumb: "#c8902a"}[g];
+  const bx = Math.round(sx - 5), by = Math.round(top - 9), pop = el < 120 ? 1 : 0;
+  x.fillStyle = OUTLINE; x.fillRect(bx - 1 + pop, by - 1 + pop, 11 - pop * 2, 9 - pop * 2); x.fillRect(bx + 3, by + 8, 3, 2);
+  x.fillStyle = "#ffffff"; x.fillRect(bx + pop, by + pop, 9 - pop * 2, 7 - pop * 2); x.fillRect(bx + 4, by + 7, 1, 2);
+  if (!pop) glyphP(x, g, col, bx + 2, by + 1);
 }
 // etiqueta de nível (verde = cai com um golpe, vermelha = chefe) e "!" quando o bicho vê o Rhanon
 function drawAnimalTags(x, en, cx, cy, now) {
@@ -564,7 +595,7 @@ function exDraw(now) {
     if (ch === "F") drawFire(x, sx, sy, now);
   }
   EX.loot.forEach(l => drawLoot(x, l, cx, cy, now));   // no chão, embaixo de todo mundo
-  const alive = EX.ents.filter(en => en.alive), knocked = EX.ents.filter(en => !en.alive && en.ko && en.koUntil > now);
+  const alive = EX.ents.filter(en => en.alive), knocked = EX.ents.filter(en => !en.alive && (en.calm || en.ko) && en.koUntil > now);
   const people = EX.spots.filter(s => PEOPLE.includes(s.kind)).map(s => ({y: s.y + 5, draw: () => drawNpc(x, s, cx, cy, now)}));
   if (EX.bus) people.push({y: EX.bus.y + EX.bus.h, draw: () => drawBus(x, EX.bus, cx, cy, now)});
   EX.spots.filter(s => s.kind === "lembranca").forEach(s => people.push({y: s.y + 4, draw: () => drawMemento(x, s, cx, cy, now)}));
@@ -675,8 +706,21 @@ function exRematch(spot) {
   const en = makeAnimalEnt(rematchBoss(), spot.tx, spot.ty); en.rematch = true;
   EX.ents.push(en); exStartBattle(en, {rematch: true});
 }
-// lembrança: estaca com a pele do chefe pendurada e um brilho subindo de vez em quando
+// chefe aliado: ele mesmo, calmo, no lugar onde foi acalmado (respirando, piscando e de vez em quando um coração);
+// sem desenho em traço novo, fica a estaca antiga com o brilho
 function drawMemento(x, s, cx, cy, now) {
+  if (!s.ally) { const b = rematchBoss(); s.ally = b ? makeAnimalEnt(b, s.tx, s.ty) : null; if (s.ally) s.ally.face = 1; }
+  const al = s.ally;
+  if (al && al.img2) {
+    const sx = Math.round(s.x - cx), sy = Math.round(s.y - cy) + 6, w = al.w, hg = al.h, f = Math.floor(now / 600) % 2;
+    const img = al.blink && now % 4200 < 140 ? al.blink : f ? al.img2 : al.img;
+    drawShadow(x, sx, sy, Math.max(8, Math.round(w * .7)));
+    x.save(); if (al.a.tint) x.filter = al.a.tint; x.globalAlpha = .95;
+    x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -Math.round(w / 2), sy - hg, w, hg); x.restore();
+    const p = now % 5200;
+    if (p < 900) drawThanks(x, al, sx, sy - hg - 6 - p / 300, p);
+    return;
+  }
   const sx = Math.round(s.x - cx), sy = Math.round(s.y - cy) + 4;
   x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(sx - 6, sy, 12, 2);
   x.fillStyle = OUTLINE; x.fillRect(sx - 2, sy - 16, 4, 17); x.fillStyle = "#9c6339"; x.fillRect(sx - 1, sy - 15, 2, 15);   // estaca
@@ -688,8 +732,8 @@ function drawMemento(x, s, cx, cy, now) {
 }
 const SPOTS = {F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", X: "xama", P: "aldeao", Q: "cabine", U: "onibus"};
 const PEOPLE = ["peles", "comida", "artesao", "armeiro", "xama", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender peles", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o xamã", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "ver a lembrança"};
-const VILLAGER_NAME = {aldeao1: "Caçador", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
+const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "falar com o chefe"};
+const VILLAGER_NAME = {aldeao1: "Mateiro", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 const BELEM_TIPS = [
   "Aqui na capital tem malandro esperto, segura a bolsa! Se um fi de rapariga desses levar teu dinheiro, vence ele que ele devolve.",
@@ -703,8 +747,8 @@ const BELEM_TIPS = [
   "Sentiu esse pitiú? É peixe fresco, maninho. Cheiro de Ver-o-Peso."
 ];
 const VILLAGER_TIPS = [
-  "O xamã da aldeia faz talismã com as peles dos chefes. Cada chefe deixa uma, duas, até três. Revanche serve pra isso, viu?",
-  "Etiqueta verde em cima do bicho? Esse aí cai com uma lançada só.",
+  "O Pajé faz talismã com o luar dos chefes. Cada chefe acalmado deixa um, dois, até três. E chefe acalmado vira amigo: dá pra treinar com ele, viu?",
+  "Etiqueta verde em cima do bicho? Esse aí se acalma com uma lançada só.",
   "Bicho se encolheu tremendo? Vai dar o bote. Aperta Z quando o anel ficar verde que tu bloqueia metade.",
   "Acerta o bicho primeiro, na lança (Z) ou na flecha (X), que o primeiro turno da briga é teu.",
   "Três tempos certos seguidos na briga, golpe perfeito ou bloqueio, enchem a Fúria: a lança vira três estocadas de uma vez. Pai d'égua!",
@@ -715,7 +759,7 @@ const VILLAGER_TIPS = [
   "Na fogueira da aldeia tu descansa até a noite ou dorme até o outro dia. As fogueiras das trilhas recuperam tudo.",
   "De noite a mata muda: morcego, coruja, lobo-guará... e dizem que o Chupa-cabra anda rondando. Égua, tenho é medo.",
   "Contam que na mata fechada passa uma mula sem cabeça, cuspindo fogo pelo pescoço. E no lago... o Boitatá. Visagem das brabas.",
-  "O vendedor da feira paga bem por couro de jacaré. Dizem, né."
+  "Jacaré troca de dente a vida inteira. O vendedor da feira paga bem pelos que ele perde."
 ];
 // ponto de conversa colado no Rhanon (o mais perto)
 function nearSpot() {
@@ -776,17 +820,17 @@ function exOpenDialog(kind, msg, look) {
     btn(`${t("Dormir até o dia seguinte")} (R$ ${PENSAO.dormir})`, nap("dormir"), false, d);
   }
   else if (kind === "tenda") { say(t("Tenda"), t("A tenda do Rhanon. Dormir recupera tudo, mas o dia passa.")); btn(t("Dormir"), () => exNap("dormir"), false, d); }
-  else if (kind === "peles") { say(t("Comprador de peles"), t("Couro bom vira dinheiro bom. Mostra aí o que tu caçou.")); peltButtons(d); }
+  else if (kind === "peles") { say(t("Comprador de lembranças"), t("Pena, dente, pele que a cobra largou... tudo vira artesanato. Mostra aí o que a mata te deu.")); peltButtons(d); }
   else if (kind === "comida") { say(t("Barraca de comida"), t("Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!")); foodButtons(d); }
   else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão e tocha pra espantar bicho. Arma e armadura é com o armeiro, ali na barraca do meio. Quanto mais forte tu ficar, mais coisa eu te mostro.")); gearButtons(d); }
-  else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, armadura de couro... Me traz as peles certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
-  else if (kind === "xama") { say(t("Xamã"), t("Todo chefe que tu derruba deixa um pedaço da força dele. Me traz as peles do chefe que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem força de chefe nenhum pra eu trabalhar. Vence um chefe e me traz as peles dele."), d);
+  else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
+  else if (kind === "xama") { say(t("Pajé"), t("Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem luar de chefe nenhum pra eu trabalhar. Acalma um chefe e me traz o luar dele."), d);
     if (Object.keys(G.skills).length) btn(t("Esquecer habilidades · R$ {n}", {n: SKILL_RESET(G.lv)}), ask(t("Esquecer todas as habilidades por R$ {n}? Os pontos voltam para gastar de novo.", {n: SKILL_RESET(G.lv)}), skillReset), G.money < SKILL_RESET(G.lv), d); }
   else if (kind === "inventario") { say(t("Bolsa"), invSummary()); invButtons(d); }
   else if (kind === "lembranca") {   // revanche com o chefe vencido
     const b = rematchBoss(), spot = nearSpot() || EX.spots.find(s => s.kind === "lembranca");
-    say(t("Lembrança de {chefe}", {chefe: b.name}), t("Foi aqui que {chefe} caiu. Enfrentar de novo? Vale de 1 a 3 peles e metade do XP.", {chefe: theName(b)}));
-    btn(t("Enfrentar de novo"), () => exRematch(spot), false, d);
+    say(t("Aliado: {chefe}", {chefe: b.name}), t("{chefe} voltou a si e agradece a ajuda. Quer treinar? Vale de 1 a 3 luares e metade do XP.", {chefe: theName(b, true)}));
+    btn(t("Treinar"), () => exRematch(spot), false, d);
   }
   else if (kind === "cabine") busCabin(say, d);
   else if (kind === "onibus") busDoor(say, d);
@@ -803,7 +847,7 @@ function busCabin(say, d) {
   if (EX.zone === "terminal") return say(t("Guichê do terminal"), G.passagem ? t("Tua passagem vale ida e volta. O ônibus pra Ananindeua sai assim que tu subir.") : t("Sem passagem não embarca, maninho."));
   if (G.passagem) return say(t("Cobrador"), t("Passagem na mão! É só subir no ônibus. Vale ida e volta: do terminal de Belém tu volta quando quiser."));
   if (!BUS.open) return say(t("Cobrador"), t("O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!"));
-  say(t("Cobrador"), t("Passagem pra Belém, a capital: R$ {n}, ida e volta. Tu tem R$ {tem}.", {n: BUS.price, tem: G.money}) + (G.money < BUS.price ? " " + t("Faltam R$ {n}. Pele de bicho forte vale bem mais na feira, viu?", {n: BUS.price - G.money}) : ""));
+  say(t("Cobrador"), t("Passagem pra Belém, a capital: R$ {n}, ida e volta. Tu tem R$ {tem}.", {n: BUS.price, tem: G.money}) + (G.money < BUS.price ? " " + t("Faltam R$ {n}. Lembrança de bicho forte vale bem mais na feira, viu?", {n: BUS.price - G.money}) : ""));
   btn(t("Comprar passagem · R$ {n}", {n: BUS.price}), ask(t("Comprar a passagem para Belém por R$ {n}?", {n: BUS.price}), () => {
     if (G.passagem || G.money < BUS.price) return;
     G.money -= BUS.price; G.passagem = true; save(); sfx("more"); exHud();
@@ -960,9 +1004,9 @@ const TUTORIAL = [
   "Pra andar: setas ou W A S D. Shift (ou C) é a esquiva: tu rola e passa pelo bote do bicho sem levar.",
   "Z (ou Espaço) é a lançada. Também serve pra conversar com o pessoal e usar a fogueira e as barracas.",
   "X atira flecha, mas só depois que tu comprar um arco com o armeiro da feira. No mouse tu mira no cursor: botão esquerdo golpeia, o direito atira.",
-  "I abre a bolsa, com comida e peles, e E abre o equipamento pra trocar arma e roupa. Nos menus: setas escolhem, Z confirma, X volta. Esc sai da fase.",
+  "I abre a bolsa, com comida e lembranças, e E abre o equipamento pra trocar arma e roupa. Nos menus: setas escolhem, Z confirma, X volta. Esc sai da fase.",
   "Na briga, quando aparecer o anel com Z, aperta Z na hora que ele ficar verde: o golpe sai perfeito, ou tu bloqueia metade do ataque do bicho.",
-  "Bicho com etiqueta verde cai com uma lançada só. E se tu acertar primeiro, começa a briga na frente. Bora, e não vai ficar panema!"
+  "Bicho com etiqueta verde se acalma com uma lançada só. E se tu acertar primeiro, começa a briga na frente. Bora, e não vai ficar panema!"
 ];
 function startTutorial() { EX.tutPage = 0; showTutorial(); }
 function showTutorial() {

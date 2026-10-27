@@ -51,12 +51,12 @@ function closeSkills() {
   $("habil").hidden = true; sfx("blip");
   if (EX && !$("explore").hidden && EX.dialog === "inventario") exOpenDialog("inventario");
 }
-// xamã: esquecer tudo devolve os pontos (custa SKILL_RESET)
+// Pajé: esquecer tudo devolve os pontos (custa SKILL_RESET)
 function skillReset() {
   const n = SKILL_RESET(G.lv);
   if (G.money < n || !Object.keys(G.skills).length) return;
   G.money -= n; G.skills = {}; vit(); save(); sfx("look");
-  localDone("aldeia", t("O xamã sopra a fumaça: o Rhanon esqueceu as habilidades e recebeu os pontos de volta."));
+  localDone("aldeia", t("O Pajé sopra a fumaça: o Rhanon esqueceu as habilidades e recebeu os pontos de volta."));
 }
 function setupSkills() {
   $("habil").addEventListener("click", ev => { if (ev.target === $("habil")) closeSkills(); });

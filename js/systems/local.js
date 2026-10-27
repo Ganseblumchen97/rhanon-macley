@@ -17,7 +17,7 @@ function localDone(where, msg) {
 }
 function drawLocal() {
   vit();
-  $("lhud").textContent = `${t("Dia")} ${G.day}${G.night ? " " + t("(noite)") : ""} · ${t("Nv")} ${G.lv} · R$ ${G.money} · ${t("PV")} ${G.hp}/${maxHP(G.lv)} · ${t("PE")} ${G.sp}/${maxSP(G.lv)} · ${t("DEF")} ${defense()} · ${t("Itens")} ×${itemCount(G.items)} · ${t("Peles")} ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
+  $("lhud").textContent = `${t("Dia")} ${G.day}${G.night ? " " + t("(noite)") : ""} · ${t("Nv")} ${G.lv} · R$ ${G.money} · ${t("PV")} ${G.hp}/${maxHP(G.lv)} · ${t("PE")} ${G.sp}/${maxSP(G.lv)} · ${t("DEF")} ${defense()} · ${t("Itens")} ×${itemCount(G.items)} · ${t("Lembranças")} ×${Object.values(G.pelts).reduce((a, n) => a + n, 0)}`;
   if ($("lnodes").dataset.city !== curCity()) buildLocalNodes();   // trocou de cidade (ônibus): redesenha o mapa
   CITY[curCity()].route.forEach(k => { const n = $("ln-" + k); n.classList.toggle("locked", !unlocked(k)); n.style.display = G.seen[k] ? "" : "none"; });
   document.querySelectorAll("#lroutes [data-b], #lbridges [data-b]").forEach(el => { el.style.display = G.seen[el.dataset.b] ? "" : "none"; });
@@ -31,7 +31,7 @@ function selectSub(id, msg) {
   if (!here) { btn(lock ? t("{lugar} (chefe de {antes} primeiro)", {lugar: l.n, antes: SUB[NEED[id]].n}) : t("Ir até lá"), () => goSub(id), lock, i); if (lock) lh(t("Abre quando cair o chefe de {antes}.", {antes: SUB[NEED[id]].n})); }
   else if (id === "aldeia" || id === "feira") {
     btn(id === "aldeia" ? t("Entrar na aldeia") : t("Entrar na feira"), () => startExplore(id), false, i);
-    lh(id === "aldeia" ? t("Lá dentro: fogueira pra descansar ou dormir, e aldeões com dicas.") : t("Lá dentro: comprador de peles, comida, artesão (roupas) e armeiro (armas)."));
+    lh(id === "aldeia" ? t("Lá dentro: fogueira pra descansar ou dormir, e aldeões com dicas.") : t("Lá dentro: comprador de lembranças, comida, artesão (roupas) e armeiro (armas)."));
   }
   else if (id === "parada") {   // cobrador vende a passagem para Belém (BUS em data/world.js)
     btn(t("Ir até a estrada"), () => startExplore(id), false, i);
@@ -39,7 +39,7 @@ function selectSub(id, msg) {
     else if (G.passagem) lh(t("Passagem comprada! Quando o ônibus pra Belém voltar a rodar, é só embarcar aqui."));
     else btn(t("Comprar passagem para Belém · R$ {n}", {n: BUS.price}), buyTicket, !BUS.open || G.money < BUS.price, i);
     if (!BUS.open) lh(t("O cobrador avisa: \"O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!\" (em breve: episódio 2)"));
-    else if (!G.passagem && G.money < BUS.price) lh(t("Faltam R$ {n}. Pele de bicho forte vale bem mais na feira.", {n: BUS.price - G.money}));
+    else if (!G.passagem && G.money < BUS.price) lh(t("Faltam R$ {n}. Lembrança de bicho forte vale bem mais na feira.", {n: BUS.price - G.money}));
   }
   else if (id === "terminal") {   // em Belém: o mesmo ônibus volta pela BR-316
     btn(t("Entrar no terminal"), () => startExplore(id), false, i);
@@ -48,14 +48,14 @@ function selectSub(id, msg) {
   }
   else if (id === "veropeso") {
     btn(t("Entrar no Ver-o-Peso"), () => startExplore(id), false, i);
-    lh(t("Lá dentro: peles, comida, artesão, armeiro e uma rede na pensão."));
+    lh(t("Lá dentro: lembranças, comida, artesão, armeiro e uma rede na pensão."));
   }
   else if (z) {
     btn(t("Explorar"), () => startExplore(id), false, i);
     const boss = ANIMALS.find(a => a.id === z.boss);
-    if (G.night) lh(BS()[bossKey(id)] ? t("{chefe} já caiu ✓", {chefe: theName(boss, true)}) : t("É noite: os bichos são outros, e {chefe} ronda o fim da trilha.", {chefe: theName(boss)}));
+    if (G.night) lh(BS()[bossKey(id)] ? t("{chefe} já voltou a si ✓", {chefe: theName(boss, true)}) : t("É noite: os bichos são outros, e {chefe} ronda o fim da trilha.", {chefe: theName(boss)}));
     else lh(BS()[id] ? t("Chefe vencido ✓ · a passagem no fim da trilha tá aberta.") : t("{chefe} espera no fim da trilha.", {chefe: theName(boss, true)}));
-    if (G.hp < maxHP(G.lv) * .35) lh(t("Rhanon tá muito ferido. Melhor descansar na aldeia antes de caçar."));
+    if (G.hp < maxHP(G.lv) * .35) lh(t("Rhanon tá muito ferido. Melhor descansar na aldeia antes de voltar pra mata."));
   }
   if (msg) lh(msg);
   btn(t("Inventário"), showInv, false, i);
@@ -99,7 +99,7 @@ function busRide(city, toStage) {
     buildLocalNodes();
     if (toStage) { if (city === "belem") G.belemVisto = true; save(); return startExplore(G.sub); }   // desce do ônibus na fase do terminal (ou da BR-316)
     openLocal();   // entra na cidade de chegada, no terminal (ou na cabine da BR-316)
-    if (city === "belem" && !G.belemVisto) { G.belemVisto = true; save(); setTimeout(() => lh(t("Primeira vez na capital! Segue a trilha até o Ver-o-Peso: lá dá pra vender peles e dormir.")), 1300); }
+    if (city === "belem" && !G.belemVisto) { G.belemVisto = true; save(); setTimeout(() => lh(t("Primeira vez na capital! Segue a trilha até o Ver-o-Peso: lá dá pra vender lembranças e dormir.")), 1300); }
   };
   requestAnimationFrame(f);
 }
@@ -143,32 +143,32 @@ function goSub(id) {
   };
   requestAnimationFrame(f);
 }
-const peltName = id => PELT[id] || t("Pele de {bicho}", {bicho: ANIMALS.find(a => a.id === id).name.toLowerCase()});
+const peltName = id => PELT[id] || t("Lembrança de {bicho}", {bicho: ANIMALS.find(a => a.id === id).name.toLowerCase()});
 const peltValue = id => { const g = ANIMALS.find(a => a.id === id).gold; return Math.round((g[0] + g[1]) / 2); };
 const peltIds = () => Object.keys(G.pelts).filter(k => G.pelts[k] > 0);
 const peltsTotal = () => peltIds().reduce((a, k) => a + G.pelts[k] * peltValue(k), 0);
-// receitas com peles: as do armeiro (CRAFT) e os talismãs do xamã (CHARMS), como [id, item]
+// receitas com peles: as do armeiro (CRAFT) e os talismãs do Pajé (CHARMS), como [id, item]
 const RECIPES = () => [...GEAR_SLOTS.flatMap(slot => Object.entries(CRAFT[slot] || {})), ...Object.entries(CHARMS)];
 // o que ainda dá para fazer com essa pele (receita de algo que o Rhanon não tem): avisa antes de vender sem querer
 const peltUses = k => RECIPES().filter(([id, it]) => !G.owned[id] && it.craft[k]).map(([, it]) => it.n);
 const USE_TAG = () => `<small class="craft-use">${t("tem receita")}</small>`;
 const useWarn = names => ` <b class="warn">${t("Serve pra fazer: {itens}.", {itens: names.join(", ")})}</b>`;
-/* Lojas da feira, cada uma numa barraca: comprador de peles, comida, artesão (roupas e tocha) e armeiro (armas e armaduras). */
+/* Lojas da feira, cada uma numa barraca: comprador de lembranças, comida, artesão (roupas e tocha) e armeiro (armas e armaduras). */
 function peltButtons(i) {
   const ids = peltIds();
   const useful = ids.filter(k => peltUses(k).length);
   // "vender sobras": guarda o que o armeiro ainda vai pedir (peltKeep) e vende o resto
   const spare = sparesTotal(), kept = useful.filter(k => peltKeep(k) > 0);
-  if (spare > 0 && (ids.length > 1 || kept.length)) btn(t("Vender sobras · R$ {n}", {n: spare}), ask(t("Vender as peles que sobram por R$ {n}?", {n: spare}) + (kept.length ? ` ${t("Fica guardado: {peles}.", {peles: kept.map(k => `${peltName(k).toLowerCase()} ×${Math.min(G.pelts[k], peltKeep(k))}`).join(", ")})}` : ""), sellSpares), false, i);
+  if (spare > 0 && (ids.length > 1 || kept.length)) btn(t("Vender sobras · R$ {n}", {n: spare}), ask(t("Vender as lembranças que sobram por R$ {n}?", {n: spare}) + (kept.length ? ` ${t("Fica guardado: {peles}.", {peles: kept.map(k => `${peltName(k).toLowerCase()} ×${Math.min(G.pelts[k], peltKeep(k))}`).join(", ")})}` : ""), sellSpares), false, i);
   ids.forEach(k => { const u = peltUses(k); btn(t("Vender {pele} ×{n} · R$ {v}", {pele: peltName(k), n: G.pelts[k], v: G.pelts[k] * peltValue(k)}) + (u.length ? " " + USE_TAG() : ""), ask(t("Vender {pele} ×{n} por R$ {v}?", {pele: peltName(k).toLowerCase(), n: G.pelts[k], v: G.pelts[k] * peltValue(k)}) + (u.length ? useWarn(u) : ""), () => sell(k)), false, i); });
-  if (!ids.length) lh(t("Nenhuma pele pra vender ainda. Caça primeiro e volta aqui."), i);
+  if (!ids.length) lh(t("Nenhuma lembrança pra vender ainda. Acalma uns bichos e volta aqui."), i);
 }
 function foodButtons(i) { Object.entries(ITEMS).forEach(([id, it]) => btn(`${it.n} (${itemEffect(it)}) · R$ ${it.price}`, ask(t("Comprar {item} por R$ {n}?", {item: it.n.toLowerCase(), n: it.price}), () => buy(id)), G.money < it.price, i)); }
 function sell(k) {
   const n = G.pelts[k] || 0, v = n * peltValue(k); if (!n) return;
   G.money += v; G.pelts[k] = 0; save(); sfx("more"); localDone("feira", t("Vendeu {pele} ×{n} por R$ {v}.", {pele: peltName(k).toLowerCase(), n, v}));
 }
-// quantas peles k as receitas (armeiro e xamã) que o Rhanon ainda não tem pedem, somadas; o que passar disso é sobra
+// quantas peles k as receitas (armeiro e Pajé) que o Rhanon ainda não tem pedem, somadas; o que passar disso é sobra
 const peltKeep = k => RECIPES().filter(([id]) => !G.owned[id]).reduce((m, [, it]) => m + (it.craft[k] || 0), 0);
 const peltSpare = k => Math.max(0, (G.pelts[k] || 0) - peltKeep(k));
 const sparesTotal = () => peltIds().reduce((a, k) => a + peltSpare(k) * peltValue(k), 0);
@@ -206,7 +206,7 @@ function gearButtons(i) {
   if (!any) lh(t("O artesão não tem nada novo por enquanto."), i);
 }
 /* ---------- armeiro: nomes à esquerda; o escolhido mostra à direita o que precisa, quanto você tem e "Fabricar" ---------- */
-// o xamã só mostra o talismã de chefe que o Rhanon já venceu (de dia ou de noite, em qualquer zona)
+// o Pajé só mostra o talismã de chefe que o Rhanon já venceu (de dia ou de noite, em qualquer zona)
 const bossBeaten = id => (G.bestiary[id]?.wins || 0) > 0 || (G.pelts[id] || 0) > 0 ||
   Object.keys(ZONES).some(z => (ZONES[z].boss === id && BS()[z]) || (NIGHT_ZONES[z]?.boss === id && BS()[z + ":noite"]));
 // o que o talismã faz, em pedaços curtos: "ATQ +4 · 20% de chance de desviar do golpe"
@@ -214,7 +214,7 @@ const CHARM_FX = {dreno: "cura {n}% do dano que dá", queima: "{n}% de chance de
   turno: "{n}% de chance de agir de novo", encanto: "{n}% de chance do bicho perder a vez", esquiva: "{n}% de chance de desviar do golpe", espinho: "devolve {n}% do dano recebido"};
 const charmDesc = it => [it.atk && `${t("ATQ")} +${it.atk}`, it.def && `${t("DEF")} +${it.def}`, it.hp && `${t("PV")} +${it.hp}`, it.sp && `${t("PE")} +${it.sp}`,
   it.fx && t(CHARM_FX[it.fx], {n: it.ch})].filter(Boolean).join(" · ");
-// armas/arco com preço (só dinheiro) e tudo de CRAFT (peles + dinheiro), do menor nível para o maior; no xamã, os talismãs
+// armas/arco com preço (só dinheiro) e tudo de CRAFT (peles + dinheiro), do menor nível para o maior; no Pajé, os talismãs
 function forgeItems() {
   const out = [];
   if (EX && EX.dialog === "xama") return Object.entries(CHARMS).filter(([id, it]) => G.owned[id] || bossBeaten(Object.keys(it.craft)[0])).map(([id, it]) => ({slot: "amulet", id, it}));
@@ -250,12 +250,12 @@ function forgeSelect(id, quiet) {
   const b = document.createElement("button"), off = forgeLacks(it);
   b.className = "cmd forge-make"; b.type = "button"; b.innerHTML = `<span>${padBadge("z")}${t("Fabricar")}</span>`;   // a tecla some em tela de toque, como nos outros botões
   if (off) b.setAttribute("aria-disabled", "true");
-  b.addEventListener("click", () => { if (!forgeLacks(it)) ask((it.craft ? t("Fabricar {item}? Gasta R$ {n} e as peles da lista.", {item: it.n.toLowerCase(), n: forgeCost(it)}) : t("Fabricar {item}? Gasta R$ {n}.", {item: it.n.toLowerCase(), n: forgeCost(it)})) + " " + gearCmp(o.slot, it), () => forgeMake(o))(); });
+  b.addEventListener("click", () => { if (!forgeLacks(it)) ask((it.craft ? t("Fabricar {item}? Gasta R$ {n} e as lembranças da lista.", {item: it.n.toLowerCase(), n: forgeCost(it)}) : t("Fabricar {item}? Gasta R$ {n}.", {item: it.n.toLowerCase(), n: forgeCost(it)})) + " " + gearCmp(o.slot, it), () => forgeMake(o))(); });
   card.appendChild(b);
 }
 // teclado no armeiro: setas escolhem o item, Z/Enter/Espaço fabricam (devolve true se usou a tecla)
 function forgeKey(ev) {
-  if (!$("exDialog").querySelector(".forge")) return false;   // xamã sem talismã para mostrar: painel comum
+  if (!$("exDialog").querySelector(".forge")) return false;   // Pajé sem talismã para mostrar: painel comum
   if (ev.key === "ArrowUp" || ev.key === "ArrowDown") {
     ev.preventDefault();
     const items = forgeItems(), k = items.findIndex(o => o.id === EX.forgeSel);
@@ -269,7 +269,7 @@ function forgeKey(ev) {
 function forgeMake({slot, id, it}) {
   Object.entries(it.craft || {}).forEach(([k, n]) => { G.pelts[k] -= n; });
   G.money -= forgeCost(it); G.owned[id] = true; G.equip[slot] = id; vit(); save(); sfx("forja");
-  if (slot === "amulet") return localDone("aldeia", t("O xamã fez: {item}. Já tá no pescoço.", {item: it.n}));
+  if (slot === "amulet") return localDone("aldeia", t("O Pajé fez: {item}. Já tá no pescoço.", {item: it.n}));
   localDone("feira", (slot === "torso" || slot === "legs" ? t("O armeiro fez: {item}. Já tá no corpo.", {item: it.n}) : t("O armeiro fez: {item}. Já tá na mão.", {item: it.n})) + (slot === "ranged" ? " " + t("Na exploração, X atira flecha.") : ""));
 }
 function buySpecial(id) {
@@ -287,7 +287,7 @@ function buyGear(slot, id) {
 // resumo da bolsa: roupa e arma ficam no Equipamento (E); aqui só a defesa, o pedido e o valor das peles
 function invSummary() {
   const ids = peltIds();
-  return t("Defesa: {def} · Dinheiro: R$ {n}", {def: defense(), n: G.money}) + (ids.length ? " · " + t("Peles valem R$ {n} na feira", {n: peltsTotal()}) : "") + questLine();
+  return t("Defesa: {def} · Dinheiro: R$ {n}", {def: defense(), n: G.money}) + (ids.length ? " · " + t("Lembranças valem R$ {n} na feira", {n: peltsTotal()}) : "") + questLine();
 }
 /* lista da bolsa: comida (Z come) e materiais (peles), mostrando BAG_ROWS linhas e rolando com as setas */
 const BAG_ROWS = 10;
@@ -306,7 +306,7 @@ function invButtons(i) {
   else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">${t("Nada para comer. A barraca de comida da feira vende.")}</div>`);
   head(t("Materiais"));
   if (ids.length) ids.forEach(k => row(peltName(k), G.pelts[k], t("R$ {n} cada", {n: peltValue(k)}) + (peltUses(k).length ? " " + USE_TAG() : "")));
-  else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">${t("Nenhuma pele ainda. Vença bichos para conseguir peles.")}</div>`);
+  else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">${t("Nenhuma lembrança ainda. Acalme bichos para ganhar lembranças.")}</div>`);
   i.appendChild(list);
   btn(t("Equipamento"), () => openEquip(), false, i);   // trocar arma e roupa (systems/equip.js)
   btn(t("Habilidades") + (skillPoints() ? ` <small>${t("{n} pontos", {n: skillPoints()})}</small>` : ""), () => openSkills(), false, i);   // systems/skills.js

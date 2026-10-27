@@ -18,7 +18,7 @@ const GL = {"0":"111101101101111","1":"010110010010111","2":"111001111100111","3
 
 const GLYPH = {
   z: ["1111", "0010", "0100", "1111"], star: ["010", "111", "010"], note: ["0110", "0101", "0100", "1100"],
-  ring: ["010", "101", "010"], dot: ["1"], bang: ["1", "1", "1", "0", "1"], heart: ["01010", "11111", "11111", "01110", "00100"],
+  ring: ["010", "101", "010"], dot: ["1"], bang: ["1", "1", "1", "0", "1"], heart: ["01010", "11111", "11111", "01110", "00100"], thumb: ["00100", "00100", "11110", "11111", "11110"],
   drop: ["010", "111", "111"], leaf: ["01", "11", "10"], puff: ["11", "11"], q: ["0110", "1001", "0010", "0100", "0000", "0100"],
   wave: ["0110", "1001"], spark: ["101", "010", "101"]
 };
@@ -38,7 +38,7 @@ const VILLAGER_LOOK = {
   urbano1: {pal: {g: "#e5401c", G: "#a82a10", r: "#1a1426", s: "#b47a48", S: "#8a5a32"}, shirt: ["#e8c040", "#b8902a"], pants: ["#2a2a30", "#18181c"], longHair: true, prop: "basket"},
   urbano2: {pal: {g: "#3f9a5c", G: "#25663a", r: "#e5401c", h: "#3a2a22"}, shirt: ["#3f9a5c", "#2a6a3e"], pants: ["#c8402a", "#8a2a1a"], longHair: true, prop: "basket"},
   urbano3: {pal: {r: "#1a1426", s: "#9a6236", S: "#6e4424"}, shirt: ["#c8402a", "#8a2a1a"], pants: ["#26364a", "#18222f"], noBand: true, prop: "pelt"},
-  // xamã: cabelo branco comprido, cocar roxo com pena azul, pintura de jenipapo, colar e o cajado com maracá
+  // Pajé: cabelo branco comprido, cocar roxo com pena azul, pintura de jenipapo, colar e o cajado com maracá
   xama: {pal: {h: "#d8d0c4", H: "#f4ecd8", g: "#7a2a8a", G: "#4e1a5a", r: "#1a1426", s: "#9a6236", S: "#6e4424", t: "#2a2230", T: "#17121c"}, feather: "#3fb0d8", longHair: true, charm: "#f4ecd8", prop: "staff"},
   armeiro: {pal: {h: "#3a2a22", g: "#e5741c", G: "#a8480e", r: "#2a2230", s: "#9a6236", S: "#6e4424", t: "#5a4a40", T: "#3a2e28"}, feather: "#ffffff", top: "#7d4f2c", prop: "spear"}
 };

@@ -918,3 +918,5 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .over-xp small{font:700 13px var(--mono);color:#fff;text-shadow:2px 2px 0 #06120a}
 .over-xp.up i{background:linear-gradient(180deg,#fff27a,#e8b020)}
 .over-xp[hidden]{display:none}
+/* bicho de água acalmado (beastThanks): afunda devagar e some */
+#beast.submerged.dive canvas.actor{transition:translate .8s steps(8),opacity .8s steps(8);translate:0 40%;opacity:0}
