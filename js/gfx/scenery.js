@@ -11,6 +11,7 @@ const SCENES = {
   rio:         {sky: ["#9ad4e8", "#7cc4a8", "#5aae78"], far: "#3a8a45", trees: "copa", plat: "areia", water: true},
   igarape:     {sky: ["#5a9a62", "#4a8a52", "#3c7a46"], far: "#24603a", trees: "copa", plat: "barro", water: true, vines: true},
   manguezal:   {sky: ["#a8b8a0", "#8aa08a", "#6e8a70"], far: "#3a5a32", trees: "mangue", plat: "lama", water: true},
+  mangueilha:  {sky: ["#d8e4c0", "#b4ccac", "#86a88a"], far: "#3a5a32", trees: "mangue", plat: "lama", water: true},   // São Luís: o mangue com o sol do Nordeste
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
   cidadevelha: {sky: ["#f0b080", "#e8a070", "#b88a9a"], far: "#7a6a8a", trees: "casario", plat: "pedra"},
@@ -74,7 +75,7 @@ function drawScenery(force) {
   else for (let i = 0; i < W * (H - G0) / 300; i++) {   // tufos, florzinhas e pedrinhas
     const tx = rnd() * W, ty = G0 + 2 + rnd() * (H - G0), c = rnd();
     if (c < .7) { rect(P.tall, tx, ty - 2, 1, 2); rect(P.tall, tx + 2, ty - 3, 1, 3); rect(P.tallHi, tx + 1, ty - 4, 1, 4); }
-    else if (c < .82 && zone !== "manguezal") { rect(["#ffd23a", "#ff8aa8", "#ffffff"][Math.floor(rnd() * 3)], tx, ty - 1, 1, 1); rect(P.leaf2, tx, ty, 1, 1); }
+    else if (c < .82 && !zone.startsWith("mangue")) { rect(["#ffd23a", "#ff8aa8", "#ffffff"][Math.floor(rnd() * 3)], tx, ty - 1, 1, 1); rect(P.leaf2, tx, ty, 1, 1); }
     else { rect(P.rock2, tx, ty, 3, 1); rect(P.rock, tx, ty - 1, 3, 1); }
   }
   // na beira da água: juncos

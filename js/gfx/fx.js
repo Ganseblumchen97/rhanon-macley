@@ -157,7 +157,7 @@ const PFX = (() => {
     const W = cv.width, H = cv.height, z = curZone;
     // folhas caem só pela metade de cima do palco, longe da placa com o nome do bicho
     const lx = () => W * (.3 + Math.random() * .7);
-    if (z === "rio" || z === "igarape" || z === "manguezal" || z === "varzea") { amb = .45; emit("ring", ["#bff3ff", "#86d6ff"], Math.random() * W, H * (.78 + Math.random() * .18), 0, -5 - Math.random() * 4, 3, {wob: 3}); }
+    if (z === "rio" || z === "igarape" || z === "manguezal" || z === "mangueilha" || z === "varzea") { amb = .45; emit("ring", ["#bff3ff", "#86d6ff"], Math.random() * W, H * (.78 + Math.random() * .18), 0, -5 - Math.random() * 4, 3, {wob: 3}); }
     else if (z === "fechada") {
       amb = .4;
       if (Math.random() < .3) emit("leaf", ["#1f5a32", "#2f7a3f", "#7a6a2a"], lx(), -3, 3 + Math.random() * 3, 6 + Math.random() * 4, 6, {wob: 6});

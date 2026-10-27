@@ -25,7 +25,8 @@ function stepWork(s, t) {
    "localNight" (Ananindeua à noite), "battleCapo" (batalha na mata: a roda de capoeira acelerada), "battleCarimbo"
    (batalha na água: carimbó), "battleGuitarrada" (batalha em Belém: guitarrada), "localNordeste" (São Luís e o
    mapa do Maranhão: toada de bumba-meu-boi com sanfona e triângulo, e o tema do Nordeste), "pytuna" (cenas de Pytuna,
-   com o tema dele), "jaci" (fim de capítulo: a lua volta a brilhar, com o tema dela), "battleBoss" (chefe: abertura
+   com o tema dele), "jaci" (fim de capítulo: a lua volta a brilhar, com o tema dela), "battleNordeste" (batalha em São Luís: forró
+   com o tema do Nordeste), "battleBoss" (chefe: abertura
    sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
@@ -572,6 +573,27 @@ const MUS = (() => {
         if (s === 0) bell(mtof(chord.notes[3] + 12), t, .014, 2.4);
         const m = this.melody && this.melody[i % 128];
         if (m) { flute(mtof(m.note), t, m.len * d * .95, .03); if (lap % 2) bell(mtof(m.note + 12), t, .01, 1.6); }
+      }
+    },
+    // batalha no Nordeste: forró acelerado (baião de batalha) com zabumba, triângulo, sanfona puxando os acordes e o tema
+    // do Nordeste (NORDESTE_THEME) na sanfona; matraca do boi por baixo. Forma A - A' (oitava acima, com floreios) - A - C
+    // (C = ponte só de zabumba e triângulo com virada crescente)
+    battleNordeste: {
+      bpm: 148, wet: .22, level: .46, swing: .05, form: ["A", "A2", "A", "C"], melody: null,
+      play(i, t, d) {
+        const N = TRACKS.localNordeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4], chord = N.chords[Math.floor(barIn / 2)];
+        const bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "C" ? null : themeLine(NORDESTE_THEME.A, part === "A2" ? 12 : 0, part === "A2"); hat(t, .02, true); }   // tema do Nordeste
+        triangulo(t, s % 4 === 2 ? .012 : .006, s % 4 === 2);
+        if (s === 0 || s === 6 || s === 8) kick(t, s === 6 ? .08 : .11);   // zabumba no baião
+        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) tapa(t, .03);
+        if (bridge) return;
+        if (s % 4 === 1) noiseHit(t, .02, .008, "bandpass", 2600, 3);   // matraca
+        if (s === 0 || s === 6 || s === 8 || s === 12) synth("triangle", mtof(chord.bass + (s === 6 || s === 12 ? 7 : 0)), t, d * 1.6, .1);
+        if ([2, 6, 10, 14].includes(s)) chord.notes.slice(1).forEach(m => sanfona(mtof(m + 12), t, d * 1.1, .005));
+        if (s === 0 && barIn % 2 === 0) pad(chord.notes, t, d * 32, .006);
+        const m = this.melody && this.melody[i % 128];
+        if (m) { sanfona(mtof(m.note), t, m.len * d * .9, part === "A2" ? .02 : .018); if (part === "A2") flute(mtof(m.note + 12), t, m.len * d * .9, .012); }
       }
     },
     // batalha: a roda de capoeira acelerada (toque de São Bento Grande), com atabaque, pandeiro, baixo marcado

@@ -23,6 +23,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  mero: ["O Mero é o avô dos peixes do mangue, curumim. Tão velho que já viu a ilha nascer. Bravo assim, só de fumaça.", {r: "Ele me olhou com cara de quem pedia desculpa, vô."}, "Pedia mesmo. Bicho velho tem educação."],
+  serpente: ["Dizem que a Serpente dorme debaixo de São Luís, e no dia em que morder o rabo a ilha afunda.", "A fumaça fez ela se mexer no sono. O menino acalmou a bicha, e a ilha ficou no lugar.", {r: "Vô, ela ficou me encarando um tempão depois."}, "Encantado não esquece quem ajudou."],
   queixada_chefe: ["O primeiro chefe foi o queixada mais velho do bando. Quando a fumaça saiu dele, espirrou três vezes e voltou pro mato com os filhotes."],
   onca_rei: ["A Onça-Rei! Até eu tremi quando ele me contou. Era uma onça do tamanho de uma anta.", {r: "Do tamanho de uma capivara, vô."}, "Uma capivara bem grande, então."],
   cobra_grande: ["A Cobra-Grande dormia no fundo do rio fazia cem anos. Acordou de mau humor por causa da fumaça. Quem não acordaria?"],

@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.47.0 — o manguezal da ilha
+
+- São Luís ganhou a primeira trilha para lutar: o manguezal da ilha, saindo da Praia Grande pela esquerda. É para
+  quem já está perto do nível 28.
+- Bichos novos: o guará-vermelho, que sai em bando, a garça-moura, o siri-azul e o carcará. Cada um tem a sua
+  curiosidade no caderno e a sua fraqueza (quem voa não aguenta planta; quem vive na água, raio).
+- De dia, o chefe é o Mero, um peixe do tamanho de uma canoa que vive no canal. De noite aparece a Serpente
+  encantada, da lenda que diz que ela dorme debaixo de São Luís e afunda a ilha se morder o próprio rabo.
+- As lutas em São Luís tocam um forró acelerado com o tema do Nordeste na sanfona.
+
 ## 0.46.0 — os temas do Rhanon e de Jaci
 
 - O Rhanon ganhou um tema próprio, que começa com um salto para cima, como a estocada da lança. Ele toca na tela

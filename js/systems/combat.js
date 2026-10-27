@@ -18,6 +18,7 @@ function setBattleDecor(zone) {
 const BATTLE_WATER = new Set(["rio", "igarape", "manguezal", "varzea"]), BATTLE_CITY = new Set(["cidadevelha", "porto", "baixadas"]);
 function getBattleTrackFor(animal) {
   if (animal.boss) return "battleBoss";
+  if (curCity() === "saoluis" && !animal.bug) return "battleNordeste";   // Nordeste: o tema da região num forró de batalha
   return animal.bug ? "battleCapo" : BATTLE_CITY.has(curZone) ? "battleGuitarrada" : BATTLE_WATER.has(curZone) ? "battleCarimbo" : "battleCapo";
 }
 

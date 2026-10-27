@@ -882,6 +882,9 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   soco: (pose, f) => garca(pose, f, {b: "#9a7a52", B: "#6e5436", y: "#d8b040", Y: "#a88a2a", k: "#c8a040"}),   // socó-boi: a garça em marrom listrado
   cobra_cipo: cobra({b: "#6ab83a", B: "#3e8a24", k: "#a8e070"}, false),   // cobra-cipó: verde-folha, fina
   macarico: (pose, f) => garca(pose, f, {b: "#a8906a", B: "#7a6446", y: "#3a2a1a", Y: "#22180e", k: "#4a3a2a"}),   // maçarico: a garça em tons de areia
+  guara: (pose, f) => garca(pose, f, {b: "#e8402a", B: "#b02818", y: "#3a2418", Y: "#22140c", k: "#5a2a1a"}),   // guará: a garça em vermelho
+  garca_moura: (pose, f) => garca(pose, f, {b: "#8a96a8", B: "#5e6a7a", y: "#e8b030", Y: "#b88a20", k: "#2a3038"}),   // garça-moura: cinza-azulada
+  serpente: cobra({b: "#c8a030", B: "#8a6a18", k: "#fff2a0", eye: "#ff8a3a"}, false),   // Serpente encantada da ilha: dourada
   boto: (pose, f) => boto(pose, f, false), boto_encantado: (pose, f) => boto(pose, f, true),
   boitata: cobra({b: "#e8601c", B: "#a8300c", k: "#ffd23a", eye: "#fff3a0", flame: true, rattle: ["#e8d8a0", "#a89870"]}, false),
   sucuri: cobra({b: "#5a7a3a", B: "#3a5a24", k: "#1e2a14"}, false),

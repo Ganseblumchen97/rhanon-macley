@@ -73,19 +73,57 @@ const STAGES = {
   },
   // São Luís (Nordeste): a Praia Grande, centro histórico de casarão de azulejo, com a pensão (O), a feira e moradores
   praiagrande: {
-    safe: true, next: null,
+    safe: true, next: "mangueilha",
     rows: [
       "########################",
       "########################",
       "#..f....-.......OOO...f#",
       "#.KKK...-..KKK..OOO....#",
       "#..V....-...C..........#",
-      "#..................P..SE",
+      "G--------------....P..SE",
       "#..P....-..............#",
       "#.####..-..####....f...#",
       "#.####..-..####..P.....#",
       "#.......-..............#",
       "~~~~~~~~=~~~~~~~~~~~~~~~"
+    ]
+  },
+  // São Luís: o manguezal da ilha (gerado por tools/gerar_mapas.py)
+  mangueilha: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTT~~~TTTTTTTTTTTTTTTTTTTTTTTTT~~~TTT,.........T",
+      "TTTTTTTTTTTTTTT~~~TTTTTTTTT....,TTTTTTTTTTT~~~TT.--------S-E",
+      "TTTTTTTTTTTTTTT~~~TTTTTTT...a,.,.,,...TTTTT~~~TT,-......,,,T",
+      "TTTTTTTTTTTTTTT~~~TTTTTT,-------------..TTT~~~TT,-..f,f,,.oT",
+      "TTTTTTTTTTTTTTT~~~TTTTTT,-...,.......-..,.T~~~T.a-....,....T",
+      "TTTTTTTTTTTTTTT~~~TTTTTT.-....,.T~~~~=..a.T~~~...-,..,....TT",
+      "TTTTTTTTTTTTTTT~~~TTTTT,.-..TTTT~~~~~=~,.,T~~~...-...f.o.TTT",
+      "TTTTT~~~~~TTTTT~~~TTTT..,-,.,TTT~~~~~=~,TTT~~~...-....TTTTTT",
+      "TTTT~~~~~~~TTTT~~~TTT....-,,..TT~~~~~=~..,.~~~..a-....TTTTTT",
+      "TTTT~~~~~~~TTTT~~~TTT....-..,fTTT~~~~=...,a~~~...-...TTTTTTT",
+      "TTTT~~~~~~~TTTT~~~TTTo...-...fTTTTTT.-...,.~~~..,-.,TTTTTTTT",
+      "TTT..~~~~~.,TTT~~~TTTf.,.-...aTTTTTT.------===----,TTTTTTTTT",
+      "TTT..,a.,,..TTT~~~TTT.,..-...,TTTTTTT......~~~....TTTTTTTTTT",
+      "TT.---------,TT~~~TTTT...-.f,TTTTTTTTT.,...~~~,...TTTTTTTTTT",
+      "TT,-.....,.-.,T~~~TTTTT,,-a.TTTTT.TTTTT.,,,~~~TTTTTTTTTTTTTT",
+      "TT.-,,..f.a-..a~~~TTTTTT.-..,....,TTTTTTTTT~~~TTTTTTTTTTTTTT",
+      "Tf,-.......-..,~~~TTTTTT.----F----.TTTTTTTT~~~TTTTTTTTTTTTTT",
+      "T.,-.......-...~~~TTTTTTT.....,.,-.TTTTTTTT~~~TTTTTTTTTTTTTT",
+      "T,,-a.,.a.,-..,~~~TTTTTT.,....,.,-.TTTTTTTT~~~TTTTTTTTTTTTTT",
+      "T..-......,-...~~~TTTTTT,.,,,.,..-.TTTTTTTT~~~TTTT~~~TTTTTTT",
+      "T..-...,..,-...~~~TTTTTT.a.,o.,..-..TTTTTTT~~~TTT~~~~~TTTTTT",
+      "T.,-...T,.,-.,.~~~TTTTTTTf,f,.,a.-.,.TTTTTT~~~TTT~~~~~TTTTTT",
+      "T..-..TTT..-,..~~~TT.,a.........,-..,.TTTTT~~~TTT~~~~~TTTTTT",
+      "TT.-...TTT,-,.,~~~a..~~~~~...,,,.-.f,.TTTTT~~~TTTT~~~TTTTTTT",
+      "T..-.,.,TT,-...~~~..~~~~~~~,.....-....TTTTT~~~TTTTTTTTTTTTTT",
+      "T.,-..,..T.----===--=======-------,.,TTTTTT~~~TTTTTTTTTTTTTT",
+      "T.,-.,..fTT,.,.~~~,.~~~~~~~.,...a...TTTTTTT~~~TTTTTTTTTTTTTT",
+      "T---B,...TTT,,.~~~..f~~~~~.,fTTTTTTTTTTTTTT~~~TTTTTTTTTTTTTT",
+      "T...,.,.TTTTT..~~~TTf..,.,oTTTTTTTTTTTTTTTT~~~TTTTTTTTTTTTTT",
+      "TT.,...TTTTTTTT~~~TTTTTTTTTTTTTTTTTTTTTTTTT~~~TTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
   // BR-316 (fim da trilha de Ananindeua): a estrada em cima com o ônibus parado e a cabine do cobrador

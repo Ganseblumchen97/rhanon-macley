@@ -9,6 +9,7 @@ const TILE_PAL = {
   igarape: {g1: "#4f9a52", g2: "#438a48", tall: "#357a3e", tallHi: "#6ab85e", path: "#b89a66", path2: "#9a7e50", leaf: "#2a7a48", leaf2: "#1d5a36", leafHi: "#46a05a", trunk: "#5a3a22", rock: "#8a8a7e", rock2: "#5e5e54", water: "#4a5a2a", water2: "#8a9a4a", wood: "#c8a070", wood2: "#7a5a36"},
   // manguezal: chão de lama cinza-marrom, mangue de folha escura, água salobra esverdeada
   manguezal: {g1: "#7a7458", g2: "#6a6448", tall: "#5a5a3a", tallHi: "#8a8a5a", path: "#a08a62", path2: "#86704c", leaf: "#3a5a32", leaf2: "#2a4424", leafHi: "#5a7a44", trunk: "#5a4a3a", rock: "#8a8478", rock2: "#5e5a50", water: "#4a6a6a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30"},
+  mangueilha: {g1: "#7a7458", g2: "#6a6448", tall: "#5a5a3a", tallHi: "#8a8a5a", path: "#a08a62", path2: "#86704c", leaf: "#3a5a32", leaf2: "#2a4424", leafHi: "#5a7a44", trunk: "#5a4a3a", rock: "#8a8478", rock2: "#5e5a50", water: "#4a6a6a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30"},   // São Luís: o mesmo mangue
   // seringal: chão de folha seca, seringueiras de casca clara e copa verde-escura
   seringal: {g1: "#7a9a4a", g2: "#8a8a42", tall: "#5a7a32", tallHi: "#a8b85a", path: "#b8925a", path2: "#9a7844", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#c8b89a", rock: "#9a948a", rock2: "#6a645a", water: "#3a6a8a", water2: "#6a9ab8", wood: "#9c6339", wood2: "#6d4329"},
   // cidade: chão de pedra/calçada, rua de asfalto ou paralelepípedo, telhado de telha (porto: zinco); walls = cores das fachadas

@@ -62,7 +62,8 @@ function drawSmoke(x, cx, cy, k = 1, now = 0, alpha = 1) {
 }
 /* Luz de Jaci: quanto do Norte já foi acalmado (chefes de dia e de noite de Ananindeua e Belém). Clareia as noites e
    descobre a lua da faixa do anoitecer (moonCanvas). */
-const NORTE_BOSSES = () => Object.keys(ZONES).flatMap(z => [z, NIGHT_ZONES[z] ? z + ":noite" : null]).filter(Boolean);
+// chefes do Norte (zonas de Ananindeua e Belém), de dia e de noite: as zonas de outras regiões ficam de fora
+const NORTE_BOSSES = () => Object.keys(ZONES).filter(z => ["ananindeua", "belem"].includes(cityOf(z))).flatMap(z => [z, NIGHT_ZONES[z] ? z + ":noite" : null]).filter(Boolean);
 const jaciLight = () => { const all = NORTE_BOSSES(); return all.filter(k => BS()[k]).length / all.length; };
 // Pytuna aparece na exploração: a fumaça chega perto do Rhanon, fala (narra) e o vento leva ela embora
 function pytunaScene(lines, done) {
