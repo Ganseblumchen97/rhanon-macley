@@ -96,14 +96,12 @@ function padAim(gp, now) {
   EX.mouse = {x: h.x + EX.padAim.x * 40, y: h.y - 8 + EX.padAim.y * 40, t: now};   // a cruz da mira aparece como no mouse
   padSetActive(true);
 }
-// Opções abertas: mostra ao vivo o nome do controle, o modo e o que está apertado (ajuda a achar botão trocado)
+// Opções abertas: o nome do controle conectado (só troca quando o controle muda, para a janela não pular)
 function padLive() {
   const el = document.getElementById("padLive"); if (!el) return;
-  const gp = PAD.raw;
-  if (!gp) { el.textContent = t("Nenhum controle encontrado. Aperte um botão do controle."); return; }
-  const v = {nome: gp.id.slice(0, 48), modo: gp.mapping || t("próprio"), b: gp.buttons.map((b, i) => b.pressed ? i : null).filter(i => i !== null).join(", ") || "—",
-    e: gp.axes.map((a, i) => Math.abs(a) > .3 ? `${i}:${a.toFixed(1)}` : null).filter(Boolean).join(" ") || "—"};
-  el.textContent = t("{nome} · modo {modo} · botões: {b} · eixos: {e}", v);
+  const gp = PAD.raw, nome = gp && gp.id.replace(/\s*\(.*$/, "").slice(0, 48);
+  const txt = !gp ? t("Nenhum controle encontrado. Aperte um botão do controle.") : t("Controle: {nome}", {nome}) + (gp.mapping === "standard" ? "" : " · " + t("modo próprio"));
+  if (el.textContent !== txt) el.textContent = txt;
 }
 // tremidinha no golpe (hitImpact): forte = mais tempo e mais força; controles sem motor ignoram
 function padRumble(level) {

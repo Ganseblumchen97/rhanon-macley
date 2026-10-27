@@ -3,6 +3,13 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.34.2 — vitória com barra de XP
+
+- A fanfarra da vitória saiu. Agora o cartão de vitória mostra a barra de XP enchendo, com um som que sobe junto
+  (estilo Pokémon) e um "plim" no fim. Se passar de nível, a barra fica dourada, toca a subida de nível e ela
+  recomeça do zero no nível novo.
+- Nas Opções, a linha do controle mostra só o nome dele. Antes os números mudavam a cada toque e a janela pulava.
+
 ## 0.34.1 — controle nos menus, botões na tela e mira no analógico
 
 - Corrigido: a tela inicial, as Opções e o cartão do fim da luta não andavam com a cruz ou o analógico do controle

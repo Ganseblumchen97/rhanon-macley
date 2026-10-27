@@ -1039,8 +1039,8 @@ TX.fr = {
     "Teclado": "Clavier",
     "Controle: {z} golpe e confirma · {x} flecha e volta · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades · {st} começa · {sel} (segurar) pula cena · analógico direito mira na exploração": "Manette : {z} frapper et valider · {x} flèche et retour · {sh} esquive · {i} sac · {e} équiper · {h} compétences · {st} commence · {sel} (maintenir) passe la scène · le stick droit vise en exploration",
     "Nenhum controle encontrado. Aperte um botão do controle.": "Aucune manette trouvée. Appuie sur un bouton de la manette.",
-    "{nome} · modo {modo} · botões: {b} · eixos: {e}": "{nome} · mode {modo} · boutons : {b} · axes : {e}",
-    "próprio": "propre",
-    "Setas": "Flèches"
+    "Setas": "Flèches",
+    "Controle: {nome}": "Manette : {nome}",
+    "modo próprio": "mode propre"
   }
 };

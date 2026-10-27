@@ -295,7 +295,8 @@ function finish(kind) {
   // depois da fanfarra, a música do lugar volta baixinho enquanto o cartão de resultado está na tela
   setTimeout(() => { if (!$("over").hidden && mode === "hunt") musicStart(fromLocal || fromExplore ? "local" : "map"); }, 2800);
   busy = true; battleResult = kind;
-  musicStop(); keepVitals(kind); const rw = kind === "win" ? reward(e, e.rematch ? REMATCH_XP : 1) : []; if (kind === "win") $("beast").classList.add("dead"); fanfare(kind);
+  const xp0 = {lv: G.lv, xp: G.xp};   // para a barra de XP do cartão encher do ponto em que estava
+  musicStop(); keepVitals(kind); const rw = kind === "win" ? reward(e, e.rematch ? REMATCH_XP : 1, false, true) : []; if (kind === "win") $("beast").classList.add("dead"); fanfare(kind);
   // cartão: título, uma frase curta e, embaixo, o que ganhou ou perdeu (um item por linha)
   const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = curCity() === "belem" ? t("Acordou no Ver-o-Peso, com metade das forças") : t("Acordou na aldeia, com metade das forças");
   const T = {
@@ -310,7 +311,33 @@ function finish(kind) {
     const again = kind !== "lose" && !fromExplore;
     if (fromExplore && kind === "lose") $("toMap").textContent = curCity() === "belem" ? t("Voltar ao Ver-o-Peso") : t("Voltar à aldeia");
     $("again").style.display = again ? "" : "none"; $("over").hidden = false; (again ? $("again") : $("toMap")).focus();
+    overXp(kind === "win" ? xp0 : null);
   }, kind === "win" ? 1700 : kind === "lose" ? 1900 : 1150);
+}
+/* barra de XP no cartão da vitória: enche do XP de antes até o de agora com o som subindo (xpFillSound); se passar de
+   nível, enche até o fim, toca a subida de nível e recomeça do zero no nível novo */
+function overXp(from) {
+  const box = $("overXp"); box.hidden = !from; box.classList.remove("up"); if (!from) return;
+  const bar = box.querySelector("i"), txt = box.querySelector("small"), to = {lv: G.lv, xp: G.xp};
+  const legs = [];   // trechos: [nível, de, até] em frações da barra
+  for (let lv = from.lv; lv <= to.lv; lv++) legs.push([lv, lv === from.lv ? from.xp / need(lv) : 0, lv === to.lv ? to.xp / need(lv) : 1]);
+  const show = (lv, f) => { bar.style.width = (100 * f) + "%"; txt.textContent = `${t("Nv")} ${lv} · XP ${Math.round(f * need(lv))} / ${need(lv)}`; };
+  show(legs[0][0], legs[0][1]);
+  let k = 0;
+  const run = () => {
+    if (k >= legs.length || $("over").hidden) return;
+    const [lv, a, b] = legs[k++], dur = REDUCE ? 0 : Math.max(.25, (b - a) * 1.4), t0 = performance.now();
+    if (b <= a) { show(lv, b); return run(); }
+    xpFillSound(dur, a, b);
+    const step = now => {
+      const p = Math.min(1, (now - t0) / (dur * 1000 || 1)); show(lv, a + (b - a) * p);
+      if (p < 1) return requestAnimationFrame(step);
+      if (b >= 1 && k < legs.length) { levelUpFx(legs[k][0]); box.classList.add("up"); setTimeout(run, 900); }   // subiu: festa e recomeça no nível novo
+      else xpDing();
+    };
+    requestAnimationFrame(step);
+  };
+  setTimeout(run, 350);
 }
 // golpe do bicho: anima, e o dano aparece na barra só quando o golpe "chega"
 const FOE_PREP = 650;   // o bicho se prepara antes do golpe: tempo de reagir com o Z
@@ -540,7 +567,7 @@ function tick() {
 }
 // XP, pele e progresso por vencer o bicho a (na batalha, o bicho atual); mult reduz o XP (abate direto)
 // drop = a pele fica no chão da exploração (golpe só) em vez de ir direto para a bolsa
-function reward(a = e, mult = 1, drop = false) {
+function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: quem chamou mostra a subida de nível (cartão da luta)
   noteWin(a.id);   // caderno de bichos e pedido de "vencer"
   const back = a.stolen || 0; if (back) { G.money += back; a.stolen = 0; }   // dinheiro que o malandro levou volta
   if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit();
@@ -548,7 +575,7 @@ function reward(a = e, mult = 1, drop = false) {
   if (got) G.pelts[a.id] = (G.pelts[a.id] || 0) + got;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }
-  if (G.lv > L0) setTimeout(() => levelUpFx(G.lv), $("explore").hidden ? 1800 : 150);   // na batalha, espera o cartão de vitória
+  if (G.lv > L0 && !quietLv) setTimeout(() => levelUpFx(G.lv), 150);
   drawXp();
   vit(); G.hp = Math.min(maxHP(G.lv), G.hp + maxHP(G.lv) - maxHP(L0)); G.sp = Math.min(maxSP(G.lv), G.sp + maxSP(G.lv) - maxSP(L0));
   save();

@@ -1033,8 +1033,8 @@ TX.en = {
     "Teclado": "Keyboard",
     "Controle: {z} golpe e confirma · {x} flecha e volta · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades · {st} começa · {sel} (segurar) pula cena · analógico direito mira na exploração": "Controller: {z} strike and confirm · {x} arrow and back · {sh} dodge · {i} bag · {e} equip · {h} skills · {st} begins · {sel} (hold) skips scene · right stick aims while exploring",
     "Nenhum controle encontrado. Aperte um botão do controle.": "No controller found. Press a button on the controller.",
-    "{nome} · modo {modo} · botões: {b} · eixos: {e}": "{nome} · mode {modo} · buttons: {b} · axes: {e}",
-    "próprio": "custom",
-    "Setas": "Arrows"
+    "Setas": "Arrows",
+    "Controle: {nome}": "Controller: {nome}",
+    "modo próprio": "custom mode"
   }
 };

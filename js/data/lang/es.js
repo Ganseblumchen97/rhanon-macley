@@ -1036,8 +1036,8 @@ TX.es = {
     "Teclado": "Teclado",
     "Controle: {z} golpe e confirma · {x} flecha e volta · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades · {st} começa · {sel} (segurar) pula cena · analógico direito mira na exploração": "Mando: {z} golpe y confirmar · {x} flecha y volver · {sh} esquivar · {i} bolsa · {e} equipar · {h} habilidades · {st} empieza · {sel} (mantener) salta la escena · el stick derecho apunta al explorar",
     "Nenhum controle encontrado. Aperte um botão do controle.": "No se encontró ningún mando. Pulsa un botón del mando.",
-    "{nome} · modo {modo} · botões: {b} · eixos: {e}": "{nome} · modo {modo} · botones: {b} · ejes: {e}",
-    "próprio": "propio",
-    "Setas": "Flechas"
+    "Setas": "Flechas",
+    "Controle: {nome}": "Mando: {nome}",
+    "modo próprio": "modo propio"
   }
 };

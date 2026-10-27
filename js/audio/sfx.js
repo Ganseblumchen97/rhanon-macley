@@ -178,10 +178,8 @@ function fanfare(kind) {
     o.connect(g).connect(lp); o.start(when); o.stop(when + dur + .01);
   };
   const S = .075;
-  if (kind === "win") {
-    [[67, 0], [69, 1], [71, 2]].forEach(([m, at]) => note(m, at * S, S * .9, .06, "pulse"));
-    for (const [i, vol] of [.06, .022, .008].entries()) { note(72, (3 + i * 2) * S, S * (i ? 1.5 : 2), vol, "pulse", !i); note(76, (3 + i * 2) * S, S * (i ? 1.5 : 2), vol * .8, "pulse", !i); }
-    note(55, 0, S * 3, .09, "triangle"); note(48, 3 * S, S * 5, .09, "triangle");
+  if (kind === "win") {   // vitória: só um "tum-tum" grave e macio; a festa fica com a barra de XP enchendo (xpFillSound)
+    note(48, 0, .16, .1, "triangle"); note(55, .14, .3, .08, "triangle"); note(67, .14, .3, .025, "triangle");
   } else if (kind === "flee") {
     [72, 74, 76, 79].forEach((m, i) => note(m, i * .06, .08, .045, "triangle"));
     note(84, .26, .25, .03, "triangle", true);
@@ -228,6 +226,18 @@ function cutinSound(kind) {
   tone(1320, t + .3, .25, "square", .04, 1320); tone(1980, t + .32, .3, "triangle", .03);
 }
 // subir de nível: fanfarra curta e triunfante (melodia original no espírito dos RPGs clássicos)
+/* barra de XP enchendo (estilo Pokémon): um tom que sobe junto com a barra, picotado em degraus; no fim, um "plim".
+   dur em segundos; from/to = quanto da barra (0 a 1), para o tom começar e parar na altura certa */
+function xpFillSound(dur, from = 0, to = 1) {
+  if (!AC || muted || dur <= 0) return;
+  const t = AC.currentTime + .02, o = AC.createOscillator(), g = AC.createGain(), lfo = AC.createOscillator(), lg = AC.createGain();
+  o.type = "square"; o.frequency.setValueAtTime(380 + 700 * from, t); o.frequency.linearRampToValueAtTime(380 + 700 * to, t + dur);
+  lfo.type = "square"; lfo.frequency.value = 28; lg.gain.value = .018;   // picota o tom: "tititititi"
+  g.gain.setValueAtTime(.022, t); g.gain.setValueAtTime(.022, t + dur - .02); g.gain.linearRampToValueAtTime(0, t + dur);
+  lfo.connect(lg).connect(g.gain); o.connect(g).connect(sfxOut);
+  o.start(t); lfo.start(t); o.stop(t + dur + .02); lfo.stop(t + dur + .02);
+}
+function xpDing() { if (!AC || muted) return; const t = AC.currentTime + .02; tone(hz(84), t, .09, "square", .04); tone(hz(91), t + .08, .22, "square", .035); }
 function levelUpJingle() {
   if (!AC || muted) return;
   const t = AC.currentTime + .05, S = .1;
