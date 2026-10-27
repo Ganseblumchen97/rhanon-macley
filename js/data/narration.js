@@ -15,6 +15,12 @@ const NARRA = {
     {r: "Vô, o senhor também foi de sonho até lá?"},
     "Fui, e nem enjoei. O Nordeste tem outros encantados, curumim. A fumaça chegou lá também. Agora deixa eu contar."
   ],
+  recife: [
+    "Recife! Rio pra todo lado, ponte em cima de ponte. Chamam de Veneza brasileira, mas eu nunca fui em Veneza.",
+    "Foi lá que o menino fez o segundo trabalho de programador: um aplicativo de cordel para um poeta da feira.",
+    {r: "Vô, o Seu Dedé fez um cordel sobre mim depois."},
+    "Fez mesmo? Então tu é famoso no Nordeste inteiro. Mas aqui na aldeia continua lavando a panela."
+  ],
   teresina: [
     "Teresina! A cidade mais quente do Brasil. O menino suava até a lança.",
     "Ela fica entre dois rios, o Parnaíba e o Poti. E no encontro deles mora uma assombração que os pescadores respeitam.",

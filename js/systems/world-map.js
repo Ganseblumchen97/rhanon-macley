@@ -15,7 +15,7 @@ function setupMapRegion() {
   svg.querySelector(".land").innerHTML = R.land.map(d => `<path d="${d}"/>`).join("") + (R.river ? `<path class="river" d="${R.river}"/>` : "");
   for (const [k, [x, y, ly]] of Object.entries(R.pos)) Object.assign(LOC[k], {x, y, ly});
   const [a, b] = R.route.map(k => LOC[k]), c = R.curve;   // estrada entre as duas cidades: reta ou em curva (uma cidade só: sem estrada)
-  $("route").setAttribute("d", !b ? "" : c ? `M${a.x},${a.y} C${a.x + c[0]},${a.y + c[1]} ${b.x + c[2]},${b.y + c[3]} ${b.x},${b.y}` : `M${a.x},${a.y} L${b.x},${b.y}`);
+  $("route").setAttribute("d", !b ? "" : c ? `M${a.x},${a.y} C${a.x + c[0]},${a.y + c[1]} ${b.x + c[2]},${b.y + c[3]} ${b.x},${b.y}` : "M" + R.route.map(k => `${LOC[k].x},${LOC[k].y}`).join(" L"));   // várias cidades: segmentos retos
 }
 // mapa grande da cidade atual (o Pará ou o Maranhão): chamado ao abrir o jogo e depois de cada voo
 function syncRegion() { MAP_REGION = CITY[curCity()].map; setupMapRegion(); buildMapNodes(); }
@@ -47,17 +47,17 @@ function select(id) {
   if (l.soon) {   // destino que ainda não abre (Belém)
     btn(t("Em breve"), () => {}, true);
     i.insertAdjacentHTML("beforeend", '<p class="hint">Um dia Rhanon vai precisar chegar à capital para pegar um avião. Por enquanto, a aventura é em Ananindeua.</p>');
-  } else if (here && id === "teresina") {
-    btn(t("Entrar em Teresina"), openLocal);
-    btn(t("Voltar de ônibus para São Luís"), () => busRide("saoluis"));
-  } else if (id === "teresina") {   // de São Luís a Teresina só de ônibus, com a passagem do trecho
-    if (G.passagemTHE) btn(t("Viajar de ônibus para Teresina"), () => busRide("teresina"));
-    else if (theOpen()) btn(t("Comprar passagem para Teresina · R$ {n}", {n: BUS_THE.price}), buyTicketTHE, G.money < BUS_THE.price);
-    i.insertAdjacentHTML("beforeend", `<p class="hint">${t(theOpen() ? "A passagem vale ida e volta entre São Luís e Teresina." : "O ônibus para Teresina sai depois que a Suçuarana dos Lençóis for acalmada.")}</p>`);
-  } else if (here && id === "saoluis") {
-    btn(t("Entrar em São Luís"), openLocal);
-    btn(t("Voar para Belém (Aeroporto de São Luís)"), () => fly("belem"));
-    i.insertAdjacentHTML("beforeend", `<p class="hint">${t("O voo de ida e volta é pago pela empresa do site da feira.")}</p>`);
+  } else if (CITY[id] && CITY[id].map === "nordeste") {   // cidades do Nordeste: entrar, ônibus para as vizinhas e o voo de São Luís
+    if (here) {
+      btn(t("Entrar em {cidade}", {cidade: LOC[id].s}), openLocal);
+      MAP_REGIONS.nordeste.route.filter(c => c !== id && busLine(id, c) && G[busLine(id, c).pass]).forEach(c => btn(t("Viajar de ônibus para {cidade}", {cidade: LOC[c].s}), () => busRide(c)));
+      if (FLIGHT[id]) { btn(t("Voar para Belém (Aeroporto de São Luís)"), () => fly("belem")); i.insertAdjacentHTML("beforeend", `<p class="hint">${t("O voo de ida e volta é pago pela empresa do site da feira.")}</p>`); }
+    } else {
+      const ln = busLine(G.loc, id);   // dá para ir de ônibus da cidade atual até esta
+      if (ln && G[ln.pass]) btn(t("Viajar de ônibus para {cidade}", {cidade: LOC[id].s}), () => busRide(id));
+      else if (ln && ln.open()) btn(t("Comprar passagem para {cidade} · R$ {n}", {cidade: LOC[id].s, n: ln.price}), () => buyBusTicket(id), G.money < ln.price);
+      i.insertAdjacentHTML("beforeend", `<p class="hint">${!ln ? t("De ônibus, só a partir da cidade vizinha na estrada.") : ln.open() ? t("A passagem vale ida e volta entre {a} e {b}.", {a: LOC[ln.from].s, b: LOC[ln === BUS_LINES[id] ? id : G.loc].s}) : t(ln.lock)}</p>`);
+    }
   } else if (here && id === "belem") {
     btn(t("Entrar em Belém"), openLocal);
     if (flightOpen()) { btn(t("Voar para São Luís (Aeroporto de Belém)"), () => fly("saoluis")); i.insertAdjacentHTML("beforeend", `<p class="hint">${t("O voo de ida e volta é pago pela empresa do site da feira.")}</p>`); }
@@ -86,10 +86,10 @@ function select(id) {
   btn(t("Mapa do Brasil"), () => openBrasil());   // as cinco regiões da viagem
   resetButton(i, () => { drawMap(); select(G.loc); });
 }
-// passagem de ônibus São Luís ↔ Teresina: comprada uma vez, vale ida e volta
-function buyTicketTHE() {
-  if (G.money < BUS_THE.price || G.passagemTHE) return;
-  G.money -= BUS_THE.price; G.passagemTHE = true; save(); sfx("more"); drawMap(); select("teresina");
+// passagem de uma linha de ônibus do Nordeste (BUS_LINES): comprada uma vez, vale ida e volta
+function buyBusTicket(id) {
+  const ln = busLine(G.loc, id); if (!ln || G.money < ln.price || G[ln.pass]) return;
+  G.money -= ln.price; G[ln.pass] = true; save(); sfx("more"); drawMap(); select(id);
 }
 /* ---------- voo entre regiões (FLIGHT em data/world.js) ----------
    o mapa do Brasil abre com um aviãozinho indo de uma região à outra; ao pousar, troca o mapa grande e a cidade */

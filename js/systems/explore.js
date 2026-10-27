@@ -178,7 +178,7 @@ function startExplore(zone, after, from) {
       else if (ch === "a") { const a = pickFromPool(zone, "terra"); if (a) EX.ents.push(makeAnimalEnt(a, tx, ty)); }
       else if (ch === "B" && !BS()[bossKey(zone)]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === zoneDef(zone).boss), tx, ty));
       else if (ch === "B") EX.spots.push({kind: "lembranca", x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});   // chefe vencido: dá para enfrentar de novo
-      else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "aldeao" ? (cityOf(zone) !== "ananindeua" ? "urbano" : "aldeao") + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
+      else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "cliente" ? FREELAS[FREELA_AT[zone] || "site_feira"].look : SPOTS[ch] === "aldeao" ? (cityOf(zone) !== "ananindeua" ? "urbano" : "aldeao") + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
     }));
     if (from === "back") {   // do lado de dentro da passagem, virado para a fase
       const gy = st.rows.findIndex(r => r.includes("G")), gx = st.rows[gy].indexOf("G"), W = st.rows[0].length, H = st.rows.length;
@@ -198,6 +198,7 @@ function startExplore(zone, after, from) {
     else if (jaciLight() >= 1 && !G.narrated.norte_fim) { EX.locked = true; setTimeout(() => bossStory("", () => { if (EX) EX.locked = false; }), 700); }   // save que já acalmou o Norte todo
     else if (cityOf(zone) === "belem" && !G.narrated.belem) { G.narrated.belem = true; save(); setTimeout(() => narrate(NARRA.belem), 600); }   // primeira vez na capital
     else if (cityOf(zone) === "saoluis" && !G.narrated.saoluis) { G.narrated.saoluis = true; save(); setTimeout(() => narrate(NARRA.saoluis), 600); }   // chegou no Nordeste
+    else if (cityOf(zone) === "recife" && !G.narrated.recife) { G.narrated.recife = true; save(); setTimeout(() => narrate(NARRA.recife), 600); }
     else if (cityOf(zone) === "teresina" && !G.narrated.teresina) { G.narrated.teresina = true; save(); setTimeout(() => narrate(NARRA.teresina), 600); }
     else if (G.loseStreak >= 2) { G.loseStreak = 0; save(); setTimeout(() => narrate([pajeHint()]), 600); }   // perdeu duas seguidas: o Pajé "lembra" de algo
   });
@@ -205,6 +206,7 @@ function startExplore(zone, after, from) {
 const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira",
   praiagrande: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   trocatroca: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
+  recifeantigo: " · lembranças, comida, rede na pensão e o Seu Dedé, que tem um freela: chega perto e aperta Z",
   parada: " · compra a passagem na cabine e embarca no ônibus", terminal: " · o ônibus volta pra Ananindeua; a trilha da esquerda vai pro Ver-o-Peso"};
 function exitExplore() {
   if (!EX || EX.locked) return;
@@ -756,9 +758,18 @@ const SPOT_LABEL = {segredo: "examinar", bau: "abrir o baú", fogueira: "descans
 const VILLAGER_NAME = {aldeao1: "Mateiro", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 // pensões das cidades (fase com O): nome do painel; dormir passa pela cena do quarto (motelScene)
-const PENSAO_NAME = {veropeso: "Pensão do Ver-o-Peso", praiagrande: "Pensão da Praia Grande", trocatroca: "Pensão do Troca-Troca"};
+const PENSAO_NAME = {veropeso: "Pensão do Ver-o-Peso", praiagrande: "Pensão da Praia Grande", trocatroca: "Pensão do Troca-Troca", recifeantigo: "Pensão do Recife Antigo"};
 // aviso de quando o Rhanon acorda na cidade (abertura do jogo, startIntro)
-const CITY_WAKE = {belem: "Belém · manhã no Ver-o-Peso...", saoluis: "São Luís · manhã na Praia Grande...", teresina: "Teresina · manhã no Troca-Troca..."};
+const CITY_WAKE = {belem: "Belém · manhã no Ver-o-Peso...", saoluis: "São Luís · manhã na Praia Grande...", teresina: "Teresina · manhã no Troca-Troca...", recife: "Recife · manhã no Recife Antigo..."};
+// Recife: quem é cada morador do Recife Antigo e o que eles contam
+const RECIFE_NAME = {urbano1: "Passista de frevo", urbano2: "Vendedora de bolo de rolo", urbano3: "Batuqueiro do maracatu"};
+const RECIFE_TIPS = [
+  "Oxente, tu é de onde? Do Pará? Então prova o bolo de rolo: é fininho, enroladinho, e tem goiabada em cada camada.",
+  "No Carnaval o Recife Antigo fica que não cabe ninguém: frevo de um lado, maracatu do outro. A sombrinha do frevo é pra equilibrar o passo.",
+  "O maracatu tem rei, rainha e a calunga, uma boneca que leva os antepassados. Quando o tambor bate, o chão treme.",
+  "Olinda fica logo ali, subindo a ladeira. Lá tem os bonecos gigantes, cada um maior que um poste.",
+  "O Seu Dedé escreve cordel desde menino e vende na feira pendurado no barbante. Agora ele quer botar tudo no celular. Arretado, né?"
+];
 // Teresina: quem é cada morador do Troca-Troca e o que eles contam
 const TERESINA_NAME = {urbano1: "Vendedora de cajuína", urbano2: "Artesão de cerâmica", urbano3: "Pescador do Poti"};
 const TERESINA_TIPS = [
@@ -779,7 +790,7 @@ const SAOLUIS_TIPS = [
   "De noite, dizem que a carruagem de Ana Jansen passa nas ruas de pedra, puxada por cavalo sem cabeça. Vixe, nem quero ver."
 ];
 // moradores de cada cidade do Nordeste: nomes e falas (journal.js, villagerTalk)
-const CITY_FOLK = () => ({saoluis: [SAOLUIS_NAME, SAOLUIS_TIPS], teresina: [TERESINA_NAME, TERESINA_TIPS]})[curCity()];
+const CITY_FOLK = () => ({saoluis: [SAOLUIS_NAME, SAOLUIS_TIPS], teresina: [TERESINA_NAME, TERESINA_TIPS], recife: [RECIFE_NAME, RECIFE_TIPS]})[curCity()];
 const BELEM_TIPS = [
   "Aqui na capital tem malandro esperto, segura a bolsa! Se um fi de rapariga desses levar teu dinheiro, vence ele que ele devolve.",
   "Os urubus do Ver-o-Peso tão aqui desde antes de mim. Não mexe com eles que eles não mexem contigo.",
@@ -834,7 +845,7 @@ function drawNpc(x, s, cx, cy, now) {
 const skipText = () => padStyle() ? t("Segure {sel} para pular", padVars()) : t("Segure C para pular");
 // setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
 function drawSpotPrompt(x, cx, cy, now) {
-  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `${padStyle() ? padLabel("z") : t("Z / GOLPE")}: ${SPOT_LABEL[s.kind]}` : "";
+  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `${padStyle() ? padLabel("z") : t("Z / GOLPE")}: ${s.kind === "cliente" ? t("falar com {cliente}", {cliente: FREELAS[freelaHere()].client}) : SPOT_LABEL[s.kind]}` : "";
   if (el.textContent !== txt) { el.textContent = txt; el.classList.toggle("show", !!s); }
   if (!s) return;
   const px = Math.round(s.x - cx), py = Math.round(s.y - cy) - (PEOPLE.includes(s.kind) ? 30 : 10) - Math.floor(now / 250) % 2;
@@ -916,20 +927,21 @@ function nbTurnOn() {
 }
 // próximo bug do freela em andamento (ou nada)
 const freelaNext = id => FREELAS[id].bugs[G.freela[id] || 0];
-// Dona Graça (Ver-o-Peso): pede o site, solta os bugs um por vez e paga na entrega
+const freelaHere = () => FREELA_AT[EX.zone] || "site_feira";   // o freela do cliente desta fase
+// cliente do freela (Dona Graça no Ver-o-Peso, Seu Dedé no Recife Antigo): pede o trabalho, solta os bugs um por vez e paga na entrega
 function freelaClient(say, d) {
-  const id = "site_feira", f = FREELAS[id], done = G.freela[id] || 0;
-  if (G.portfolio[id]) return say(f.client, t("O site tá bombando, menino! Todo mundo agora sabe o preço das coisas antes de chegar."));
+  const id = freelaHere(), f = FREELAS[id], done = G.freela[id] || 0;
+  if (G.portfolio[id]) return say(f.client, f.after);
   if (!G.nb.on) return say(f.client, t("Tu que é o menino que mexe com computador? Arruma um notebook que eu tenho trabalho pra ti."));
   if (done >= f.bugs.length) {
-    say(f.client, t("Égua, ficou lindo! Toma, tá pago, e com gorjeta."));
-    btn(t("Entregar o site · R$ {n}", {n: f.pay}), () => {
+    say(f.client, f.thanks);
+    btn(t("Entregar o trabalho · R$ {n}", {n: f.pay}), () => {
       G.portfolio[id] = true; G.money += f.pay; save(); sfx("more"); exHud();
       exOpenDialog("cliente", t("Freela entregue! +R$ {n}. Programa novo no notebook: {prog}", {n: f.pay, prog: t(f.prog)}));
     }, false, d);
     return;
   }
-  say(f.client, t("Preciso de um site pra feira, com o preço das coisas. Pago R$ {n}. Só que o código tá cheio de bug...", {n: f.pay}) + " " + t("Bugs resolvidos: {n} de {total}.", {n: done, total: f.bugs.length}));
+  say(f.client, t(f.ask, {n: f.pay}) + " " + t("Bugs resolvidos: {n} de {total}.", {n: done, total: f.bugs.length}));
   btn(t("Depurar o próximo bug"), () => {
     exCloseDialog();
     const b = BUGS.find(x => x.id === freelaNext(id)), en = makeAnimalEnt(b, Math.floor(EX.hero.x / TILE), Math.floor(EX.hero.y / TILE));
@@ -937,9 +949,9 @@ function freelaClient(say, d) {
   }, false, d);
 }
 function freelaBugDone() {
-  const id = "site_feira", f = FREELAS[id];
+  const id = freelaHere(), f = FREELAS[id];
   G.freela[id] = Math.min(f.bugs.length, (G.freela[id] || 0) + 1); save();
-  exToast(G.freela[id] >= f.bugs.length ? t("Último bug resolvido! Fala com a Dona Graça pra entregar o site.") : t("Bug resolvido! Faltam {n}.", {n: f.bugs.length - G.freela[id]}));
+  exToast(G.freela[id] >= f.bugs.length ? t("Último bug resolvido! Fala com {cliente} pra entregar o trabalho.", {cliente: f.client}) : t("Bug resolvido! Faltam {n}.", {n: f.bugs.length - G.freela[id]}));
 }
 /* ---------- BR-316: cabine do cobrador e o ônibus (fases parada e terminal) ---------- */
 const busDest = () => EX.zone === "parada" ? "belem" : "ananindeua";

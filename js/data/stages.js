@@ -126,6 +126,23 @@ const STAGES = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
+  // Recife (Nordeste): o Recife Antigo, com a pensão (O), barracas, moradores e o Seu Dedé (W), cliente do freela do cordel
+  recifeantigo: {
+    safe: true, next: null,
+    rows: [
+      "########################",
+      "########################",
+      "#..f....-.......OOO...f#",
+      "#.KKK...-..KKK..OOO....#",
+      "#..V....-...C..........#",
+      "#...........W......P..SE",
+      "#..P....-..............#",
+      "#.####..-..####....f...#",
+      "#.####..-..####..P.....#",
+      "#.......-..............#",
+      "~~~~~~~~=~~~~~~~~~~~~~~~"
+    ]
+  },
   // Teresina (Nordeste): o mercado do Troca-Troca, com a pensão (O), barracas e moradores; G leva ao Encontro dos rios
   trocatroca: {
     safe: true, next: "encontro",

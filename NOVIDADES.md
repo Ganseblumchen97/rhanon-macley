@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.50.0 — Recife e o app de cordel
+
+- O mapa de São Luís e Teresina virou o mapa do Nordeste inteiro, com uma estrada só ligando São Luís, Teresina e
+  Recife. Depois de acalmar o Surubim, Teresina vende a passagem de ônibus para Recife por R$ 1.000, de ida e volta.
+- A chegada é no Recife Antigo, com casarões coloridos, pensão, comida e moradores que falam de frevo, maracatu e
+  bolo de rolo.
+- Segundo freela do Rhanon: o Seu Dedé, cordelista, quer os folhetos num aplicativo e paga R$ 500. São três bugs
+  novos: o Vazamento de Memória, o Acento Quebrado e o Requisito Mutante.
+- Entregue o app, o notebook ganha um programa: o caderno passa a mostrar o que cada elemento faz em todos os bichos
+  que você já enfrentou, sem precisar testar um por um.
+- Por enquanto Recife tem só o Recife Antigo. A trilha de Olinda vem na próxima versão.
+
 ## 0.49.0 — Teresina e o Cabeça de Cuia
 
 - Depois de acalmar a Suçuarana dos Lençóis, o mapa (agora "Maranhão e Piauí") vende a passagem de ônibus para
