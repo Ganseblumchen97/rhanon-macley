@@ -68,6 +68,30 @@ const CITY = {
     bay: "M0,0 L44,0 C28,40 46,80 28,110 C40,150 22,200 38,240 C28,270 34,300 46,325 L0,325Z",   // baía do Guajará
     river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Ananindeua →"], home: "veropeso", gate: "terminal"}
 };
+/* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
+   que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
+const SECRETS = {
+  mata:     {elem: "fogo", item: "mandioca", n: "Moita seca", d: "Uma moita seca e espinhenta tapa um vão no meio do mato. Do outro lado tem alguma coisa.",
+    lore: "Ali no fundo da mata o menino achou o baú que eu tinha escondido quando era moço. Esqueci de contar pra ele. Tava lá, me esperando."},
+  fechada:  {elem: "planta", item: "peixe", n: "Cipoal", d: "Um cipoal grosso e trançado fecha a passagem. Dá pra puxar os cipós, se tiver jeito.",
+    lore: "Os mateiros antigos guardavam comida no meio do cipoal. Bicho nenhum passa por ali. Gente esperta passa."},
+  rio:      {elem: "agua", item: "peixe", n: "Barranco de barro seco", d: "Um barranco de barro seco e rachado. Molhado, ele desmancha.",
+    lore: "Na seca o rio recua e o barro endurece igual pedra. Na cheia, desmancha. O menino só fez a cheia chegar mais cedo."},
+  igarape:  {elem: "vento", item: "acai", n: "Monte de folhas", d: "Um monte de folhas secas, alto que só, esconde um buraco no mato. Um vento forte espalhava tudo.",
+    lore: "Debaixo das folhas do igarapé tem caminho que só o Boto conhece. E agora o Rhanon. O Boto não gostou muito, não."},
+  manguezal: {elem: "planta", item: "acai", n: "Raízes trançadas", d: "As raízes do mangue se trançaram e fecharam um vão na lama.",
+    lore: "O mangue é berçário de tudo: caranguejo, peixe, garça. Escondido nas raízes, o menino achou o que um pescador deixou pra trás."},
+  seringal: {elem: "fogo", item: "manicoba", n: "Galhada seca", d: "Galhos secos de seringueira velha empilhados. Pegam fogo rapidinho.",
+    lore: "No seringal abandonado ficou muita coisa dos seringueiros. Gente que trabalhou muito e ganhou pouco. O menino guardou o que achou com respeito."},
+  varzea:   {elem: "vento", item: "manicoba", n: "Capim alto e embolado", d: "Um capinzal alto e embolado, mais alto que o Rhanon. Uma ventania abria caminho.",
+    lore: "Os búfalos deitam no capim da várzea e deixam ele todo amassado. Debaixo de um desses ninhos o menino achou um baú. Cheirava a búfalo."},
+  cidadevelha: {elem: "raio", item: "acai", n: "Portão com trava elétrica", d: "Um portão de ferro antigo com uma trava elétrica quebrada. Sem energia, não abre.",
+    lore: "Os casarões da Cidade Velha guardam quintal escondido. Tem um que ninguém abria fazia cem anos. O menino abriu com um raio. Imagina a cara do vizinho."},
+  porto:    {elem: "raio", item: "peixe", n: "Grade do depósito", d: "A grade de um depósito velho do porto, com uma trava elétrica sem força.",
+    lore: "No porto tudo chega e tudo sai. Num depósito esquecido o menino achou o que um barco deixou e ninguém veio buscar."},
+  baixadas: {elem: "agua", item: "manicoba", n: "Lama seca", d: "Um monte de lama seca tapa o vão entre duas casas. Com água, ela amolece.",
+    lore: "Nas Baixadas o povo vive com a maré: ela sobe, ela desce, ela leva e traz. Naquele canto ela trouxe um presente."}
+};
 /* Clima do Norte: um por dia, sorteado pelo número do dia (o mesmo dia tem sempre o mesmo tempo, sem campo no save).
    boost = quanto cada elemento pesa na batalha; more = bichos que aparecem mais; dodge = chance (%) do golpe do bicho
    passar raspando. fight = aviso no começo da luta. Cada região nova terá o próprio clima (WEATHER_ODDS por cidade). */

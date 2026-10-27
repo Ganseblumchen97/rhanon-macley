@@ -29,7 +29,7 @@ const gateOpen = () => !!EX.st.next && unlocked(EX.st.next);
 const STAGE_PREV = Object.fromEntries(Object.entries(STAGES).filter(([, st]) => st.next).map(([k, st]) => [st.next, k]));
 function solidAt(px, py) {
   const ch = stageTile(Math.floor(px / TILE), Math.floor(py / TILE));
-  return ch === "G" ? !gateOpen() : SOLID.includes(ch);
+  return ch === "G" ? !gateOpen() : ch === "Y" || ch === "J" ? secretSolid(ch) : SOLID.includes(ch);
 }
 // a caixa dos pés (meia largura hw, meia altura hh) em (x, y) encosta em algo sólido?
 function boxBlocked(x, y, hw, hh) {
@@ -161,11 +161,12 @@ function startExplore(zone, after, from) {
   if (moving || (EX && EX.starting)) return;
   if (EX) EX.starting = true;
   wipe(() => {
-    const st = STAGES[zone];
-    EX = {zone, st, rows: st.rows, map: drawStageMap(st.rows, zone), pal: TILE_PAL[zone] || TILE_PAL.mata,
+    const st = STAGES[zone], rows = st.safe ? st.rows : secretRows(zone, st.rows);   // fase de caça: com o recanto secreto cavado
+    EX = {zone, st, rows, map: drawStageMap(rows, zone), pal: TILE_PAL[zone] || TILE_PAL.mata,
       night: !!G.night, ents: [], fx: [], loot: [], spits: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
     const at = (tx, ty) => (st.rows[ty] || "")[tx];
-    st.rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
+    rows.forEach((row, ty) => [...row].forEach((ch, tx) => {
+      if (ch === "Y" && secretState(zone)) return;   // segredo já aberto: a entrada é chão
       if ("QUO".includes(ch)) {   // bloco: um ponto só, embaixo do meio dele (onde o Rhanon chega pela calçada)
         if (at(tx - 1, ty) === ch || at(tx, ty - 1) === ch) return;
         let w = 0, h = 0; while (at(tx + w, ty) === ch) w++; while (at(tx, ty + h) === ch) h++;
@@ -602,6 +603,8 @@ function exDraw(now) {
       x.fillRect(sx + 5 + sw, sy + 3, 2, 1); x.fillRect(sx + 9 + sw, sy + 5, 1, 1);
     }
     if (ch === "G" && !gateOpen()) drawGate(x, sx, sy, EX.pal);
+    if (ch === "Y" && !secretState(EX.zone)) drawSecretBlock(x, sx, sy, SECRETS[EX.zone].elem, now);
+    if (ch === "J") drawChest(x, sx, sy, secretState(EX.zone) >= SECRET_LOOTED, now);
     if (ch === "F") drawFire(x, sx, sy, now);
   }
   EX.loot.forEach(l => drawLoot(x, l, cx, cy, now));   // no chão, embaixo de todo mundo
@@ -742,9 +745,9 @@ function drawMemento(x, s, cx, cy, now) {
   const p = (now / 1400) % 1;
   if (!REDUCE && p < .7) { x.fillStyle = p < .35 ? "#ffd23a" : "#fff3c4"; x.fillRect(sx + 4 - Math.round(p * 4), sy - 18 - Math.round(p * 10), 1, 1); }
 }
-const SPOTS = {F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", X: "xama", L: "tecnico", W: "cliente", P: "aldeao", Q: "cabine", U: "onibus"};
+const SPOTS = {Y: "segredo", J: "bau", F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", X: "xama", L: "tecnico", W: "cliente", P: "aldeao", Q: "cabine", U: "onibus"};
 const PEOPLE = ["peles", "comida", "artesao", "armeiro", "xama", "tecnico", "cliente", "aldeao"];
-const SPOT_LABEL = {fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", tecnico: "falar com o técnico", cliente: "falar com a Dona Graça", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "falar com o chefe"};
+const SPOT_LABEL = {segredo: "examinar", bau: "abrir o baú", fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", tecnico: "falar com o técnico", cliente: "falar com a Dona Graça", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "falar com o chefe"};
 const VILLAGER_NAME = {aldeao1: "Mateiro", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 const BELEM_TIPS = [
@@ -768,6 +771,7 @@ const VILLAGER_TIPS = [
   "Todo bicho tem um elemento que ele não aguenta: fogo, água, vento, raio ou planta. Acerta esse que ele fraqueja e tu bate de novo na hora.",
   "Usou um elemento num bicho? O caderno anota se ele é fraco, se resiste ou se nem liga. A fraqueza que tu descobrir aparece embaixo do nome dele.",
   "Sem arco? Joga a lança (Especial). Bate forte, mas às vezes erra.",
+  "Dizem que toda trilha tem um canto escondido. Uns se abrem com fogo, outros com água... cada um tem seu jeito.",
   "O chefe de cada mata fica no fim da trilha. Vence ele que abre o caminho pra próxima.",
   "Na fogueira da aldeia tu descansa até a noite ou dorme até o outro dia. As fogueiras das trilhas recuperam tudo.",
   "De noite a mata muda: morcego, coruja, lobo-guará... e dizem que o Chupa-cabra anda rondando. Égua, tenho é medo.",
@@ -847,6 +851,8 @@ function exOpenDialog(kind, msg, look) {
     say(t("Aliado: {chefe}", {chefe: b.name}), t("{chefe} voltou a si e agradece a ajuda. Quer treinar? Vale de 1 a 3 luares e metade do XP.", {chefe: theName(b, true)}));
     btn(t("Treinar"), () => exRematch(spot), false, d);
   }
+  else if (kind === "segredo") secretPanel(say, d);
+  else if (kind === "bau") secretChest(say, d);
   else if (kind === "cabine") busCabin(say, d);
   else if (kind === "onibus") busDoor(say, d);
   else villagerTalk(look, say, d);   // pedido (oferta ou entrega) ou uma dica (systems/journal.js)

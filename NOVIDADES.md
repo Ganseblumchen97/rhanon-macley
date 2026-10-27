@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.42.0 — os cantos escondidos do Norte
+
+- Cada trilha do Norte agora esconde um canto secreto no meio da mata (ou entre os casarões, em Belém). A entrada fica
+  fechada por alguma coisa: uma moita seca, um cipoal, um barranco de barro, um monte de folhas, uma trava elétrica...
+- Para abrir, use o elemento certo fora da batalha: chegue perto, aperte Z e use o especial (gasta 6 PE). Moita seca
+  pede fogo, cipoal pede planta, barro pede água, folhas pedem vento e trava elétrica pede raio. Se você ainda não tem o
+  especial, o painel diz qual falta.
+- Dentro tem um baú com dinheiro e comida, e o Pajé conta uma história daquele lugar.
+
 ## 0.41.0 — chuva, neblina e mormaço
 
 - Agora o Norte tem clima: cada dia pode ter tempo bom, chuva, neblina, mormaço ou ventania. Dá para ver na trilha

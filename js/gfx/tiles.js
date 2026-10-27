@@ -23,7 +23,7 @@ const TILE_PAL = {
 };
 const OUTLINE = "#1a2418";
 // tipo de terreno desenhado embaixo das letras especiais
-const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "r"};
+const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "r", Y: ".", J: "."};   // Y e J: entrada e baú do segredo (systems/secrets.js)
 
 function fillEllipse(x, cx, cy, rx, ry, col) {
   x.fillStyle = col;

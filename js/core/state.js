@@ -33,7 +33,7 @@ function vit() {
   G.skills = G.skills || {};   // degraus aprendidos da árvore de habilidades
   // notebook: jogo novo começa sem ele (missão do começo); save antigo já tem tudo ligado
   if (!G.nb) G.nb = G.tutorial ? {} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};
-  G.freela = G.freela || {}; G.portfolio = G.portfolio || {};
+  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {};
   G.regions = G.regions || {norte: true};   // regiões já visitadas (o aeroporto voa entre elas)
   if (!G.narrated) G.narrated = G.belemVisto ? {belem: true} : {};   // falas do Pajé já contadas (prólogo, Belém, cada chefe)
   G.loseStreak = G.loseStreak || 0;   // lutas perdidas seguidas (2 = o Pajé dá uma dica)   // bugs resolvidos por freela; freelas entregues
