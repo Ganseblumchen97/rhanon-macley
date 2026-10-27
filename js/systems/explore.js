@@ -198,11 +198,13 @@ function startExplore(zone, after, from) {
     else if (jaciLight() >= 1 && !G.narrated.norte_fim) { EX.locked = true; setTimeout(() => bossStory("", () => { if (EX) EX.locked = false; }), 700); }   // save que já acalmou o Norte todo
     else if (cityOf(zone) === "belem" && !G.narrated.belem) { G.narrated.belem = true; save(); setTimeout(() => narrate(NARRA.belem), 600); }   // primeira vez na capital
     else if (cityOf(zone) === "saoluis" && !G.narrated.saoluis) { G.narrated.saoluis = true; save(); setTimeout(() => narrate(NARRA.saoluis), 600); }   // chegou no Nordeste
+    else if (cityOf(zone) === "teresina" && !G.narrated.teresina) { G.narrated.teresina = true; save(); setTimeout(() => narrate(NARRA.teresina), 600); }
     else if (G.loseStreak >= 2) { G.loseStreak = 0; save(); setTimeout(() => narrate([pajeHint()]), 600); }   // perdeu duas seguidas: o Pajé "lembra" de algo
   });
 }
 const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira",
   praiagrande: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
+  trocatroca: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   parada: " · compra a passagem na cabine e embarca no ônibus", terminal: " · o ônibus volta pra Ananindeua; a trilha da esquerda vai pro Ver-o-Peso"};
 function exitExplore() {
   if (!EX || EX.locked) return;
@@ -555,7 +557,7 @@ function drawAnimalEnt(x, en, cx, cy, now) {
 }
 // bicho acalmado (golpe só ou vitória na batalha): agradece num balãozinho e corre para longe do Rhanon, para o mato
 const CALM_WAIT = 700, CALM_SPEED = 120, CALM_RUN = 1000;   // ms parado agradecendo, pixels/s correndo, ms correndo até sumir
-const BIRDS = new Set(["asa_branca", "guara", "garca_moura", "carcara", "harpia", "coruja", "garca", "macarico", "urubu", "soco", "pombo", "urubu_porto", "gaivota", "gaviao_real"]);
+const BIRDS = new Set(["bigua", "asa_branca", "guara", "garca_moura", "carcara", "harpia", "coruja", "garca", "macarico", "urubu", "soco", "pombo", "urubu_porto", "gaivota", "gaviao_real"]);
 function exCalm(en, now = performance.now()) {
   const h = EX.hero, dx = en.x - h.x, dy = en.y - h.y, n = Math.hypot(dx, dy) || 1;
   en.alive = false; en.calm = {t0: now, x0: en.x, y0: en.y, vx: dx / n, vy: dy / n}; en.face = dx > 0 ? 1 : -1;
@@ -753,6 +755,19 @@ const PEOPLE = ["peles", "comida", "artesao", "armeiro", "xama", "tecnico", "cli
 const SPOT_LABEL = {segredo: "examinar", bau: "abrir o baú", fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", tecnico: "falar com o técnico", cliente: "falar com a Dona Graça", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "falar com o chefe"};
 const VILLAGER_NAME = {aldeao1: "Mateiro", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
+// pensões das cidades (fase com O): nome do painel; dormir passa pela cena do quarto (motelScene)
+const PENSAO_NAME = {veropeso: "Pensão do Ver-o-Peso", praiagrande: "Pensão da Praia Grande", trocatroca: "Pensão do Troca-Troca"};
+// aviso de quando o Rhanon acorda na cidade (abertura do jogo, startIntro)
+const CITY_WAKE = {belem: "Belém · manhã no Ver-o-Peso...", saoluis: "São Luís · manhã na Praia Grande...", teresina: "Teresina · manhã no Troca-Troca..."};
+// Teresina: quem é cada morador do Troca-Troca e o que eles contam
+const TERESINA_NAME = {urbano1: "Vendedora de cajuína", urbano2: "Artesão de cerâmica", urbano3: "Pescador do Poti"};
+const TERESINA_TIPS = [
+  "Égua não, aqui é \"oxe\"! Bem-vindo a Teresina, a cidade mais quente do Brasil. Toma uma cajuína gelada que passa.",
+  "O Parnaíba e o Poti se encontram logo ali. Nas noites de cheia, ninguém pesca no encontro: é a hora do Cabeça de Cuia.",
+  "Esse barro aqui vem do Poti Velho. A gente faz panela, pote e santo desde o tempo dos avós.",
+  "Rapaz, de dia é mormaço que derrete. Vai pro rio cedinho, que depois do meio-dia nem o jacaré aguenta.",
+  "Dizem que o Cabeça de Cuia só se livra da maldição se se arrepender de verdade. Vai que tu ajuda o homem."
+];
 // São Luís: quem é cada morador da Praia Grande (mesmos desenhos de Belém) e o que eles contam
 const SAOLUIS_NAME = {urbano1: "Vendedora de juçara", urbano2: "Rendeira", urbano3: "Brincante do boi"};
 const SAOLUIS_TIPS = [
@@ -763,6 +778,8 @@ const SAOLUIS_TIPS = [
   "Lá pros Lençóis a areia é tão branca que parece neve, e entre as dunas tem lagoa azul. Um dia abre caminho pra lá.",
   "De noite, dizem que a carruagem de Ana Jansen passa nas ruas de pedra, puxada por cavalo sem cabeça. Vixe, nem quero ver."
 ];
+// moradores de cada cidade do Nordeste: nomes e falas (journal.js, villagerTalk)
+const CITY_FOLK = () => ({saoluis: [SAOLUIS_NAME, SAOLUIS_TIPS], teresina: [TERESINA_NAME, TERESINA_TIPS]})[curCity()];
 const BELEM_TIPS = [
   "Aqui na capital tem malandro esperto, segura a bolsa! Se um fi de rapariga desses levar teu dinheiro, vence ele que ele devolve.",
   "Os urubus do Ver-o-Peso tão aqui desde antes de mim. Não mexe com eles que eles não mexem contigo.",
@@ -839,9 +856,8 @@ function exOpenDialog(kind, msg, look) {
     say(t("Fogueira"), t("Um respiro no meio da trilha. Descansar recupera toda a vida e a energia."));
     btn(t("Descansar"), () => exCampRest("fogueira"), false, d);
   }
-  else if (kind === "tenda" && (EX.zone === "veropeso" || EX.zone === "praiagrande")) {   // cidade: rede na pensão (diária barata em PENSAO)
-    const sl = EX.zone === "praiagrande";
-    say(t(sl ? "Pensão da Praia Grande" : "Pensão do Ver-o-Peso"), (G.night ? t("Rede limpa, cheiro de maré e o mercado acordando cedo. Dormir recupera tudo.") : t("Rede pra quem é de fora. Descansar até a noite recupera metade; dormir até o outro dia, tudo.")) + " " + t("Dinheiro: R$ {n}.", {n: G.money}));
+  else if (kind === "tenda" && PENSAO_NAME[EX.zone]) {   // cidade: rede na pensão (diária barata em PENSAO)
+    say(PENSAO_NAME[EX.zone], (G.night ? t("Rede limpa, cheiro de maré e o mercado acordando cedo. Dormir recupera tudo.") : t("Rede pra quem é de fora. Descansar até a noite recupera metade; dormir até o outro dia, tudo.")) + " " + t("Dinheiro: R$ {n}.", {n: G.money}));
     // paga e passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
     const nap = k => ask(k === "noite" ? t("Pagar R$ {n} pela rede até a noite?", {n: PENSAO[k]}) : t("Pagar R$ {n} pela rede até amanhã?", {n: PENSAO[k]}), () => {
       if (G.money < PENSAO[k]) { sfx("blip"); return exOpenDialog("tenda", t("Falta dinheiro: a diária é R$ {n}.", {n: PENSAO[k]})); }
@@ -992,7 +1008,7 @@ function exNap(k) {
   exCloseDialog(); EX.locked = true; exKeys.clear();
   const night = k === "noite", label = night ? t("Anoiteceu") : t("Amanheceu · Dia {n}", {n: G.day + 1});
   const wake = hide => dawnWipe(() => { if (hide) hide(); const msg = rest(k, true, true); EX.night = G.night; exHud(); musicStart("local"); setTimeout(() => { if (!EX) return; EX.locked = false; exToast(msg); }, DAWN_MS * .6); }, label, night);
-  if (EX.zone === "veropeso" || EX.zone === "praiagrande") motelScene(k, wake); else wake();
+  if (PENSAO_NAME[EX.zone]) motelScene(k, wake); else wake();
 }
 /* quarto do motel: uns 3 s com o Rhanon dormindo na cama e a janela mudando de cor (noite: escurece; dormir: escurece e
    clareia; intro: só clareia); o quarto escurece junto e o abajur acende. C, Z, Enter ou Esc pulam. done(hide) segue com
@@ -1076,9 +1092,9 @@ function exCampRest(kind) {
 function startIntro() {
   vit(); G.night = false; save();
   if (curCity() !== "ananindeua") return startExplore(CITY[curCity()].home, () => {   // na cidade: acorda no quarto da pensão
-    const sl = curCity() === "saoluis", m = EX.spots.find(q => q.kind === "tenda"), h = EX.hero;   // sai do quarto pela porta do motel
+    const m = EX.spots.find(q => q.kind === "tenda"), h = EX.hero;   // sai do quarto pela porta do motel
     if (m) Object.assign(h, {x: m.x, y: m.y + 8, dir: "down", aim: {x: 0, y: 1}});
-    motelScene("intro", hide => wipe(() => { hide(); if (EX) EX.locked = false; exToast(t(sl ? "São Luís · manhã na Praia Grande..." : "Belém · manhã no Ver-o-Peso...")); }));
+    motelScene("intro", hide => wipe(() => { hide(); if (EX) EX.locked = false; exToast(CITY_WAKE[curCity()]); }));
   });
   startExplore("aldeia", exIntro);
 }

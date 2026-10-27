@@ -93,12 +93,12 @@ function questDeliver() {
 }
 // conversa com um aldeão: entrega, oferta ou uma dica qualquer
 function villagerTalk(look, say, d) {
-  const sl = curCity() === "saoluis", name = (sl && SAOLUIS_NAME[look]) || VILLAGER_NAME[look] || "Aldeão", act = G.quest && questById(G.quest.id), off = !G.quest && G.offer && questById(G.offer.id);
+  const folk = CITY_FOLK(), name = (folk && folk[0][look]) || VILLAGER_NAME[look] || "Aldeão", act = G.quest && questById(G.quest.id), off = !G.quest && G.offer && questById(G.offer.id);
   if (act && act.giver === look) {
     if (questReady()) { say(name, t("E aí, trouxe o que eu pedi?")); btn(t("Entregar"), questDeliver, false, d); }
     else say(name, `${act.text} (${questGoal(act)}: ${t("{n} de {total}", {n: questCount(act), total: act.need.n})})`);
   } else if (off && off.giver === look) { say(name, off.text); lh(t("Recompensa: {premio}.", {premio: rewardText(off.reward)}), d); btn(t("Aceitar o pedido"), questAccept, false, d); }
-  else { const tips = sl ? SAOLUIS_TIPS : look.startsWith("urbano") ? BELEM_TIPS : VILLAGER_TIPS; say(name, tips[Math.floor(Math.random() * tips.length)]); }
+  else { const tips = folk ? folk[1] : look.startsWith("urbano") ? BELEM_TIPS : VILLAGER_TIPS; say(name, tips[Math.floor(Math.random() * tips.length)]); }
 }
 // linha do pedido na bolsa
 const questLine = () => { const q = G.quest && questById(G.quest.id); return q ? "<br>" + t("Pedido de {quem}: {meta} ({n} de {total})", {quem: VILLAGER_NAME[q.giver].toLowerCase(), meta: questGoal(q), n: questCount(q), total: q.need.n}) : ""; };

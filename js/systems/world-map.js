@@ -47,6 +47,13 @@ function select(id) {
   if (l.soon) {   // destino que ainda não abre (Belém)
     btn(t("Em breve"), () => {}, true);
     i.insertAdjacentHTML("beforeend", '<p class="hint">Um dia Rhanon vai precisar chegar à capital para pegar um avião. Por enquanto, a aventura é em Ananindeua.</p>');
+  } else if (here && id === "teresina") {
+    btn(t("Entrar em Teresina"), openLocal);
+    btn(t("Voltar de ônibus para São Luís"), () => busRide("saoluis"));
+  } else if (id === "teresina") {   // de São Luís a Teresina só de ônibus, com a passagem do trecho
+    if (G.passagemTHE) btn(t("Viajar de ônibus para Teresina"), () => busRide("teresina"));
+    else if (theOpen()) btn(t("Comprar passagem para Teresina · R$ {n}", {n: BUS_THE.price}), buyTicketTHE, G.money < BUS_THE.price);
+    i.insertAdjacentHTML("beforeend", `<p class="hint">${t(theOpen() ? "A passagem vale ida e volta entre São Luís e Teresina." : "O ônibus para Teresina sai depois que a Suçuarana dos Lençóis for acalmada.")}</p>`);
   } else if (here && id === "saoluis") {
     btn(t("Entrar em São Luís"), openLocal);
     btn(t("Voar para Belém (Aeroporto de São Luís)"), () => fly("belem"));
@@ -78,6 +85,11 @@ function select(id) {
   }
   btn(t("Mapa do Brasil"), () => openBrasil());   // as cinco regiões da viagem
   resetButton(i, () => { drawMap(); select(G.loc); });
+}
+// passagem de ônibus São Luís ↔ Teresina: comprada uma vez, vale ida e volta
+function buyTicketTHE() {
+  if (G.money < BUS_THE.price || G.passagemTHE) return;
+  G.money -= BUS_THE.price; G.passagemTHE = true; save(); sfx("more"); drawMap(); select("teresina");
 }
 /* ---------- voo entre regiões (FLIGHT em data/world.js) ----------
    o mapa do Brasil abre com um aviãozinho indo de uma região à outra; ao pousar, troca o mapa grande e a cidade */

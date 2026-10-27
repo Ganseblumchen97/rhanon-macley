@@ -865,6 +865,32 @@ function pessoa(look) {
     return {c, head: pose === "ko" ? [18 * S, 20 * S] : [16 * S, 13 * S]};
   };
 }
+// Cabeça de Cuia (Teresina, à noite): pescador sem camisa, de calção, com a cabeça enorme em forma de cuia, cabelo molhado
+// e olhos acesos; desmaiado, fica deitado na beira com a cabeça no chão
+function cabecaCuia(pose, f) {
+  const d = rigGrid(1, 40, 50), sk = "#8a5a32", Sk = "#5e3a1e", cu = "#c8a050", Cu = "#8a6a28", sh = "#3a5a8a", Sh = "#24405a";
+  if (pose === "ko") {
+    d.part().poly([[12, 42], [34, 40], [37, 45], [14, 48]], sk, Sk);
+    d.part().ellipse(10, 39, 9, 8, cu, Cu, .6).rect(9, 30, 2, 2, "#5a7a2a");
+    d.dots([[6, 38], [8, 40], [8, 38], [6, 40], [12, 38], [14, 40], [14, 38], [12, 40]], BN);
+    return {c: d.canvas(), head: [10, 38]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (pose === "idle" ? f : 0) + (cr ? 3 : 0), bx = at ? -3 : hu ? 3 : 0;
+  const X = v => v + bx, Y = v => v + by;
+  d.part().limb(X(17), Y(36), X(15), Y(48), 3, sk, Sk); d.limb(X(23), Y(36), X(25), Y(48), 3, sk, Sk);   // pernas
+  d.part().poly([[X(14), Y(30)], [X(26), Y(30)], [X(27), Y(38)], [X(13), Y(38)]], sh, Sh);   // calção
+  d.part().poly([[X(14), Y(20)], [X(26), Y(20)], [X(26), Y(31)], [X(14), Y(31)]], sk, Sk);   // tronco
+  const hand = at ? [[X(14), Y(22)], [X(2), Y(20)]] : cr ? [[X(14), Y(22)], [X(9), Y(33)]] : [[X(14), Y(22)], [X(10), Y(32)]];
+  d.part().limb(...hand[0], ...hand[1], 3, sk, Sk);
+  d.part().limb(X(26), Y(22), X(30), Y(32), 3, sk, Sk);
+  d.part().ellipse(X(20), Y(11), 12, 10, cu, Cu, .6).rect(X(19), Y(0), 2, 2, "#5a7a2a");   // a cabeça de cuia, com o talo
+  d.dots([[X(13), Y(6)], [X(14), Y(5)], [X(12), Y(8)]], "#ecd090");   // brilho da cuia
+  d.dots([[X(9), Y(14)], [X(31), Y(14)], [X(9), Y(16)], [X(31), Y(16)], [X(10), Y(18)], [X(30), Y(18)]], "#2a1a10");   // cabelo molhado escorrendo
+  if (hu) d.dots([[X(15), Y(12)], [X(16), Y(12)], [X(24), Y(12)], [X(25), Y(12)]], BN);
+  else d.ellipse(X(15.5), Y(12), 1.6, 1.8, "#8ad0f0").ellipse(X(24.5), Y(12), 1.6, 1.8, "#8ad0f0");
+  if (at) d.ellipse(X(20), Y(17), 2.5, 2, BN); else d.rect(X(17), Y(17), 6, 1, BN);
+  return {c: d.canvas(), head: [X(20), Y(11)]};
+}
 // visagem (assombração de Belém): vestido comprido sem pés, flutuando, cabelo escuro e olhos acesos; C troca as cores
 function visagem(C) {
   return (pose, f) => {
@@ -907,6 +933,8 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   macarico: (pose, f) => garca(pose, f, {b: "#a8906a", B: "#7a6446", y: "#3a2a1a", Y: "#22180e", k: "#4a3a2a"}),   // maçarico: a garça em tons de areia
   guara: (pose, f) => garca(pose, f, {b: "#e8402a", B: "#b02818", y: "#3a2418", Y: "#22140c", k: "#5a2a1a"}),   // guará: a garça em vermelho
   garca_moura: (pose, f) => garca(pose, f, {b: "#8a96a8", B: "#5e6a7a", y: "#e8b030", Y: "#b88a20", k: "#2a3038"}),   // garça-moura: cinza-azulada
+  bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
+  cabeca_cuia: cabecaCuia,
   cascavel: cobra({b: "#b89a5a", B: "#7a6234", k: "#4a3a1a"}, true),   // cascavel: cabeça triangular, cor de areia com losangos escuros
   serpente: cobra({b: "#c8a030", B: "#8a6a18", k: "#fff2a0", eye: "#ff8a3a"}, false),   // Serpente encantada da ilha: dourada
   boto: (pose, f) => boto(pose, f, false), boto_encantado: (pose, f) => boto(pose, f, true),

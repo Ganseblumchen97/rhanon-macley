@@ -88,7 +88,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
 .stage{--plat:46%}
 .stage.zone-fechada{--plat:42%}
-.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
 .stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
@@ -96,9 +96,9 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-mata::before{background:#3d8a4d;right:9%;top:var(--plat)}
 .stage.zone-mata::after{background:#3d8a4d;left:4%;bottom:7%}
 /* beira do rio: o lago fica no fundo (faixa azul atrás) e os dois lutam em chão de terra */
-.stage.zone-rio{background:linear-gradient(180deg,#3a7a4a 0 27%,#4fa8c8 27% 28%,#2a7a9a 28% 34%,#1f6482 34% 40%,#2c5a34 40% 100%)}
-.stage.zone-rio::before{background:#8a7448;right:9%;top:var(--plat)}
-.stage.zone-rio::after{background:#8a7448;left:4%;bottom:7%}
+.stage:is(.zone-rio,.zone-encontro){background:linear-gradient(180deg,#3a7a4a 0 27%,#4fa8c8 27% 28%,#2a7a9a 28% 34%,#1f6482 34% 40%,#2c5a34 40% 100%)}
+.stage:is(.zone-rio,.zone-encontro)::before{background:#8a7448;right:9%;top:var(--plat)}
+.stage:is(.zone-rio,.zone-encontro)::after{background:#8a7448;left:4%;bottom:7%}
 .stage.zone-fechada{background:linear-gradient(180deg,#264a32 0 54%,#142a1c 54% 100%)}
 /* igarapé: mata alta escura, faixa de água cor de chá e barranco */
 .stage.zone-igarape{background:linear-gradient(180deg,#24563a 0 24%,#6a7a3a 24% 25%,#4a5a2a 25% 33%,#3a4a22 33% 40%,#22462c 40% 100%)}

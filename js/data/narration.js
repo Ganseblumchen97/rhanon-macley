@@ -15,6 +15,12 @@ const NARRA = {
     {r: "Vô, o senhor também foi de sonho até lá?"},
     "Fui, e nem enjoei. O Nordeste tem outros encantados, curumim. A fumaça chegou lá também. Agora deixa eu contar."
   ],
+  teresina: [
+    "Teresina! A cidade mais quente do Brasil. O menino suava até a lança.",
+    "Ela fica entre dois rios, o Parnaíba e o Poti. E no encontro deles mora uma assombração que os pescadores respeitam.",
+    {r: "O Cabeça de Cuia, vô. Todo mundo no ônibus falava dele."},
+    "Pois é. Vamos ver se tu acalma até ele."
+  ],
   belem: [
     "Belém! O menino nunca tinha visto tanta gente junta. Nem tanto urubu.",
     "Na capital a fumaça era outra: saía de carro, de fábrica, de gente apressada. E as visagens de lá ficaram confusas também.",
@@ -23,6 +29,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  surubim: ["O Surubim é o rei do fundo do Parnaíba, curumim. Pintado igual onça, com bigode de velho.", {r: "Ele fez cócegas com o bigode, vô."}, "Era agradecimento. Peixe não sabe abraçar."],
+  cabeca_cuia: ["O Cabeça de Cuia foi gente: um pescador que maltratou a mãe e ficou com a cabeça pesada de remorso, assombrando o rio.", "A fumaça deixou ele mais bravo ainda. O menino acalmou o homem, e pela primeira vez em muito tempo ele chorou.", {r: "Ele disse que ia pedir perdão pra mãe dele, vô."}, "Então a maldição já tá ficando mais leve."],
   sucuarana: ["A suçuarana é prima da onça, curumim, só que da cor da areia. Nas dunas ninguém via ela chegar.", "O menino só viu porque ela fez sombra. E lá no Lençóis quase não tem sombra."],
   boi_bumba: ["O Boi Bumbá! No Maranhão o boi morre e ressuscita todo ano, na festa. Mas a fumaça deixou ele preso no meio do caminho.", {r: "Ele dançou comigo antes de ir embora, vô."}, "Dançou mesmo? Então tu acalmou direito. Boi que dança tá em paz."],
   mero: ["O Mero é o avô dos peixes do mangue, curumim. Tão velho que já viu a ilha nascer. Bravo assim, só de fumaça.", {r: "Ele me olhou com cara de quem pedia desculpa, vô."}, "Pedia mesmo. Bicho velho tem educação."],

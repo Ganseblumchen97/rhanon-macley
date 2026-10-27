@@ -12,11 +12,12 @@ const MAP_REGIONS = {
     // a BR-316 sai de Ananindeua para o sudoeste e faz uma volta antes de chegar a Belém (curve: os dois pontos de controle)
     route: ["ananindeua", "belem"], pos: {ananindeua: [494, 238], belem: [398, 312]}, curve: [18, 74, 86, -2]},
   // Maranhão (Nordeste): contorno estilizado, com a ilha de São Luís no golfão, lá em cima
-  maranhao: {n: "Maranhão", aria: "Mapa estilizado do Maranhão, com a ilha de São Luís",
+  maranhao: {n: "Maranhão e Piauí", aria: "Mapa estilizado do Maranhão, com a ilha de São Luís e Teresina na divisa com o Piauí",
     land: ["M249 65 L328 76 L357 113 L371 145 L380 152 L407 145 L443 134 L508 145 L558 155 L530 192 L486 245 L479 283 L429 351 L357 404 L306 452 L263 495 L249 548 L213 500 L162 447 L148 378 L148 298 L83 293 L62 283 L184 245 L220 177 L242 113Z",
       "M383 133 L396 124 L410 130 L406 145 L390 148Z"],   // continente (a partir de longitude/latitude) e a ilha de São Luís no golfão
     river: "M292 325 C300 270 340 220 362 160",   // rio Mearim, desaguando na baía de São Marcos
-    route: ["saoluis"], pos: {saoluis: [396, 136]}},
+    // a estrada desce da ilha até Teresina, na beira do Parnaíba (divisa com o Piauí)
+    route: ["saoluis", "teresina"], pos: {saoluis: [396, 136], teresina: [482, 288]}, curve: [-30, 70, -70, -20]},
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre Ananindeua e Curitiba",
     land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
     route: ["ananindeua", "curitiba"], pos: {ananindeua: [322, 168], curitiba: [315, 478]}}
@@ -39,6 +40,7 @@ const REGIONS = {
 const LOC = {
   ananindeua: {n: "Ananindeua (PA)", s: "Ananindeua", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor anda brava, e cada lembrança que os bichos deixam rende uns trocados."},
   belem: {n: "Belém (PA)", s: "Belém", txt: "A capital do Pará, na beira da baía do Guajará. Prédios, casarões de azulejo, o Ver-o-Peso... e bicho e malandro bem mais fortes que os da mata."},
+  teresina: {n: "Teresina (PI)", s: "Teresina", txt: "A capital mais quente do Brasil, entre dois rios: o Parnaíba e o Poti. No encontro das águas, dizem, mora o Cabeça de Cuia."},
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
@@ -59,6 +61,8 @@ const SUB = {
   /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
      pela Cidade Velha, pelo Porto e pelas Baixadas, cada vez mais difícil */
   terminal: {city: "belem", n: "Terminal rodoviário", s: "Terminal", x: 392, y: 262, txt: "O ônibus da BR-316 para aqui. A passagem vale ida e volta: dá pra voltar pra Ananindeua quando quiser."},
+  trocatroca: {city: "teresina", n: "Troca-Troca", x: 260, y: 170, txt: "O mercado do Troca-Troca, no centro de Teresina: rede, cerâmica, cajuína gelada e gente pechinchando. Tem pensão e comida."},
+  encontro: {city: "teresina", n: "Encontro dos rios", x: 120, y: 120, txt: "Onde o Poti deságua no Parnaíba: praia de rio, mata ciliar, lontra, jacaré... e, nas noites de cheia, o Cabeça de Cuia."},
   lencois: {city: "saoluis", n: "Lençóis", x: 186, y: 64, txt: "Dunas brancas até onde a vista alcança e, entre elas, lagoas azuis de água da chuva. Pouca sombra e muito bicho bravo com o sol."},
   mangueilha: {city: "saoluis", n: "Manguezal da ilha", x: 104, y: 214, txt: "O mangue da ilha de São Luís, onde a maré sobe e desce metros: guará vermelho, siri, carcará... e um peixe do tamanho de uma canoa no canal."},
   praiagrande: {city: "saoluis", n: "Praia Grande", x: 214, y: 168, txt: "O centro histórico de São Luís: ladeira de pedra, casarão coberto de azulejo português e a feira da praia. Tem pensão, comida e gente que conta história."},
@@ -81,7 +85,11 @@ const CITY = {
   saoluis: {n: "São Luís", map: "maranhao", route: ["praiagrande", "mangueilha", "lencois"], cabin: false,
     land: "30,120 80,60 170,30 280,26 370,56 420,120 426,210 390,280 300,312 180,316 80,290 26,220",
     bay: "M0,0 L120,0 C90,30 60,60 34,96 C20,130 12,170 0,190Z",   // baía de São Marcos
-    river: "M260,40 C250,90 236,120 226,150 C214,186 236,230 230,290", road: "M262,200 C320,230 380,250 446,262", sign: [350, 290, "✈ Aeroporto"], home: "praiagrande", gate: "praiagrande"}
+    river: "M260,40 C250,90 236,120 226,150 C214,186 236,230 230,290", road: "M262,200 C320,230 380,250 446,262", sign: [350, 290, "✈ Aeroporto"], home: "praiagrande", gate: "praiagrande"},
+  // Teresina (Nordeste): entre o Parnaíba (oeste) e o Poti (leste), que se encontram ao norte; a estrada vai para São Luís
+  teresina: {n: "Teresina", map: "maranhao", route: ["trocatroca", "encontro"], cabin: false,
+    land: "40,40 180,20 320,30 420,90 430,200 400,290 280,316 150,312 50,280 20,170",
+    river: "M60,320 C90,240 70,160 110,100 C130,70 150,40 160,0", road: "M300,200 C350,220 400,250 446,270", sign: [340, 300, "São Luís →"], home: "trocatroca", gate: "trocatroca"}
 };
 /* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
    que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
@@ -120,11 +128,12 @@ const WEATHER = {
 // chance de cada tempo por cidade; Belém tem a chuva da tarde quase todo dia
 const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15], ["mormaco", 12], ["ventania", 8]],
   belem: [["limpo", 25], ["chuva", 45], ["neblina", 8], ["mormaco", 14], ["ventania", 8]],
-  saoluis: [["limpo", 30], ["chuva", 25], ["neblina", 5], ["mormaco", 25], ["ventania", 15]]};   // ilha de muito sol e vento
+  saoluis: [["limpo", 30], ["chuva", 25], ["neblina", 5], ["mormaco", 25], ["ventania", 15]],   // ilha de muito sol e vento
+  teresina: [["limpo", 35], ["chuva", 10], ["neblina", 5], ["mormaco", 45], ["ventania", 5]]};   // a capital mais quente do Brasil
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
-  let r = seeded(day * 17 + ({belem: 5, saoluis: 11}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
   for (const [k, w] of odds) if ((r -= w) < 0) return k;
   return "limpo";
 }
@@ -141,6 +150,10 @@ const EDGES = Object.values(CITY).flatMap(c => c.route.slice(1).map((k, i) => [c
 /* ônibus da BR-316 entre Ananindeua (cabine da parada) e Belém (terminal): a passagem é comprada uma vez na cabine
    (G.passagem) e vale ida e volta. open = false fecharia Belém de novo (a cabine só mostraria o preço). */
 const BUS = {price: 800, open: true};
+/* ônibus entre São Luís e Teresina (a passagem é outra, G.passagemTHE, também de ida e volta): vende no mapa do
+   Maranhão depois de acalmar a Suçuarana dos Lençóis */
+const BUS_THE = {price: 900};
+const theOpen = () => !!BS().lencois;
 /* Notebook do Rhanon (missão do começo, só em jogo novo; ver HISTORIA.md): o Mateiro entrega quebrado depois do tutorial,
    o técnico da feira vende a BATERIA, o macaco-prego larga o TECLADO e a ariranha o CARREGADOR quando são acalmados, e
    ele liga na tomada da cabine da BR-316. Ligado, chega o primeiro freela e o caderno vira digital. */
@@ -155,7 +168,7 @@ const FREELAS = {
 };
 const PENSAO = {noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

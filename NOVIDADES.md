@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.49.0 — Teresina e o Cabeça de Cuia
+
+- Depois de acalmar a Suçuarana dos Lençóis, o mapa (agora "Maranhão e Piauí") vende a passagem de ônibus para
+  Teresina por R$ 900, de ida e volta. O ônibus desce pelo Maranhão até a capital mais quente do Brasil.
+- A chegada é no mercado do Troca-Troca, com pensão, comida, comprador de lembranças e moradores que falam da cajuína,
+  da cerâmica do Poti Velho e da lenda do rio.
+- Saindo do mercado, o Encontro dos rios, onde o Poti deságua no Parnaíba, para quem está perto do nível 33. Bichos
+  novos: lontra, jacaré-de-papo-amarelo, cágado e biguá.
+- De dia, o chefe é o Surubim. De noite aparece o Cabeça de Cuia, o pescador amaldiçoado de cabeça enorme da lenda
+  de Teresina.
+
 ## 0.48.0 — os Lençóis e o Boi Bumbá
 
 - Depois de acalmar o Mero, a passagem do manguezal da ilha leva aos Lençóis: dunas brancas até onde a vista alcança

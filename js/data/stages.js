@@ -126,6 +126,59 @@ const STAGES = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
+  // Teresina (Nordeste): o mercado do Troca-Troca, com a pensão (O), barracas e moradores; G leva ao Encontro dos rios
+  trocatroca: {
+    safe: true, next: "encontro",
+    rows: [
+      "########################",
+      "########################",
+      "#..f....-.......OOO...f#",
+      "#.KKK...-..KKK..OOO....#",
+      "#..V....-...C..........#",
+      "G--------------....P..SE",
+      "#..P....-..............#",
+      "#.KKK...-..####....f...#",
+      "#.......-..####..P.....#",
+      "#.......-..............#",
+      "TTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
+  // Teresina: o Encontro dos rios (gerado por tools/gerar_mapas.py)
+  encontro: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTT~~~~~TTTTTTTTTTTTTTTTT~~~~~TTTTTa.,....TT..T",
+      "TTTTTTTTTTTTTTTT~~~~~TTTTTTTTTTTTTTTTT~~~~~TTTTT........,..T",
+      "TTTTTTTTTTTTTTTT~~~~~TTTTTTTTTTTTTTTTT~~~~~TTT..---------S-E",
+      "TTTTTTTTTTTT....~~~~~T...TTTTTTTTTTTTT~~~~~TTT..-......,...T",
+      "TTTTTTTTTT......~~~~~,...TTTTTTTo,.a.T~~~~~TTT,.-,....,TT..T",
+      "TTTTTTTT.a------=====----..TTT.o......~~~~~TTT..-,.TTTTTTTTT",
+      "TTTTTTTT,.-,..,.~~~~~.,.-..TTT........~~~~~.....-...TTTTTTTT",
+      "TTTTTTTT,.-.,..a~~~~~T.a-..TT.--------=====--..,-...TTTTTTTT",
+      "TTTTTTTT.,-..TTT~~~~~...-..aT.-.......~~~~~.-...-,,,TTTTTTTT",
+      "TTTTTTT.,.-...TT~~~~~...-,..T.-,..,.,.~~~~~,-...-,oTTTTTTTTT",
+      "TTTTTTT...-..oTT~~~~~...-.....-....f.T~~~~~.-..,-,.....TTTTT",
+      "TTTTTTT.,,-.afTT~~~~~T..-.....-...TTTT~~~~~.-...-------..TTT",
+      "TTTTTTTT.,-..TTT~~~~~T..-.,f..-..,TTTT~~~~~a-.TT...,,.-.TTTT",
+      "TTTTTTTTT.-.TTTT~~~~~T.,-a.f,,F,..TTTT~~~~~.-.TTTT.o..-aTTTT",
+      "TTTT.....,-.TTTT~~~~~T..-.,T.,-..TTTTT~~~~~.-.TTT.....-.TTTT",
+      "TTTa-------.TTTT~~~~~To.-.....-,TTTTTT~~~~~.-,TTT..,..-.TTTT",
+      "TTT.-.,....TTTTT~~~~~T..-.....-.TTTTTT~~~~~.-.TTT.a..,-,TTTT",
+      "TT..-..TTTTTTTTT~~~~~TT.-------,TTTTTT~~~~~,-,...Tf,f.-.TTTT",
+      "Ta..-,,aTTTTTTTT~~~~~TT.a..,...TTTTTTT~~~~~.-a,.,...,.-.TTTT",
+      "T...-.,.TTTTTTTT~~~~~TTT.,,...TTTTTTTT~~~~~.----=====--.TTTT",
+      "T...-.f.TTTTTTTT~~~~~TTTTTTTTTTTTTTTTT~~~~~,.,.~~~~~~~.TTTTT",
+      "T...-..TTTTTTTTT~~~~~TTTTT~~~~~TTTTTTT~~~~~T..o~~~~~~~TTTTTT",
+      "T..,-..TTTTTTTTT~~~~~TTTT~~~~~~~TTTTTT~~~~~TTTT~~~~~~~TTTTTT",
+      "T...-,.,TTTTTTTT~~~~~TTTT~~~~~~~TTTTTT~~~~~TTTTT~~~~~TTTTTTT",
+      "T.f.-..oTTTTTTTT~~~~~TTTT~~~~~~~TTTTTT~~~~~TTTTTTTTTTTTTTTTT",
+      "T..B-...TTTTTTTT~~~~~TTTTT~~~~~TTTTTTT~~~~~TTTTTTTTTTTTTTTTT",
+      "T.....,TTTTTTTTT~~~~~TTTTTTTTTTTTTTTTT~~~~~TTTTTTTTTTTTTTTTT",
+      "T.....TTTTTTTTTT~~~~~TTTTTTTTTTTTTTTTT~~~~~TTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // São Luís: os Lençóis, dunas e lagoas (gerado por tools/gerar_mapas.py)
   lencois: {
     next: null,

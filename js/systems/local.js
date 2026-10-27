@@ -46,6 +46,10 @@ function selectSub(id, msg) {
     btn(t("Voltar para Ananindeua"), () => busRide("ananindeua"), false, i);
     lh(t("A passagem vale ida e volta. Na aldeia tem a fogueira e as matas de sempre."));
   }
+  else if (id === "trocatroca") {
+    btn(t("Entrar no Troca-Troca"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo de Teresina."));
+  }
   else if (id === "praiagrande") {
     btn(t("Entrar na Praia Grande"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo de São Luís."));
@@ -84,12 +88,13 @@ function rest(kind, quiet, toast) {
 const BUS_MS = 3600;
 // toStage = embarcou na fase da rodovia: chegando, entra direto na fase da cabine/terminal da outra cidade
 function busRide(city, toStage) {
-  if (moving || !G.passagem || G.loc === city) return;
+  const ne = city === "teresina" || G.loc === "teresina";   // trecho São Luís ↔ Teresina: outra passagem
+  if (moving || !(ne ? G.passagemTHE : G.passagem) || G.loc === city) return;
   if ($("map").hidden) showMapNow();   // saindo da cabine/terminal: volta para o mapa do Pará
   moving = true; sfx("look");
   const road = $("route"), L = road.getTotalLength(), fromStart = MAP_REGIONS[MAP_REGION].route[0] === G.loc;
   $("mk").style.display = "none"; $("mkbus").style.display = "";
-  $("info").innerHTML = `<h2>${t("Na estrada…")}</h2><p>${city === "belem" ? t("O ônibus segue pela BR-316 rumo a Belém.") : t("O ônibus volta pela BR-316 para Ananindeua.")}</p>`;
+  $("info").innerHTML = `<h2>${t("Na estrada…")}</h2><p>${t({belem: "O ônibus segue pela BR-316 rumo a Belém.", ananindeua: "O ônibus volta pela BR-316 para Ananindeua.", teresina: "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís."}[city])}</p>`;
   let t0 = 0, last = null, vrum = 0;
   const f = ts => {
     t0 = t0 || ts;
