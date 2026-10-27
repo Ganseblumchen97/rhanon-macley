@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.37.0 — o Pajé conta a história
+
+- Agora o Pajé narra o jogo, anos depois, na fogueira da aldeia. Num jogo novo, ele abre a história antes do tutorial:
+  a lua Jaci apagando, a fumaça que deixa os bichos bravos e o menino que sonhava com Curitiba.
+- Na primeira vez em Belém e depois de acalmar cada chefe, ele comenta o que aconteceu. Às vezes o Pajé erra um
+  detalhe e o Rhanon corrige o avô. Alguns chefes dão pistas de onde vem a fumaça.
+- Perdeu duas lutas seguidas? Ao voltar para a trilha, o Pajé "lembra" de uma dica que ajuda.
+- As falas aparecem num painel embaixo da tela: Z (ou ✕/A no controle) passa para a próxima e Esc pula tudo.
+
 ## 0.36.0 — o notebook do Rhanon e o primeiro freela
 
 - Num jogo novo, o Mateiro entrega ao Rhanon um notebook que a cheia trouxe, mas ele não liga: falta bateria, teclado e

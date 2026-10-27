@@ -192,6 +192,8 @@ function startExplore(zone, after, from) {
     exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || t(" · lembranças, comida, artesão e armeiro: chega perto de uma barraca e aperta Z")) : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? t(" · dizem que algo do folclore ronda o fim da trilha...") : t(" · o chefe espera no fim da trilha")));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
+    else if (cityOf(zone) === "belem" && !G.narrated.belem) { G.narrated.belem = true; save(); setTimeout(() => narrate(NARRA.belem), 600); }   // primeira vez na capital
+    else if (G.loseStreak >= 2) { G.loseStreak = 0; save(); setTimeout(() => narrate([pajeHint()]), 600); }   // perdeu duas seguidas: o Pajé "lembra" de algo
   });
 }
 const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira",
@@ -218,7 +220,11 @@ function resumeExplore(result) {
   if (en && result === "win" && en.rematch) exToast(t("Treino vencido: {chefe} gostou da luta!", {chefe: theName(en.a)}));
   else if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? t("{chefe} voltou a si! A aldeia vai falar disso por muitas noites.", {chefe: theName(en.a, true)})
     : EX.st.next === "parada" ? t("Último chefe de Ananindeua vencido! A passagem leva à BR-316.") : EX.st.next ? t("Caminho livre: {lugar}! Segue a trilha até a passagem.", {lugar: SUB[EX.st.next].n}) : t("Último chefe daqui vencido!"));
-  if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); }   // o mapa mostra o caminho novo
+  const reveal = () => { if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); } };   // o mapa mostra o caminho novo
+  if (en && result === "win" && en.boss && !en.rematch && NARRA_BOSS[en.a.id] && !G.narrated[en.a.id]) {
+    G.narrated[en.a.id] = true; save(); EX.locked = true;
+    setTimeout(() => narrate(NARRA_BOSS[en.a.id], () => { if (EX) EX.locked = false; reveal(); }), 900);
+  } else reveal();
 }
 
 /* ---------- ações do Rhanon ---------- */
@@ -389,7 +395,7 @@ function exUpdate(dt, now) {
   }
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
   if (EX.dodge) ix = iy = 0;
-  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden || !$("habil").hidden || !$("revela").hidden) ix = iy = 0;
+  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden || !$("habil").hidden || !$("narra").hidden || !$("revela").hidden) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     if (!(EX.jab > 0)) {   // durante a estocada a lança e o corpo ficam virados para onde ela foi (a mira do mouse), mesmo andando
@@ -652,7 +658,7 @@ function exToast(msg) {
 function setupExploreInput() {
   const DIRS = {ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down", ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right"};
   document.addEventListener("keydown", ev => {
-    if (!EX || $("explore").hidden || !$("opcoes").hidden || !$("caderno").hidden) return;   // com opções ou caderno abertos, o teclado é deles
+    if (!EX || $("explore").hidden || !$("opcoes").hidden || !$("caderno").hidden || !$("narra").hidden) return;   // com opções, caderno ou narração abertos, o teclado é deles
     if (EX.dialog) { dialogKey(ev); return; }
     if (EX.camp) {   // cena (abertura, fogueira): só segurar C pula
       ev.preventDefault();
@@ -1090,6 +1096,7 @@ function campSkip() {
 // fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
   const kind = EX.camp.kind; EX.camp = null; EX.dialog = null; exKeys.clear();
+  if (kind === "intro" && G.tutorial && !G.narrated.prologo) { G.narrated.prologo = true; save(); return narrate(NARRA.prologo, startTutorial); }   // o Pajé abre a história
   if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast(t("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata."));
   exToast(rest(kind, true, true)); exHud();
   if (EX.zone === "aldeia" && kind !== "fogueira") setTimeout(() => EX && announceOffer(), 2400);   // novo dia ou noite: pode ter pedido novo   // dormir: o galo já cantou no amanhecer da cena

@@ -46,12 +46,12 @@ const LANG_FIELDS = [
   ["LOC", "*", "@n"], ["LOC", "*", "@s"], ["LOC", "*", "@txt"],
   ["ITEMS", "*", "@n"], ["EQUIP", "*", "*", "@n"], ["CMDS", "*", "@n"], ["CMDS", "*", "@d"], ["SPECIALS", "*", "@n"], ["SPECIALS", "*", "@d"],
   ["QUESTS", "*", "@text"], ["QUESTS", "*", "@thanks"], ["VILLAGER_NAME", "*"], ["VILLAGER_TIPS", "*"], ["BELEM_TIPS", "*"],
-  ["TUTORIAL", "*"], ["SAFE_TIP", "*"], ["SPOT_LABEL", "*"], ["EQ_SLOTS", "*", "@n"], ["EQ_SLOTS", "*", "@none"], ["CHARM_FX", "*"], ["BUGS", "*", "@name"], ["BUGS", "*", "@intro"], ["BUGS", "*", "@moves", "*"], ["FREELAS", "*", "@n"], ["FREELAS", "*", "@client"], ["FREELAS", "*", "@prog"], ["BUG_CMD", "*"],
+  ["TUTORIAL", "*"], ["SAFE_TIP", "*"], ["SPOT_LABEL", "*"], ["EQ_SLOTS", "*", "@n"], ["EQ_SLOTS", "*", "@none"], ["CHARM_FX", "*"], ["BUGS", "*", "@name"], ["BUGS", "*", "@intro"], ["BUGS", "*", "@moves", "*"], ["FREELAS", "*", "@n"], ["FREELAS", "*", "@client"], ["FREELAS", "*", "@prog"], ["BUG_CMD", "*"], ["NARRA", "*", "*"], ["NARRA", "*", "*", "@r"], ["NARRA_BOSS", "*", "*"], ["NARRA_BOSS", "*", "*", "@r"], ["NARRA_HINT", "*"],
   ["SKILL_TREES", "*", "@n"], ["SKILL_TREES", "*", "@d"], ["SKILL_TREES", "*", "nodes", "*", "@n"], ["SKILL_TREES", "*", "nodes", "*", "@d"]
 ];
 // percorre um caminho de LANG_FIELDS e chama fn(objeto, chave) em cada texto encontrado
 function langWalk(root, path, fn) {
-  if (root == null) return;
+  if (root == null || typeof root !== "object") return;   // texto solto no meio do caminho (ex.: fala que não é {r: ...})
   const [step, ...rest] = path, keys = step === "*" ? Object.keys(root) : step[0] === "@" ? [step.slice(1)] : [step];
   keys.forEach(k => {
     if (!(k in root)) return;

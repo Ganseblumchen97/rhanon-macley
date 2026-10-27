@@ -612,6 +612,7 @@ function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: 
 }
 function keepVitals(kind) {
   vit();
+  G.loseStreak = kind === "lose" ? (G.loseStreak || 0) + 1 : kind === "win" ? 0 : G.loseStreak; if (kind === "lose") G.loseZone = curZone;
   if (kind === "lose") { G.hp = Math.ceil(maxHP(G.lv) / 2); G.sp = Math.ceil(maxSP(G.lv) / 2); G.lastLoss = Math.round(G.money * (.05 + Math.random() * .1)); G.money -= G.lastLoss; G.sub = CITY[curCity()].home; G.day++; }   // acorda na aldeia (ou no Ver-o-Peso, em Belém)
   else { G.hp = Math.max(1, p.hp); G.sp = p.sp; G.items = p.items; }
   save();
