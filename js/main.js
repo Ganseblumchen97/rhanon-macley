@@ -41,6 +41,11 @@ new MutationObserver(() => { const t = $("overTitle"); if (t.childNodes.length =
 document.addEventListener("keydown", ev => {
   // cartão do resultado: Z aperta o botão escolhido (como Enter)
   if (!$("over").hidden && (ev.key === "z" || ev.key === "Z") && document.activeElement && document.activeElement.closest("#over")) { ev.preventDefault(); document.activeElement.click(); return; }
+  if (!$("over").hidden && ev.key.startsWith("Arrow")) {   // setas trocam entre "Lutar de novo" e "Voltar"
+    const bs = [...$("over").querySelectorAll("button")].filter(b => b.offsetParent !== null), i = bs.indexOf(document.activeElement);
+    if (bs.length) { ev.preventDefault(); bs[(i + (ev.key === "ArrowUp" || ev.key === "ArrowLeft" ? bs.length - 1 : 1)) % bs.length].focus(); sfx("blip"); }
+    return;
+  }
   // setas e 1-6 só durante a batalha
   if (mode !== "hunt" || !p || !$("over").hidden || !$("map").hidden || !$("local").hidden || !$("explore").hidden || !$("titleScreen").hidden) return;
   if (qte && ["z", "Z", " "].includes(ev.key)) { ev.preventDefault(); if (!ev.repeat) qtePress(); return; }   // golpe/bloqueio no tempo certo

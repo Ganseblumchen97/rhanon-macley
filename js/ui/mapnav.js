@@ -47,7 +47,7 @@ function menuKey(ev, host) {   // devolve true se usou a tecla
 function setupMapNav() {
   document.addEventListener("keydown", ev => {
     if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
-    if (!$("titleScreen").hidden) { if ((ev.key === "Enter" || ev.key === "z" || ev.key === "Z") && document.activeElement !== $("startAdventure")) $("startAdventure").click(); return; }
+    if (!$("titleScreen").hidden) { menuKey(ev, $("titleScreen").querySelector(".t-menu")); return; }   // setas entre "Iniciar aventura" e "Opções", Z/Enter apertam
     // entrevistas e missões de trabalho
     if (["interview", "betterInterview", "work"].includes(mode) && $("over").hidden && $("map").hidden) {
       const i = "123".indexOf(ev.key) >= 0 ? "123".indexOf(ev.key) : "abc".indexOf(ev.key.toLowerCase());

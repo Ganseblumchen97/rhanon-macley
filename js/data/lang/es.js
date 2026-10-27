@@ -1026,6 +1026,18 @@ TX.es = {
     "Controle conectado: {nome}": "Mando conectado: {nome}",
     "controle": "mando",
     "Controle desconectado": "Mando desconectado",
-    "Controle: A/✕ golpe e confirma · B/◯ flecha e volta · X/▢ esquiva · Y/△ bolsa · LB equipar · RB habilidades · Start começa · Select (segurar) pula cena": "Mando: A/✕ golpe y confirmar · B/◯ flecha y volver · X/▢ esquivar · Y/△ bolsa · LB equipar · RB habilidades · Start empieza · Select (mantener) salta la escena"
+    "{dir} escolhem o espaço · {z} troca para o próximo · {x} fecha": "{dir} eligen el espacio · {z} cambia al siguiente · {x} cierra",
+    "{dir} escolhem · {z} aprende · {x} fecha": "{dir} eligen · {z} aprende · {x} cierra",
+    "{z} aprende.": "{z} la aprende.",
+    "Segure {sel} para pular": "Mantén {sel} para saltar",
+    "{dir} anda · analógico direito mira · {z} golpe e conversa · {x} flecha · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades": "{dir} anda · stick derecho apunta · {z} golpe y hablar · {x} flecha · {sh} esquivar · {i} bolsa · {e} equipar · {h} habilidades",
+    "Ícones dos botões": "Iconos de los botones",
+    "Automático": "Automático",
+    "Teclado": "Teclado",
+    "Controle: {z} golpe e confirma · {x} flecha e volta · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades · {st} começa · {sel} (segurar) pula cena · analógico direito mira na exploração": "Mando: {z} golpe y confirmar · {x} flecha y volver · {sh} esquivar · {i} bolsa · {e} equipar · {h} habilidades · {st} empieza · {sel} (mantener) salta la escena · el stick derecho apunta al explorar",
+    "Nenhum controle encontrado. Aperte um botão do controle.": "No se encontró ningún mando. Pulsa un botón del mando.",
+    "{nome} · modo {modo} · botões: {b} · eixos: {e}": "{nome} · modo {modo} · botones: {b} · ejes: {e}",
+    "próprio": "propio",
+    "Setas": "Flechas"
   }
 };

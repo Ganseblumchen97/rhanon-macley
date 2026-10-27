@@ -1029,6 +1029,18 @@ TX.fr = {
     "Controle conectado: {nome}": "Manette connectée : {nome}",
     "controle": "manette",
     "Controle desconectado": "Manette déconnectée",
-    "Controle: A/✕ golpe e confirma · B/◯ flecha e volta · X/▢ esquiva · Y/△ bolsa · LB equipar · RB habilidades · Start começa · Select (segurar) pula cena": "Manette : A/✕ frapper et valider · B/◯ flèche et retour · X/▢ esquive · Y/△ sac · LB équiper · RB compétences · Start commence · Select (maintenir) passe la scène"
+    "{dir} escolhem o espaço · {z} troca para o próximo · {x} fecha": "{dir} pour choisir l'emplacement · {z} passe au suivant · {x} ferme",
+    "{dir} escolhem · {z} aprende · {x} fecha": "{dir} pour choisir · {z} apprend · {x} ferme",
+    "{z} aprende.": "{z} pour l'apprendre.",
+    "Segure {sel} para pular": "Maintiens {sel} pour passer",
+    "{dir} anda · analógico direito mira · {z} golpe e conversa · {x} flecha · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades": "{dir} marcher · stick droit pour viser · {z} frapper et parler · {x} flèche · {sh} esquive · {i} sac · {e} équiper · {h} compétences",
+    "Ícones dos botões": "Icônes des boutons",
+    "Automático": "Automatique",
+    "Teclado": "Clavier",
+    "Controle: {z} golpe e confirma · {x} flecha e volta · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades · {st} começa · {sel} (segurar) pula cena · analógico direito mira na exploração": "Manette : {z} frapper et valider · {x} flèche et retour · {sh} esquive · {i} sac · {e} équiper · {h} compétences · {st} commence · {sel} (maintenir) passe la scène · le stick droit vise en exploration",
+    "Nenhum controle encontrado. Aperte um botão do controle.": "Aucune manette trouvée. Appuie sur un bouton de la manette.",
+    "{nome} · modo {modo} · botões: {b} · eixos: {e}": "{nome} · mode {modo} · boutons : {b} · axes : {e}",
+    "próprio": "propre",
+    "Setas": "Flèches"
   }
 };

@@ -66,7 +66,7 @@ function openEquip(msg) {
   });
   if (!list.length) lh(s.slot === "ranged" ? t("Ainda sem arco. O armeiro da feira faz um.") : t("Nada pra trocar aqui ainda."), pick);
   if (msg) lh(msg, box);
-  box.insertAdjacentHTML("beforeend", `<p class="hint eq-keys">${t("Setas escolhem o espaço · Z troca para o próximo · 1-9 equipam direto · X fecha")}</p>`);
+  box.insertAdjacentHTML("beforeend", `<p class="hint eq-keys">${padStyle() ? t("{dir} escolhem o espaço · {z} troca para o próximo · {x} fecha", padVars()) : t("Setas escolhem o espaço · Z troca para o próximo · 1-9 equipam direto · X fecha")}</p>`);
   btn(t("Fechar"), closeEquip, false, box);
   if (o.hidden) { o.hidden = false; sfx("blip"); }
 }

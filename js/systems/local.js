@@ -248,7 +248,7 @@ function forgeSelect(id, quiet) {
   card.querySelector("h3").prepend(gearIcon(o.slot, it));
   if (G.owned[id]) return;
   const b = document.createElement("button"), off = forgeLacks(it);
-  b.className = "cmd forge-make"; b.type = "button"; b.innerHTML = `<span><i class="key">Z</i>${t("Fabricar")}</span>`;   // a tecla some em tela de toque, como nos outros botões
+  b.className = "cmd forge-make"; b.type = "button"; b.innerHTML = `<span>${padBadge("z")}${t("Fabricar")}</span>`;   // a tecla some em tela de toque, como nos outros botões
   if (off) b.setAttribute("aria-disabled", "true");
   b.addEventListener("click", () => { if (!forgeLacks(it)) ask((it.craft ? t("Fabricar {item}? Gasta R$ {n} e as peles da lista.", {item: it.n.toLowerCase(), n: forgeCost(it)}) : t("Fabricar {item}? Gasta R$ {n}.", {item: it.n.toLowerCase(), n: forgeCost(it)})) + " " + gearCmp(o.slot, it), () => forgeMake(o))(); });
   card.appendChild(b);

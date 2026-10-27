@@ -1023,6 +1023,18 @@ TX.en = {
     "Controle conectado: {nome}": "Controller connected: {nome}",
     "controle": "controller",
     "Controle desconectado": "Controller disconnected",
-    "Controle: A/✕ golpe e confirma · B/◯ flecha e volta · X/▢ esquiva · Y/△ bolsa · LB equipar · RB habilidades · Start começa · Select (segurar) pula cena": "Controller: A/✕ strike and confirm · B/◯ arrow and back · X/▢ dodge · Y/△ bag · LB equip · RB skills · Start begins · Select (hold) skips scene"
+    "{dir} escolhem o espaço · {z} troca para o próximo · {x} fecha": "{dir} choose the slot · {z} switches to the next · {x} closes",
+    "{dir} escolhem · {z} aprende · {x} fecha": "{dir} choose · {z} learns · {x} closes",
+    "{z} aprende.": "{z} learns it.",
+    "Segure {sel} para pular": "Hold {sel} to skip",
+    "{dir} anda · analógico direito mira · {z} golpe e conversa · {x} flecha · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades": "{dir} walk · right stick aims · {z} strike and talk · {x} arrow · {sh} dodge · {i} bag · {e} equip · {h} skills",
+    "Ícones dos botões": "Button icons",
+    "Automático": "Automatic",
+    "Teclado": "Keyboard",
+    "Controle: {z} golpe e confirma · {x} flecha e volta · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades · {st} começa · {sel} (segurar) pula cena · analógico direito mira na exploração": "Controller: {z} strike and confirm · {x} arrow and back · {sh} dodge · {i} bag · {e} equip · {h} skills · {st} begins · {sel} (hold) skips scene · right stick aims while exploring",
+    "Nenhum controle encontrado. Aperte um botão do controle.": "No controller found. Press a button on the controller.",
+    "{nome} · modo {modo} · botões: {b} · eixos: {e}": "{nome} · mode {modo} · buttons: {b} · axes: {e}",
+    "próprio": "custom",
+    "Setas": "Arrows"
   }
 };

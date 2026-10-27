@@ -32,7 +32,7 @@ function buildCmds() {
 function openSubMenu(opts, backDesc, from) {
   subMenu = opts; subFrom = from; sfx("look"); $("cmds").innerHTML = "";
   opts.forEach((o, n) => cmdButton(`<i class="key">${n + 1}</i>${o.label}<small>${o.small || ""}</small>`, o.desc, o.fn, o.off));
-  cmdButton(`<i class="key">X</i>Voltar`, backDesc, closeSubMenu);
+  cmdButton(`${padBadge("x")}${t("Voltar")}`, backDesc, closeSubMenu);
   $("cmds").classList.toggle("scroll", opts.length >= CMDS.length);   // bolsa cheia: não passa da altura dos comandos, rola com as setas
   $("cmds").firstChild.focus();
 }
@@ -161,7 +161,7 @@ let qte = null, foeImpact = 0;           // qte = {at, el, ok, tried}; foeImpact
 function qteArm(impactIn, target) {
   qteClear();
   const q = pos(target), el = el$("qte", {left: q.x + "px", top: q.y - 34 + "px"}), lead = Math.max(0, impactIn - QTE_EARLY);
-  el.innerHTML = "<i></i><b>Z</b>"; el.style.setProperty("--dur", lead + "ms");
+  el.innerHTML = `<i></i><b>${padLabel("z")}</b>`;   // no controle, o botão dele (ui/gamepad.js) el.style.setProperty("--dur", lead + "ms");
   qte = {at: performance.now() + impactIn, el, ok: false, tried: false};
   setTimeout(() => { if (el.isConnected) { el.classList.add("agora"); sfx("janela"); } }, lead);
   setTimeout(() => el.remove(), impactIn + QTE_LATE + 260);

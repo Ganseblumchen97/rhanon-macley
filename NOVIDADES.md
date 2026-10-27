@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.34.1 — controle nos menus, botões na tela e mira no analógico
+
+- Corrigido: a tela inicial, as Opções e o cartão do fim da luta não andavam com a cruz ou o analógico do controle
+  (nem com as setas do teclado). Agora andam, e ✕/A aperta o que está escolhido.
+- Jogando com controle, a tela mostra os botões dele no lugar das teclas: ✕ ◯ ▢ △ no PlayStation, A B X Y no Xbox e
+  os do Nintendo. Apertou o teclado, voltam as teclas. Nas Opções, "Ícones dos botões" deixa escolher um estilo fixo.
+- Na exploração, o analógico direito mira como o mouse: a lança e a flecha saem na direção dele. Sem mexer nele,
+  continua tudo pela direção em que o Rhanon anda.
+- Nas Opções aparece ao vivo o que o controle está mandando. Se algum botão vier trocado, manda print dessa linha.
+
 ## 0.34.0 — jogue com controle
 
 - Agora dá para jogar com controle de Xbox, PlayStation, Switch Pro ou genérico: é só ligar no computador e apertar

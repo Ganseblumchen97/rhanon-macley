@@ -218,8 +218,11 @@ function resumeExplore(result) {
 
 /* ---------- ações do Rhanon ---------- */
 const entH = en => Math.min(en.h, 20);
+// analógico direito do controle inclinado (ui/gamepad.js): mira para lá antes do golpe ou da flecha
+const padAimNow = () => { if (EX.padAim) exAimAt(EX.hero.x + EX.padAim.x * 20, EX.hero.y - 8 + EX.padAim.y * 20); };
 function exStrike() {
   if (!EX || EX.locked || EX.dialog || EX.camp || EX.cool > 0) return;
+  padAimNow();
   const spot = nearSpot(); if (spot) return exOpenDialog(spot.kind, null, spot.look);   // perto de alguém: conversa em vez de golpe
   const h = EX.hero; EX.cool = .35; EX.jab = .16; sfx("spear");
   // a lança alcança uns 1,5 quadrado à frente: confere pontos ao longo dela
@@ -235,6 +238,7 @@ const bowHand = a => [16 + a.x * 13, 25 + a.y * 9];
 function exThrow() {
   if (!EX || EX.locked || EX.dialog || EX.camp || EX.cool > 0 || EX.spear || EX.draw) return;
   if (!G.equip.ranged) { EX.cool = 1.2; sfx("blip"); return exToast(t("Pra atacar de longe precisa de arco. O armeiro da feira faz um.")); }
+  padAimNow();
   const h = EX.hero; EX.cool = BOW_DRAW + .45; sfx("guard");
   EX.draw = {t: 0, aim: {x: h.aim.x, y: h.aim.y}};
 }
@@ -359,6 +363,7 @@ function exUpdate(dt, now) {
   // aviso "segure C para pular" com a barrinha enchendo (0,7 s segurando pula a cena)
   const sk = $("exSkip");
   if (EX.camp) {
+    if (sk.hidden) sk.firstChild.nodeValue = skipText() + " ";   // "Segure C" ou o botão do controle
     sk.hidden = false;
     const p = EX.skipHold ? Math.min(1, (now - EX.skipHold) / 700) : 0;
     sk.style.setProperty("--p", p * 100 + "%");
@@ -735,9 +740,10 @@ function drawNpc(x, s, cx, cy, now) {
   if (mark) drawQuestMark(x, sx, top - 4, mark, now);
   if (sleeping && !REDUCE) { const p = (now / 1100 + s.tx * .37) % 1; glyphP(x, "z", "#ffffff", sx + 4 + p * 6, top + 6 - p * 10); }
 }
+const skipText = () => padStyle() ? t("Segure {sel} para pular", padVars()) : t("Segure C para pular");
 // setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
 function drawSpotPrompt(x, cx, cy, now) {
-  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `${t("Z / GOLPE")}: ${SPOT_LABEL[s.kind]}` : "";
+  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `${padStyle() ? padLabel("z") : t("Z / GOLPE")}: ${SPOT_LABEL[s.kind]}` : "";
   if (el.textContent !== txt) { el.textContent = txt; el.classList.toggle("show", !!s); }
   if (!s) return;
   const px = Math.round(s.x - cx), py = Math.round(s.y - cy) - (PEOPLE.includes(s.kind) ? 30 : 10) - Math.floor(now / 250) % 2;
@@ -866,7 +872,7 @@ function motelScene(kind, done) {
   wipe(() => {
     let o = $("motelRoom");
     if (!o) { o = document.createElement("div"); o.id = "motelRoom"; o.className = "motel-room"; o.innerHTML = '<canvas width="192" height="120"></canvas><p></p>'; document.body.appendChild(o); }
-    o.querySelector("p").textContent = t("Segure C para pular");
+    o.querySelector("p").textContent = skipText();
     o.hidden = false;
     const x = o.querySelector("canvas").getContext("2d"), t0 = performance.now(), D = REDUCE ? 600 : MOTEL_MS;
     let ended = false;

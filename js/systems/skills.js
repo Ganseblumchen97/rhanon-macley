@@ -33,10 +33,10 @@ function openSkills(msg) {
   // degrau escolhido: o que ele faz e por que ainda não dá
   const tr = SKILL_TREES[SK_SEL.t], nd = tr.nodes[SK_SEL.i], st = skillState(tr, SK_SEL.i), card = document.createElement("div");
   card.className = "sk-card";
-  card.innerHTML = `<h3>${nd.n}</h3><p>${nd.d}</p><p class="hint">${{learned: t("Já aprendida."), locked: t("Aprenda antes a habilidade de cima."), short: t("Faltam pontos: suba de nível."), open: t("Z aprende.")}[st]}</p>`;
+  card.innerHTML = `<h3>${nd.n}</h3><p>${nd.d}</p><p class="hint">${{learned: t("Já aprendida."), locked: t("Aprenda antes a habilidade de cima."), short: t("Faltam pontos: suba de nível."), open: padStyle() ? t("{z} aprende.", padVars()) : t("Z aprende.")}[st]}</p>`;
   box.append(card);
   if (msg) lh(msg, box);
-  box.insertAdjacentHTML("beforeend", `<p class="hint eq-keys">${t("Setas escolhem · Z aprende · X fecha")}</p>`);
+  box.insertAdjacentHTML("beforeend", `<p class="hint eq-keys">${padStyle() ? t("{dir} escolhem · {z} aprende · {x} fecha", padVars()) : t("Setas escolhem · Z aprende · X fecha")}</p>`);
   btn(t("Fechar"), closeSkills, false, box);
   if (o.hidden) { o.hidden = false; sfx("blip"); }
 }

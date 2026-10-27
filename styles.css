@@ -889,3 +889,25 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 #exSkills.pts{background:#ffd23a;color:#3a2414;animation:skPulse 1.2s steps(2) infinite;--sk:#ffd23a}
 /* aviso do controle (ui/gamepad.js) */
 .pad-toast{position:fixed;right:16px;bottom:16px;z-index:2000;padding:8px 14px;background:#06120a;color:#f6e9c4;border:3px solid #ffd23a;font:700 13px var(--mono);box-shadow:4px 4px 0 var(--red);animation:rpop .3s var(--pop) backwards}
+/* ícones do controle (ui/gamepad.js): com o controle em uso, os números de atalho somem e os botões aparecem com a
+   cor de cada controle (body[data-pad] = xbox, ps ou nintendo); o rodapé da exploração troca de versão */
+.pb{display:inline-grid;place-items:center;min-width:1.5em;height:1.5em;padding:0 .3em;margin-right:.35em;border-radius:999px;background:#1a1a1a;color:#fff;
+  font:700 .8em/1 var(--mono);box-shadow:0 2px 0 #000;vertical-align:middle;box-sizing:border-box}
+.pb-e,.pb-h,.pb-Enter,.pb-c,.pb-arrows{border-radius:5px}
+body[data-pad="xbox"] .pb-z,.pb-z[data-st="xbox"]{background:#3fae3f}
+body[data-pad="xbox"] .pb-x,.pb-x[data-st="xbox"]{background:#d8382f}
+body[data-pad="xbox"] .pb-Shift,.pb-Shift[data-st="xbox"]{background:#2f6fd8}
+body[data-pad="xbox"] .pb-i,.pb-i[data-st="xbox"]{background:#e8b020;color:#1a1a1a}
+body[data-pad="ps"] .pb-z,.pb-z[data-st="ps"]{color:#7ab0ff}
+body[data-pad="ps"] .pb-x,.pb-x[data-st="ps"]{color:#ff6a6a}
+body[data-pad="ps"] .pb-Shift,.pb-Shift[data-st="ps"]{color:#ff8ad0}
+body[data-pad="ps"] .pb-i,.pb-i[data-st="ps"]{color:#5ee0a0}
+body[data-pad="nintendo"] .pb-z,body[data-pad="nintendo"] .pb-x,body[data-pad="nintendo"] .pb-Shift,body[data-pad="nintendo"] .pb-i{background:#2a2a2a}
+body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .cmd .key{display:none}
+.ex-help-pad{display:none}
+body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-pad{display:block}
+body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{display:none}
+.pad-live{font:11px var(--mono);opacity:.8;word-break:break-word}
+.qte b{white-space:nowrap}
+/* Opções no teclado/controle: a linha em foco fica marcada */
+.opcoes .opt-row:focus-within{outline:3px solid #ffd23a;outline-offset:2px;border-radius:3px}
