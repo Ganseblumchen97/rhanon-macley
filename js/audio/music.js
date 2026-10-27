@@ -23,7 +23,8 @@ function stepWork(s, t) {
    (NORTE_THEME), cada uma com a sua roupa; os enfeites e os solos da parte B do mapa ainda são sorteados.
    Faixas: "title" (abertura), "map" (mapa grande: Pará/Brasil), "local" (Ananindeua, toque de capoeira com flauta),
    "localNight" (Ananindeua à noite), "battleCapo" (batalha na mata: a roda de capoeira acelerada), "battleCarimbo"
-   (batalha na água: carimbó), "battleGuitarrada" (batalha em Belém: guitarrada), "battleBoss" (chefe: abertura
+   (batalha na água: carimbó), "battleGuitarrada" (batalha em Belém: guitarrada), "localNordeste" (São Luís e o
+   mapa do Maranhão: toada de bumba-meu-boi com sanfona e triângulo, e o tema do Nordeste), "battleBoss" (chefe: abertura
    sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
@@ -80,6 +81,23 @@ const MUS = (() => {
   }
   const snare = (when, vol) => { noiseHit(when, .13, vol, "bandpass", 1800); synth("triangle", 190, when, .08, vol * .5); };
   const hat = (when, vol, open) => noiseHit(when, open ? .12 : .03, vol, "highpass", 7000);
+  // sanfona: duas palhetas um pouco desafinadas entre si (o "musette" que faz o som tremer), timbre de palheta filtrado
+  // e o fole entrando macio
+  function sanfona(freq, when, dur, vol) {
+    const f = X.createBiquadFilter(), g = X.createGain();
+    f.type = "lowpass"; f.frequency.value = Math.min(4200, freq * 6); f.Q.value = .8;
+    g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .03);
+    g.gain.setValueAtTime(vol, when + Math.max(.04, dur - .06)); g.gain.linearRampToValueAtTime(0, when + dur + .05);
+    f.connect(g).connect(bus.mix);
+    for (const [type, det, k] of [["sawtooth", -9, .55], ["sawtooth", 9, .55], ["square", 0, .25]]) {
+      const o = X.createOscillator(), og = X.createGain(); o.type = type; o.frequency.value = freq; o.detune.value = det; og.gain.value = k;
+      o.connect(og).connect(f); o.start(when); o.stop(when + dur + .1);
+    }
+  }
+  // triângulo: ferro tocado (parciais inarmônicos); aberto soa, fechado (mão abafando) é só um tic
+  function triangulo(when, vol, open) {
+    for (const [fq, k] of [[2600, 1], [4180, .5], [5930, .3]]) synth("sine", fq, when, open ? .4 : .05, vol * k);
+  }
   function flute(freq, when, dur, vol) {
     const o = X.createOscillator(), g = X.createGain(), lfo = X.createOscillator(), depth = X.createGain();
     o.type = "triangle"; o.frequency.value = freq; lfo.frequency.value = 5; depth.gain.value = freq * .005;
@@ -287,6 +305,15 @@ const MUS = (() => {
         [4, 0, 70, 6], [4, 6, 74, 6], [4, 12, 79, 4], [5, 0, 77, 12],
         [6, 0, 76, 6], [6, 6, 73, 6], [6, 12, 69, 4], [7, 0, 69, 12]]
   };
+  /* Tema do Nordeste (leitmotif): toada de bumba-meu-boi em sol mixolídio (o fá natural dá o sabor nordestino).
+     O motivo é "ré–si–ré–mi" no ritmo 4-2-2 da toada, e cada frase desce de volta; um acorde a cada dois compassos:
+     sol–fá–dó–ré com sétima. */
+  const NORDESTE_THEME = {
+    A: [[0, 0, 74, 4], [0, 4, 71, 2], [0, 6, 74, 2], [0, 8, 76, 4], [0, 12, 74, 4], [1, 0, 71, 12],
+        [2, 0, 72, 4], [2, 4, 69, 2], [2, 6, 72, 2], [2, 8, 77, 4], [2, 12, 76, 4], [3, 0, 72, 12],
+        [4, 0, 76, 4], [4, 4, 72, 2], [4, 6, 76, 2], [4, 8, 79, 4], [4, 12, 77, 4], [5, 0, 76, 8], [5, 8, 74, 4], [5, 12, 72, 4],
+        [6, 0, 74, 4], [6, 4, 78, 2], [6, 6, 81, 2], [6, 8, 79, 4], [6, 12, 78, 4], [7, 0, 74, 12]]
+  };
   // tema → 128 passos (oito compassos); shift muda a oitava (ou o tom: +7 leva para lá menor); com enfeite, as notas
   // longas às vezes ganham um floreio rápido no fim (o sorteio fica só aí: o desenho da frase não muda); upTo = só os
   // primeiros compassos (o resto fica em silêncio)
@@ -459,6 +486,31 @@ const MUS = (() => {
         if (Math.random() < .002) owl(t);
         const m = this.melody && this.melody[i % 128];
         if (m) flute(mtof(m.note), t, m.len * d, .026);
+      }
+    },
+    // São Luís e o mapa do Maranhão: toada de bumba-meu-boi misturada com forró. O batuque do boi (matraca, pandeirão,
+    // maracá) fica por baixo; por cima, zabumba e triângulo de forró, a sanfona puxando os acordes no contratempo e
+    // tocando o tema do Nordeste (NORDESTE_THEME), com a flauta dobrando na volta A'. Forma: introdução de batuque - A - A' - A
+    localNordeste: {
+      bpm: 112, wet: .3, level: .4, swing: .06, form: ["I", "A", "A2", "A"], melody: null,
+      chords: [{bass: 43, notes: [55, 59, 62, 67]}, {bass: 41, notes: [53, 57, 60, 65]}, {bass: 36, notes: [52, 55, 60, 64]}, {bass: 38, notes: [54, 57, 60, 62]}],
+      matraca: "x.xxx.xxx.xxx.xx",
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4], chord = this.chords[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(NORDESTE_THEME.A, part === "A2" ? 12 : 0, part === "A2");   // tema do Nordeste
+        if (this.matraca[s] === "x") noiseHit(t, .025, s % 4 === 0 ? .018 : .009, "bandpass", 2600, 3);   // matracas
+        triangulo(t, s % 4 === 2 ? .01 : .005, s % 4 === 2);   // triângulo: fechado no tempo, aberto no contratempo
+        if (s === 0 || s === 8) { surdo(t, .1); noiseHit(t, .12, .02, "lowpass", 400); }   // pandeirão
+        if (s === 6 || s === 14) surdo(t, .05);
+        if (s === 0 || s === 7 || s === 10) kick(t, .08);   // zabumba
+        if (s === 4 || s === 12) tapa(t, .025);
+        if (s % 2 === 1) caxixi(t, .007);   // maracá
+        if (s === 0 && barIn % 2 === 0) { pad(chord.notes, t, d * 32, .009); synth("triangle", mtof(chord.bass), t, d * 6, .09); }
+        if (s === 8) synth("triangle", mtof(chord.bass + 7), t, d * 4, .07);
+        if (part !== "I" && [2, 6, 10, 14].includes(s)) chord.notes.slice(1).forEach(m => sanfona(mtof(m + 12), t, d * 1.2, .0045));   // sanfona puxando os acordes
+        if (Math.random() < .004) bird(t);
+        const m = this.melody && this.melody[i % 128];
+        if (m) { sanfona(mtof(m.note), t, m.len * d * .92, .016); if (part === "A2") flute(mtof(m.note + 12), t, m.len * d * .9, .016); }   // tema na sanfona
       }
     },
     // batalha: a roda de capoeira acelerada (toque de São Bento Grande), com atabaque, pandeiro, baixo marcado
@@ -836,6 +888,7 @@ function legacyStop() { if (legacyTimer) clearInterval(legacyTimer); legacyTimer
 /* ----- o que o resto do jogo usa ----- */
 function musicStart(id) {
   id = id || "battleCapo";
+  if ((id === "local" && curCity() === "saoluis") || (id === "map" && MAP_REGION === "maranhao")) id = "localNordeste";   // Nordeste: a toada do boi
   if (id === "local" && G.night) id = "localNight";   // à noite a música da exploração muda de clima
   if (id === "map" && MAP_REGION === "para") id = G.night ? "mapParaNight" : "mapPara";   // mapa do Pará: guitarrada de dia e de noite
   if (MUS.has(id)) { legacyStop(); MUS.play(id); }

@@ -978,6 +978,7 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 @keyframes brPulse{50%{r:19px}}
 .br-smoke circle{fill:#2a2a34;stroke:#06120a;stroke-width:2}
 .br-smoke rect{fill:#ff2a2a}
+.br-plane path{fill:none;stroke:#ffffff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 2px 0 #06120a)}   /* avião do voo entre regiões (fly em world-map.js) */
 .br-card{border-top:2px dashed var(--wood);padding-top:6px;margin-top:6px}
 .br-card h3{margin:0;font:400 22px var(--display);text-transform:uppercase}
 .br-card p{margin:4px 0;font:13px/1.45 var(--mono);color:var(--brown)}

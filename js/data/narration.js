@@ -9,6 +9,12 @@ const NARRA = {
     "O Rhanon era um menino da nossa aldeia. Lança na mão e a cabeça cheia de computador. Sonhava com Curitiba, imagina.",
     "Naquela manhã ele acordou do lado dessa mesma fogueira. E foi aí que tudo começou."
   ],
+  saoluis: [
+    "E foi de avião! O menino que nunca tinha saído do Pará, lá em cima das nuvens, agarrado na poltrona.",
+    "São Luís é uma ilha. A maré sobe e desce tanto que o mar parece respirar. E em toda esquina tem boi: bumba-meu-boi, com matraca e pandeirão.",
+    {r: "Vô, o senhor também foi de sonho até lá?"},
+    "Fui, e nem enjoei. O Nordeste tem outros encantados, curumim. A fumaça chegou lá também. Agora deixa eu contar."
+  ],
   belem: [
     "Belém! O menino nunca tinha visto tanta gente junta. Nem tanto urubu.",
     "Na capital a fumaça era outra: saía de carro, de fábrica, de gente apressada. E as visagens de lá ficaram confusas também.",

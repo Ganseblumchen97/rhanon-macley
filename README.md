@@ -1,4 +1,4 @@
-﻿# Rhanon Macley — RPG (alfa 0.43.0)
+﻿# Rhanon Macley — RPG (alfa 0.44.0)
 
 **Jogar:** https://ganseblumchen97.github.io/rhanon-macley/
 

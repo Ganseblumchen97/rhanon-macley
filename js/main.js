@@ -3,8 +3,7 @@
 applyLangData(); translateStatic();   // idioma escolhido nas Opções (core/lang.js); em português (ou sem o arquivo do idioma) não faz nada
 if (!CURITIBA_OPEN && G.loc === "curitiba") { G.loc = "ananindeua"; save(); }   // Curitiba fechada por enquanto
 $("gameVersion").textContent = t("ALFA") + " " + GAME_VERSION;
-setupMapRegion();
-buildMapNodes();
+syncRegion();   // mapa grande da cidade do save (Pará ou Maranhão)
 buildLocalNodes();
 setupExploreInput();
 setupMapNav(); setupGamepad(); setupNarration();

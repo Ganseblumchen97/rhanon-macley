@@ -46,6 +46,11 @@ function selectSub(id, msg) {
     btn(t("Voltar para Ananindeua"), () => busRide("ananindeua"), false, i);
     lh(t("A passagem vale ida e volta. Na aldeia tem a fogueira e as matas de sempre."));
   }
+  else if (id === "praiagrande") {
+    btn(t("Entrar na Praia Grande"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo de São Luís."));
+    lh(t("O aeroporto fica no mapa do Maranhão (Esc): de lá sai o voo de volta para Belém."));
+  }
   else if (id === "veropeso") {
     btn(t("Entrar no Ver-o-Peso"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, artesão, armeiro e uma rede na pensão."));
@@ -422,7 +427,7 @@ function buildLocalNodes() {
     }
   });
   $("lbridges").innerHTML = bridges;
-  const mark = k => k === C.gate   // a BR-316 (e o terminal de Belém) é uma cabine de cobrador, não uma bolinha
+  const mark = k => k === C.gate && C.cabin !== false   // a BR-316 (e o terminal de Belém) é uma cabine de cobrador, não uma bolinha
     ? '<g class="cabin"><circle r="13" class="hit"/><rect x="-9" y="-12" width="18" height="15"/><path d="M-12 -12L0 -21L12 -12Z"/><rect class="win" x="-5" y="-8" width="10" height="5"/></g>'
     : '<circle r="10"/>';
   $("lnodes").innerHTML = ROUTE.map(k => [k, SUB[k]]).map(([k, l]) => `<g class="node" id="ln-${k}" data-k="${k}" transform="translate(${l.x} ${l.y})" tabindex="0" role="button" aria-label="${l.n}">${mark(k)}<text y="28" text-anchor="middle">${l.s || l.n}</text></g>`).join("");   // s = nome curto no mapa

@@ -1,7 +1,7 @@
 /* Mapa grande (Pará ou Brasil, ver MAP_REGION em data/world.js): HUD, painel de informações, viagem e troca de telas. */
 const curVis = () => CURITIBA_OPEN && (G.lv >= REQ.lv || G.loc === "curitiba");
 function drawMap() {
-  vit(); $("hud").textContent = `${t("Nv")} ${G.lv} · XP ${G.xp}/${need(G.lv)} · R$ ${G.money}` + (G.loc === "ananindeua" || G.loc === "belem" ? ` · ${t("PV")} ${G.hp}/${maxHP(G.lv)} · ${t("PE")} ${G.sp}/${maxSP(G.lv)}` : "") + (G.job ? ` · PROGRAMADOR · XP PROF. ${G.jobXp||0}` : "") + (G.betterJob ? " · SÊNIOR" : "");
+  vit(); $("hud").textContent = `${t("Nv")} ${G.lv} · XP ${G.xp}/${need(G.lv)} · R$ ${G.money}` + (CITY[G.loc] ? ` · ${t("PV")} ${G.hp}/${maxHP(G.lv)} · ${t("PE")} ${G.sp}/${maxSP(G.lv)}` : "") + (G.job ? ` · PROGRAMADOR · XP PROF. ${G.jobXp||0}` : "") + (G.betterJob ? " · SÊNIOR" : "");
   const R = MAP_REGIONS[MAP_REGION];
   if ($("n-curitiba")) $("n-curitiba").style.display = curVis() ? "" : "none";
   $("route").style.display = R.route.includes("curitiba") && !curVis() ? "none" : "";
@@ -14,9 +14,11 @@ function setupMapRegion() {
   svg.setAttribute("aria-label", R.aria);
   svg.querySelector(".land").innerHTML = R.land.map(d => `<path d="${d}"/>`).join("") + (R.river ? `<path class="river" d="${R.river}"/>` : "");
   for (const [k, [x, y, ly]] of Object.entries(R.pos)) Object.assign(LOC[k], {x, y, ly});
-  const [a, b] = R.route.map(k => LOC[k]), c = R.curve;   // estrada entre as duas cidades: reta ou em curva
-  $("route").setAttribute("d", c ? `M${a.x},${a.y} C${a.x + c[0]},${a.y + c[1]} ${b.x + c[2]},${b.y + c[3]} ${b.x},${b.y}` : `M${a.x},${a.y} L${b.x},${b.y}`);
+  const [a, b] = R.route.map(k => LOC[k]), c = R.curve;   // estrada entre as duas cidades: reta ou em curva (uma cidade só: sem estrada)
+  $("route").setAttribute("d", !b ? "" : c ? `M${a.x},${a.y} C${a.x + c[0]},${a.y + c[1]} ${b.x + c[2]},${b.y + c[3]} ${b.x},${b.y}` : `M${a.x},${a.y} L${b.x},${b.y}`);
 }
+// mapa grande da cidade atual (o Pará ou o Maranhão): chamado ao abrir o jogo e depois de cada voo
+function syncRegion() { MAP_REGION = CITY[curCity()].map; setupMapRegion(); buildMapNodes(); }
 // cria os pontos clicáveis do mapa a partir de LOC (só os que existem no mapa escolhido)
 function buildMapNodes() {
   const pos = MAP_REGIONS[MAP_REGION].pos;
@@ -45,8 +47,14 @@ function select(id) {
   if (l.soon) {   // destino que ainda não abre (Belém)
     btn(t("Em breve"), () => {}, true);
     i.insertAdjacentHTML("beforeend", '<p class="hint">Um dia Rhanon vai precisar chegar à capital para pegar um avião. Por enquanto, a aventura é em Ananindeua.</p>');
+  } else if (here && id === "saoluis") {
+    btn(t("Entrar em São Luís"), openLocal);
+    btn(t("Voar para Belém (Aeroporto de São Luís)"), () => fly("belem"));
+    i.insertAdjacentHTML("beforeend", `<p class="hint">${t("O voo de ida e volta é pago pela empresa do site da feira.")}</p>`);
   } else if (here && id === "belem") {
     btn(t("Entrar em Belém"), openLocal);
+    if (flightOpen()) { btn(t("Voar para São Luís (Aeroporto de Belém)"), () => fly("saoluis")); i.insertAdjacentHTML("beforeend", `<p class="hint">${t("O voo de ida e volta é pago pela empresa do site da feira.")}</p>`); }
+    else if (G.portfolio.site_feira || NORTE_BOSSES().every(k => BS()[k])) i.insertAdjacentHTML("beforeend", `<p class="hint">${t("Aeroporto de Belém: o voo para São Luís sai quando o site da feira estiver entregue e os 20 chefes do Norte acalmados.")}</p>`);
   } else if (id === "belem" || (id === "ananindeua" && G.loc === "belem")) {   // entre as duas cidades só se vai de ônibus
     if (G.passagem && BUS.open) { btn(id === "belem" ? t("Viajar de ônibus para Belém") : t("Voltar de ônibus para Ananindeua"), () => busRide(id)); i.insertAdjacentHTML("beforeend", `<p class="hint">${t("A passagem vale ida e volta pela BR-316.")}</p>`); }
     else i.insertAdjacentHTML("beforeend", '<p class="hint">Para chegar à capital, compre a passagem na cabine da BR-316, no fim da trilha de Ananindeua.</p>');
@@ -71,6 +79,27 @@ function select(id) {
   btn(t("Mapa do Brasil"), () => openBrasil());   // as cinco regiões da viagem
   resetButton(i, () => { drawMap(); select(G.loc); });
 }
+/* ---------- voo entre regiões (FLIGHT em data/world.js) ----------
+   o mapa do Brasil abre com um aviãozinho indo de uma região à outra; ao pousar, troca o mapa grande e a cidade */
+function fly(city) {
+  if (moving || !FLIGHT[G.loc] || FLIGHT[G.loc] !== city) return;
+  moving = true; sfx("onibus"); musicStop();
+  const from = REGIONS[regionOfCity(G.loc)].pos, to = REGIONS[regionOfCity(city)].pos;
+  openBrasil(); const svg = $("brasil").querySelector("svg");
+  svg.insertAdjacentHTML("beforeend", `<g class="br-plane"><path d="M-9 0 L9 0 M-2 -7 L3 0 L-2 7 M-8 -3 L-6 0 L-8 3" /></g>`);
+  const pl = svg.querySelector(".br-plane"), ang = Math.atan2(to[1] - from[1], to[0] - from[0]) * 180 / Math.PI, t0 = performance.now(), ms = REDUCE ? 300 : 3200;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / ms), e = k * k * (3 - 2 * k);
+    pl.setAttribute("transform", `translate(${from[0] + (to[0] - from[0]) * e} ${from[1] + (to[1] - from[1]) * e - Math.sin(k * Math.PI) * 30}) rotate(${ang})`);
+    if (k < 1) return requestAnimationFrame(step);
+    vit(); G.loc = city; G.sub = CITY[city].home; G.seen[G.sub] = true; (G.regions || (G.regions = {}))[regionOfCity(city)] = true; save();
+    moving = false; closeBrasil(); syncRegion(); buildLocalNodes(); drawMap(); select(city); sfx("more");
+    musicStart("map");
+  };
+  requestAnimationFrame(step);
+}
+// região de uma cidade (pelo mapa grande dela)
+const regionOfCity = c => Object.keys(REGIONS).find(k => REGIONS[k].map === CITY[c].map);
 /* ---------- mapa do Brasil: as cinco regiões (REGIONS), do Norte ao Sul ----------
    À esquerda o contorno com um ponto por região (a aberta pulsa, as outras ficam apagadas) e a fumaça de Pytuna no Sul
    depois que ele foge; à direita a lista (setas escolhem, Z abre, X fecha) e o painel da região escolhida. */
@@ -86,10 +115,12 @@ function openBrasil() {
   Object.entries(REGIONS).forEach(([k, r]) => btn(r.n + (r.open ? "" : ` <small>${t("em breve")}</small>`), () => { BR_SEL = k; sfx("blip"); openBrasil(); }, false, side));
   side.querySelectorAll(".cmd").forEach((b, j) => b.classList.toggle("sel", Object.keys(REGIONS)[j] === BR_SEL));
   const r = REGIONS[BR_SEL], card = document.createElement("div"); card.className = "br-card";
-  card.innerHTML = `<h3 style="color:${r.color}">${r.n}</h3><p>${r.txt}</p>` + (r.open
+  card.innerHTML = `<h3 style="color:${r.color}">${r.n}</h3><p>${r.txt}</p>` + (BR_SEL === "nordeste"
+    ? `<p class="hint">${t(G.regions?.nordeste ? "Você já esteve aqui. Por enquanto, São Luís; o resto do Nordeste vem em breve." : flightOpen() ? "O voo para São Luís já sai do Aeroporto de Belém." : "O voo sai do Aeroporto de Belém depois que o site da feira for entregue e os 20 chefes do Norte acalmados.")}</p>`
+    : r.open
     ? `<p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p>` +
       `<p class="hint">${t("Entre as cidades da região, vai de ônibus (rodoviária da BR-316).")}</p>` +
-      `<p class="hint">${t("{aero}: os voos de ida e volta abrem quando o Rhanon chegar na próxima região.", {aero: r.airport})}</p>`
+      `<p class="hint">${t(flightOpen() ? "{aero}: voo de ida e volta para São Luís." : "{aero}: os voos de ida e volta abrem quando o Rhanon chegar na próxima região.", {aero: r.airport})}</p>`
     : `<p class="hint">${t("Ainda não dá pra ir. A história chega lá em breve.")}</p>`);
   side.append(card);
   btn(t("Fechar"), closeBrasil, false, side);

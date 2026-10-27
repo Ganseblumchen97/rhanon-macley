@@ -45,7 +45,7 @@ const LANG_FIELDS = [
   ["SUB", "*", "@n"], ["SUB", "*", "@s"], ["SUB", "*", "@txt"], ["CITY", "*", "@n"], ["MAP_REGIONS", "*", "@n"], ["MAP_REGIONS", "*", "@aria"],
   ["LOC", "*", "@n"], ["LOC", "*", "@s"], ["LOC", "*", "@txt"],
   ["ITEMS", "*", "@n"], ["EQUIP", "*", "*", "@n"], ["CMDS", "*", "@n"], ["CMDS", "*", "@d"], ["SPECIALS", "*", "@n"], ["SPECIALS", "*", "@d"], ["ELEMENTS", "*", "@n"], ["WEATHER", "*", "@n"], ["SECRETS", "*", "@n"], ["SECRETS", "*", "@d"], ["SECRETS", "*", "@lore"], ["WEATHER", "*", "@fight"],
-  ["QUESTS", "*", "@text"], ["QUESTS", "*", "@thanks"], ["VILLAGER_NAME", "*"], ["VILLAGER_TIPS", "*"], ["BELEM_TIPS", "*"],
+  ["QUESTS", "*", "@text"], ["QUESTS", "*", "@thanks"], ["VILLAGER_NAME", "*"], ["VILLAGER_TIPS", "*"], ["BELEM_TIPS", "*"], ["SAOLUIS_TIPS", "*"], ["SAOLUIS_NAME", "*"],
   ["TUTORIAL", "*"], ["SAFE_TIP", "*"], ["SPOT_LABEL", "*"], ["EQ_SLOTS", "*", "@n"], ["EQ_SLOTS", "*", "@none"], ["CHARM_FX", "*"], ["BUGS", "*", "@name"], ["BUGS", "*", "@intro"], ["BUGS", "*", "@moves", "*"], ["FREELAS", "*", "@n"], ["FREELAS", "*", "@client"], ["FREELAS", "*", "@prog"], ["BUG_CMD", "*"], ["NARRA", "*", "*"], ["NARRA", "*", "*", "@r"], ["NARRA_BOSS", "*", "*"], ["NARRA_BOSS", "*", "*", "@r"], ["NARRA_HINT", "*"], ["REGIONS", "*", "@n"], ["REGIONS", "*", "@txt"], ["REGIONS", "*", "@airport"], ["NARRA_PYT", "*", "*"], ["NARRA_PYT", "*", "*", "@r"], ["NARRA_PYT", "*", "*", "@p"],
   ["SKILL_TREES", "*", "@n"], ["SKILL_TREES", "*", "@d"], ["SKILL_TREES", "*", "nodes", "*", "@n"], ["SKILL_TREES", "*", "nodes", "*", "@d"]
 ];

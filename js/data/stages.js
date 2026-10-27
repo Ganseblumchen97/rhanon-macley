@@ -71,6 +71,23 @@ const STAGES = {
       "TTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
+  // São Luís (Nordeste): a Praia Grande, centro histórico de casarão de azulejo, com a pensão (O), a feira e moradores
+  praiagrande: {
+    safe: true, next: null,
+    rows: [
+      "########################",
+      "########################",
+      "#..f....-.......OOO...f#",
+      "#.KKK...-..KKK..OOO....#",
+      "#..V....-...C..........#",
+      "#..................P..SE",
+      "#..P....-..............#",
+      "#.####..-..####....f...#",
+      "#.####..-..####..P.....#",
+      "#.......-..............#",
+      "~~~~~~~~=~~~~~~~~~~~~~~~"
+    ]
+  },
   // BR-316 (fim da trilha de Ananindeua): a estrada em cima com o ônibus parado e a cabine do cobrador
   parada: {
     safe: true, next: null,

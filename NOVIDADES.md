@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.44.0 — de avião para São Luís
+
+- O Nordeste abriu! Com o site da Dona Graça entregue e os 20 chefes do Norte acalmados, o mapa do Pará mostra o
+  botão "Voar para São Luís" em Belém. A passagem é de ida e volta e sai de graça: quem paga é a empresa do site.
+- Um aviãozinho cruza o mapa do Brasil e o Rhanon pousa em São Luís, com o mapa do Maranhão no lugar do Pará. Para
+  voltar, é só pegar o voo para Belém no mapa do Maranhão.
+- A primeira parada é a Praia Grande, o centro histórico de casarões de azulejo, com pensão, comida, comprador de
+  lembranças e moradores que contam sobre a juçara, a maré gigante, o bumba-meu-boi e a carruagem de Ana Jansen.
+- O Nordeste ganhou o seu tema musical: uma toada de bumba-meu-boi com sanfona e triângulo.
+- Por enquanto São Luís tem só a Praia Grande. As trilhas para lutar (o manguezal da ilha e os Lençóis) vêm nas
+  próximas versões.
+
 ## 0.43.0 — o tema do Norte
 
 - O Norte ganhou uma música própria: um tema que volta sempre igual, para você sair cantarolando. Antes a melodia

@@ -3,7 +3,7 @@ const REQ = {lv: 4, money: 150};   // para Curitiba aparecer e a passagem
 const CURITIBA_OPEN = false;       // false = Curitiba fica escondida (foco em Ananindeua por enquanto)
 /* Mapa grande: "para" (por enquanto: Ananindeua aberta e Belém, a capital, em breve) ou "brasil" (Ananindeua e Curitiba).
    Cada mapa tem o contorno (land), um rio opcional, a trilha tracejada (route) e onde fica cada local de LOC. */
-const MAP_REGION = "para";
+let MAP_REGION = "para";   // mapa grande da cidade atual (CITY[...].map); muda quando o Rhanon voa para outra região (syncRegion)
 const MAP_REGIONS = {
   para: {n: "Pará", aria: "Mapa estilizado do Pará, com Ananindeua e Belém",
     land: ["M63 224 L97 167 L154 110 L211 91 L241 103 L306 179 L333 224 L382 259 L431 255 L458 236 L485 209 L530 221 L549 232 L530 285 L500 323 L466 384 L454 437 L428 490 L393 559 L287 544 L173 540 L127 502 L82 464 L127 357 L150 285 L97 262Z",
@@ -11,6 +11,12 @@ const MAP_REGIONS = {
     river: "M63 281 C130 286 190 282 230 276 S310 240 338 222",   // rio Amazonas
     // a BR-316 sai de Ananindeua para o sudoeste e faz uma volta antes de chegar a Belém (curve: os dois pontos de controle)
     route: ["ananindeua", "belem"], pos: {ananindeua: [494, 238], belem: [398, 312]}, curve: [18, 74, 86, -2]},
+  // Maranhão (Nordeste): contorno estilizado, com a ilha de São Luís no golfão, lá em cima
+  maranhao: {n: "Maranhão", aria: "Mapa estilizado do Maranhão, com a ilha de São Luís",
+    land: ["M249 65 L328 76 L357 113 L371 145 L380 152 L407 145 L443 134 L508 145 L558 155 L530 192 L486 245 L479 283 L429 351 L357 404 L306 452 L263 495 L249 548 L213 500 L162 447 L148 378 L148 298 L83 293 L62 283 L184 245 L220 177 L242 113Z",
+      "M383 133 L396 124 L410 130 L406 145 L390 148Z"],   // continente (a partir de longitude/latitude) e a ilha de São Luís no golfão
+    river: "M292 325 C300 270 340 220 362 160",   // rio Mearim, desaguando na baía de São Marcos
+    route: ["saoluis"], pos: {saoluis: [396, 136]}},
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre Ananindeua e Curitiba",
     land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
     route: ["ananindeua", "curitiba"], pos: {ananindeua: [322, 168], curitiba: [315, 478]}}
@@ -21,7 +27,7 @@ const MAP_REGIONS = {
 const REGIONS = {
   norte:       {n: "Norte", pos: [215, 200], color: "#3f9a5c", open: true, map: "para", airport: "Aeroporto de Belém",
     txt: "Onde tudo começou: a aldeia, Ananindeua e Belém. Os bichos e encantados da floresta ficaram bravos com a fumaça de Pytuna."},
-  nordeste:    {n: "Nordeste", pos: [385, 245], color: "#e8a020", open: false,
+  nordeste:    {n: "Nordeste", pos: [385, 245], color: "#e8a020", open: true, map: "maranhao", airport: "Aeroporto de São Luís",
     txt: "Sertão, dunas e mangue. Dizem que lá a fumaça secou tudo, e a Comadre Fulozinha anda perdida na mata."},
   centroeste:  {n: "Centro-Oeste", pos: [262, 335], color: "#c8603a", open: false,
     txt: "O Pantanal, o cerrado e Brasília. Um céu tão grande que a lua devia brilhar mais."},
@@ -33,6 +39,7 @@ const REGIONS = {
 const LOC = {
   ananindeua: {n: "Ananindeua (PA)", s: "Ananindeua", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor anda brava, e cada lembrança que os bichos deixam rende uns trocados."},
   belem: {n: "Belém (PA)", s: "Belém", txt: "A capital do Pará, na beira da baía do Guajará. Prédios, casarões de azulejo, o Ver-o-Peso... e bicho e malandro bem mais fortes que os da mata."},
+  saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
 /* Mapa de Ananindeua (viewBox 440x325): uma trilha só, em zigue-zague, na ordem de dificuldade (ROUTE).
@@ -52,6 +59,7 @@ const SUB = {
   /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
      pela Cidade Velha, pelo Porto e pelas Baixadas, cada vez mais difícil */
   terminal: {city: "belem", n: "Terminal rodoviário", s: "Terminal", x: 392, y: 262, txt: "O ônibus da BR-316 para aqui. A passagem vale ida e volta: dá pra voltar pra Ananindeua quando quiser."},
+  praiagrande: {city: "saoluis", n: "Praia Grande", x: 214, y: 168, txt: "O centro histórico de São Luís: ladeira de pedra, casarão coberto de azulejo português e a feira da praia. Tem pensão, comida e gente que conta história."},
   veropeso: {city: "belem", n: "Ver-o-Peso", x: 252, y: 250, txt: "A feira mais famosa do Pará, na beira da baía: peixe, açaí, erva de cheiro, urubu no telhado de ferro... e rede na pensão."},
   cidadevelha: {city: "belem", n: "Cidade Velha", x: 128, y: 266, txt: "Rua de pedra, casarão de azulejo e praça com mangueira. Pombo, gato, iguana... e malandro de olho na bolsa."},
   porto: {city: "belem", n: "Porto e Docas", x: 86, y: 160, txt: "Galpão velho, guindaste e barco chegando de todo canto. Rato do tamanho de gato e golpista esperando quem desce."},
@@ -60,13 +68,18 @@ const SUB = {
 /* cada cidade tem o seu mapa local (viewBox 440x325): a trilha única em ordem (route), o contorno (land), o rio ou
    canal que a trilha cruza (com as pontes calculadas) e a estrada que sai do mapa (road), com a placa (sign) */
 const CITY = {
-  ananindeua: {n: "Ananindeua", route: ["aldeia", "feira", "mata", "fechada", "rio", "igarape", "manguezal", "seringal", "varzea", "parada"],
+  ananindeua: {n: "Ananindeua", map: "para", route: ["aldeia", "feira", "mata", "fechada", "rio", "igarape", "manguezal", "seringal", "varzea", "parada"],
     land: "10,70 60,20 190,8 305,18 395,55 430,140 428,235 398,300 300,316 170,314 60,304 12,255 5,160",
     river: "M318,24 C305,70 358,96 346,140 C334,190 300,222 316,318", road: "M52,62 C34,44 18,32 -4,26", sign: [6, 18, "← Belém"], home: "aldeia", gate: "parada"},
-  belem: {n: "Belém", route: ["terminal", "veropeso", "cidadevelha", "porto", "baixadas"],
+  belem: {n: "Belém", map: "para", route: ["terminal", "veropeso", "cidadevelha", "porto", "baixadas"],
     land: "40,40 150,14 300,10 400,40 432,130 430,240 400,300 300,316 160,316 40,300 22,230 36,150 20,90",
     bay: "M0,0 L44,0 C28,40 46,80 28,110 C40,150 22,200 38,240 C28,270 34,300 46,325 L0,325Z",   // baía do Guajará
-    river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Ananindeua →"], home: "veropeso", gate: "terminal"}
+    river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Ananindeua →"], home: "veropeso", gate: "terminal"},
+  // São Luís (Nordeste): a ilha, com o rio Anil e a estrada para o aeroporto; por enquanto só a Praia Grande
+  saoluis: {n: "São Luís", map: "maranhao", route: ["praiagrande"], cabin: false,
+    land: "30,120 80,60 170,30 280,26 370,56 420,120 426,210 390,280 300,312 180,316 80,290 26,220",
+    bay: "M0,0 L120,0 C90,30 60,60 34,96 C20,130 12,170 0,190Z",   // baía de São Marcos
+    river: "M260,40 C250,90 236,120 226,150 C214,186 236,230 230,290", road: "M262,200 C320,230 380,250 446,262", sign: [350, 290, "✈ Aeroporto"], home: "praiagrande", gate: "praiagrande"}
 };
 /* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
    que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
@@ -104,17 +117,22 @@ const WEATHER = {
 };
 // chance de cada tempo por cidade; Belém tem a chuva da tarde quase todo dia
 const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15], ["mormaco", 12], ["ventania", 8]],
-  belem: [["limpo", 25], ["chuva", 45], ["neblina", 8], ["mormaco", 14], ["ventania", 8]]};
+  belem: [["limpo", 25], ["chuva", 45], ["neblina", 8], ["mormaco", 14], ["ventania", 8]],
+  saoluis: [["limpo", 30], ["chuva", 25], ["neblina", 5], ["mormaco", 25], ["ventania", 15]]};   // ilha de muito sol e vento
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
-  let r = seeded(day * 17 + (city === "belem" ? 5 : 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  let r = seeded(day * 17 + ({belem: 5, saoluis: 11}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
   for (const [k, w] of odds) if ((r -= w) < 0) return k;
   return "limpo";
 }
 const weatherNow = () => { const w = weatherOn(G.day); return G.night && w === "mormaco" ? "limpo" : w; };   // mormaço some de noite
 const weatherBoost = k => (WEATHER[weatherNow()].boost || {})[k] || 1;
-const curCity = () => G.loc === "belem" ? "belem" : "ananindeua";
+const curCity = () => CITY[G.loc] ? G.loc : "ananindeua";
+/* voo entre Belém e São Luís (aeroportos de REGIONS): de graça, pago pela empresa do freela, e só depois do fim do
+   capítulo do Norte (os 20 chefes acalmados) e do site da feira entregue */
+const FLIGHT = {belem: "saoluis", saoluis: "belem"};
+const flightOpen = () => !!G.portfolio.site_feira && NORTE_BOSSES().every(k => BS()[k]);
 const cityOf = k => (SUB[k] && SUB[k].city) || "ananindeua";
 const ROUTE = Object.values(CITY).flatMap(c => c.route);   // todos os locais das duas cidades
 const EDGES = Object.values(CITY).flatMap(c => c.route.slice(1).map((k, i) => [c.route[i], k]));
