@@ -2,7 +2,7 @@
    Gerada por IA a partir do português; nomes do folclore (Curupira, Boitatá...) ficam como estão. */
 TX.fr = {
   // gênero dos bichos em francês (nem sempre igual ao português: "a onça" vira "le jaguar")
-  fem: new Set(["periquito", "fulozinha", "lontra", "cagado", "harpia", "caranguejeira", "ariranha", "poraque", "cobra_grande", "morcego", "coruja", "morcego_vampiro", "morcego_pescador", "mula", "tracaja", "garca", "matinta", "mulher_branco", "gaivota", "cobra_norato", "mucura"]),
+  fem: new Set(["gato_mato", "periquito", "fulozinha", "lontra", "cagado", "harpia", "caranguejeira", "ariranha", "poraque", "cobra_grande", "morcego", "coruja", "morcego_vampiro", "morcego_pescador", "mula", "tracaja", "garca", "matinta", "mulher_branco", "gaivota", "cobra_norato", "mucura"]),
   // "le jaguar", "la mygale", "l'anaconda" (vogal: l'; o h de "harpie" é aspirado, então fica "la harpie")
   article(a, cap) {
     const n = PROPER.has(a.id) ? a.name : a.name.toLowerCase(), s = (/^[aeiouyàâéèêëîïôûœ]/i.test(n) ? "l'" : this.fem.has(a.id) ? "la " : "le ") + n;
@@ -1620,6 +1620,48 @@ TX.fr = {
     "Tufo da barbicha do bode": "Touffe de barbiche de bouc",
     "Pena branca de rasga-mortalha": "Plume blanche d'effraie",
     "Luar do Bode-rei": "Clair de lune du Bouc-roi",
-    "Luar da Comadre Fulozinha": "Clair de lune de la Comadre Fulozinha"
+    "Luar da Comadre Fulozinha": "Clair de lune de la Comadre Fulozinha",
+    "Serra do Araripe": "Serra do Araripe",
+    "Serra": "Serra",
+    "Lá no alto, a chapada: paredão de pedra cheio de fóssil, mata verde na encosta e encruzilhada de estrada de terra. Nas sextas de lua cheia, ninguém sobe.": "Là-haut, le plateau : une falaise pleine de fossiles, une forêt verte sur le versant et des carrefours de chemins de terre. Les vendredis de pleine lune, personne ne monte.",
+    "Soldadinho-do-araripe": "Manakin de l'Araripe",
+    "Mocó": "Mocó",
+    "Veado-catingueiro": "Daguet gris",
+    "Gato-do-mato": "Oncille",
+    "Tapejara": "Tapejara",
+    "Lobisomem": "Loup-garou",
+    "Voo do soldadinho": "Vol du manakin",
+    "Pulo de pedra": "Saut de rocher",
+    "Pulo do veado": "Bond du daguet",
+    "Pulo da pedra": "Saut du rocher",
+    "Bicada de pedra": "Coup de bec de pierre",
+    "Grito da chapada": "Cri du plateau",
+    "Uivo da sexta-feira": "Hurlement du vendredi",
+    "Um passarinho branco de topete vermelho desce da mata da serra e encara o Rhanon de peito estufado.": "Un petit oiseau blanc à huppe rouge descend de la forêt de la serra et toise Rhanon, poitrine bombée.",
+    "Entre as pedras do paredão, um mocó assobia e pula de laje em laje até cair na frente do Rhanon.": "Entre les pierres de la falaise, un mocó siffle et saute de dalle en dalle jusqu'à atterrir devant Rhanon.",
+    "Um veado-catingueiro de chifrinho curto aparece entre os galhos secos e bate a pata no chão.": "Un daguet gris aux petits bois courts apparaît entre les branches sèches et frappe le sol du sabot.",
+    "Um gato-do-mato pintadinho, do tamanho de um gato de casa, rosna em cima da pedra.": "Une petite oncille tachetée, de la taille d'un chat domestique, gronde sur un rocher.",
+    "Uma pedra do paredão racha e se abre em asas. É um tapejara, o réptil voador de crista alta, acordado depois de cem milhões de anos.": "Une pierre de la falaise se fend et s'ouvre en ailes. C'est un tapejara, le reptile volant à haute crête, réveillé après cent millions d'années.",
+    "É sexta-feira e a lua está cheia. Na encruzilhada da serra, um vulto de calça rasgada se curva, cresce pelo e uiva: o Lobisomem.": "C'est vendredi et la lune est pleine. Au carrefour de la serra, une silhouette au pantalon déchiré se courbe, se couvre de poils et hurle : le Loup-garou.",
+    "Passarinho que só existe na encosta da Chapada do Araripe, no Ceará: corpo branco, asa preta e topete vermelho. É um dos pássaros mais ameaçados do Brasil.": "Petit oiseau qui n'existe que sur le versant de la Chapada do Araripe, au Ceará : corps blanc, ailes noires et huppe rouge. C'est l'un des oiseaux les plus menacés du Brésil.",
+    "Roedor da caatinga que vive nas fendas dos paredões de pedra. Tem almofadinhas nas patas e escala pedra lisa como ninguém.": "Rongeur de la caatinga qui vit dans les fentes des parois rocheuses. Il a des coussinets aux pattes et grimpe sur la pierre lisse comme personne.",
+    "Veado pequeno da caatinga, de chifre curto e reto. Aguenta muito tempo sem beber água, só com o que tira das folhas.": "Petit cervidé de la caatinga aux bois courts et droits. Il tient longtemps sans boire, rien qu'avec l'eau des feuilles.",
+    "O menor gato selvagem do Brasil, do tamanho de um gato de casa. Caça de noite: rato, passarinho e lagartixa.": "Le plus petit chat sauvage du Brésil, de la taille d'un chat domestique. Il chasse la nuit : rats, petits oiseaux et geckos.",
+    "Réptil voador que viveu no tempo dos dinossauros, com uma crista enorme na cabeça. Os fósseis dele foram achados na pedra da Chapada do Araripe, uma das mais ricas do mundo.": "Reptile volant de l'époque des dinosaures, avec une énorme crête sur la tête. Ses fossiles ont été trouvés dans la roche de la Chapada do Araripe, l'une des plus riches du monde.",
+    "Na lenda do sertão, o sétimo filho homem vira lobo nas noites de sexta-feira de lua cheia. Corre sete encruzilhadas antes de o galo cantar e, de manhã, volta a ser gente, cansado e sem lembrar de nada.": "Dans la légende du sertão, le septième fils devient loup les nuits de pleine lune du vendredi. Il court sept carrefours avant le chant du coq et, au matin, redevient un homme, fatigué et sans aucun souvenir.",
+    "Pena vermelha de soldadinho": "Plume rouge de manakin",
+    "Tufo de pelo de mocó": "Touffe de poils de mocó",
+    "Chifrinho trocado de veado": "Petit bois tombé de daguet",
+    "Pelo de gato-do-mato": "Poils d'oncille",
+    "Luar do Tapejara": "Clair de lune du Tapejara",
+    "Luar do Lobisomem": "Clair de lune du Loup-garou",
+    "O Tapejara voava por aquelas bandas no tempo dos dinossauros, curumim. Virou pedra, e a pedra guardou ele cem milhões de anos.": "Le Tapejara volait par là-bas au temps des dinosaures, petit. Il est devenu pierre, et la pierre l'a gardé cent millions d'années.",
+    "A fumaça acordou o bicho no lugar errado, no tempo errado. O menino acalmou ele, e ele voltou a dormir no paredão.": "La fumée a réveillé la bête au mauvais endroit, au mauvais moment. Le garçon l'a apaisée, et elle s'est rendormie dans la falaise.",
+    "Vô, ele piscou pra mim antes de virar pedra de novo.": "Grand-père, il m'a fait un clin d'œil avant de redevenir pierre.",
+    "Pedra que pisca. Só tu mesmo pra ver uma coisa dessas.": "Une pierre qui fait des clins d'œil. Il n'y a que toi pour voir un truc pareil.",
+    "O Lobisomem é gente, curumim. Gente com uma sina pesada: toda sexta de lua cheia vira bicho e corre sete encruzilhadas.": "Le Loup-garou est un homme, petit. Un homme au destin lourd : chaque vendredi de pleine lune, il devient bête et court sept carrefours.",
+    "A fumaça fez a sina durar mais que a noite. O menino segurou o bicho até o galo cantar.": "La fumée a fait durer le sort plus que la nuit. Le garçon a tenu la bête jusqu'au chant du coq.",
+    "De manhã ele era só um vaqueiro cansado, vô. Me ofereceu café.": "Le matin, ce n'était qu'un vacher fatigué, Grand-père. Il m'a offert du café.",
+    "E tu tomou? Café de lobisomem... Tá explicado por que tu não dormia direito naquela época.": "Et tu l'as bu ? Du café de loup-garou... Ça explique pourquoi tu dormais mal à cette époque."
   }
 };

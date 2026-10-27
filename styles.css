@@ -88,7 +88,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
 .stage{--plat:46%}
 .stage.zone-fechada{--plat:42%}
-.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
 .stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
@@ -112,6 +112,10 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-caatinga{background:linear-gradient(180deg,#f0d8a0 0 24%,#8a7a62 24% 34%,#d8c08a 34% 100%)}
 .stage.zone-caatinga::before{background:#b8865a;right:9%;top:var(--plat)}
 .stage.zone-caatinga::after{background:#b8865a;left:4%;bottom:7%}
+/* Serra do Araripe: paredão de terra vermelha e encosta verde */
+.stage.zone-serra{background:linear-gradient(180deg,#f0c890 0 22%,#8a5a3a 22% 34%,#a87a52 34% 100%)}
+.stage.zone-serra::before{background:#a87a50;right:9%;top:var(--plat)}
+.stage.zone-serra::after{background:#a87a50;left:4%;bottom:7%}
 /* manguezal: mangue escuro, água salobra e lama */
 .stage:is(.zone-manguezal,.zone-mangueilha){background:linear-gradient(180deg,#2e4a2c 0 22%,#7a9a8a 22% 23%,#4a6a6a 23% 31%,#3e5a58 31% 38%,#5a5440 38% 100%)}
 .stage:is(.zone-manguezal,.zone-mangueilha)::before{background:#6a6248;right:9%;top:var(--plat)}

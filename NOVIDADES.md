@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.53.0 — a serra e o Lobisomem
+
+- Depois de acalmar o Bode-rei, a passagem no alto da Caatinga leva à Serra do Araripe: terra vermelha, mata verde
+  na encosta e paredão de pedra. É para quem está perto do nível 44.
+- Bichos novos: o soldadinho-do-araripe, um passarinho branco de topete vermelho que só existe nessa chapada, o mocó,
+  o veado-catingueiro e o gato-do-mato.
+- De dia, o chefe é o Tapejara, um réptil voador de crista alta do tempo dos dinossauros. Os fósseis dele foram
+  achados de verdade na Chapada do Araripe, e no jogo a fumaça acordou ele dentro do paredão.
+- De noite, na encruzilhada da serra, aparece o Lobisomem. Cuidado com o uivo, que dá medo.
+- Em Petrolina ainda falta a beira do rio. Ela vem numa próxima versão.
+
 ## 0.52.0 — o sertão e a Comadre Fulozinha
 
 - O Nordeste ganhou a quarta cidade: Petrolina, no sertão de Pernambuco, na beira do rio São Francisco. Depois de

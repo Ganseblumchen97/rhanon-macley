@@ -41,6 +41,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  tapejara: ["O Tapejara voava por aquelas bandas no tempo dos dinossauros, curumim. Virou pedra, e a pedra guardou ele cem milhões de anos.", "A fumaça acordou o bicho no lugar errado, no tempo errado. O menino acalmou ele, e ele voltou a dormir no paredão.", {r: "Vô, ele piscou pra mim antes de virar pedra de novo."}, "Pedra que pisca. Só tu mesmo pra ver uma coisa dessas."],
+  lobisomem: ["O Lobisomem é gente, curumim. Gente com uma sina pesada: toda sexta de lua cheia vira bicho e corre sete encruzilhadas.", "A fumaça fez a sina durar mais que a noite. O menino segurou o bicho até o galo cantar.", {r: "De manhã ele era só um vaqueiro cansado, vô. Me ofereceu café."}, "E tu tomou? Café de lobisomem... Tá explicado por que tu não dormia direito naquela época."],
   bode_rei: ["O Bode-rei era o pai de todo o rebanho solto da caatinga. Chifre torto, barba comprida e cabeça mais dura que pedra.", {r: "Ele me deu três cabeçadas, vô. Três!"}, "E tu deu quantas nele? Pois é. Bode não guarda rancor: depois foi comer uma palma ali do lado."],
   fulozinha: ["A Comadre Fulozinha é a dona da mata do sertão, curumim. Menina pequena, cabelo comprido até o pé, e um assobio que se ouve de longe.", "Ela protege os bichos de caçador. A fumaça fez ela achar que todo mundo era caçador, até o menino.", {r: "Eu deixei fumo e mingau pra ela, vô. Do jeito que o povo ensinou."}, "Fez certo. Ela agradeceu com uma trança no teu cabelo, lembra? Tu ficou dias sem conseguir desfazer."],
   teiu_rei: ["O Teiú-rei tomava sol no alto da Sé desde o tempo dos holandeses, diz o povo de Olinda.", "A fumaça não deixava ele dormir. O menino acalmou o bicho e ele voltou pra pedra quentinha."],

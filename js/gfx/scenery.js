@@ -16,6 +16,7 @@ const SCENES = {
   lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
+  serra:       {sky: ["#f0c890", "#d8b888", "#b8a890"], far: "#8a5a3a", trees: "copa", plat: "barro"},   // Araripe: paredão de terra vermelha e mata na encosta
   caatinga:    {sky: ["#f0d8a0", "#e8c890", "#d8b8a0"], far: "#8a7a62", trees: "caatinga", plat: "areia"},   // sertão: céu de poeira, serra ao longe
   olinda:      {sky: ["#f8c890", "#f0a878", "#c88aa8"], far: "#8a6a9a", trees: "casario", plat: "pedra"},   // Olinda: pôr do sol no alto da Sé
   cidadevelha: {sky: ["#f0b080", "#e8a070", "#b88a9a"], far: "#7a6a8a", trees: "casario", plat: "pedra"},

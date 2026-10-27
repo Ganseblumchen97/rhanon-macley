@@ -376,6 +376,18 @@ const QUADS = {
     },
     tail: (d, P, C) => { const x = P.cx + P.rx - 1, y = P.cy - 4; d.limb(x, y, x + 3, y + (P.pose === "ko" ? 2 : -4), 2, C.k); },
     pattern: (d, P, C) => { d.ellipse(P.cx + 4, P.cy - 2, 4, 3, C.k); d.ellipse(P.cx - 6, P.cy + 1, 3, 2.5, C.k); }},
+  // veado-catingueiro: pernas finas, pelo pardo, rabo branco curto e chifrinho reto
+  veado: {W: 52, H: 42, cx: 28, rx: 12, ry: 6.5, leg: 14, lw: 2.2, neck: 6, hu: 10, hr: 4.5,
+    C: {b: "#a8784a", B: "#7a5230", l: "#e8d8b8"}, legC: ["#8a6038", "#5e3e22"], paw: ["#2a1a10", "#1a100a"],
+    head: (d, x, y, o, C) => {
+      d.part().limb(x + 1, y - 4, x + 2, y - 11, 1, "#5e4a30").limb(x + 4, y - 3, x + 6, y - 10, 1, "#5e4a30");   // chifrinhos retos
+      d.part().ellipse(x + 4, y - 3, 3, 1.6, C.B);   // orelha
+      d.part().ellipse(x, y, 4.5, 4, C.b, C.B, .6).poly([[x - 3, y - 1], [x - 9, y + 1], [x - 8, y + 3], [x - 2, y + 3]], C.b, C.B, x - 6);
+      d.dots([[x - 9, y + 1], [x - 8, y + 1]], BN).dots([[x - 6, y + 3], [x - 5, y + 3]], C.l); bEye(d, x - 1, y - 1, o);
+      if (o.mouth) bMouth(d, x - 8, y + 3, 3, false); if (o.tongue) d.dots([[x - 7, y + 4]], BR);
+    },
+    tail: (d, P, C) => { const x = P.cx + P.rx - 1, y = P.cy - 4; d.ellipse(x + 2, y + (P.pose === "ko" ? 3 : 0), 2, 2.5, C.l); },
+    pattern: (d, P, C) => d.ellipse(P.cx, P.cy + P.ry * .55, P.rx * .7, P.ry * .3, C.l)},
   // rato (ratazana do porto, rato-d'água e o Ratão): cinza, orelhas redondas rosadas e rabo comprido pelado
   rato: {W: 48, H: 24, cx: 24, rx: 10, ry: 5.5, leg: 4, lw: 2.5, neck: 2, hu: 2, hr: 4,
     C: {b: "#6a6a70", B: "#4a4a50", l: "#9a9aa0"}, legC: ["#d89a9a", "#b87878"],
@@ -932,6 +944,66 @@ function fulozinha(pose, f) {
   if (at) d.ellipse(X(20), Y(14), 1.2, 1.5, BN);   // assobiando
   return {c: d.canvas(), head: [X(20), Y(10)]};
 }
+// Tapejara (serra, de dia): réptil voador de pedra, de asa de pele presa no braço, bico curto e a crista alta de vela;
+// desmaiado, fica estendido no chão de asas abertas
+function tapejara(pose, f) {
+  const d = rigGrid(1, 60, 48), G = 45, C = {b: "#a89070", B: "#6e5a44", m: "#c88a5a", M: "#8a5a36", c: "#e8603a", k: "#f0c040", s: "#5a4a3a"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  const crest = (x, y) => d.part().poly([[x - 7, y], [x - 7, y - 8], [x - 3, y - 15], [x + 3, y - 17], [x + 8, y - 13], [x + 6, y - 6], [x + 2, y - 3]], C.c, "#a83a1a", x + 3)
+    .limb(x - 5, y - 2, x + 1, y - 14, 1, C.k);   // a vela alta da crista, saindo do bico, com uma nervura amarela
+  if (pose === "ko") {
+    d.part().poly([[6, 40], [24, 33], [30, 40]], C.m, C.M).poly([[30, 40], [40, 33], [56, 41]], C.m, C.M);   // asas abertas no chão
+    d.part().ellipse(30, 40, 9, 4, C.b, C.B, .5);
+    crest(14, 40); d.part().ellipse(14, 40, 5, 4, C.b, C.B, .6).poly([[10, 40], [4, 42], [10, 43]], C.s); bEye(d, 13, 39, o);
+    return {c: d.canvas(), head: [14, 40]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", cy = (cr ? 30 : at ? 24 : 27) + (pose === "idle" ? f : 0), cx = at ? 29 : hu ? 34 : 32;
+  const up = at || pose === "idle" && f;   // asas: erguidas no bote e numa das batidas parado
+  const wing = s => up ? [[cx, cy - 3], [cx + s * 6, cy - 20], [cx + s * 24, cy - 14], [cx + s * 8, cy + 2]] : [[cx, cy - 3], [cx + s * 10, cy - 8], [cx + s * 24, cy + 4], [cx + s * 6, cy + 5]];
+  d.part().poly(wing(1), C.M, C.s, cx + 14).dots([[cx + 10, cy - 6], [cx + 16, cy - 4]], C.B);   // asa de trás
+  d.part().limb(cx + 2, cy + 6, cx + 4, G, 2, C.B).limb(cx - 2, cy + 6, cx - 3, G, 2, C.B);   // perninhas
+  d.part().ellipse(cx, cy, 7, 7.5, C.b, C.B, .5);
+  d.part().poly(wing(-1), C.m, C.M, cx - 12).limb(cx, cy - 3, wing(-1)[1][0], wing(-1)[1][1], 1.5, C.B);   // asa da frente, com o osso do braço
+  const hx = at ? cx - 9 : cx - 6, hy = at ? cy - 8 : cr ? cy - 7 : cy - 10;
+  d.part().limb(cx - 2, cy - 6, hx + 2, hy + 3, 2.5, C.b, C.B);   // pescoço
+  crest(hx, hy);
+  d.part().ellipse(hx, hy, 4.5, 4, C.b, C.B, .6).poly([[hx - 3, hy - 1], [hx - 9, hy + 1], [hx - 10, hy + 4], [hx - 3, hy + 3]], C.s);   // bico curto, virado para baixo
+  if (at) d.dots([[hx - 7, hy + 2], [hx - 5, hy + 2]], BR);
+  bEye(d, hx - 1, hy - 1, o);
+  return {c: d.canvas(), head: [hx, hy]};
+}
+// Lobisomem (serra, à noite): lobo de pé, curvado, pelo cinza-escuro, orelha em ponta, olhos vermelhos e a calça
+// rasgada de quando era gente; desmaiado, fica deitado de lado
+function lobisomem(pose, f) {
+  const d = rigGrid(1, 52, 50), G = 47, C = {b: "#5a5458", B: "#38323a", l: "#7a7478", k: "#1a1418", t: "#e8e0c8", p: "#3a4a6a", P: "#26324a"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" ? "shut" : "open"};
+  if (pose === "ko") {
+    d.part().ellipse(28, 41, 16, 5.5, C.b, C.B, .5).poly([[34, 38], [46, 39], [46, 45], [34, 45]], C.p, C.P);
+    d.part().ellipse(11, 40, 6, 4.5, C.b, C.B, .6).poly([[6, 40], [1, 42], [6, 43]], C.b, C.B).poly([[12, 36], [14, 31], [16, 37]], C.b);
+    bEye(d, 10, 39, o);
+    return {c: d.canvas(), head: [11, 38]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (cr ? 4 : at ? -1 : 0) + (pose === "idle" ? f : 0), bx = at ? -3 : hu ? 3 : 0;
+  const cx = 30 + bx, cy = 24 + by;
+  d.part().limb(cx + 5, cy + 10, cx + 9, G - 6, 4.5, C.P).limb(cx + 9, G - 6, cx + 7, G, 3.5, C.B).ellipse(cx + 6, G, 3.5, 1.6, C.k);   // perna de trás, joelho de bicho
+  d.part().limb(cx + 8, cy - 5, cx + 15, cy + 7, 3.5, C.B).dots([[cx + 14, cy + 9], [cx + 16, cy + 9], [cx + 15, cy + 10]], C.t);   // braço de trás
+  d.part().limb(cx + 9, cy + 6, cx + 16, cy + 2, 2.5, C.b, C.B);   // rabo
+  d.part().ellipse(cx, cy, 11, 13, C.b, C.B, .5).ellipse(cx - 2, cy + 3, 6, 7, C.l);   // tronco curvado, peito mais claro
+  d.part().poly([[cx - 9, cy + 8], [cx + 10, cy + 8], [cx + 10, cy + 13], [cx - 9, cy + 13]], C.p, C.P);   // cós da calça
+  for (const [x, y] of [[-8, -8], [-3, -11], [4, -10], [8, -4]]) d.limb(cx + x, cy + y, cx + x + 2, cy + y - 3, 1, C.B);   // pelo eriçado
+  d.part().limb(cx - 4, cy + 11, cx - 7, G - 6, 4.5, C.p, C.P).limb(cx - 7, G - 6, cx - 6, G, 3.5, C.b, C.B).ellipse(cx - 7, G, 3.5, 1.6, C.k);   // perna da frente
+  d.dots([[cx - 9, G - 7], [cx - 5, G - 6], [cx - 8, G - 5]], C.P);   // barra rasgada
+  const hand = at ? [cx - 22, cy - 7] : cr ? [cx - 15, cy + 11] : [cx - 14, cy + 6];
+  d.part().limb(cx - 8, cy - 6, hand[0], hand[1], 3.5, C.b, C.B).dots([[hand[0] - 2, hand[1] - 1], [hand[0] - 2, hand[1] + 1], [hand[0] - 1, hand[1] + 2]], C.t);   // garras
+  const hx = cx - 5, hy = cy - 15;
+  d.part().poly([[hx + 1, hy - 4], [hx + 3, hy - 11], [hx + 6, hy - 3]], C.b).poly([[hx - 3, hy - 4], [hx - 2, hy - 10], [hx + 1, hy - 4]], C.B);   // orelhas em ponta
+  d.part().ellipse(hx, hy, 6, 5, C.b, C.B, .6).poly([[hx - 3, hy - 1], [hx - 12, hy + 1], [hx - 11, hy + 4], [hx - 3, hy + 4]], C.b, C.B, hx - 8);   // focinho comprido
+  d.dots([[hx - 12, hy + 1], [hx - 11, hy + 1]], BN);
+  if (o.eye === "shut") d.rect(hx - 3, hy - 1, 3, 1, BN);
+  else d.ellipse(hx - 2, hy - 1, 1.6, 1.4, "#ff3a2a").dots([[hx - 2, hy - 1]], "#ffe0a0");
+  if (at || cr) { d.part().poly([[hx - 11, hy + 3], [hx - 3, hy + 4], [hx - 4, hy + 7], [hx - 10, hy + 5]], "#3a1410"); d.dots([[hx - 10, hy + 3], [hx - 7, hy + 4], [hx - 5, hy + 4]], C.t); }
+  return {c: d.canvas(), head: [hx, hy]};
+}
 // visagem (assombração de Belém): vestido comprido sem pés, flutuando, cabelo escuro e olhos acesos; C troca as cores
 function visagem(C) {
   return (pose, f) => {
@@ -975,7 +1047,7 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   guara: (pose, f) => garca(pose, f, {b: "#e8402a", B: "#b02818", y: "#3a2418", Y: "#22140c", k: "#5a2a1a"}),   // guará: a garça em vermelho
   garca_moura: (pose, f) => garca(pose, f, {b: "#8a96a8", B: "#5e6a7a", y: "#e8b030", Y: "#b88a20", k: "#2a3038"}),   // garça-moura: cinza-azulada
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
-  cabeca_cuia: cabecaCuia, fulozinha,
+  cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara,
   jiboia: cobra({b: "#a8885a", B: "#74583a", k: "#4a3220"}, false),   // jiboia: parda, com as manchas escuras em sela
   meia_noite: pessoa({pal: {s: "#5e3a1e", S: "#3a2412", h: "#1a1420"}, shirt: ["#1a1a22", "#0e0e14"], pants: ["#1a1a22", "#0e0e14"], noBand: true, cap: ["#1a1a22", "#0e0e14"]}),   // Homem da Meia-Noite: o boneco de fraque e cartola
   cascavel: cobra({b: "#b89a5a", B: "#7a6234", k: "#4a3a1a"}, true),   // cascavel: cabeça triangular, cor de areia com losangos escuros
