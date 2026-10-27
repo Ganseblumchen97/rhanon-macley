@@ -100,8 +100,9 @@ const AQUATIC = new Set(["piranha", "poraque", "boto"]);
 function pickFromPool(zone, where) {
   const z = zoneDef(zone), pool = where ? z.pool.filter(([id]) => (where === "agua") === AQUATIC.has(id)) : z.pool;
   if (!pool.length) return null;
-  let r = Math.random() * pool.reduce((s, [, w]) => s + w, 0);
-  for (const [id, w] of pool) if ((r -= w) < 0) return ANIMALS.find(a => a.id === id);
+  const more = WEATHER[weatherNow()].more || [], wt = ([id, w]) => more.includes(id) ? w * 2 : w;   // clima: os bichos dele aparecem o dobro
+  let r = Math.random() * pool.reduce((s, q) => s + wt(q), 0);
+  for (const q of pool) if ((r -= wt(q)) < 0) return ANIMALS.find(a => a.id === q[0]);
   return ANIMALS.find(a => a.id === pool[0][0]);
 }
 // espalha peixes pela água da fase (em trechos com água dos dois lados, para terem por onde nadar)
@@ -189,7 +190,7 @@ function startExplore(zone, after, from) {
     $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false; exFit();
     musicStart("local"); exHud();
-    exToast(st.safe ? SUB[zone].n + (SAFE_TIP[zone] || t(" · lembranças, comida, artesão e armeiro: chega perto de uma barraca e aperta Z")) : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? t(" · dizem que algo do folclore ronda o fim da trilha...") : t(" · o chefe espera no fim da trilha")));
+    exToast((st.safe ? SUB[zone].n + (SAFE_TIP[zone] || t(" · lembranças, comida, artesão e armeiro: chega perto de uma barraca e aperta Z")) : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? t(" · dizem que algo do folclore ronda o fim da trilha...") : t(" · o chefe espera no fim da trilha"))) + (weatherNow() === "limpo" ? "" : " · " + WEATHER[weatherNow()].n));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
     else if (G.night && !G.tutorial && !G.narrated.pyt_noite) { G.narrated.pyt_noite = true; save(); setTimeout(() => pytunaScene(NARRA_PYT.noite), 700); }   // primeira noite: Pytuna aparece
@@ -621,6 +622,7 @@ function exDraw(now) {
   if (EX.night) drawNightShade(x, cx, cy, now);
   drawPytuna(x, cx, cy, now);   // fumaça de Pytuna nas cenas dele (ui/narration.js)
   drawAmbient(x, cx, cy, now, true);
+  drawWeather(x, now);
   if (EX.camp && EX.camp.kind !== "fogueira") drawCampSky(x, cx, cy, now);
   for (const s of EX.spits) {   // jato d'água: gota com rastro
     const n = Math.hypot(s.vx, s.vy) || 1, px = Math.round(s.x - cx), py = Math.round(s.y - cy);
@@ -811,8 +813,8 @@ function exOpenDialog(kind, msg, look) {
   const d = $("exDialog"); EX.dialog = kind; exKeys.clear(); sfx("blip");
   const say = (title, text) => { d.innerHTML = `<h2>${title}</h2><p>${text}</p>`; };
   if (kind === "fogueira" && EX.st.safe) {   // fogueira da aldeia: escolhe até quando descansar
-    say(t("Fogueira"), G.night ? t("Noite alta. Dormir aqui recupera tudo e já começa o outro dia.")
-      : t("O fogo estala. Descansar até a noite recupera metade (e de noite a mata muda). Dormir até o outro dia recupera tudo."));
+    say(t("Fogueira"), (G.night ? t("Noite alta. Dormir aqui recupera tudo e já começa o outro dia.")
+      : t("O fogo estala. Descansar até a noite recupera metade (e de noite a mata muda). Dormir até o outro dia recupera tudo.")) + " " + t("Amanhã: {clima}.", {clima: WEATHER[weatherOn(G.day + 1)].n.toLowerCase()}));
     if (!G.night) btn(t("Descansar até a noite"), () => exCampRest("noite"), false, d);
     btn(t("Dormir até o dia seguinte"), () => exCampRest("dormir"), false, d);
   }
@@ -1160,6 +1162,41 @@ function drawNightShade(x, cx, cy, now) {
     x.drawImage(puff, Math.round(px - 20 + Math.sin(now / 2300 + ty * .7) * 7), Math.round(py - 8), 40, 18);
   }
   x.globalAlpha = 1;
+}
+/* clima por cima da fase (data/world.js: WEATHER): chuva em risquinhos diagonais, neblina em tufos andando, mormaço
+   alaranjado e ventania em riscos rápidos com folhas. Tudo calculado pelo relógio, sem guardar partícula. */
+function drawWeather(x, now, w = weatherNow()) {
+  const W = VIEW_W, H = VIEW_H, dim = EX.night ? .6 : 1, R = REDUCE ? 0 : 1;
+  if (w === "chuva") {
+    x.fillStyle = `rgba(30,50,80,${.16 * dim})`; x.fillRect(0, 0, W, H);
+    x.fillStyle = EX.night ? "#9ab8d870" : "#d2e6f8b0";
+    const n = Math.round(W * H / 700);
+    for (let i = 0; i < n; i++) {
+      const py = ((i * 613 + now * (.28 + (i % 4) * .03) * R) % (H + 16)) - 8, px = (((i * 977 - py * .3) % W) + W) % W;
+      x.fillRect(Math.round(px), Math.round(py), 1, 3); x.fillRect(Math.round(px) - 1, Math.round(py) + 3, 1, 2);
+    }
+    for (let i = 0; i < n / 8; i++) {   // respingos no chão
+      const k = Math.floor(now / 260) + i * 31; if (k % 3) continue;
+      x.fillRect((k * 97 + i * 53) % W, (k * 61 + i * 89) % H, 2, 1);
+    }
+  } else if (w === "neblina") {
+    x.fillStyle = `rgba(214,222,236,${.32 * dim})`; x.fillRect(0, 0, W, H);
+    const puff = FOG_PUFF || (FOG_PUFF = fogPuff());
+    x.globalAlpha = .65 * dim;
+    for (let i = 0; i < 10; i++) x.drawImage(puff, Math.round(((i * 157 + now * .008 * R * (1 + i % 3)) % (W + 120)) - 100), Math.round((i * 53 + 20) % H), 100, 44);
+    x.globalAlpha = 1;
+  } else if (w === "mormaco") {
+    x.fillStyle = "rgba(255,170,60,.1)"; x.fillRect(0, 0, W, H);
+    x.fillStyle = "rgba(255,230,160,.12)"; x.fillRect(0, 0, W, Math.round(H * .3));
+  } else if (w === "ventania") {
+    x.fillStyle = EX.night ? "#ffffff30" : "#ffffff70";
+    const n = Math.round(W * H / 2500);
+    for (let i = 0; i < n; i++) x.fillRect(Math.round(((i * 211 + now * (.35 + (i % 3) * .1) * R) % (W + 30)) - 30), (i * 71) % H, 6 + i % 6, 1);
+    for (let i = 0; i < 6; i++) {   // folhas voando
+      const px = ((i * 173 + now * .22 * R) % (W + 20)) - 10, py = (i * 97 + Math.sin(now / 300 + i) * 8 + H) % H;
+      x.fillStyle = i % 2 ? "#6fbf4a" : "#a6d65a"; x.fillRect(Math.round(px), Math.round(py), 2, 1);
+    }
+  }
 }
 let FOG_PUFF = null;
 function fogPuff() {   // tufo de neblina: elipse clara que some nas bordas

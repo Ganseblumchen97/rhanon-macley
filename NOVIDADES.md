@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.41.0 — chuva, neblina e mormaço
+
+- Agora o Norte tem clima: cada dia pode ter tempo bom, chuva, neblina, mormaço ou ventania. Dá para ver na trilha
+  (a chuva caindo, a neblina passando, o mormaço alaranjado, as folhas voando no vento) e também na batalha. Em Belém
+  chove mais, como de verdade.
+- O clima mexe na luta. Com chuva, água e raio batem mais forte e o fogo mais fraco; no mormaço, o fogo fica mais forte;
+  na ventania, vento e planta. Na neblina, às vezes o golpe do bicho só passa raspando.
+- Cada tempo traz mais dos seus bichos: com chuva aparecem mais sapos, ariranhas e poraquês; com neblina, corujas e
+  garças; no mormaço, calangos; na ventania, harpias e urubus.
+- Ao entrar numa trilha, o aviso no topo diz como está o tempo, e a fogueira da aldeia conta como vai ser amanhã.
+
 ## 0.40.0 — os cinco elementos
 
 - Agora a batalha tem elementos: fogo, água, vento, raio e planta. Cada bicho é fraco contra um deles e alguns

@@ -612,6 +612,15 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 /* batalha à noite: véu azul com a lua no alto */
 .stage .night-shade{position:absolute;inset:0;z-index:0;pointer-events:none;display:none;background:radial-gradient(circle at 86% 13%,#fff4c8 0 3.2%,rgba(255,236,170,.25) 4%,rgba(255,236,170,.06) 10%,transparent 18%),rgba(8,12,44,.66)}
 .stage.night .night-shade{display:block}
+/* clima do dia na batalha (WEATHER em data/world.js): chuva caindo, neblina, mormaço e ventania, atrás dos bichos */
+.stage .weather-fx{position:absolute;inset:0;z-index:0;pointer-events:none;display:none}
+.stage.w-chuva .weather-fx{display:block;background:repeating-linear-gradient(105deg,transparent 0 22px,rgba(210,230,250,.35) 22px 24px,transparent 24px 47px),rgba(30,50,80,.18);background-size:140px 140px,auto;animation:chuva .45s steps(6) infinite}
+.stage.w-neblina .weather-fx{display:block;background:linear-gradient(0deg,rgba(220,228,240,.55),rgba(220,228,240,.15) 60%,rgba(220,228,240,.3))}
+.stage.w-mormaco .weather-fx{display:block;background:linear-gradient(180deg,rgba(255,220,150,.22),rgba(255,160,60,.1) 50%,transparent)}
+.stage.w-ventania .weather-fx{display:block;background:repeating-linear-gradient(0deg,transparent 0 37px,rgba(255,255,255,.28) 37px 38px,transparent 38px 61px);background-size:240px 100%;animation:ventania .6s steps(8) infinite}
+@keyframes chuva{to{background-position:-38px 140px,0 0}}
+@keyframes ventania{to{background-position:240px 0}}
+@media (prefers-reduced-motion:reduce){.stage .weather-fx{animation:none}}
 /* anoitecer (dawnWipe com night): faixa azul-escura, lua do mal no canto e lobo uivando */
 .wipe.dusk{background:#0b0b24}
 .wipe.dusk::after{background:#3a4aa8}

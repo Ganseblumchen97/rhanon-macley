@@ -68,6 +68,28 @@ const CITY = {
     bay: "M0,0 L44,0 C28,40 46,80 28,110 C40,150 22,200 38,240 C28,270 34,300 46,325 L0,325Z",   // baía do Guajará
     river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Ananindeua →"], home: "veropeso", gate: "terminal"}
 };
+/* Clima do Norte: um por dia, sorteado pelo número do dia (o mesmo dia tem sempre o mesmo tempo, sem campo no save).
+   boost = quanto cada elemento pesa na batalha; more = bichos que aparecem mais; dodge = chance (%) do golpe do bicho
+   passar raspando. fight = aviso no começo da luta. Cada região nova terá o próprio clima (WEATHER_ODDS por cidade). */
+const WEATHER = {
+  limpo:    {n: "Tempo bom"},
+  chuva:    {n: "Chuva", boost: {agua: 1.2, raio: 1.2, fogo: .8}, more: ["sapo", "ariranha", "poraque", "jacaretinga"], fight: "Tá chovendo: água e raio ficam mais fortes, e o fogo mais fraco."},
+  neblina:  {n: "Neblina", dodge: 12, more: ["coruja", "garca", "soco"], fight: "Neblina: às vezes o golpe do bicho passa raspando."},
+  mormaco:  {n: "Mormaço", boost: {fogo: 1.2, agua: .9}, more: ["calango", "iguana"], fight: "Mormaço: o fogo fica mais forte."},
+  ventania: {n: "Ventania", boost: {vento: 1.2, planta: 1.1}, more: ["harpia", "urubu", "gaivota"], fight: "Ventania: o vento e as folhas ficam mais fortes."}
+};
+// chance de cada tempo por cidade; Belém tem a chuva da tarde quase todo dia
+const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15], ["mormaco", 12], ["ventania", 8]],
+  belem: [["limpo", 25], ["chuva", 45], ["neblina", 8], ["mormaco", 14], ["ventania", 8]]};
+function weatherOn(day, city = curCity()) {
+  if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
+  const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
+  let r = seeded(day * 17 + (city === "belem" ? 5 : 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  for (const [k, w] of odds) if ((r -= w) < 0) return k;
+  return "limpo";
+}
+const weatherNow = () => { const w = weatherOn(G.day); return G.night && w === "mormaco" ? "limpo" : w; };   // mormaço some de noite
+const weatherBoost = k => (WEATHER[weatherNow()].boost || {})[k] || 1;
 const curCity = () => G.loc === "belem" ? "belem" : "ananindeua";
 const cityOf = k => (SUB[k] && SUB[k].city) || "ananindeua";
 const ROUTE = Object.values(CITY).flatMap(c => c.route);   // todos os locais das duas cidades

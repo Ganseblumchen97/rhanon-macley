@@ -7,6 +7,8 @@ function setBattleDecor(zone) {
   // à noite: um véu azul-escuro com a lua por cima do cenário (embaixo das plataformas e dos personagens)
   if (!stage.querySelector(".night-shade")) decor.insertAdjacentHTML("afterend", '<div class="night-shade" aria-hidden="true"></div>');
   stage.classList.toggle("night", !!G.night); stage.style.setProperty("--jaci", jaciLight().toFixed(2));   // Jaci voltando clareia a noite
+  if (!stage.querySelector(".weather-fx")) stage.querySelector(".night-shade").insertAdjacentHTML("afterend", '<div class="weather-fx" aria-hidden="true"></div>');
+  stage.classList.remove(...[...stage.classList].filter(c => c.startsWith("w-"))); stage.classList.add("w-" + weatherNow());   // clima do dia (data/world.js)
   decor.innerHTML = "";
   setScenery(zone || curZone || "mata");   // cenário em pixel art (gfx/scenery.js)
 }
@@ -83,6 +85,7 @@ function init(opts = {}) {
   lines = [animal.intro];
   if (opts.firstHit) { e.hp = Math.max(1, e.hp - opts.firstHit); lines.push(t("Rhanon acertou primeiro: −{n}. Sua vez!", {n: opts.firstHit})); }
   if (opts.enemyFirst) lines.push(t("{bicho} pegou Rhanon de surpresa!", {bicho: theName(animal, true)}));
+  if (!animal.bug && WEATHER[weatherNow()].fight) lines.push(WEATHER[weatherNow()].fight);   // o clima do dia mexe na luta
   $("over").hidden = true;
   const wet = WATER_BATTLE.has(animal.id);   // bicho de água: laguinho no lugar do chão e ele meio submerso
   // peixes afundam mais; jacaré, ariranha e cobras só um pouco
@@ -232,7 +235,7 @@ function act(id) {
     const k = SPECIALS.find(s => s.id === id).elem, m = bugMode ? 1 : elemMult(e, k), fresh = !bugMode && !elemKnown(e, k);
     elemLearn(e, k);
     p.sp -= 6;
-    let d = Math.round((rnd(14, 18) + G.lv - 1 + charmStat("atk") + skillStat("atk")) * m); if (p.weak > 0) d = Math.ceil(d / 2);
+    let d = Math.round((rnd(14, 18) + G.lv - 1 + charmStat("atk") + skillStat("atk")) * m * (bugMode ? 1 : weatherBoost(k))); if (p.weak > 0) d = Math.ceil(d / 2);   // clima: chuva fortalece água e raio...
     e.hp = Math.max(0, e.hp - d);
     const v = {bicho: foe(), n: d}, msg = {fogo: t("A tocha cospe fogo n{bicho}: −{n}.", v), agua: t("A cuia joga um jato d'água n{bicho}: −{n}.", v), vento: t("Um sopro de vento acerta {bicho}: −{n}.", v), raio: t("Um raio cai n{bicho}: −{n}.", v),
       cipo: t("Um chicote de cipó estala n{bicho}: −{n}.", v), folhas: t("Folhas afiadas cortam {bicho}: −{n}.", v)};
@@ -390,6 +393,9 @@ function foeAttack(kind, d, sp0) {
       const all = hasSkill("bloqueio2"), back = all ? d : Math.floor(d * (hasSkill("bloqueio") ? 2 / 3 : 1 / 2)); p.hp += back; d -= back;
       if (back) { say(t("Bloqueio! Evitou {n} de dano.", {n: back})); pop(t("BLOQUEIO!"), $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
       if (all && back) { p.bonus = true; say(t("Contra-ataque perfeito: no próximo turno, o Rhanon age duas vezes!")); }
+    }
+    if (d > 0 && !e.bug && Math.random() * 100 < (WEATHER[weatherNow()].dodge || 0)) {   // neblina: o bicho erra de vez em quando
+      p.hp += d; d = 0; say(t("Na neblina, o golpe passa raspando!")); pop(t("DESVIOU!"), $("hero"), "heal"); sfx("esquiva");
     }
     if (d > 0 && charmRoll("esquiva")) {   // talismã do Curupira: escapa do golpe inteiro
       p.hp += d; d = 0; say(t("Rhanon desvia no último instante!")); pop(t("DESVIOU!"), $("hero"), "heal"); sfx("esquiva");
