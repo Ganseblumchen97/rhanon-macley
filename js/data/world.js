@@ -79,6 +79,7 @@ const SUB = {
   caatinga: {city: "petrolina", n: "Caatinga", x: 120, y: 110, txt: "A mata branca do sertão: galho seco, mandacaru e chão rachado. Bode, preá, tatu-bola... e, de noite, um assobio fino no meio dos espinhos."},
   orla: {city: "petrolina", n: "Orla do Velho Chico", s: "Orla", x: 300, y: 210, txt: "A beira do São Francisco em Petrolina: barquinho de carranca, feira de bode e de queijo, pensão e o povo do sertão, que ri de tudo."},
   centrobonito: {city: "bonito", n: "Centro de Bonito", s: "Centro", x: 300, y: 150, txt: "A rua principal de Bonito: casinha baixa, sorveteria, guia de turismo em cada esquina, a pensão e uma fonte de água tão clara que dá pra contar as pedrinhas."},
+  parquebsb: {city: "brasilia", n: "Parque Nacional de Brasília", s: "Parque", x: 92, y: 84, txt: "Cerrado de verdade, a poucos minutos do concreto: campo aberto, vereda de buriti, piscina de água mineral e bicho de todo tamanho. De noite, uma pedra voa do nada e um menino ri no escuro."},
   planopiloto: {city: "brasilia", n: "Plano Piloto", s: "Plano Piloto", x: 214, y: 172, txt: "O centro de Brasília: superquadra de prédio sobre pilotis, comércio da quadra, ipê-roxo na calçada e a pensão. Na banca da esquina, a brigada de incêndio procura um programador."},
   gruta: {city: "bonito", n: "Gruta do Lago Azul", s: "Gruta", x: 96, y: 92, txt: "Uma caverna funda na serra da Bodoquena, com um lago de água azul lá embaixo. Estalactite, morcego, fóssil de bicho de dez mil anos... e, de noite, um assobio de quem cuida da mata."},
   rioprata: {city: "bonito", n: "Rio da Prata", x: 140, y: 236, txt: "Um rio de água cristalina que nasce no meio da mata: peixe nadando do lado, sucuri no fundo de areia branca e ariranha gritando na margem. De noite, uma luz dourada anda em cima da água."},
@@ -138,8 +139,8 @@ const CITY = {
     land: "26,50 160,20 320,26 420,84 430,200 396,292 270,316 140,312 40,276 14,160",
     river: "M60,0 C90,80 200,110 230,180 C250,230 220,280 240,325", road: "M300,150 C340,110 390,70 446,40", sign: [360, 30, "Cuiabá →"], home: "centrobonito", gate: "centrobonito"},
   // Brasília (Centro-Oeste): o Plano Piloto no meio, o Lago Paranoá à direita e um córrego do cerrado; a estrada sai para
-  // Bonito pelo oeste. Por enquanto só o Plano Piloto
-  brasilia: {n: "Brasília", look: "cerrado", map: "centroeste", route: ["planopiloto"], cabin: false,
+  // Bonito pelo oeste. O Plano Piloto e o Parque Nacional, lá em cima
+  brasilia: {n: "Brasília", look: "cerrado", map: "centroeste", route: ["planopiloto", "parquebsb"], cabin: false,
     land: "24,40 170,16 330,22 420,80 432,200 396,292 270,316 140,312 40,278 12,160",
     bay: "M330,0 L440,0 L440,325 L360,325 C330,280 350,240 320,200 C300,170 330,120 310,80 C300,50 320,20 330,0Z",   // Lago Paranoá
     river: "M110,0 C120,80 96,160 124,325", road: "M214,172 C160,190 90,200 -6,214", sign: [8, 236, "← Bonito"], home: "planopiloto", gate: "planopiloto"}
@@ -260,7 +261,7 @@ const FREELAS = {
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.64.0 — o Parque Nacional e o fim do Centro-Oeste
+
+- Brasília ganhou o Parque Nacional (níveis 58 a 60): cerrado aberto, capim dourado e piscinas de água mineral. A
+  passagem fica no lado esquerdo do Plano Piloto.
+- Bichos novos no Parque: ema, veado-campeiro, papagaio-verdadeiro, irara e, de noite, o gato-mourisco.
+- De dia, o chefe é o Tamanduá-rei, que sai de trás do maior cupinzeiro do campo. Depois dele, o Pytuna aparece e
+  avisa que vai para o Sudeste. De noite, pedras voam do escuro: é o Romãozinho, o menino que nunca cresce.
+- Acalme os 10 chefes do Centro-Oeste, de dia e de noite, e o Pajé conta como as estrelas voltaram ao céu do cerrado.
+  No fim aparece a faixa "Fim do Centro-Oeste". A história continua no Sudeste, em breve.
+- O caderno de bichos e o mapa do Brasil mostram quantos chefes do Centro-Oeste você já acalmou ("Brilho das
+  estrelas").
+
 ## 0.63.0 — Brasília e o mapa de queimadas
 
 - Cidade nova: Brasília. Depois de acalmar a Preguiça-gigante da Gruta do Lago Azul, compre a passagem de ônibus no

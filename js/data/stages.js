@@ -148,19 +148,55 @@ const STAGES = {
   // Brasília (Centro-Oeste): o Plano Piloto, superquadra com a pensão (O), barracas, moradores e a Iara (W), da brigada
   // de incêndio, cliente do freela do mapa de queimadas
   planopiloto: {
-    safe: true, next: null,
+    safe: true, next: "parquebsb",
     rows: [
       "########################",
       "########################",
       "#..f....-.......OOO...f#",
       "#.KKK...-..KKK..OOO....#",
       "#..V....-...C..........#",
-      "#-----------W......P..SE",
+      "G-----------W......P..SE",
       "#..P....-..............#",
       "#.####..-..####....f...#",
       "#.####..-..####..P.....#",
       "#..T....-.....T........#",
       "TTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
+  // Brasília: o Parque Nacional (gerado por tools/gerar_mapas.py)
+  parquebsb: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTT,TT,T.,..,,,,,o....TT.T.TTTT,,TTT,TTTT,.oT.T,T,.,.TTTTT",
+      "TT.T,T.....,..a....,TTT.,T,,TTTT,,T..TTTTT....TTTTT.a.,TT.TT",
+      "TT..,.-------------..TTTT,,o..,.TT.T..T.TT.,.f,,,,,o..TT..TT",
+      "TT,a,.-,..,,a,....-a.T.T.,TTTT,,,T,T.TT...,,.......,,...,TTT",
+      "TT,,,,-,,.,..,,,..-........To.TTT...T.,,-----------------,,T",
+      "TTTT.,-.,TTTT.o.,,-...,,.,...T,,T.T,.TT.-....,.....,..,.-,.T",
+      "TTT.,,-.~~~~~TT..,-,...,.,....TTTT.T.T..-.,T,...,o,..T,,-..T",
+      "TTT,.,-~~~~~~~,,..--------B,..TTTT.T.,..-.,..T~~~~~TT,.,-..T",
+      "TTT..,-~~~~~~~,.,T..,.,,.,...TTT.TT.....-a,.,~~~~~~~,T.,-,.T",
+      "TT,..,-~~~~~~~,.T.,oT.,,,...TT.,,.T..,,.-.f.T~~~~~~~T.,.-..T",
+      "TT.,..-.~~~~~..TTT.,TTa,....Ta...,,..,..-..,,~~~~~~~T..,-.,T",
+      "TTTT,,-.,.TT.TT.,.TaT...T,TT.T.,a.....,.-..T.T~~~~~TT.o.-.,T",
+      "TT,TT.-.,,,,.,,..T,T,.,T.T,TT.-----------..T.TT,..TT,,..-..T",
+      "TT,T,a-.,,.,.....TTTTT.,T,..,.-.......,...TTT.TTT..,To,.-,TT",
+      "TTT,T,-----------,T.TTT..T,.T,-,,..,,,.TT..TT,.....,,...-,TT",
+      "TT.,TT,.,,,....,-.o..TTT.TT,,.-..T.....TTT.T,T.........a-,TT",
+      "TTaT,..,..,,.,.,-..T,~~~~~T..,-,o.TT,TTT.TTT.,-----------.TT",
+      "TT....T..TT...o.-..,~~~~~~~f,.-,..,.TTT.TTTT..-..,,,..,,.,TT",
+      "TT,T.T...,.T,,,.-.,.~~~~~~~...F,..f,.TTTT.T...-.~~~~~..,,TTT",
+      "TT..T.T.TT..a,..-,fo~~~~~~~f..-.,..To.TT,T,...-~~~~~~~T.T.TT",
+      "TT.TT..TTTT.T...-.,T.~~~~~.,..-,....TT,TTT,,.,-~~~~~~~T.TTTT",
+      "TTTT.T.TT,TT,.T.-.,.,o.f..,T..-.f.a,TT.,T.T,,.-~~~~~~~.TTTTT",
+      "TT,.T.,TTT..,.T.-,...,,.a..,..-.T.,....TT.T,,,-,~~~~~T.TT,TT",
+      "TT.T,.TT.o.T.,T.---------------.,.,,...T,TT.T.-.T,,...,TT,,T",
+      "TT.T,T.,..TTTo.T,..,...,..,.,...T.TTToT,T.a.T,-......,..,..T",
+      "TTTT,T.TTT...,TTTT,.,,..,..TT.....,T,T.TT.T.,.-----------S-E",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...,...,.,...T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
   // Bonito (Centro-Oeste): o centro, com a pensão (O), barracas, a fonte de água clara e moradores; G leva ao Rio da Prata

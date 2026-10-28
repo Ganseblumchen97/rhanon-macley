@@ -88,7 +88,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
 .stage{--plat:46%}
 .stage.zone-fechada{--plat:42%}
-.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-beira,.zone-pantanal,.zone-chapada,.zone-rioprata,.zone-gruta,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-beira,.zone-pantanal,.zone-chapada,.zone-rioprata,.zone-gruta,.zone-parquebsb,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
 .stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
@@ -120,6 +120,9 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-beira{background:linear-gradient(180deg,#f0d090 0 24%,#6a8a4a 24% 30%,#3a8a8a 30% 38%,#b8b07a 38% 100%)}
 .stage.zone-beira::before{background:#d8c08a;right:9%;top:var(--plat)}
 .stage.zone-beira::after{background:#d8c08a;left:4%;bottom:7%}
+.stage.zone-parquebsb{background:linear-gradient(180deg,#f0d8a0 0 24%,#7a8a3a 24% 30%,#3aa8d8 30% 38%,#a8a856 38% 100%)}
+.stage.zone-parquebsb::before{background:#c8b870;right:9%;top:var(--plat)}
+.stage.zone-parquebsb::after{background:#c8b870;left:4%;bottom:7%}
 .stage.zone-gruta{background:linear-gradient(180deg,#14141e 0 24%,#3a3848 24% 30%,#1a5ad8 30% 38%,#5a5660 38% 100%)}
 .stage.zone-gruta::before{background:#8a8478;right:9%;top:var(--plat)}
 .stage.zone-gruta::after{background:#8a8478;left:4%;bottom:7%}

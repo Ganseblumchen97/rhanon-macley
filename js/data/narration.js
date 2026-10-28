@@ -59,6 +59,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  tamandua_rei: ["O Tamanduá-rei era o mais velho do cerrado, curumim. Andava devagar, comia cupim e não mexia com ninguém.", "Mas a queimada chegou no cupinzeiro dele. E tamanduá de unha de fora é coisa séria: abraça até onça.", {r: "Ele me deu um abraço que eu senti a costela estalar, vô."}, "Abraço de tamanduá é assim. Depois de acalmado, deitou e se cobriu com o próprio rabo pra dormir."],
+  romaozinho: ["O Romãozinho foi um menino ruim com a mãe, curumim. Ela rogou praga, e ele ficou assim: sem crescer, sem morrer, jogando pedra no telhado dos outros.", "A fumaça deixou ele mais bravo ainda. As pedras viravam brasa.", {r: "Eu não briguei com ele, vô. Brinquei. Joguei pedra no rio com ele até cansar."}, "E foi isso que acalmou o menino. Fazia cem anos que ninguém brincava com ele."],
   preguica_gigante: ["A Preguiça-gigante dormia no fundo da gruta havia dez mil anos, curumim. Virou pedra e osso, e o lago azul cobriu ela.", "A fumaça entrou na gruta e acordou o que devia ficar dormindo. Bicho de outro tempo, perdido no nosso.", {r: "Ela era devagar, vô. Mas cada unhada derrubava uma estalactite."}, "E tu cantou pra ela dormir de novo, eu sei. Tu sempre cantou mal, mas bicho velho não liga pra isso."],
   caipora: ["A Caipora é a dona dos bichos, curumim. Anda montada no porco-do-mato e castiga quem caça por maldade.", "A fumaça fez ela achar que todo mundo era caçador. Até o menino, que nunca caçou por esporte na vida.", {r: "Eu deixei fumo pra ela, vô, igual a gente faz pra Comadre Fulozinha."}, "Fez certo. Ela pegou o fumo, deu uma baforada e sumiu no escuro, montada no cateto."],
   ariranha_mae: ["A Ariranha-mãe cuidava de todas as tocas do Rio da Prata, curumim. Bando de ariranha é família, e família defende os filhotes.", "A fumaça fez ela achar que o menino vinha pegar os pequenos.", {r: "Eu só queria atravessar o rio, vô. Ela gritou tão alto que meu ouvido zuniu o dia inteiro."}, "Grito de mãe é assim mesmo. O meu também era, e tu nunca reclamou."],
@@ -153,6 +155,14 @@ const NARRA_PYT = {
     {r: "E fazem festa também, frevo, maracatu. Disso tu não entende nada."},
     "A fumaça não respondeu. Foi embora pro sertão, pro lado do Velho Chico."
   ],
+  // Brasília: o último chefe de dia do Centro-Oeste; a fumaça foge para o Sudeste, das cidades que não dormem
+  tamandua_rei: [
+    "No campo do Parque, com os prédios de Brasília lá no fundo, a fumaça apareceu fina, quase sem cor.",
+    {p: "Tu atrapalhou a brigada, o mapa, o fogo... Aqui no meio eu não cresço mais, curumim."},
+    {r: "Então tu vai embora do Centro-Oeste."},
+    {p: "Vou pro Sudeste. Lá tem tanta luz de poste que ninguém nem lembra que existe lua. Lá eu me escondo fácil."},
+    "E a fumaça foi pro sudeste, devagar, rasteira, por baixo das nuvens."
+  ],
   // Bonito: a fumaça desce até o lago azul da gruta; quer sujar a água mais limpa do Brasil
   preguica_gigante: [
     "Quando a Preguiça-gigante voltou a dormir, a fumaça desceu pela boca da gruta e ficou boiando em cima do lago azul.",
@@ -175,6 +185,13 @@ const NARRA_PYT = {
     {r: "É assim que eles aguentam. E é assim que tu perde."},
     {p: "Perdi o sertão. O resto do Brasil ainda é meu. Me procura no meio do mapa, onde o céu é maior."},
     "E o vento quente levou ela pro oeste, pro cerrado."
+  ],
+  centroeste: [
+    "E quando o último encantado do Centro-Oeste se acalmou, curumim, o céu do cerrado limpou de uma vez.",
+    "Sem fumaça, apareceram as estrelas. Todas. O Cruzeiro do Sul, as Três Marias, a Ema do céu, que o nosso povo conhece.",
+    {r: "Eu deitei no capim do Parque e fiquei contando, vô. Desisti no mil e pouco."},
+    "Jasytatá, curumim: estrela. O nome da nossa aldeia. Lá no meio do Brasil o menino entendeu por quê.",
+    "Mas a fumaça seguiu pro Sudeste, pras cidades que não dormem. Essa parte fica pra amanhã."
   ],
   nordeste: [
     "E quando o último encantado do Nordeste se acalmou, curumim, Guaraci baixou a cabeça.",

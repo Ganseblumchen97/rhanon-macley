@@ -1152,6 +1152,9 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
   cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara, carranca, nego_dagua: negoDagua,
   martim: (pose, f) => pombo(pose, f, {b: "#2a7ac8", B: "#1a4a8a", n: "#f4f0e4", p: "#e8702a", w: "#4aa8e0", y: "#2a2a2a"}),   // martim-pescador: azul, colar branco e peito laranja
+  ema: (pose, f) => garca(pose, f, {b: "#9a9488", B: "#6a645a", n: "#8a8478", N: "#5a544a", y: "#3a3428", Y: "#22201a", k: "#6a645a"}),   // ema: penas cinza-pardas, pernas fortes
+  papagaio: (pose, f) => pombo(pose, f, {b: "#3aa84a", B: "#22782e", n: "#f0d020", p: "#3aa84a", w: "#2a8a3a", y: "#2a2a2a"}),   // papagaio-verdadeiro: verde, cara amarela
+  romaozinho: pessoa({pal: {s: "#b47a48", S: "#8a5a32", h: "#1a1420"}, shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#8a6a3a", "#5e4626"], noBand: true}),   // Romãozinho: menino de camisa velha e calça curta
   cobra_coral: cobra({b: "#d8282a", B: "#9a1a1a", k: "#1a1a1a"}, false),   // cobra-coral: vermelha com os anéis pretos
   caipora: pessoa({pal: {s: "#6a3a1e", S: "#4a2612", h: "#ff6a1c"}, shirt: ["#6a3a1e", "#4a2612"], pants: ["#7a5a2a", "#5a3e1a"], noBand: true}),   // Caipora: pele escura, cabelo de fogo, tanga de palha
   mutum: (pose, f) => pombo(pose, f, {b: "#1e1e26", B: "#0e0e14", n: "#2a2a34", p: "#f0f0e8", w: "#2a2a34", y: "#f0c020"}),   // mutum: preto, barriga branca e bico amarelo

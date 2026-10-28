@@ -16,6 +16,7 @@ const SCENES = {
   lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
+  parquebsb:   {sky: ["#f0d8a0", "#e8c890", "#b8c8d8"], far: "#7a8a3a", trees: "campo", plat: "grama", water: true},   // Parque Nacional de Brasília: céu de seca e o campo do cerrado
   gruta:       {sky: ["#14141e", "#1c1c2c", "#24243a"], far: "#3a3848", trees: "campo", plat: "pedra", water: true},   // Gruta do Lago Azul: teto de pedra escuro e o lago azul
   rioprata:    {sky: ["#a8e0f0", "#88d0d8", "#6ac0a8"], far: "#2f7a42", trees: "copa", plat: "areia", water: true},   // Rio da Prata: mata verde e água cristalina
   chapada:     {sky: ["#f0a868", "#e8b888", "#c8a8a0"], far: "#b8583a", trees: "copa", plat: "barro"},   // Chapada: paredão de arenito vermelho no fim da tarde

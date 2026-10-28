@@ -69,6 +69,10 @@ const jaciLight = () => { const all = NORTE_BOSSES(); return all.filter(k => BS(
    Recife e Petrolina, de dia e de noite) acalmados, a chuva volta e o capítulo fecha */
 const NORDESTE_BOSSES = () => Object.keys(ZONES).filter(z => CITY[cityOf(z)].map === "nordeste").flatMap(z => [z, NIGHT_ZONES[z] ? z + ":noite" : null]).filter(Boolean);
 const guaraciCalm = () => { const all = NORDESTE_BOSSES(); return all.filter(k => BS()[k]).length / all.length; };
+/* Brilho das estrelas (jasytatá): no Centro-Oeste a fumaça das queimadas apagou o céu enorme do cerrado; com os chefes de
+   lá (Cuiabá, Bonito e Brasília, de dia e de noite) acalmados, as estrelas voltam e o capítulo fecha */
+const CENTROESTE_BOSSES = () => Object.keys(ZONES).filter(z => CITY[cityOf(z)].map === "centroeste").flatMap(z => [z, NIGHT_ZONES[z] ? z + ":noite" : null]).filter(Boolean);
+const estrelaCalm = () => { const all = CENTROESTE_BOSSES(); return all.filter(k => BS()[k]).length / all.length; };
 // Pytuna aparece na exploração: a fumaça chega perto do Rhanon, fala (narra) e o vento leva ela embora
 function pytunaScene(lines, done) {
   if (!EX) return narrate(lines, done);
@@ -96,7 +100,8 @@ function chapterBanner(title, sub) {
   ransom(b.querySelector("h2"), [title.toUpperCase()], 11); levelUpJingle();
   setTimeout(() => b.classList.add("out"), 4200); setTimeout(() => b.remove(), 5000);
 }
-// depois do comentário do Pajé sobre um chefe: Pytuna (se for o último de uma cidade) e o fim do Norte ou do Nordeste, nessa ordem
+// depois do comentário do Pajé sobre um chefe: Pytuna (se for o último de uma cidade) e o fim do Norte, do Nordeste ou do
+// Centro-Oeste, nessa ordem
 function bossStory(id, done) {
   const steps = [];
   // ainda não viu o Pytuna (nenhuma noite na mata): ele se apresenta aqui, e a cena da primeira noite não repete
@@ -111,6 +116,10 @@ function bossStory(id, done) {
   if (guaraciCalm() >= 1 && !G.narrated.nordeste_fim) steps.push(next => {
     G.narrated.nordeste_fim = true; save(); musicStart("jaci");   // a chuva volta no sertão: o tema da esperança
     narrate(NARRA_PYT.nordeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Nordeste"), t(G.portfolio.app_cordel ? "A história continua no Centro-Oeste: o voo sai do Aeroporto do Recife." : "A história continua no Centro-Oeste. Antes, entregue o app de cordel do Seu Dedé no Recife Antigo.")); setTimeout(next, 1500); });
+  });
+  if (estrelaCalm() >= 1 && !G.narrated.centroeste_fim) steps.push(next => {
+    G.narrated.centroeste_fim = true; save(); musicStart("jaci");   // as estrelas voltam ao céu do cerrado: o tema da esperança
+    narrate(NARRA_PYT.centroeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Centro-Oeste"), t("A história continua no Sudeste. Em breve!")); setTimeout(next, 1500); });
   });
   const run = () => steps.length ? steps.shift()(run) : done && done();
   run();
