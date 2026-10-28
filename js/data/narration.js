@@ -78,7 +78,8 @@ const NARRA_BOSS = {
 };
 /* Pytuna, a Noite sem Lua (a fumaça que apaga Jaci): {p: "..."} é a fala dele, com o retrato de fumaça e olhos vermelhos.
    NARRA_PYT: noite = primeira noite na exploração; os outros, depois do chefe com esse id (último de dia de cada cidade).
-   norte = fim do capítulo, quando os 20 chefes do Norte estão acalmados (Jaci inteira de novo). */
+   norte = fim do capítulo, quando os 20 chefes do Norte estão acalmados (Jaci inteira de novo); nordeste = fim do
+   Nordeste, com os chefes de lá acalmados (a calma de Guaraci, guaraciCalm). */
 const NARRA_PYT = {
   noite: [
     "Foi na primeira noite que ele viu. A fumaça desceu do céu, devagar, e ficou olhando pra ele.",
@@ -107,6 +108,38 @@ const NARRA_PYT = {
     "Em Belém ela já não falava tão alto. Jaci estava voltando, e a fumaça sabia.",
     {p: "A capital também não te segurou... Tá bom. Lá pro Sul, onde a mata de pinheiro acaba, eu sou maior que tu."},
     "E o vento levou ela pro Sul. Foi a última vez que o Norte viu Pytuna."
+  ],
+  // Nordeste: a fumaça volta quente e seca, deixando Guaraci bravo; aparece depois do último chefe de dia de cada cidade
+  sucuarana: [
+    "Nas dunas dos Lençóis a fumaça apareceu de novo, curumim. Mas não era a mesma: vinha quente, seca, cheirando a capim queimado.",
+    {p: "Achou que eu tinha ficado no Norte? Aqui eu nem preciso da noite, curumim. Aqui eu seco o dia."},
+    {r: "Tu tá deixando Guaraci bravo."},
+    {p: "Sol bravo seca rio, seca roça, seca gente. Quanto mais seco, mais eu cresço."}
+  ],
+  surubim: [
+    "No encontro dos rios, a fumaça ficou rodando em cima da água, sem conseguir secar nada.",
+    {p: "Dois rios teimosos... Mas o sertão é grande, curumim. Lá tu não acha água pra te esconder."},
+    {r: "Então eu levo a minha."}
+  ],
+  teiu_rei: [
+    "No alto de Olinda, Pytuna se misturou com a fumaça da cidade, dos carros, das fábricas.",
+    {p: "Tá vendo? Aqui eu nem preciso trabalhar. Eles mesmos fazem fumaça pra mim."},
+    {r: "E fazem festa também, frevo, maracatu. Disso tu não entende nada."},
+    "A fumaça não respondeu. Foi embora pro sertão, pro lado do Velho Chico."
+  ],
+  carranca: [
+    "Na beira do Velho Chico, quando a carranca voltou pra proa, a fumaça desceu baixinha, sem força.",
+    {p: "Carranca, rezadeira, cordel... Esse povo ri de tudo, até do sol rachando o chão."},
+    {r: "É assim que eles aguentam. E é assim que tu perde."},
+    {p: "Perdi o sertão. O resto do Brasil ainda é meu. Me procura no meio do mapa, onde o céu é maior."},
+    "E o vento quente levou ela pro oeste, pro cerrado."
+  ],
+  nordeste: [
+    "E quando o último encantado do Nordeste se acalmou, curumim, Guaraci baixou a cabeça.",
+    "Choveu no sertão naquela noite. Chuva grossa, de molhar o mandacaru e encher o açude.",
+    {r: "O povo saiu na rua pra tomar banho de chuva, vô. Até o Bode-rei."},
+    "O Nordeste tinha aprendido a rir com o sol bravo. Naquela noite riu com chuva. Mas a fumaça seguiu pro meio do Brasil.",
+    "Essa parte fica pra amanhã. Dorme, curumim."
   ],
   norte: [
     "E foi assim que o Norte voltou a ver Jaci inteira, curumim. Olha lá em cima.",

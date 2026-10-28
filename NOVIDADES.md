@@ -3,6 +3,14 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.58.0 — o fim do Nordeste
+
+- O Pytuna voltou, agora quente e seco: ele aparece depois do último chefe de dia de cada cidade do Nordeste
+  (Suçuarana, Surubim, Teiú-rei e Carranca) e conversa com o Rhanon.
+- Acalme os 14 chefes do Nordeste, de dia e de noite, e o Pajé conta como a chuva voltou ao sertão. No fim aparece a
+  faixa "Fim do Nordeste". A história continua no Centro-Oeste, em breve.
+- O caderno de bichos e o mapa do Brasil mostram quantos chefes do Nordeste você já acalmou ("Calma de Guaraci").
+
 ## 0.57.0 — a beira do Velho Chico e uma tela inicial para cada região
 
 - Petrolina ganhou a última trilha: a Beira do Velho Chico (níveis 46 a 48). A passagem fica no alto da Serra do

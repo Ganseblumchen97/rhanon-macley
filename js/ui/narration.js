@@ -65,6 +65,10 @@ function drawSmoke(x, cx, cy, k = 1, now = 0, alpha = 1) {
 // chefes do Norte (zonas de Ananindeua e Belém), de dia e de noite: as zonas de outras regiões ficam de fora
 const NORTE_BOSSES = () => Object.keys(ZONES).filter(z => ["ananindeua", "belem"].includes(cityOf(z))).flatMap(z => [z, NIGHT_ZONES[z] ? z + ":noite" : null]).filter(Boolean);
 const jaciLight = () => { const all = NORTE_BOSSES(); return all.filter(k => BS()[k]).length / all.length; };
+/* Calma de Guaraci: no Nordeste a fumaça secou tudo e o sol ficou bravo; com os chefes de lá (São Luís, Teresina,
+   Recife e Petrolina, de dia e de noite) acalmados, a chuva volta e o capítulo fecha */
+const NORDESTE_BOSSES = () => Object.keys(ZONES).filter(z => CITY[cityOf(z)].map === "nordeste").flatMap(z => [z, NIGHT_ZONES[z] ? z + ":noite" : null]).filter(Boolean);
+const guaraciCalm = () => { const all = NORDESTE_BOSSES(); return all.filter(k => BS()[k]).length / all.length; };
 // Pytuna aparece na exploração: a fumaça chega perto do Rhanon, fala (narra) e o vento leva ela embora
 function pytunaScene(lines, done) {
   if (!EX) return narrate(lines, done);
@@ -85,14 +89,14 @@ function drawPytuna(x, cx, cy, now) {
   const M = 34, sx = Math.max(M, Math.min(VIEW_W - M, p.x - cx)), sy = Math.max(M + 18, Math.min(VIEW_H - M - 70, p.y - cy));   // em cima a faixa do HUD, embaixo o painel da fala
   drawSmoke(x, sx + out * 30, sy + out * 120, 1.2 * inK + out, now, (1 - out) * .95);
 }
-// fim do capítulo do Norte: faixa grande com letras de recorte
+// fim de capítulo (Norte, Nordeste): faixa grande com letras de recorte
 function chapterBanner(title, sub) {
   const b = document.createElement("div"); b.className = "chapter"; b.setAttribute("aria-live", "polite");
   b.innerHTML = `<h2 class="title"></h2><p>${sub}</p>`; document.body.appendChild(b);
   ransom(b.querySelector("h2"), [title.toUpperCase()], 11); levelUpJingle();
   setTimeout(() => b.classList.add("out"), 4200); setTimeout(() => b.remove(), 5000);
 }
-// depois do comentário do Pajé sobre um chefe: Pytuna (se for o último de uma cidade) e o fim do Norte, nessa ordem
+// depois do comentário do Pajé sobre um chefe: Pytuna (se for o último de uma cidade) e o fim do Norte ou do Nordeste, nessa ordem
 function bossStory(id, done) {
   const steps = [];
   // ainda não viu o Pytuna (nenhuma noite na mata): ele se apresenta aqui, e a cena da primeira noite não repete
@@ -103,6 +107,10 @@ function bossStory(id, done) {
   if (jaciLight() >= 1 && !G.narrated.norte_fim) steps.push(next => {
     G.narrated.norte_fim = true; save(); musicStart("jaci");   // a lua volta inteira: o tema de Jaci
     narrate(NARRA_PYT.norte, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Norte"), t(G.portfolio.site_feira ? "A história continua no Nordeste: o voo sai do Aeroporto de Belém." : "A história continua no Nordeste. Antes, entregue o site da Dona Graça no Ver-o-Peso.")); setTimeout(next, 1500); });
+  });
+  if (guaraciCalm() >= 1 && !G.narrated.nordeste_fim) steps.push(next => {
+    G.narrated.nordeste_fim = true; save(); musicStart("jaci");   // a chuva volta no sertão: o tema da esperança
+    narrate(NARRA_PYT.nordeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Nordeste"), t("A história continua no Centro-Oeste. Em breve!")); setTimeout(next, 1500); });
   });
   const run = () => steps.length ? steps.shift()(run) : done && done();
   run();
