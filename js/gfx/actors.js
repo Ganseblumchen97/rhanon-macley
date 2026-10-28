@@ -18,6 +18,9 @@ function hitStop(ms) {
   an.forEach(a => a.pause()); setTimeout(() => an.forEach(a => a.playState === "paused" && a.play()), ms);
 }
 /* ---------- ator do Rhanon (batalha e desafios): visto de costas, montado pelo esqueleto (gfx/rig.js) ---------- */
+// Fúria: um acerto a cada FURY_GAP ms, o primeiro FURY_LEAD ms depois do "fury" começar; FURY_HITS = quantos (3, ou 4 com habilidade)
+const FURY_GAP = 320, FURY_LEAD = 300;
+let FURY_HITS = 3;
 const HERO_FIT = .7;   // tamanho de 1 pixel do desenho em relação ao --px do palco (arte 32x44 mais fina que a antiga)
 function makeHeroActor() {
   const W = 48, H = 56, SX = 8, SY = 10;   // o desenho 32x44 fica com os pés na linha 54; linha 55 é a sombra
@@ -80,6 +83,24 @@ function makeHeroActor() {
         pose.lean = el < 180 ? -1 : el < 620 ? 2 : 0; pose.weapon = el >= 180 && el < 620 ? "stab" : "guard";
         if (el > 850) set("idle");
         break;
+      case "fury": {   // Fúria: estocada alta (pulando), estocada baixa (agachado) e, no último, gira a lança e salta no golpe final
+        const n = FURY_HITS, gap = REDUCE ? 1 : FURY_GAP, i = Math.max(0, Math.min(n - 1, Math.floor((el - (FURY_LEAD - 150)) / gap)));
+        const loc = el - (FURY_LEAD - 150 + i * gap), last = i === n - 1, wind = loc < 150, kind = last ? "final" : i % 2 ? "baixa" : "alta";
+        if (el < FURY_LEAD - 150) { pose.weapon = "guard"; pose.lean = 1; break; }   // correndo até o bicho
+        if (kind === "alta") {
+          if (wind) { pose.weapon = "guard"; pose.lean = -1; pose.dy = 1; }
+          else { pose.weapon = "stab"; pose.lean = 2; lift = loc < 260 ? Math.round(Math.sin((loc - 150) / 110 * Math.PI) * 4) : 0; }
+        } else if (kind === "baixa") {
+          if (wind) { pose.weapon = "raise"; pose.lean = -1; }
+          else { pose.weapon = "stab"; pose.lean = 3; pose.dy = 2; Object.assign(pose, {lf: [8, 40], rf: [24, 40]}); }
+        } else {
+          if (wind) { pose.weapon = ["up", "diag", "raise"][Math.min(2, Math.floor(loc / 50))]; pose.dy = 1; }   // gira a lança
+          else { pose.weapon = "stab"; pose.lean = 3; lift = loc < 330 ? Math.round(Math.sin((loc - 150) / 180 * Math.PI) * 6) : 0; }
+          if (!wind && lastFx !== 9) { lastFx = 9; const [gx, gy] = grid(SX + 30, SY + 14); PFX.burst(10, "star", ["#ffd23a", "#ffffff", "#e5001c"], gx, gy, 20, {life: .6}); }
+        }
+        if (el > FURY_LEAD + (n - 1) * gap + 450) set("idle");
+        break;
+      }
       case "throw":   // jogar a lança: ergue para trás, arremessa (fica sem a lança) e pega outra de volta
         if (el < 330) { pose.weapon = "raise"; pose.lean = -1; pose.dy = 1; }
         else { pose.weapon = el > 1000 ? "up" : null; pose.lean = el < 600 ? 2 : 0; pose.rh = el < 600 ? [28, 22] : undefined; }
@@ -201,7 +222,7 @@ function makeHeroActor() {
 
 /* ---------- ator dos bichos (e de quem mais for desenhado pronto) ---------- */
 function makeBeastActor() {
-  let cv = null, g = null, base = null, white = null, w = 0, h = 0, f = 1, k = 1, CW = 0, CH = 0, kind = "", motion = "", state = "idle", since = 0, lastFx = 0, nextHop = 0, info = {}, swT = 0, rig = null;
+  let cv = null, g = null, base = null, white = null, w = 0, h = 0, f = 1, k = 1, CW = 0, CH = 0, kind = "", motion = "", state = "idle", since = 0, lastFx = 0, nextHop = 0, info = {}, swT = 0, smT = 0, rig = null;
   const whites = new WeakMap(), whiteFrame = c => whites.get(c) || (whites.set(c, whiteOf(c)), whites.get(c));
   const MX = 6, MT = 8, MB = 2;
   const set = (s) => { state = s; since = animNow(); lastFx = 0; };
@@ -236,6 +257,8 @@ function makeBeastActor() {
     const r = cv.getBoundingClientRect(), u = r.width / CW;
     return PFX.toGrid(r.left + lx * u, r.top + ly * u);
   }
+  // bicho da luta ainda tomado pela fumaça (olho vermelho, fumaça subindo); acalmado ou no treino, volta ao normal
+  const evilNow = () => mode === "hunt" && !!e && e.hp > 0 && !e.rematch && isTomado(e) && state !== "defeat";
   // desenha o sprite com a parte de cima "respirando" e, nas cobras, ondulando
   function body(img, x, y, t, o) {
     const split = Math.round(h * .55), wave = motion === "sway" || motion === "swim";
@@ -264,6 +287,10 @@ function makeBeastActor() {
       if (motion === "hop" && t > nextHop) { nextHop = t + 1400 + Math.random() * 1600; set("hop"); }
       if (motion === "curl" && Math.floor(t / 2600) % 3 === 2) o.dy = 2;
       if (motion === "snort" && t - lastFx > 2400) { lastFx = t; const [gx, gy] = grid(MX - 1, MT + h * .45); PFX.emit("puff", ["#e8e4dc"], gx, gy, -8, -2, .5); PFX.emit("puff", ["#e8e4dc"], gx, gy + 1, -10, 0, .45); }
+      if (evilNow() && t - smT > 260) {   // tomado: fumaça escura subindo do corpo
+        smT = t; const [gx, gy] = grid(MX + w * (.2 + Math.random() * .6), MT + h * (.15 + Math.random() * .5));
+        PFX.emit("puff", PYT_SMOKE, gx, gy, (Math.random() - .5) * 4, -7 - Math.random() * 5, 1.1);
+      }
       if (info.boss && t - lastFx > 140) {
         lastFx = t; const [gx, gy] = grid(MX + Math.random() * w, MT + h * (.3 + Math.random() * .6));
         PFX.emit("dot", AURA[kind] || ["#ffd23a"], gx, gy, 0, -9 - Math.random() * 6, .9);
@@ -341,7 +368,7 @@ function makeBeastActor() {
     const img = flash ? white : base;
     if (shake) ox += Math.floor(t / 40) % 2 ? 1 : -1;
     if (rp) {
-      const fr = beastFrame(rig, rp, rp === "idle" || rp === "blink" ? o.dy % 2 : 0), x0 = MX + ox, y0 = MT - lift;
+      const fr = beastFrame(rig, rp, rp === "idle" || rp === "blink" ? o.dy % 2 : 0, evilNow()), x0 = MX + ox, y0 = MT - lift;
       g.drawImage(flash ? whiteFrame(fr) : fr, x0, y0, w, h);
       if (state === "defeat" && rp === "ko" && !REDUCE) {
         const [hx, hy] = fr.dataset.head.split(",").map(n => n / k);
@@ -442,7 +469,31 @@ const WALKER = (() => {
   function setup(id, size) {
     const g = $(id); if (!g || g.dataset.walker) return;
     g.dataset.walker = "1";
-    g.innerHTML = `<ellipse rx="${size * .32}" ry="${size * .09}" fill="rgba(0,0,0,.35)"/><g class="wk"><image width="${size}" height="${size * 1.375}" x="${-size / 2}" y="${-size * 1.375 + 1}" style="image-rendering:pixelated"/></g>`;
+    g.innerHTML = `<ellipse rx="${size * .32}" ry="${size * .09}" fill="rgba(0,0,0,.35)"/><g class="wk"><image width="${size}" height="${size * 1.375}" x="${-size / 2}" y="${-size * 1.375 + 1}" style="image-rendering:pixelated"/></g>`
+      + `<g class="mk3d">${"<path/>".repeat(5)}<circle/><circle class="mk3d-hi"/></g>`;
+    gem(g, size, 0);
+  }
+  /* marcador em cima da cabeça (como o do Persona 3, nas cores do Rhanon): uma pirâmide de ponta para baixo, verde da
+     faixa da cabeça, girando em 3D, e uma bolinha vermelha da pintura do rosto em cima. As faces são projetadas a cada
+     quadro (vista um pouco de cima) e pintadas de trás para frente, mais claras quando viradas para a luz */
+  const GEM_FACE = ["#7ee08a", "#3f9a5c", "#25663a", "#1a4a2a"];
+  function gem(g, size, t) {
+    const m = g.querySelector(".mk3d"); if (!m) return;
+    const r = size * .2, hgt = size * .42, top = -size * 1.375 - 8 - (REDUCE ? 0 : Math.sin(t / 420) * 2), a0 = REDUCE ? .5 : t / 700, tilt = .38;
+    const P = (x, y, z) => [x, top + y + z * tilt, z];   // projeção: y para baixo, z (profundidade) sobe um pouco na tela
+    const ring = [0, 1, 2, 3].map(i => { const a = a0 + i * Math.PI / 2; return P(Math.cos(a) * r, 0, Math.sin(a) * r); }), tip = P(0, hgt, 0);
+    const faces = ring.map((v, i) => { const w = ring[(i + 1) % 4], ang = a0 + (i + .5) * Math.PI / 2; return {pts: [v, w, tip], z: Math.sin(ang), light: Math.cos(ang - .9)}; });
+    faces.push({pts: ring, z: -2, light: 1.2});   // tampa de cima (vista de cima, sempre atrás das faces da frente)
+    faces.sort((p, q) => p.z - q.z);
+    const paths = m.querySelectorAll("path");
+    faces.forEach((f, i) => {
+      const col = f.light > 1 ? "#a8f0a0" : GEM_FACE[f.light > .45 ? 0 : f.light > -.2 ? 1 : f.light > -.7 ? 2 : 3];
+      paths[i].setAttribute("d", "M" + f.pts.map(p => p[0].toFixed(1) + " " + p[1].toFixed(1)).join("L") + "Z");
+      paths[i].setAttribute("fill", col); paths[i].setAttribute("stroke", "#173a22"); paths[i].setAttribute("stroke-width", "1"); paths[i].setAttribute("stroke-linejoin", "round");
+    });
+    const [ball, hi] = m.querySelectorAll("circle"), by = top - r * .95;
+    Object.entries({cx: 0, cy: by, r: r * .62, fill: "#e2363d", stroke: "#5a1418", "stroke-width": 1}).forEach(([k, v]) => ball.setAttribute(k, v));
+    Object.entries({cx: -r * .22, cy: by - r * .22, r: r * .2, fill: "#ffd0c8"}).forEach(([k, v]) => hi.setAttribute(k, v));
   }
   function tick(t) {
     for (const [id, size] of [["mk", 30], ["lmk", 26]]) {
@@ -452,7 +503,7 @@ const WALKER = (() => {
       if (!m) continue;
       const x = +m[1], y = +m[2];
       if (s.x !== null && (Math.abs(x - s.x) > .01 || Math.abs(y - s.y) > .01)) { s.moveT = t; if (Math.abs(x - s.x) > .01) s.face = x > s.x ? 1 : -1; }
-      s.x = x; s.y = y;
+      s.x = x; s.y = y; gem(g, size, t);
       const walking = t - s.moveT < 140;
       const key = walking ? "walk" + Math.floor(t / 110) % 4 : "stand" + (REDUCE ? 0 : Math.floor(t / 650) % 2);
       const k2 = key + s.face;

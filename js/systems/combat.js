@@ -109,7 +109,7 @@ function init(opts = {}) {
   $("over").hidden = true;
   const wet = WATER_BATTLE.has(animal.id);   // bicho de água: laguinho no lugar do chão e ele meio submerso
   // peixes afundam mais; jacaré, ariranha e cobras só um pouco
-  $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : ""); $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("meMedal").style.backgroundImage = `url(${heroMedal()})`; $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
+  $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : "") + (isTomado(animal) && !opts.rematch ? " tomado" : "");   // tomado: brilho escuro da fumaça $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("meMedal").style.backgroundImage = `url(${heroMedal()})`; $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
   pick(); render();
   $("cmds").firstChild.focus(); musicStart(getBattleTrackFor(animal));
   // abertura: o Rhanon entra pela esquerda, o bicho chega pela direita e o nome dele aparece numa faixa
@@ -198,7 +198,8 @@ let qte = null, foeImpact = 0;           // qte = {at, el, ok, tried}; foeImpact
 function qteArm(impactIn, target) {
   qteClear();
   const q = pos(target), el = el$("qte", {left: q.x + "px", top: q.y - 34 + "px"}), lead = Math.max(0, impactIn - QTE_EARLY);
-  el.innerHTML = `<i></i><b>${padLabel("z")}</b>`;   // no controle, o botão dele (ui/gamepad.js) el.style.setProperty("--dur", lead + "ms");
+  // alvo fixo (::before), o anel que fecha até ele (i) e a tecla no meio; no controle, o botão dele (ui/gamepad.js)
+  el.innerHTML = `<i></i><u></u><b>${padLabel("z")}</b>`; el.style.setProperty("--dur", lead + "ms");
   qte = {at: performance.now() + impactIn, el, ok: false, tried: false};
   setTimeout(() => { if (el.isConnected) { el.classList.add("agora"); sfx("janela"); } }, lead);
   setTimeout(() => el.remove(), impactIn + QTE_LATE + 260);
@@ -391,6 +392,8 @@ function beastThanks() {
   BEAST_A.set("idle");
   if (e.bug) return setTimeout(() => $("beast").classList.add("glitch"), 300);   // bug: pisca em pedaços e some
   const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .15);
+  $("beast").classList.remove("tomado");
+  if (isTomado(e) && !e.rematch) { const [sx, sy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .45); PFX.burst(18, "puff", PYT_SMOKE, sx, sy, 16, {life: 1.2, up: 18}); }   // a fumaça de Pytuna sai do corpo e sobe
   if (!person) setTimeout(() => PFX.burst(g === "heart" ? 6 : 3, g, {heart: ["#ff6b8a", "#ff9fb4"], note: ["#5a6ad8", "#ffffff"], thumb: ["#ffd23a", "#c8902a"]}[g], gx, gy, 14, {life: 1, up: 12}), 200);
   if (e.boss) return;
   if ($("beast").classList.contains("submerged")) return setTimeout(() => $("beast").classList.add("dive"), 700);
@@ -576,24 +579,25 @@ function cipoWhip(a, b) {
 // fúria: faixa "FÚRIA!", Rhanon corre até o bicho e dá três estocadas (a última mais forte). Devolve quanto dura (ms).
 function furyStrike(ds) {
   holdE = preE; qteClear();
-  const b = pos($("beast")), dx = Math.max(0, b.x - pos($("hero")).x - 70), T0 = REDUCE ? 0 : 900, gap = REDUCE ? 0 : 230;
+  const b = pos($("beast")), dx = Math.max(0, b.x - pos($("hero")).x - 70), T0 = REDUCE ? 0 : 900, gap = REDUCE ? 0 : FURY_GAP;
   encounterBanner(t("Fúria da mata"), t(ds.length === 4 ? "quatro golpes!" : "três golpes!")); sfx("furia"); musicDuck(1200);
-  setTimeout(() => {
-    HERO_A.set("stab"); sfx("spear");
-    $("hero").animate([{transform: "translateX(0)", easing: "cubic-bezier(.6,0,1,.6)"}, {transform: `translateX(${dx}px)`, offset: .2}, {transform: `translateX(${dx}px)`, offset: .82, easing: "cubic-bezier(.2,.7,.3,1)"}, {transform: "translateX(0)"}],
-      {duration: REDUCE ? 1 : 300 + gap * ds.length + 250});
+  setTimeout(() => {   // corre até o bicho e fica colado nele: cada acerto é uma estocada diferente (estado "fury" do HERO_A)
+    FURY_HITS = ds.length; HERO_A.set("fury"); sfx("spear");
+    const dur = REDUCE ? 1 : FURY_LEAD + gap * ds.length + 300;
+    $("hero").animate([{transform: "translateX(0)", easing: "cubic-bezier(.6,0,1,.6)"}, {transform: `translateX(${dx}px)`, offset: 200 / dur}, {transform: `translateX(${dx}px)`, offset: 1 - 260 / dur, easing: "cubic-bezier(.2,.7,.3,1)"}, {transform: "translateX(0)"}],
+      {duration: dur});
   }, T0);
   let shown = preE;
   ds.forEach((d, i) => setTimeout(() => {
     const last = i === ds.length - 1;
     shown = Math.max(0, shown - d); holdE = last ? null : shown;
-    if (!last) HERO_A.set("stab");
+    if (i) sfx("spear");
     hitBeast(); slash($("beast")); burst(b, last ? ["#ffd23a", "#ffffff", "#e5001c"] : ["#fff", "#cfd8dc", "#f2a20c"], last ? 20 : 10, last ? 110 : 60);
     pop(String(d), $("beast"), last ? "crit" : "strong"); sfx(last ? "critico" : "hit"); hitImpact(last ? "furia" : "leve");
     if (last) { say(t(ds.length === 4 ? "FÚRIA! Quatro estocadas: −{n}." : "FÚRIA! Três estocadas: −{n}.", {n: ds.join(", −")})); charmOnHit(ds.reduce((a, b) => a + b, 0)); setTimeout(() => pop(t("FÚRIA!"), $("beast"), "crit"), 200); }
     render();
-  }, T0 + 300 + i * gap));
-  return T0 + 300 + gap * (ds.length - 1) + 400;
+  }, T0 + FURY_LEAD + i * gap));
+  return T0 + FURY_LEAD + gap * (ds.length - 1) + 500;
 }
 // barra de XP do painel do Rhanon (quanto falta para o próximo nível)
 function drawXp() { $("xpb").style.width = (100 * G.xp / need(G.lv)) + "%"; $("xpTxt").textContent = G.xp + " / " + need(G.lv); }
@@ -674,7 +678,7 @@ function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: 
   if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit();
   const got = drop || a.bug ? 0 : a.boss ? rnd(1, 3) : 1;   // chefe deixa de 1 a 3 (o Pajé faz talismã com elas); bug não deixa nada
   const part = NB_DROP[a.id] && G.nb.tem && !G.nb[NB_DROP[a.id]] ? NB_DROP[a.id] : null;   // macaco e ariranha largam peças do notebook
-  if (part) G.nb[part] = true;
+  if (part) { G.nb[part] = true; G.nbNew.push(part); }   // nbNew: a tela do notebook mostra ela encaixando
   if (got) G.pelts[a.id] = (G.pelts[a.id] || 0) + got;
   G.xp += xp;
   while (G.xp >= need(G.lv)) { G.xp -= need(G.lv); G.lv++; }

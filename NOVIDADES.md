@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.55.0 — a fumaça nos olhos e a Fúria de verdade
+
+- Os bichos agora mostram que estão tomados pela fumaça de Pytuna: olho vermelho aceso, cara brava e uma fumaça
+  escura saindo do corpo. Quando você acalma um deles, a fumaça sai e ele volta ao normal antes de agradecer.
+- O anel do tempo certo voltou a fechar: um anel grande vai diminuindo até o alvo com o Z no meio. Quando encosta e
+  fica verde, aperte Z. Acertou, ele estoura em dourado.
+- A Fúria da mata agora mostra os três golpes: o Rhanon fica colado no bicho e dá uma estocada alta, uma baixa e,
+  no fim, gira a lança e salta no golpe final.
+- Nos mapas, um marcador verde em forma de pirâmide gira em cima da cabeça do Rhanon.
+- O notebook ganhou uma tela: abra pela bolsa (I) para ver as peças que já tem e as que faltam. Cada peça nova
+  aparece entrando no lugar.
+
 ## 0.54.0 — descanso de verdade e um HUD de guardião
 
 - Na fogueira da aldeia voltou a opção "Descansar": recupera toda a vida e a energia sem passar o tempo. Na pensão de

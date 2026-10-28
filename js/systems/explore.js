@@ -153,7 +153,9 @@ function makeAnimalEnt(a, tx, ty) {
   const img = artCanvas("animal/" + a.id + "/mapa") || codeAnimalSprite(a), k = (+img.dataset.scale || 1) / (a.ow || 1), x = tx * TILE + 8, y = ty * TILE + 12;
   // traço novo: segundo quadro (respirando/andando) e o desmaiado, para quando cai com um golpe só
   const rig = img.dataset.rig, img2 = rig && beastFrame(a.id, "idle", 1), ko = rig && beastFrame(a.id, "ko"), blink = rig && beastFrame(a.id, "blink");
-  return {a, img, img2, ko, blink, w: img.width / k, h: img.height / k, x, y, homeX: x, homeY: y, hw: Math.min(7, Math.round(img.width / k / 3)), hh: 3,
+  // tomado pela fumaça (vivo, antes de ser acalmado): os mesmos quadros com o olho vermelho
+  const evil = rig && isTomado(a) && {img: beastFrame(a.id, "idle", 0, true), img2: beastFrame(a.id, "idle", 1, true), blink: beastFrame(a.id, "blink", 0, true)};
+  return {a, img, img2, ko, blink, evil, tomado: isTomado(a), w: img.width / k, h: img.height / k, x, y, homeX: x, homeY: y, hw: Math.min(7, Math.round(img.width / k / 3)), hh: 3,
     speed: a.id === "preguica" ? 18 : (ANIMAL_SPEED[a.size] ?? 40), boss: !!a.boss, alive: true,
     state: "wander", vx: 0, vy: 0, until: 0, face: -1, walk: 0, stunUntil: 0};
 }
@@ -240,6 +242,7 @@ function resumeExplore(result) {
     setTimeout(jaciJingle, 300);   // um pedaço da luz de Jaci volta
     setTimeout(() => narrate(NARRA_BOSS[en.a.id], () => bossStory(en.a.id, () => { if (EX) EX.locked = false; reveal(); })), 900);
   } else reveal();
+  if (result === "win") setTimeout(nbShowNew, 1300);   // peça do notebook ganha na luta: entra encaixando
 }
 
 /* ---------- ações do Rhanon ---------- */
@@ -328,7 +331,7 @@ function exHit(en) {
     curZone = EX.zone;
     exToast(t("Acalmou {bicho} num golpe só!", {bicho: theName(a)}) + " " + reward(a, G.lv - (a.lv || 1) >= ONE_HIT_LEVELS ? WEAK_XP : ONE_HIT_XP, !en.aquatic).join(" · "));
     if (!en.aquatic) EX.loot.push({id: a.id, x: en.x, y: en.y, t0: performance.now()});   // a lembrança fica no chão até ele passar por cima (peixe: vai direto para a bolsa)
-    exHud();
+    exHud(); setTimeout(nbShowNew, 1200);   // largou peça do notebook: ela entra encaixando
     return;
   }
   sfx("hit");
@@ -542,7 +545,10 @@ function drawAnimalEnt(x, en, cx, cy, now) {
   if (c && en.koUntil - now < 350 && Math.floor(now / 70) % 2) return;   // já longe: pisca e some no mato
   if (c) { if (bob && en.img2) img = en.img2; bob = run ? 0 : bob * 2; }
   else if (!en.alive) { img = en.ko; bob = 0; if (en.koUntil - now < 400 && Math.floor(now / 80) % 2) return; }   // desmaiado, pisca e some
-  else if (en.img2) { if (bob) img = en.img2; bob = 0; if (en.blink && (now + en.homeX * 7) % 3600 < 140) img = en.blink; }   // traço novo: troca de quadro e pisca
+  else if (en.img2) {   // traço novo: troca de quadro e pisca (tomado: os quadros de olho vermelho)
+    const q = en.evil || en; img = q.img;
+    if (bob) img = q.img2; bob = 0; if (q.blink && (now + en.homeX * 7) % 3600 < 140) img = q.blink;
+  }
   if (c && el < CALM_WAIT + 300) drawThanks(x, en, sx, sy - hg - 6 - Math.min(4, el / 120), el);
   if (en.aquatic && (en.alive || c)) {   // na água: só a parte de cima aparece, com marolinhas em volta
     const vis = Math.round(hg * .6), top = sy - vis + 2 + (Math.floor(now / 400 + en.x) % 2), sh = img.height * .6;
@@ -555,12 +561,30 @@ function drawAnimalEnt(x, en, cx, cy, now) {
     return;
   }
   drawShadow(x, sx, sy, Math.max(8, Math.round(w * .7)));
+  if (en.alive && en.tomado) drawTomado(x, sx, sy - bob, w, hg, now, en.homeX, true);   // halo escuro atrás do bicho
   x.save();
   if (en.a.tint) x.filter = en.a.tint;
   if (en.face > 0) { x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -Math.round(w / 2), sy - hg - bob, w, hg); }
   else x.drawImage(img, sx - Math.round(w / 2), sy - hg - bob, w, hg);
   x.restore();
+  if (en.alive && en.tomado) drawTomado(x, sx, sy - bob, w, hg, now, en.homeX);
   grassOver(x, en, cx, cy);
+}
+/* fumaça de Pytuna num bicho tomado (some quando ele é acalmado): back = halo escuro arroxeado pulsando atrás do
+   corpo; senão, fiapos escuros subindo das costas e sumindo */
+function drawTomado(x, sx, sy, w, hg, now, seed, back) {
+  if (back) {
+    const k = .5 + .5 * Math.sin(now / 420 + seed), rx = w * .55 + 2 + k * 2, ry = hg * .5 + 2 + k;
+    x.globalAlpha = .22 + k * .14; x.fillStyle = "#2a1440";
+    x.beginPath(); x.ellipse(sx, sy - hg * .45, rx, ry, 0, 0, Math.PI * 2); x.fill();
+    x.globalAlpha = 1; return;
+  }
+  for (let i = 0; i < 6; i++) {
+    const p = (now / 1300 + i / 6 + seed * .013) % 1, s = p < .35 ? 4 : p < .7 ? 3 : 2;
+    const px = Math.round(sx + Math.sin(p * 4 + i * 1.7) * w * .35), py = Math.round(sy - hg * (.45 + .12 * (i % 3)) - p * 22);
+    x.globalAlpha = .85 * (1 - p); x.fillStyle = PYT_SMOKE[i % PYT_SMOKE.length]; x.fillRect(px - (s >> 1), py - (s >> 1), s, s);
+  }
+  x.globalAlpha = 1;
 }
 // bicho acalmado (golpe só ou vitória na batalha): agradece num balãozinho e corre para longe do Rhanon, para o mato
 const CALM_WAIT = 700, CALM_SPEED = 120, CALM_RUN = 1000;   // ms parado agradecendo, pixels/s correndo, ms correndo até sumir
@@ -568,6 +592,7 @@ const BIRDS = new Set(["soldadinho", "tapejara", "periquito", "rasga_mortalha", 
 function exCalm(en, now = performance.now()) {
   const h = EX.hero, dx = en.x - h.x, dy = en.y - h.y, n = Math.hypot(dx, dy) || 1;
   en.alive = false; en.calm = {t0: now, x0: en.x, y0: en.y, vx: dx / n, vy: dy / n}; en.face = dx > 0 ? 1 : -1;
+  if (en.tomado) for (let i = 0; i < 12; i++) EX.fx.push({x: en.x + (Math.random() - .5) * en.w * .7, y: en.y - en.h * (.3 + Math.random() * .5), vx: (Math.random() - .5) * 18, vy: -22 - Math.random() * 26, life: .9, col: PYT_SMOKE[i % PYT_SMOKE.length]});   // a fumaça sai e sobe
   en.koUntil = now + CALM_WAIT + (en.aquatic ? 500 : CALM_RUN);
 }
 // balãozinho de agradecimento: coração; passarinho canta (nota); o macaco faz joinha; gente (malandro) não agradece
@@ -908,6 +933,7 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "xama") { say(t("Pajé"), t("Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem luar de chefe nenhum pra eu trabalhar. Acalma um chefe e me traz o luar dele."), d);
     if (Object.keys(G.skills).length) btn(t("Esquecer habilidades · R$ {n}", {n: SKILL_RESET(G.lv)}), ask(t("Esquecer todas as habilidades por R$ {n}? Os pontos voltam para gastar de novo.", {n: SKILL_RESET(G.lv)}), skillReset), G.money < SKILL_RESET(G.lv), d); }
   else if (kind === "tecnico") nbTechnician(say, d);
+  else if (kind === "notebook") { say(t("Notebook"), ""); d.querySelector("p").remove(); nbView(d); }
   else if (kind === "cliente") freelaClient(say, d);
   else if (kind === "inventario") { say(t("Bolsa"), invSummary()); invButtons(d); }
   else if (kind === "lembranca") {   // revanche com o chefe vencido
@@ -939,9 +965,83 @@ function nbTechnician(say, d) {
     (G.nb.carregador ? "" : " " + t("Carregador... as ariranhas do rio vivem brincando com fio que a cheia leva.")));
   if (!G.nb.bateria) btn(t("Comprar bateria · R$ {n}", {n: NB_BATTERY}), ask(t("Comprar a bateria do notebook por R$ {n}?", {n: NB_BATTERY}), () => {
     if (G.money < NB_BATTERY || G.nb.bateria) return;
-    G.money -= NB_BATTERY; G.nb.bateria = true; save(); sfx("more"); exHud();
-    exOpenDialog("tecnico", t("Bateria nova no lugar!"));
+    G.money -= NB_BATTERY; G.nb.bateria = true; G.nbNew.push("bateria"); save(); sfx("more"); exHud();
+    exOpenDialog("notebook");   // a bateria entra encaixando
   }), G.money < NB_BATTERY, d);
+}
+/* notebook na tela (bolsa ou peça nova): o desenho com as peças que já tem no lugar e as que faltam tracejadas, com "?".
+   Peça nova (G.nbNew) entra encaixando: o teclado cai de cima, a bateria vem da esquerda e o carregador da direita */
+const NB_W = 120, NB_H = 80, NB_SNAP = 900;   // tamanho do desenho e quanto dura cada peça encaixando (ms)
+function nbView(host) {
+  const c = document.createElement("canvas"), p = document.createElement("p"), news = (G.nbNew || []).filter(k => G.nb[k]);
+  c.width = NB_W; c.height = NB_H; c.className = "nb-canvas"; p.className = "hint nb-txt";
+  host.append(c, p);
+  G.nbNew = []; save();
+  const t0 = performance.now(), snapT = {};   // quando cada peça nova encaixou (brilha um pouco)
+  const tick = now => {
+    if (!c.isConnected) return;
+    const i = Math.floor((now - t0) / NB_SNAP), k = news[i], u = k ? ((now - t0) % NB_SNAP) / NB_SNAP : 1;
+    news.slice(0, i).forEach(q => { if (!snapT[q]) { snapT[q] = now; sfx("guard"); setTimeout(() => sfx("more"), 120); } });   // encaixou: clique e brilho
+    drawNotebook(c.getContext("2d"), now, k ? {part: k, u, later: news.slice(i + 1)} : null, snapT);
+    requestAnimationFrame(tick);
+  };
+  const miss = nbMissing().map(nbPartName).join(", ");
+  p.textContent = news.length ? t("Peça nova no lugar: {peca}!", {peca: news.map(nbPartName).join(", ")}) + (miss ? " " + t("Faltam: {pecas}.", {pecas: miss}) : "")
+    : G.nb.on ? t("Ligado. O caderno de bichos agora é digital.") : nbReady() ? t("Tudo no lugar! Só falta tomada: a cabine da BR-316 tem uma.") : t("Faltam: {pecas}.", {pecas: miss});
+  if (news.length && !nbMissing().length && !G.nb.on) p.textContent += " " + t("Tudo no lugar! Só falta tomada: a cabine da BR-316 tem uma.");
+  requestAnimationFrame(tick);
+}
+// anim = peça encaixando agora ({part, u de 0 a 1, later = as que vêm depois}); snapT = quando cada uma encaixou (brilha)
+function drawNotebook(x, now, anim, snapT = {}) {
+  const R = (a, b, w, h, col) => { x.fillStyle = col; x.fillRect(a, b, w, h); };
+  const dash = (a, b, w, h) => {   // peça que falta: contorno tracejado piscando, com "?"
+    x.save(); x.strokeStyle = Math.floor(now / 500) % 2 ? "#c8c8d4" : "#8a8a96"; x.setLineDash([2, 2]); x.lineWidth = 1;
+    x.strokeRect(a + .5, b + .5, w - 1, h - 1); x.restore();
+    x.fillStyle = "#c8c8d4"; x.font = "bold 7px monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("?", a + w / 2, b + h / 2 + .5);
+  };
+  const has = k => G.nb[k] && !(anim && (anim.part === k || anim.later.includes(k)));   // a que está entrando ainda não conta
+  const e = anim ? 1 - (1 - anim.u) ** 3 : 1, off = k => anim && anim.part === k ? 1 - e : 0;
+  x.clearRect(0, 0, NB_W, NB_H); x.imageSmoothingEnabled = false;
+  // tampa e tela
+  R(29, 5, 62, 43, "#1a1a22"); R(30, 6, 60, 41, "#3a3a46"); R(33, 9, 54, 35, "#101218");
+  if (G.nb.on) {
+    const g = x.createLinearGradient(0, 9, 0, 44); g.addColorStop(0, "#3aa0e8"); g.addColorStop(1, "#1a4a8a"); x.fillStyle = g; x.fillRect(33, 9, 54, 35);
+    R(37, 14, 22, 2, "#d8f0ff"); R(37, 19, 34, 1, "#9fd0f0"); R(37, 22, 28, 1, "#9fd0f0"); R(37, 25, 31, 1, "#9fd0f0");
+    if (Math.floor(now / 500) % 2) R(37, 29, 3, 2, "#ffffff");
+  } else { x.fillStyle = "rgba(255,255,255,.07)"; x.beginPath(); x.moveTo(33, 30); x.lineTo(52, 9); x.lineTo(60, 9); x.lineTo(33, 38); x.fill(); }
+  R(55, 7, 2, 1, "#5a5a68");   // câmera
+  // base (em perspectiva) e dobradiça
+  R(31, 47, 58, 2, "#24242c");
+  x.fillStyle = "#4a4a58"; x.beginPath(); x.moveTo(30, 49); x.lineTo(90, 49); x.lineTo(97, 63); x.lineTo(23, 63); x.fill();
+  R(23, 63, 74, 2, "#2a2a34"); R(31, 49, 58, 1, "#6a6a7a");
+  R(53, 59, 14, 3, "#5a5a6a");   // touchpad
+  // teclado: cai de cima
+  if (has("teclado") || (anim && anim.part === "teclado")) {
+    const dy = Math.round(-30 * off("teclado"));
+    for (let r = 0; r < 3; r++) for (let k = 0; k < 11; k++) R(35 + k * 4.6 + r, 51 + r * 2 + dy, 3, 1, "#c8c8d4");
+    R(46, 57 + dy, 26, 1, "#c8c8d4");
+  } else dash(35, 50, 50, 8);
+  // bateria: entra pela esquerda, embaixo da base
+  if (has("bateria") || (anim && anim.part === "bateria")) {
+    const dx = Math.round(-40 * off("bateria"));
+    R(27 + dx, 66, 22, 7, "#1a3a1a"); R(28 + dx, 67, 20, 5, "#3fae3f"); R(49 + dx, 68, 2, 3, "#1a3a1a"); R(31 + dx, 68, 6, 1, "#b6f58e");
+  } else dash(27, 66, 24, 7);
+  // carregador: fio saindo da lateral até a fonte, que entra pela direita
+  if (has("carregador") || (anim && anim.part === "carregador")) {
+    const dx = Math.round(40 * off("carregador"));
+    x.strokeStyle = "#1a1a22"; x.lineWidth = 1.5; x.beginPath(); x.moveTo(95, 59); x.quadraticCurveTo(103 + dx, 60, 104 + dx, 68); x.stroke();
+    R(101 + dx, 68, 14, 8, "#1a1a22"); R(102 + dx, 69, 12, 6, "#3a3a46"); R(104 + dx, 70, 3, 1, "#7dff9a");
+  } else dash(100, 67, 16, 9);
+  // brilho de quem acabou de encaixar
+  const spot = {teclado: [60, 54], bateria: [38, 69], carregador: [108, 72]};
+  Object.entries(snapT).forEach(([k, at]) => { if (now - at > 900) return;
+    const [sx, sy] = spot[k], a = (now / 120) % (Math.PI * 2);
+    for (let i = 0; i < 4; i++) { const b = a + i * Math.PI / 2; R(Math.round(sx + Math.cos(b) * 9), Math.round(sy + Math.sin(b) * 5), 2, 2, i % 2 ? "#ffd23a" : "#ffffff"); }
+  });
+}
+// peça nova chegou (comprou a bateria, acalmou o macaco ou a ariranha): a tela do notebook abre sozinha na exploração
+function nbShowNew() {
+  if (G.nbNew && G.nbNew.length && EX && !$("explore").hidden && !EX.locked && !EX.dialog && !EX.camp) exOpenDialog("notebook");
 }
 // liga o notebook na tomada da rodoviária: a tela acende, chega o e-mail do primeiro freela e o caderno vira digital
 function nbTurnOn() {

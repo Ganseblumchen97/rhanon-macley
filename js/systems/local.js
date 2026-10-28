@@ -338,6 +338,13 @@ function invButtons(i) {
   btn(t("Equipamento"), () => openEquip(), false, i);   // trocar arma e roupa (systems/equip.js)
   btn(t("Habilidades") + (skillPoints() ? ` <small>${t("{n} pontos", {n: skillPoints()})}</small>` : ""), () => openSkills(), false, i);   // systems/skills.js
   btn(t("Caderno de bichos"), openJournal, false, i);
+  if (G.nb.tem) btn(t("Notebook"), () => EX && !$("explore").hidden ? exOpenDialog("notebook") : showNbLocal(), false, i);   // a tela com as peças
+}
+// notebook pelo mapa da cidade (fora da exploração): no painel do lado, com "Voltar" para a bolsa
+function showNbLocal() {
+  const i = $("linfo"); sfx("blip");
+  i.innerHTML = `<h2>${t("Notebook")}</h2>`; nbView(i);
+  btn(t("Voltar"), () => showInv(), false, i);
 }
 // depois de comer/trocar equipamento: atualiza o inventário de onde veio
 function invDone(msg) {

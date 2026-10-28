@@ -2,15 +2,22 @@
    (o canvas leva data-scale="2", então aparece no mesmo tamanho dos desenhos antigos).
    Cada bicho tem as poses: idle (f = 0/1, respirando), crouch (agacha antes do bote), attack (bote/boca aberta),
    hurt (levou golpe) e ko (desmaiado, olho em "X"). Todos olham para a esquerda.
-   beastFrame(id, pose, f) -> canvas (com dataset.head = posição da cabeça, para as estrelinhas do desmaio). */
-const BEAST_K = 2, BN = "#22100a", BW = "#ffffff", BR = "#e2363d";
+   beastFrame(id, pose, f, evil) -> canvas (com dataset.head = posição da cabeça, para as estrelinhas do desmaio).
+   evil = bicho tomado pela fumaça de Pytuna: olho vermelho aceso e cenho franzido (nos que usam bEye). */
+const BEAST_K = 2, BN = "#22100a", BW = "#ffffff", BR = "#e2363d", BEAST_EVIL_EYE = "#ff2a2a";
+let BEAST_EVIL = false;   // ligado só enquanto beastFrame desenha um quadro "tomado"
+const PYT_SMOKE = ["#2a2a34", "#3a3a46", "#1a1a22", "#4a3a5a"];   // fumaça de Pytuna saindo dos bichos tomados
+// quem a fumaça toma: bicho de verdade (bug do freela e gente não; ver MOTION "person")
+const isTomado = a => !!a && !a.bug && MOTION[a.id] !== "person";
 
 /* ---------- peças comuns ---------- */
 // olho: open (aberto, com brilho), angry (sobrancelha), shut (fechado), x (desmaio)
 function bEye(d, x, y, o, n = BN) {
   if (o.eye === "x") d.dots([[x - 1, y - 1], [x + 1, y - 1], [x, y], [x - 1, y + 1], [x + 1, y + 1]], n);
   else if (o.eye === "shut") d.rect(x - 1, y, 3, 1, n);
-  else {
+  else if (BEAST_EVIL) {   // tomado: olho vermelho com brilho e sempre bravo
+    d.rect(x - 1, y - 1, 2, 2, BEAST_EVIL_EYE).dots([[x - 1, y - 1]], "#ffd0c8").dots([[x - 2, y - 2], [x - 1, y - 2], [x, y - 3], [x + 1, y - 3]], n);
+  } else {
     d.rect(x - 1, y - 1, 2, 2, n).dots([[x - 1, y - 1]], BW);
     if (o.eye === "angry") d.dots([[x - 2, y - 2], [x - 1, y - 2], [x, y - 3], [x + 1, y - 3]], n);
   }
@@ -1059,13 +1066,17 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
 Object.keys(QUADS).forEach(id => { BEAST_DRAW[id] = (pose, f) => quad(QUADS[id], pose, f); });
 const BEAST_CACHE = new Map();
 const beastId = id => BEAST_DRAW[id] ? id : BEAST_DRAW[ART[id]] ? ART[id] : null;   // chefes usam o desenho do bicho base
-function beastFrame(id, pose = "idle", f = 0) {
+function beastFrame(id, pose = "idle", f = 0, evil = false) {
   const k = beastId(id); if (!k) return null;
-  const key = k + pose + f;
+  evil = evil && pose !== "ko";   // desmaiado já voltou a si
+  const key = k + pose + f + (evil ? "!" : "");
   if (!BEAST_CACHE.has(key)) {
-    const r = BEAST_DRAW[k](pose, f);
-    r.c.dataset.scale = BEAST_K; r.c.dataset.head = r.head.join(",");
-    BEAST_CACHE.set(key, r.c);
+    BEAST_EVIL = evil;
+    try {
+      const r = BEAST_DRAW[k](pose, f);
+      r.c.dataset.scale = BEAST_K; r.c.dataset.head = r.head.join(",");
+      BEAST_CACHE.set(key, r.c);
+    } finally { BEAST_EVIL = false; }
   }
   return BEAST_CACHE.get(key);
 }

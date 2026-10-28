@@ -235,7 +235,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .lreveal-tip{fill:#fff;stroke:#ffd23a;stroke-width:3}
 .node.locked{opacity:.4}
 #lmk{pointer-events:none}
-#lmk path,#lmk circle{fill:var(--blood);stroke:var(--paper);stroke-width:2}
+#lmk .pin path,#lmk .pin circle{fill:var(--blood);stroke:var(--paper);stroke-width:2}
 /* log */
 .log{
   margin:0 14px;padding:10px 16px;min-height:96px;background:rgba(12,22,16,.92);border-left:8px solid var(--jaguar);
@@ -292,7 +292,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .node:focus-visible{outline:none}
 .node text{font-family:var(--display);font-size:15px;fill:var(--bone);paint-order:stroke;stroke:var(--ink);stroke-width:4px}
 #mk{pointer-events:none}
-#mk path,#mk circle{fill:var(--blood);stroke:var(--bone);stroke-width:2}
+#mk .pin path,#mk .pin circle{fill:var(--blood);stroke:var(--bone);stroke-width:2}
 .pin{animation:bob .9s steps(2) infinite}
 .info{background:var(--bone);color:var(--ink);padding:14px 18px;box-shadow:8px 8px 0 var(--blood)}
 .info h2{margin:0 0 6px;font-family:var(--display);font-weight:400;font-size:22px}
@@ -398,7 +398,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .node circle{fill:var(--accent);stroke:var(--paper);stroke-width:4}
 .node:hover circle,.node:focus-visible circle{fill:var(--paper);stroke:var(--accent)}
 .node text{font-family:var(--display);font-size:20px;fill:var(--paper);stroke:var(--ink);stroke-width:6px;paint-order:stroke;letter-spacing:.04em;text-transform:uppercase}
-#mk path,#mk circle{fill:var(--blood);stroke:var(--paper)}
+#mk .pin path,#mk .pin circle{fill:var(--blood);stroke:var(--paper)}
 .hud{background:var(--paper);color:var(--ink);transform:none;rotate:-2deg;box-shadow:none;clip-path:polygon(2% 0,100% 8%,98% 100%,0 92%);padding:8px 24px;font:700 13px var(--mono)}
 .info{background:var(--paper);color:var(--ink);box-shadow:none;rotate:1deg;clip-path:polygon(2% 0,100% 3%,98% 100%,0 96%);padding:18px 26px 22px}
 .info h2{font-size:30px;text-transform:uppercase}
@@ -737,17 +737,27 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .tut canvas{width:48px;height:66px;image-rendering:pixelated;flex:none}
 .tut p{margin:0}
 #explore.no-help .ex-help{visibility:hidden}
-/* golpe no tempo certo: anel com "Z" fechando; verde = é agora; dourado = acertou; apagado = errou */
-.fxi.qte{width:30px;height:30px;translate:-50% -50%;display:grid;place-items:center;opacity:.8;z-index:6;pointer-events:none}
-.qte b{position:relative;font:400 16px var(--display);color:var(--parch);text-shadow:2px 2px 0 #1a1426}
-.qte i{position:absolute;inset:0;border:3px solid rgba(246,233,196,.85);border-radius:50%;box-shadow:0 0 0 2px rgba(26,20,38,.5);animation:qteRing var(--dur) linear forwards}
-@keyframes qteRing{from{scale:2.6;opacity:.25}to{scale:1;opacity:1}}
-.qte.agora i{border-color:#7dff9a;box-shadow:0 0 10px #7dff9a}
-.qte.agora b{color:#7dff9a}
-.qte.acertou i{border-color:#ffd23a;box-shadow:0 0 14px #ffd23a;animation:qteHit .3s ease-out forwards}
+/* golpe no tempo certo: um alvo fixo (anel tracejado com a tecla no meio) e um anel grande que fecha até ele, mudando
+   de branco para verde; quando encosta, o alvo acende verde ("é agora"); acertou = estouro dourado; errou = apaga */
+.fxi.qte{width:34px;height:34px;translate:-50% -50%;display:grid;place-items:center;z-index:6;pointer-events:none}
+.qte::before{content:"";position:absolute;inset:0;border-radius:50%;border:3px dashed rgba(246,233,196,.75);background:radial-gradient(circle,rgba(26,20,38,.55) 55%,transparent 72%);
+  box-shadow:0 0 0 2px rgba(26,20,38,.45);animation:qteSpin 2.4s linear infinite}
+@keyframes qteSpin{to{rotate:360deg}}
+.qte b{position:relative;font:400 17px var(--display);color:var(--parch);text-shadow:2px 2px 0 #1a1426}
+.qte i{position:absolute;inset:-2px;border:4px solid #fff;border-radius:50%;box-shadow:0 0 0 2px rgba(26,20,38,.55),inset 0 0 0 2px rgba(26,20,38,.35);
+  animation:qteClose var(--dur,600ms) cubic-bezier(.35,0,.9,1) forwards}
+@keyframes qteClose{from{scale:3.4;opacity:.15;border-color:#ffffff;border-width:2px}60%{opacity:.85;border-color:#d8f8c0}to{scale:1;opacity:1;border-color:#7dff9a;border-width:4px}}
+.qte u{position:absolute;inset:-7px;border-radius:50%;opacity:0}
+.qte.agora::before{border-style:solid;border-color:#7dff9a;box-shadow:0 0 0 2px rgba(26,20,38,.45),0 0 14px 3px rgba(125,255,154,.75);animation:none}
+.qte.agora i{border-color:#7dff9a;box-shadow:0 0 12px #7dff9a}
+.qte.agora b{color:#7dff9a;scale:1.15}
+.qte.acertou i{border-color:#ffd23a;box-shadow:0 0 16px #ffd23a;animation:qteHit .32s ease-out forwards}
+.qte.acertou u{border:3px solid #fff2a0;animation:qteHit .45s ease-out forwards}
+.qte.acertou::before{border-color:#ffd23a;border-style:solid}
 .qte.acertou b{color:#ffd23a}
-.qte.errou{opacity:.25;filter:grayscale(1)}
-@keyframes qteHit{to{scale:1.6;opacity:0}}
+.qte.errou{opacity:.3;filter:grayscale(1);transition:opacity .15s}
+@keyframes qteHit{from{opacity:1}to{scale:2;opacity:0}}
+@media (prefers-reduced-motion:reduce){.qte::before{animation:none}}
 /* caderno de bichos: cartões com desenho, nível, onde vive e a curiosidade; os não vistos ficam só na silhueta */
 .caderno{width:min(860px,94vw);max-height:86vh;overflow:auto}
 .cad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:8px 0}
@@ -1085,3 +1095,12 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 .boss-warn.treino{background:radial-gradient(ellipse at center,rgba(40,140,60,.25),rgba(0,0,0,.5));animation:none}
 .boss-warn.treino .bw-tape{background:repeating-linear-gradient(-45deg,#ffd23a 0 22px,#2f7a3a 22px 44px);box-shadow:0 4px 0 #173a22,0 -4px 0 #173a22}
 .boss-warn.treino .bw-sub{background:var(--leafB)}
+/* bicho tomado pela fumaça de Pytuna (batalha): brilho escuro arroxeado pulsando em volta; some quando ele é acalmado */
+#beast.tomado canvas.actor{filter:drop-shadow(0 0 5px rgba(42,20,64,.9)) drop-shadow(0 0 12px rgba(74,30,110,.55));animation:tomadoPulse 1.6s ease-in-out infinite}
+@keyframes tomadoPulse{50%{filter:drop-shadow(0 0 3px rgba(42,20,64,.7)) drop-shadow(0 0 7px rgba(74,30,110,.35))}}
+@media (prefers-reduced-motion:reduce){#beast.tomado canvas.actor{animation:none}}
+.mk3d{pointer-events:none}
+/* notebook (nbView em explore.js): o desenho grande, em cima de uma esteira de palha */
+.nb-canvas{display:block;width:min(360px,100%);aspect-ratio:3/2;margin:4px auto 6px;image-rendering:pixelated;border-radius:6px;
+  background:repeating-linear-gradient(90deg,#c8a86a 0 6px,#b8965a 6px 12px);box-shadow:inset 0 0 0 3px var(--wood2),inset 0 -14px 0 rgba(0,0,0,.12)}
+.nb-txt{text-align:center}
