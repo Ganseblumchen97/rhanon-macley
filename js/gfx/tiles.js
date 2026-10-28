@@ -28,6 +28,8 @@ const TILE_PAL = {
   // Bonito: o centro (calçada clara, casa baixa colorida) e o Rio da Prata (mata verde e água azul-turquesa transparente)
   centrobonito: {g1: "#c8bca0", g2: "#b8ac90", tall: "#6a9a4a", tallHi: "#9ac86a", path: "#8a7e6a", path2: "#6e6454", leaf: "#2f7a3a", leaf2: "#22602a", leafHi: "#4a9a4a", trunk: "#6d4329", rock: "#a89a88", rock2: "#7a6a58", water: "#3ab8c8", water2: "#a8f0f0", wood: "#9c6339", wood2: "#6d4329", roof: "#c06a3a", roof2: "#8a4422", walls: ["#f0e6d0", "#8ad0c8", "#f0c860", "#e89aaa", "#a8d888"]},
   rioprata: {g1: "#6aa84c", g2: "#5a9842", tall: "#4a8a38", tallHi: "#8ac860", path: "#d8c8a0", path2: "#bcaa84", leaf: "#2a7a3a", leaf2: "#1e5e2c", leafHi: "#4a9a48", trunk: "#5a3a22", rock: "#c8c4b8", rock2: "#9a968a", water: "#2aa8c0", water2: "#a8f4f4", wood: "#a8703f", wood2: "#6d4329"},
+  // Gruta do Lago Azul: chão de pedra escura, musgo, estalagmite (gruta: true) e a água azul-forte do lago
+  gruta: {g1: "#5a5660", g2: "#4e4a54", tall: "#3a6a4a", tallHi: "#5a9a6a", path: "#8a8070", path2: "#6e6658", leaf: "#3a5a4a", leaf2: "#2a4a3a", leafHi: "#5a7a6a", trunk: "#4a4038", rock: "#b8b0a0", rock2: "#7a7468", water: "#1a5ad8", water2: "#6ab4ff", wood: "#9c6339", wood2: "#6d4329", gruta: true},
   // Chapada dos Guimarães: terra vermelha, capim dourado do cerrado, árvore torta (cerrado: true) e muita pedra arenito
   chapada: {g1: "#b88a52", g2: "#a87a46", tall: "#b8a04a", tallHi: "#e8d070", path: "#d8a070", path2: "#b8804e", leaf: "#5a8a3a", leaf2: "#3a6a2a", leafHi: "#8ab85a", trunk: "#4a3020", rock: "#c8704a", rock2: "#8a4a2e", water: "#3a8ab0", water2: "#9ad8e8", wood: "#9c6339", wood2: "#6d4329", cerrado: true},
   // Pantanal: capim verde-claro de campo alagado, cordilheira de mata baixa e água de baía escura e parada
@@ -109,6 +111,17 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
       for (const [a, b, c, d] of [[7, 9, 2, 3], [8, 9, 13, 2], [7, 7, 4, 1], [8, 6, 11, 0], [8, 10, 14, 7], [7, 10, 1, 7]]) {   // galhos secos
         const n = Math.max(Math.abs(c - a), Math.abs(d - b));
         for (let k = 0; k <= n; k++) x.fillRect(ox + Math.round(a + (c - a) * k / n), oy + Math.round(b + (d - b) * k / n), 1, 1);
+      }
+    }
+  } else if (ch === "T" && P.gruta) {   // gruta: estalagmite (cone de pedra subindo do chão), uma ou duas, com a ponta clara
+    grass();
+    const two = r(92) < .45;
+    for (const [cx, h, w] of two ? [[5, 11, 3], [11, 8, 2]] : [[8, 14, 4]]) {
+      for (let k = 0; k < h; k++) {
+        const hw = Math.max(1, Math.round(w * (k + 1) / h));
+        x.fillStyle = OUTLINE; x.fillRect(ox + cx - hw - 1, oy + 16 - h + k, hw * 2 + 2, 1);
+        x.fillStyle = k < 2 ? P.rock : P.rock2; x.fillRect(ox + cx - hw, oy + 16 - h + k, hw * 2, 1);
+        x.fillStyle = P.rock; x.fillRect(ox + cx - hw, oy + 16 - h + k, 1, 1);
       }
     }
   } else if (ch === "T" && P.cerrado) {   // cerrado: árvore baixa de tronco torto e casca grossa, copa achatada e torta

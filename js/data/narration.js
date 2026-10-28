@@ -53,6 +53,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  preguica_gigante: ["A Preguiça-gigante dormia no fundo da gruta havia dez mil anos, curumim. Virou pedra e osso, e o lago azul cobriu ela.", "A fumaça entrou na gruta e acordou o que devia ficar dormindo. Bicho de outro tempo, perdido no nosso.", {r: "Ela era devagar, vô. Mas cada unhada derrubava uma estalactite."}, "E tu cantou pra ela dormir de novo, eu sei. Tu sempre cantou mal, mas bicho velho não liga pra isso."],
+  caipora: ["A Caipora é a dona dos bichos, curumim. Anda montada no porco-do-mato e castiga quem caça por maldade.", "A fumaça fez ela achar que todo mundo era caçador. Até o menino, que nunca caçou por esporte na vida.", {r: "Eu deixei fumo pra ela, vô, igual a gente faz pra Comadre Fulozinha."}, "Fez certo. Ela pegou o fumo, deu uma baforada e sumiu no escuro, montada no cateto."],
   ariranha_mae: ["A Ariranha-mãe cuidava de todas as tocas do Rio da Prata, curumim. Bando de ariranha é família, e família defende os filhotes.", "A fumaça fez ela achar que o menino vinha pegar os pequenos.", {r: "Eu só queria atravessar o rio, vô. Ela gritou tão alto que meu ouvido zuniu o dia inteiro."}, "Grito de mãe é assim mesmo. O meu também era, e tu nunca reclamou."],
   mae_ouro: ["A Mãe-do-ouro é uma luz que guarda as riquezas da terra e do rio. Quem é ganancioso, ela faz se perder atrás do brilho.", "A fumaça confundiu ela: achou que o rio inteiro estava sendo roubado. E de certo jeito estava, curumim. Lama de garimpo, lixo, fumaça.", {r: "Ela me deu uma pepita, vô. Eu devolvi pro rio."}, "Por isso ela te deixou passar. Quem devolve, ela protege."],
   guara_rei: ["O Lobo-guará-rei andava pelo cerrado inteiro, curumim, de perna comprida pra ver por cima do capim. Plantava lobeira por onde passava.", "A queimada comeu o capim dele. Lobo sem capim fica no aberto, com medo, e medo vira raiva.", {r: "Ele não queria brigar, vô. Queria só voltar pra casa."}, "E tu mostrou o caminho. Por isso que o cerrado ainda tem lobo, menino."],
@@ -144,6 +146,14 @@ const NARRA_PYT = {
     {p: "Tá vendo? Aqui eu nem preciso trabalhar. Eles mesmos fazem fumaça pra mim."},
     {r: "E fazem festa também, frevo, maracatu. Disso tu não entende nada."},
     "A fumaça não respondeu. Foi embora pro sertão, pro lado do Velho Chico."
+  ],
+  // Bonito: a fumaça desce até o lago azul da gruta; quer sujar a água mais limpa do Brasil
+  preguica_gigante: [
+    "Quando a Preguiça-gigante voltou a dormir, a fumaça desceu pela boca da gruta e ficou boiando em cima do lago azul.",
+    {p: "Água limpa assim incomoda, curumim. Dá pra ver o fundo. Eu gosto de onde ninguém vê nada."},
+    {r: "É por isso que tu foge de Bonito. Aqui não tem onde se esconder."},
+    {p: "Foge? Eu vou pra cidade do meio. Lá tem gente que decide queimar e gente que finge que não viu."},
+    "E a fumaça subiu pela gruta e foi pro norte, pro lado de Brasília."
   ],
   // Centro-Oeste: a fumaça vira queimada de verdade, e ela fala de Brasília, onde se decide o que queima
   guara_rei: [

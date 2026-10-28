@@ -1152,6 +1152,8 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
   cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara, carranca, nego_dagua: negoDagua,
   martim: (pose, f) => pombo(pose, f, {b: "#2a7ac8", B: "#1a4a8a", n: "#f4f0e4", p: "#e8702a", w: "#4aa8e0", y: "#2a2a2a"}),   // martim-pescador: azul, colar branco e peito laranja
+  cobra_coral: cobra({b: "#d8282a", B: "#9a1a1a", k: "#1a1a1a"}, false),   // cobra-coral: vermelha com os anéis pretos
+  caipora: pessoa({pal: {s: "#6a3a1e", S: "#4a2612", h: "#ff6a1c"}, shirt: ["#6a3a1e", "#4a2612"], pants: ["#7a5a2a", "#5a3e1a"], noBand: true}),   // Caipora: pele escura, cabelo de fogo, tanga de palha
   mutum: (pose, f) => pombo(pose, f, {b: "#1e1e26", B: "#0e0e14", n: "#2a2a34", p: "#f0f0e8", w: "#2a2a34", y: "#f0c020"}),   // mutum: preto, barriga branca e bico amarelo
   sucuri_amarela: cobra({b: "#c8a830", B: "#8a7018", k: "#2a2210"}, false),   // sucuri-amarela: amarela de mancha preta
   mae_ouro: visagem({w: "#ffd23a", W: "#e8901a", s: "#ffe8a0", h: "#f0b020", e: "#ff5a1c"}),   // Mãe-do-ouro: vestido e cabelo de ouro em brasa

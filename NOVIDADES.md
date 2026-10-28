@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.62.0 — a Gruta do Lago Azul
+
+- Bonito ganhou a última trilha: a Gruta do Lago Azul (níveis 56 a 58), uma caverna de pedra com estalagmites e um
+  lago azul lá no fundo. A passagem fica no fim do Rio da Prata, ao lado da Ariranha-mãe, e abre depois de acalmar ela.
+- Bichos novos na gruta: morcego-de-gruta, aranha-chicote, cateto, o bagre-cego, branquinho e sem olho, que nada no
+  lago, e, de noite, a cobra-coral.
+- De dia, o chefe é a Preguiça-gigante: o fóssil enorme da parede acorda com a fumaça. Depois dela, o Pytuna aparece
+  em cima do lago e vai embora para Brasília. De noite, montada num cateto, chega a Caipora, a dona dos bichos.
+- O mapa do Rio da Prata mudou um pouco para caber a passagem nova.
+
 ## 0.61.0 — Bonito e o Rio da Prata
 
 - Cidade nova no Centro-Oeste: Bonito, no Mato Grosso do Sul. Depois de acalmar o Lobo-guará-rei da Chapada, compre

@@ -95,7 +95,7 @@ function drawAmbient(x, cx, cy, now, night) {
   x.globalAlpha = 1;
 }
 // peixes vivem só na água: nadam de um lado para o outro, cospem água quando veem o Rhanon e só a flecha alcança
-const AQUATIC = new Set(["piraputanga", "dourado", "piau", "piranha", "poraque", "boto", "traira"]);
+const AQUATIC = new Set(["bagre_cego", "piraputanga", "dourado", "piau", "piranha", "poraque", "boto", "traira"]);
 // where: "terra" (sem peixes, para os "a" do mapa), "agua" (só peixes) ou nada (qualquer um, usado na batalha)
 function pickFromPool(zone, where) {
   const z = zoneDef(zone), pool = where ? z.pool.filter(([id]) => (where === "agua") === AQUATIC.has(id)) : z.pool;
