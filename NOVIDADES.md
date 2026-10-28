@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.57.0 — a beira do Velho Chico e uma tela inicial para cada região
+
+- Petrolina ganhou a última trilha: a Beira do Velho Chico (níveis 46 a 48). A passagem fica no alto da Serra do
+  Araripe, ao lado do paredão, e abre depois de acalmar o Tapejara.
+- Bichos novos na beira: carão, martim-pescador, cobra-d'água e o piau, que nada no rio e cospe água em quem chega
+  perto (só a flecha alcança ele antes da luta).
+- De dia, o chefe é a Carranca: um barco desce o rio sozinho, e a cabeça de madeira da proa, tomada pela fumaça,
+  arreganha os dentes. De noite, quem espera no rio é o Nego d'água, que ri alto e puxa o Rhanon pro redemoinho.
+- A tela inicial agora mostra a região onde o seu save está: a mata com a lua no Norte e o pôr do sol do sertão, com
+  mandacaru e pau seco, no Nordeste.
+- No mapa da cidade, a dica de baixo dizia "X: mapa do Norte" até no Nordeste. Agora mostra a região certa.
+
 ## 0.56.0 — a aldeia no Tapajós e o barco de linha
 
 - O Rhanon agora mora na Aldeia Jasytatá ("estrela", em tupi), na beira do rio Tapajós, no meio da Amazônia. A feira

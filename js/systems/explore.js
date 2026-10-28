@@ -95,7 +95,7 @@ function drawAmbient(x, cx, cy, now, night) {
   x.globalAlpha = 1;
 }
 // peixes vivem só na água: nadam de um lado para o outro, cospem água quando veem o Rhanon e só a flecha alcança
-const AQUATIC = new Set(["piranha", "poraque", "boto", "traira"]);
+const AQUATIC = new Set(["piau", "piranha", "poraque", "boto", "traira"]);
 // where: "terra" (sem peixes, para os "a" do mapa), "agua" (só peixes) ou nada (qualquer um, usado na batalha)
 function pickFromPool(zone, where) {
   const z = zoneDef(zone), pool = where ? z.pool.filter(([id]) => (where === "agua") === AQUATIC.has(id)) : z.pool;
@@ -588,7 +588,7 @@ function drawTomado(x, sx, sy, w, hg, now, seed, back) {
 }
 // bicho acalmado (golpe só ou vitória na batalha): agradece num balãozinho e corre para longe do Rhanon, para o mato
 const CALM_WAIT = 700, CALM_SPEED = 120, CALM_RUN = 1000;   // ms parado agradecendo, pixels/s correndo, ms correndo até sumir
-const BIRDS = new Set(["soldadinho", "tapejara", "periquito", "rasga_mortalha", "galo_campina", "bigua", "asa_branca", "guara", "garca_moura", "carcara", "harpia", "coruja", "garca", "macarico", "urubu", "soco", "pombo", "urubu_porto", "gaivota", "gaviao_real"]);
+const BIRDS = new Set(["carao", "martim", "soldadinho", "tapejara", "periquito", "rasga_mortalha", "galo_campina", "bigua", "asa_branca", "guara", "garca_moura", "carcara", "harpia", "coruja", "garca", "macarico", "urubu", "soco", "pombo", "urubu_porto", "gaivota", "gaviao_real"]);
 function exCalm(en, now = performance.now()) {
   const h = EX.hero, dx = en.x - h.x, dy = en.y - h.y, n = Math.hypot(dx, dy) || 1;
   en.alive = false; en.calm = {t0: now, x0: en.x, y0: en.y, vx: dx / n, vy: dy / n}; en.face = dx > 0 ? 1 : -1;
@@ -802,7 +802,9 @@ const PETROLINA_TIPS = [
   "Na caatinga tudo tem espinho: mandacaru, xique-xique, até o bode tem cara de poucos amigos. Vai de gibão, se puder.",
   "De noite, quem anda na caatinga ouve um assobio fino. É a Comadre Fulozinha. Ela protege a mata e dá surra de cipó em caçador.",
   "Pra agradar a Comadre, o povo deixa fumo e mingau no pé do pau. Mas esse ano nem isso tá acalmando ela.",
-  "Dizem que lá pra serra, nas noites de lua cheia de sexta-feira, anda um lobisomem. Vixe, nem quero saber."
+  "Dizem que lá pra serra, nas noites de lua cheia de sexta-feira, anda um lobisomem. Vixe, nem quero saber.",
+  "Rio abaixo, na beira, tem uma carranca que se soltou da proa e desce o rio sozinha, de cara fechada. Oxe, logo a que devia proteger a gente.",
+  "Quem pesca de noite na beira deixa um fuminho na pedra pro Nego d'água. Se não deixar, ele ri alto e vira a canoa."
 ];
 // Recife: quem é cada morador do Recife Antigo e o que eles contam
 const RECIFE_NAME = {urbano1: "Passista de frevo", urbano2: "Vendedora de bolo de rolo", urbano3: "Batuqueiro do maracatu"};

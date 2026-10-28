@@ -28,6 +28,7 @@ const MAP_ICON = {
   recifeantigo: ["#8a3a6a", MI_HOUSE("#f0c040", "#2a8a8a")],
   olinda: ["#3a7a4a", `<path d="M-9 9 Q0 2 9 9Z" fill="${MI.l}" ${MI.s}/><rect x="-4" y="-3" width="8" height="8" fill="${MI.c}" ${MI.s}/><path d="M-5 -3 L0 -7 L5 -3Z" fill="${MI.r}" ${MI.s}/><path d="M0 -11 V-7 M-1.6 -9.4 H1.6" stroke="${MI.k}" stroke-width="1.2"/>`],
   orla: ["#2a7a9a", `<path d="M-9 1 Q0 7 9 1 L7 -1 H-7Z" fill="${MI.t}" ${MI.s}/><path d="M-9 1 Q-10 -4 -7 -6 L-6 -2Z" fill="#e8a020" ${MI.s}/><path d="M1 -1 V-9 L6 -2Z" fill="${MI.c}" ${MI.s}/>` + MI_WAVE(7)],
+  beira: ["#2a7a8a", `<path d="M-8 2 Q0 6 8 2 L6 -1 H-6Z" fill="${MI.t}" ${MI.s}/><path d="M-8 2 Q-10 -3 -7 -6 Q-4 -7 -4 -3 L-5 -1Z" fill="#e5401c" ${MI.s}/><circle cx="-6.5" cy="-4.5" r="1" fill="#ffd23a"/>` + MI_WAVE(7)],   // barquinho com a carranca de juba vermelha
   caatinga: ["#b8763a", `<path d="M-1.6 8 V-7 Q0 -9.5 1.6 -7 V8Z" fill="#5a9a3a" ${MI.s}/><path d="M-1.6 1 H-5 V-4 M1.6 3 H5 V-2" fill="none" stroke="#5a9a3a" stroke-width="2.4" stroke-linecap="round"/>`],
   serra: ["#a84a2a", `<path d="M-9 7 L-3 -6 L1 1 L4 -3 L9 7Z" fill="#d8784a" ${MI.s}/><path d="M-3 -6 L-1 -2 L-5 -2Z" fill="${MI.c}"/>`],
   curitiba: ["#4a3a8a", `<rect x="-1.2" y="-1" width="2.4" height="9" fill="${MI.t}"/><path d="M-8 -1 Q0 -6 8 -1 M-6 -5 Q0 -9 6 -5" fill="none" stroke="#3a7a3a" stroke-width="2.6" stroke-linecap="round"/>`]

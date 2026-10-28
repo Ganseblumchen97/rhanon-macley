@@ -18,11 +18,10 @@ $("startAdventure").addEventListener("click", () => {
   audio(); musicStop();
   startIntro();   // a aventura começa com Rhanon acordando na fogueira da aldeia (a tela inicial some por trás da transição)
 });
-$("local").querySelector(".nav-help").textContent = t("Setas ou WASD: escolher local · Z: confirmar · X: mapa do {mapa}", {mapa: MAP_REGIONS[MAP_REGION].n});
 $("homeButton").addEventListener("click", () => {
   $("local").hidden = true;
   musicStop();
-  $("titleScreen").hidden = false;
+  $("titleScreen").hidden = false; drawTitleBg();   // a região pode ter mudado desde a abertura (voo)
   audio(); musicStart("title");
 });
 $("mute").addEventListener("click", toggleMute);
@@ -95,6 +94,6 @@ document.addEventListener("visibilitychange", () => { if (AC) document.hidden ? 
 ransom($("titleLogo"), ["MACLEY'S", "ADVENTURE"], 7);
 TITLE_A.mount($("titleArt"));
 drawMap(); themeReady = true;
-$("titleScreen").hidden = false; drawTitleForest();
+$("titleScreen").hidden = false; drawTitleBg();
 startAnimationLoop();
 debugSetup();   // só faz algo com ?debug na URL (ver state.js)

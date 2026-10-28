@@ -16,6 +16,7 @@ const SCENES = {
   lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
+  beira:       {sky: ["#f0d090", "#e8d8a8", "#a8d0d8"], far: "#6a8a4a", trees: "caatinga", plat: "areia", water: true},   // Velho Chico: sertão na margem do rio largo
   serra:       {sky: ["#f0c890", "#d8b888", "#b8a890"], far: "#8a5a3a", trees: "copa", plat: "barro"},   // Araripe: paredão de terra vermelha e mata na encosta
   caatinga:    {sky: ["#f0d8a0", "#e8c890", "#d8b8a0"], far: "#8a7a62", trees: "caatinga", plat: "areia"},   // sertão: céu de poeira, serra ao longe
   olinda:      {sky: ["#f8c890", "#f0a878", "#c88aa8"], far: "#8a6a9a", trees: "casario", plat: "pedra"},   // Olinda: pôr do sol no alto da Sé
@@ -267,19 +268,27 @@ function setScenery(zone) {
 if (window.ResizeObserver) addEventListener("DOMContentLoaded", () => new ResizeObserver(() => drawScenery()).observe($("stage")));
 addEventListener("resize", () => drawScenery());
 
-/* ---------- tela inicial: a mata ao entardecer ---------- */
-// lua grande, três fileiras de copas (a de trás clara, a da frente quase preta), troncos nas bordas e cipós caindo do alto;
-// a faixa preta inclinada e as letras recortadas (styles.css) dão o toque do Persona por cima
-function drawTitleForest() {
+/* ---------- tela inicial: o fundo é da região do save ---------- */
+// cada região tem o seu desenho (TITLE_BG) e o montinho de chão debaixo do Rhanon (plat); região sem desenho usa o Norte.
+// A faixa preta inclinada e as letras recortadas (styles.css, com as cores de cada região em [data-region]) dão o Persona
+const TITLE_BG = {norte: {plat: "mata", draw: titleForest}, nordeste: {plat: "caatinga", draw: titleSertao}};
+function drawTitleBg() {
   const cv = $("titleBg");
   if (!cv || $("titleScreen").hidden) return;
-  $("titleArt").style.setProperty("--titlePlat", sceneryPlat("mata"));   // montinho de grama debaixo do Rhanon
+  const reg = TITLE_BG[MAP_REGION] ? MAP_REGION : "norte", bg = TITLE_BG[reg];
   const k = Math.max(3, Math.round(Math.min(innerWidth / 260, innerHeight / 170))), W = Math.ceil(innerWidth / k), H = Math.ceil(innerHeight / k);
-  if (cv.width === W && cv.height === H) return;
-  cv.width = W; cv.height = H;
-  const x = cv.getContext("2d"), P = TILE_PAL.mata, rnd = sceneRng(4242);
+  if (cv.width === W && cv.height === H && cv.dataset.region === reg) return;
+  cv.width = W; cv.height = H; cv.dataset.region = reg; $("titleScreen").dataset.region = reg;
+  $("titleArt").style.setProperty("--titlePlat", sceneryPlat(bg.plat));   // montinho de chão debaixo do Rhanon
+  const x = cv.getContext("2d");
   const rect = (c, a, b, w, h) => { x.fillStyle = c; x.fillRect(Math.round(a), Math.round(b), Math.round(w), Math.round(h)); };
   const blob = (cx, cy, rr, c) => { x.fillStyle = c; x.beginPath(); x.arc(Math.round(cx), Math.round(cy), Math.max(1, rr), 0, Math.PI * 2); x.fill(); };
+  bg.draw(W, H, rect, blob);
+}
+// Norte: a mata ao entardecer. Lua grande, três fileiras de copas (a de trás clara, a da frente quase preta), troncos nas
+// bordas e cipós caindo do alto
+function titleForest(W, H, rect, blob) {
+  const rnd = sceneRng(4242);
   const sky = ["#0f3a2a", "#17583a", "#1f7a46", "#3a9a4e", "#8ac460", "#e8d070"];
   sky.forEach((c, i) => { const a = Math.round(H * .62 * i / sky.length), b = Math.round(H * .62 * (i + 1) / sky.length); rect(c, 0, a, W, b - a); if (i) for (let px = 0; px < W; px += 2) rect(c, px + (a % 2), a - 1, 1, 1); });
   rect("#e8d070", 0, H * .62, W, H);
@@ -304,4 +313,51 @@ function drawTitleForest() {
     if (rnd() < .3) { const vx = Math.round(rnd() * W), vl = H * (.08 + rnd() * .3); for (let y = 0; y < vl; y++) rect(y % 6 === 5 ? "#2f7a3f" : "#0a2414", vx + Math.round(Math.sin(y / 7) * 1.5), y, 1, 1); blob(vx, vl, 1.6, "#2f7a3f"); }
   }
 }
-addEventListener("resize", () => drawTitleForest());
+// Nordeste: o sertão no pôr do sol. Céu do roxo ao laranja com estrelas no alto, sol listrado afundando atrás da chapada,
+// asa-branca voando, serrote mais perto e, na frente, mandacaru e pau seco escuros nas bordas, como moldura
+function titleSertao(W, H, rect, blob) {
+  const rnd = sceneRng(7171), hz = H * .62, ink = "#14060e";
+  const sky = ["#2a1438", "#4a1a48", "#7a2448", "#b83a44", "#e8643a", "#f8a040", "#ffd474"];
+  sky.forEach((c, i) => { const a = Math.round(hz * i / sky.length), b = Math.round(hz * (i + 1) / sky.length); rect(c, 0, a, W, b - a); if (i) for (let px = 0; px < W; px += 2) rect(c, px + (a % 2), a - 1, 1, 1); });
+  for (let i = 0; i < W / 6; i++) rect(rnd() < .3 ? "#fff2c8" : "#c8a0d0", rnd() * W, rnd() * hz * .3, 1, 1);   // estrelas acendendo
+  // o sol grande e baixo, com listras de céu cortando a metade de baixo
+  const sx = W * .72, sy = hz * .9, sr = Math.min(W, H) * .2;
+  [[1.9, "rgba(255,200,110,.10)"], [1.45, "rgba(255,200,110,.16)"], [1.18, "rgba(255,210,120,.24)"]].forEach(([s, c]) => blob(sx, sy, sr * s, c));
+  blob(sx, sy, sr, "#ffe07a"); blob(sx - sr * .3, sy - sr * .35, sr * .5, "#fff0a8");
+  for (let i = 0, y = sy + sr * .08; y < sy + sr; i++, y += 2 + i) rect("#f08a3a", sx - sr, y, sr * 2, 1 + i * .5);
+  // asa-branca: três passarinhos em "v"
+  [[.3, .22], [.36, .17], [.26, .3]].forEach(([bx, by]) => { const px = W * bx, py = H * by; rect("#2a1028", px - 2, py, 2, 1); rect("#2a1028", px, py + 1, 1, 1); rect("#2a1028", px + 1, py, 2, 1); });
+  // a chapada no fundo (mesa de topo reto, muda pouco) e o serrote mais perto, cada fileira mais escura
+  const ridge = (c, base, top, step, flat) => {
+    let y = base - top * (.5 + rnd() * .5);
+    for (let px = 0; px < W; px += step) {
+      if (!flat || rnd() < .15) y = Math.min(base - 2, Math.max(base - top, y + (rnd() - .5) * top * (flat ? .8 : .5)));
+      rect(c, px, y, step, H - y);
+    }
+  };
+  ridge("#7a2a44", hz, H * .14, 3, true);
+  ridge("#4a1a34", H * .7, H * .1, 2, false);
+  rect("#2a0e1e", 0, H * .76, W, H);
+  for (let px = 0; px < W; px += 1 + Math.floor(rnd() * 4)) rect("#2a0e1e", px, H * .76 - 1 - Math.floor(rnd() * 2), 1, 2);   // capim seco na beira
+  rect(ink, 0, H * .86, W, H);
+  // moldura: mandacaru (tronco com braços para cima) e pau seco (galhos tortos, sem folha) nas bordas
+  const cactus = (cx, w, top) => {   // tronco e braços de topo redondo (cotovelo ligando ao tronco), com gomos mais claros
+    const col = (x0, y0, ww, y1) => { blob(x0 + ww / 2, y0, ww / 2 + 1, ink); rect(ink, x0 - 1, y0, ww + 2, y1 - y0 + 1); blob(x0 + ww / 2, y0, ww / 2, "#3a1a24"); rect("#3a1a24", x0, y0, ww, y1 - y0); rect("#5a2a34", x0 + 1, y0, 1, y1 - y0); rect("#2a1018", x0 + ww - 2, y0, 1, y1 - y0); };
+    const arms = [[-1, .3, .14], [1, .42, .12], [-1, .58, .09]].map(([s, f, up]) => {
+      const aw = Math.max(3, Math.round(w * .75)), ay = top + (H - top) * f, gap = Math.round(w * .7), ax = s < 0 ? cx - gap - aw : cx + w + gap;
+      const ex = s < 0 ? ax : cx + w, ew = gap + aw, eh = Math.max(2, Math.round(w * .6));
+      rect(ink, ex - 1, ay - 1, ew + 2, eh + 2); col(ax, ay - H * up, aw, ay + eh);
+      return () => rect("#3a1a24", ex, ay, ew, eh);   // o cotovelo por cima do contorno do braço
+    });
+    col(cx, top, w, H); arms.forEach(f => f());
+  };
+  const dryTree = (tx, w) => {
+    rect(ink, tx - 1, H * .3, w + 2, H); rect("#2a1018", tx, H * .3, w, H);
+    for (let i = 0; i < 7; i++) {
+      let gx = tx + w / 2, gy = H * (.3 + rnd() * .35); const dx = (rnd() < .5 ? -1 : 1) * (.6 + rnd() * .6);
+      for (let j = 0; j < 14 + rnd() * 14; j++) { rect("#2a1018", gx, gy, 2, 2); gx += dx; gy -= .5 + rnd() * .8; if (rnd() < .15) rect("#2a1018", gx + dx * 3, gy - 2, 1, 3); }
+    }
+  };
+  cactus(W * .05, 7, H * .2); dryTree(W * .15, 3); cactus(W * .9, 8, H * .14); dryTree(W * .81, 3);
+}
+addEventListener("resize", () => drawTitleBg());

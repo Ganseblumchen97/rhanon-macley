@@ -19,6 +19,8 @@ const TILE_PAL = {
   cidadevelha: {g1: "#a8a090", g2: "#948c7c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7e786c", path2: "#625c52", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22"},
   // caatinga: chão de terra clara rachada, capim seco, mandacaru e árvore seca (cactus: o T vira um ou outro)
   caatinga: {g1: "#d8c08a", g2: "#c8ae78", tall: "#a89a5a", tallHi: "#d8c87a", path: "#b8865a", path2: "#9a6a42", leaf: "#4a8a5a", leaf2: "#2e6a3e", leafHi: "#7ab884", trunk: "#8a8478", rock: "#b0a090", rock2: "#7a6a58", water: "#4a8aa8", water2: "#8ac0d0", wood: "#9c6339", wood2: "#6d4329", cactus: true},
+  // beira do Velho Chico: areia da margem, capim verde de beira de rio e a água verde do São Francisco
+  beira: {g1: "#b8b07a", g2: "#a8a06a", tall: "#6a9a3a", tallHi: "#9ac85a", path: "#d8c08a", path2: "#b89a62", leaf: "#3a7a3a", leaf2: "#2a5a2a", leafHi: "#5a9a4a", trunk: "#6d4a2a", rock: "#a89a88", rock2: "#7a6a58", water: "#3a8a8a", water2: "#8acac0", wood: "#9c6339", wood2: "#6d4329"},
   // serra do Araripe: chão de terra vermelha, mato verde da encosta e muita pedra
   serra: {g1: "#a87a52", g2: "#986a46", tall: "#5a7a3a", tallHi: "#8aaa5a", path: "#c8986a", path2: "#a87a50", leaf: "#3a6a2e", leaf2: "#2a5222", leafHi: "#5a8a44", trunk: "#5a3a22", rock: "#b0786a", rock2: "#7a4a3a", water: "#4a8aa8", water2: "#8ac0d0", wood: "#9c6339", wood2: "#6d4329"},
   // Petrolina: a orla do São Francisco, calçada clara e casario baixo de cores quentes

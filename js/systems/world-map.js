@@ -18,7 +18,10 @@ function setupMapRegion() {
   $("route").setAttribute("d", R.path ? R.path : !b ? "" : c ? `M${a.x},${a.y} C${a.x + c[0]},${a.y + c[1]} ${b.x + c[2]},${b.y + c[3]} ${b.x},${b.y}` : "M" + R.route.map(k => `${LOC[k].x},${LOC[k].y}`).join(" L"));   // várias cidades: segmentos retos
 }
 // mapa grande da cidade atual (o Pará ou o Maranhão): chamado ao abrir o jogo e depois de cada voo
-function syncRegion() { MAP_REGION = CITY[curCity()].map; setupMapRegion(); buildMapNodes(); }
+function syncRegion() {
+  MAP_REGION = CITY[curCity()].map; setupMapRegion(); buildMapNodes();
+  $("local").querySelector(".nav-help").textContent = t("Setas ou WASD: escolher local · Z: confirmar · X: mapa do {mapa}", {mapa: MAP_REGIONS[MAP_REGION].n});   // o X volta ao mapa da região de agora
+}
 // cria os pontos clicáveis do mapa a partir de LOC (só os que existem no mapa escolhido)
 function buildMapNodes() {
   const pos = MAP_REGIONS[MAP_REGION].pos;

@@ -88,7 +88,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
 .stage{--plat:46%}
 .stage.zone-fechada{--plat:42%}
-.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-beira,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
 .stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
@@ -116,6 +116,10 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-serra{background:linear-gradient(180deg,#f0c890 0 22%,#8a5a3a 22% 34%,#a87a52 34% 100%)}
 .stage.zone-serra::before{background:#a87a50;right:9%;top:var(--plat)}
 .stage.zone-serra::after{background:#a87a50;left:4%;bottom:7%}
+/* Beira do Velho Chico: céu quente, margem verde e o rio largo */
+.stage.zone-beira{background:linear-gradient(180deg,#f0d090 0 24%,#6a8a4a 24% 30%,#3a8a8a 30% 38%,#b8b07a 38% 100%)}
+.stage.zone-beira::before{background:#d8c08a;right:9%;top:var(--plat)}
+.stage.zone-beira::after{background:#d8c08a;left:4%;bottom:7%}
 /* manguezal: mangue escuro, água salobra e lama */
 .stage:is(.zone-manguezal,.zone-mangueilha){background:linear-gradient(180deg,#2e4a2c 0 22%,#7a9a8a 22% 23%,#4a6a6a 23% 31%,#3e5a58 31% 38%,#5a5440 38% 100%)}
 .stage:is(.zone-manguezal,.zone-mangueilha)::before{background:#6a6248;right:9%;top:var(--plat)}
@@ -892,6 +896,10 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .title-flies i:nth-child(10){left:70%;top:84%;animation-delay:-1.7s}
 @keyframes vagalume{0%,100%{opacity:0;translate:0 0}20%{opacity:1}50%{opacity:.4;translate:18px -22px}70%{opacity:1;translate:-8px -36px}}
 @media (prefers-reduced-motion:reduce){.title-flies i{animation:none;opacity:.7}}
+/* Nordeste (drawTitleBg com o save no Nordeste): faixa da cor do sertão ao anoitecer e faíscas quentes no lugar dos vaga-lumes */
+.title-screen[data-region=nordeste]{background:#14060e}
+.title-screen[data-region=nordeste]::before{background:rgba(26,8,18,.88)}
+.title-screen[data-region=nordeste] .title-flies i{background:#ffd8a0;box-shadow:0 0 10px 3px rgba(255,170,90,.5)}
 /* letras do logo: pedaços de pergaminho, tábua, folha e o amarelo da lua, com contorno e sombra dura */
 .title .l{box-shadow:3px 3px 0 #06120a;outline:2px solid #06120a}
 .title .l.a{background:linear-gradient(180deg,#f6e9c4,#e8d29a);color:#3a2414}
@@ -1047,7 +1055,7 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .plate .bar i{border-radius:5px;background:linear-gradient(180deg,#ff9a8a,#e2363d 55%,#9a1a20)}
 .plate::after{content:"";position:absolute;pointer-events:none;right:12px;bottom:-8px;width:44px;height:14px;background:var(--orn) center/contain no-repeat}
 .plate{--orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M2 7q10-9 20 0q-10 9-20 0z' fill='%233f9a5c' stroke='%23173a22' stroke-width='2'/%3E%3Cpath d='M22 7q10-9 20 0q-10 9-20 0z' fill='%236fc06a' stroke='%23173a22' stroke-width='2'/%3E%3C/svg%3E")}
-.stage:is(.zone-rio,.zone-igarape,.zone-encontro) .plate{background:linear-gradient(180deg,#3a7a9a,#1f4f6e);border-color:#123248;color:#eaf6ff;
+.stage:is(.zone-rio,.zone-igarape,.zone-encontro,.zone-beira) .plate{background:linear-gradient(180deg,#3a7a9a,#1f4f6e);border-color:#123248;color:#eaf6ff;
   --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M1 8q5-6 10 0t10 0t10 0t10 0' fill='none' stroke='%23123248' stroke-width='5'/%3E%3Cpath d='M1 8q5-6 10 0t10 0t10 0t10 0' fill='none' stroke='%239fe0ff' stroke-width='2'/%3E%3C/svg%3E")}
 .stage:is(.zone-manguezal,.zone-mangueilha) .plate{background:linear-gradient(180deg,#6a5a3a,#3f3220);border-color:#241a10;color:#f3ead0;
   --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M4 1q4 6 0 12M12 1q-4 6 2 12M22 1q4 6-2 12M32 1q-3 6 3 12M40 1q3 6-1 12' fill='none' stroke='%23241a10' stroke-width='4'/%3E%3Cpath d='M4 1q4 6 0 12M12 1q-4 6 2 12M22 1q4 6-2 12M32 1q-3 6 3 12M40 1q3 6-1 12' fill='none' stroke='%23a08a5a' stroke-width='1.6'/%3E%3C/svg%3E")}

@@ -868,8 +868,8 @@ function mapinguari(pose, f) {
 
 /* ---------- Belém: pombo, gente da cidade (malandros) e as visagens ---------- */
 // pombo: corpo cinza, pescoço furta-cor (verde e roxo), pés laranja
-function pombo(pose, f) {
-  const d = rigGrid(1, 34, 30), G = 27, C = {b: "#8a8a9a", B: "#5e5e6e", n: "#5aa07a", p: "#9a6ab0", w: "#76768a", y: "#e86a3a"};
+function pombo(pose, f, C = {b: "#8a8a9a", B: "#5e5e6e", n: "#5aa07a", p: "#9a6ab0", w: "#76768a", y: "#e86a3a"}) {
+  const d = rigGrid(1, 34, 30), G = 27;
   const o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
   if (pose === "ko") {
     d.part().ellipse(18, 23, 9, 4.5, C.b, C.B, .5).limb(22, 21, 25, 16, 1.2, C.y).limb(19, 21, 21, 16, 1.2, C.y);
@@ -1011,6 +1011,68 @@ function lobisomem(pose, f) {
   if (at || cr) { d.part().poly([[hx - 11, hy + 3], [hx - 3, hy + 4], [hx - 4, hy + 7], [hx - 10, hy + 5]], "#3a1410"); d.dots([[hx - 10, hy + 3], [hx - 7, hy + 4], [hx - 5, hy + 4]], C.t); }
   return {c: d.canvas(), head: [hx, hy]};
 }
+// Carranca (beira do Velho Chico, de dia): o barquinho de madeira com a carranca na proa, cabeça de bicho entalhada de
+// juba vermelha, olho arregalado e boca cheia de dente; desmaiada, o barco adorna e a carranca deita na água
+function carranca(pose, f) {
+  const d = rigGrid(1, 58, 50), C = {h: "#8a5a32", H: "#5e3a1e", s: "#3a6aa8", m: "#c8301c", M: "#8a1a10", k: "#e8a050", K: "#a86a2a", t: "#f4ecd8", y: "#ffd23a"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  if (pose === "ko") {
+    d.part().poly([[6, 38], [52, 34], [54, 42], [10, 47]], C.h, C.H, 40).limb(9, 42, 53, 38, 1.2, C.s);   // casco adornado
+    d.part().ellipse(12, 40, 9, 6, C.m, C.M, .5).ellipse(10, 40, 6, 4.5, C.k, C.K, .6);   // a cabeça deitada
+    bEye(d, 8, 39, o); bEye(d, 13, 38, o);
+    return {c: d.canvas(), head: [10, 40]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (pose === "idle" ? f : 0) + (cr ? 3 : 0), bx = at ? -4 : hu ? 3 : 0;
+  const X = v => v + bx, Y = v => v + by;
+  d.part().poly([[X(4), Y(34)], [X(54), Y(37)], [X(51), Y(46)], [X(13), Y(47)]], C.h, C.H, X(44));   // casco
+  d.limb(X(7), Y(37), X(53), Y(40), 1.5, C.s).dots([[X(20), Y(43)], [X(30), Y(44)], [X(40), Y(44)]], C.H);   // faixa azul pintada e as tábuas
+  d.part().limb(X(48), Y(36), X(48), Y(14), 1.5, C.H).poly([[X(48), Y(15)], [X(56), Y(31)], [X(48), Y(31)]], C.t, "#c8c0a8");   // mastro e vela
+  d.part().limb(X(11), Y(36), X(12), Y(26), 4, C.h, C.H);   // o pescoço de pau saindo da proa
+  const hx = X(at ? 9 : 12), hy = Y(at ? 17 : 19);
+  for (const [a, r] of [[-2.6, 12], [-2, 13], [-1.4, 13], [-.8, 12], [-.2, 11], [.4, 10], [1, 9]])   // a juba entalhada, em mechas
+    d.part().limb(hx + 2, hy, hx + 2 + Math.cos(a) * r, hy + Math.sin(a) * r, 3, C.m, C.M);
+  d.part().ellipse(hx, hy, 7.5, 8.5, C.k, C.K, .55);   // a cara
+  d.part().ellipse(hx - 3, hy - 3, 2.6, 2.4, C.t).ellipse(hx + 2.5, hy - 3, 2.6, 2.4, C.t);   // olho arregalado
+  bEye(d, hx - 3, hy - 3, o); bEye(d, hx + 2.5, hy - 3, o);
+  d.limb(hx - 6, hy - 6, hx - 1, hy - 5, 1, C.M).limb(hx + 1, hy - 5, hx + 6, hy - 6, 1, C.M);   // sobrancelha franzida
+  d.dots([[hx - 1, hy + 1], [hx, hy + 1]], C.K);   // narina
+  const mo = at ? 4 : cr ? 3 : 2;   // a boca: mais aberta no bote
+  d.part().poly([[hx - 5, hy + 3], [hx + 4, hy + 3], [hx + 3, hy + 4 + mo], [hx - 4, hy + 4 + mo]], "#3a1410");
+  d.dots([[hx - 4, hy + 3], [hx - 2, hy + 3], [hx, hy + 3], [hx + 2, hy + 3], [hx - 3, hy + 3 + mo], [hx - 1, hy + 3 + mo], [hx + 1, hy + 3 + mo]], C.t);   // dentes de pau
+  d.dots([[hx - 6, hy + 1], [hx + 5, hy + 1]], C.y);   // pintura amarela nas bochechas
+  return {c: d.canvas(), head: [hx, hy]};
+}
+// Nego d'água (beira do Velho Chico, à noite): o homem do rio, careca, de pele escura com brilho de água, mão e pé de pato e
+// fiapo de alga no ombro; ri alto. Na luta fica com a cintura dentro d'água; desmaiado, boia de costas
+function negoDagua(pose, f) {
+  const d = rigGrid(1, 44, 50), sk = "#6a4630", Sk = "#462c1c", sh = "#9ac0b8", wb = "#4a6a62", Wb = "#2e4a42", al = "#5a8a3a", sb = "#2a4a6a", Sb = "#1a3048";
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  const hand = (x, y, s) => d.part().poly([[x, y - 1], [x + s * 4, y - 3], [x + s * 5, y], [x + s * 4, y + 3], [x, y + 2]], wb, Wb).dots([[x + s * 3, y - 1], [x + s * 3, y + 1]], Wb);   // mão de pato
+  if (pose === "ko") {
+    d.part().poly([[12, 40], [34, 39], [35, 44], [12, 45]], sk, Sk).rect(26, 39, 6, 6, sb);   // boiando de costas, de calção
+    d.part().poly([[35, 40], [41, 37], [42, 43]], wb, Wb).poly([[35, 43], [41, 45], [40, 47]], wb, Wb);   // pé de pato
+    d.part().ellipse(9, 41, 6, 5.5, sk, Sk, .6).dots([[7, 37], [8, 37]], sh);
+    d.ellipse(7, 40, 1.8, 1.6, BW).ellipse(11, 40, 1.8, 1.6, BW); bEye(d, 7, 40, o); bEye(d, 11, 40, o);
+    return {c: d.canvas(), head: [9, 40]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (pose === "idle" ? f : 0) + (cr ? 3 : 0), bx = at ? -3 : hu ? 3 : 0;
+  const X = v => v + bx, Y = v => v + by;
+  d.part().limb(X(18), Y(36), X(16), Y(46), 3.5, sk, Sk).limb(X(24), Y(36), X(26), Y(46), 3.5, sk, Sk);   // pernas (dentro d'água)
+  d.part().poly([[X(14), Y(31)], [X(28), Y(31)], [X(29), Y(39)], [X(13), Y(39)]], sb, Sb);   // calção
+  d.part().poly([[X(13), Y(18)], [X(29), Y(18)], [X(28), Y(32)], [X(14), Y(32)]], sk, Sk, X(25));   // tronco largo
+  d.dots([[X(15), Y(20)], [X(16), Y(21)], [X(25), Y(20)], [X(19), Y(26)]], sh);   // brilho da água na pele
+  d.part().limb(X(14), Y(18), X(11), Y(23), 1.5, al).limb(X(28), Y(18), X(31), Y(24), 1.5, al);   // fiapo de alga nos ombros
+  const hf = at ? [X(1), Y(16)] : cr ? [X(7), Y(31)] : [X(8), Y(28)];
+  d.part().limb(X(14), Y(20), ...hf, 3, sk, Sk); hand(hf[0], hf[1], -1);
+  d.part().limb(X(28), Y(20), X(33), Y(29), 3, sk, Sk); hand(X(33), Y(29), 1);
+  d.part().ellipse(X(21), Y(10), 7, 7.5, sk, Sk, .6).ellipse(X(14), Y(11), 1.5, 2, sk, Sk).ellipse(X(28), Y(11), 1.5, 2, sk, Sk);   // cabeça careca e orelhas
+  d.dots([[X(18), Y(4)], [X(19), Y(4)], [X(20), Y(3)]], sh);   // brilho da careca molhada
+  if (o.eye !== "shut") d.ellipse(X(18), Y(9), 2, 1.8, BW).ellipse(X(24), Y(9), 2, 1.8, BW);   // branco do olho, que aparece na pele escura
+  bEye(d, X(18), Y(9), o, o.eye === "shut" ? BW : BN); bEye(d, X(24), Y(9), o, o.eye === "shut" ? BW : BN);
+  if (at || cr) { d.part().ellipse(X(21), Y(14), 3.5, 2.5, "#3a1410"); d.rect(X(18), Y(12), 7, 1, BW); }   // a gargalhada
+  else d.limb(X(17), Y(13), X(21), Y(15), 1, Sk).limb(X(21), Y(15), X(25), Y(13), 1, Sk);   // sorriso de quem sabe que vai virar a canoa
+  return {c: d.canvas(), head: [X(21), Y(10)]};
+}
 // visagem (assombração de Belém): vestido comprido sem pés, flutuando, cabelo escuro e olhos acesos; C troca as cores
 function visagem(C) {
   return (pose, f) => {
@@ -1054,7 +1116,10 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   guara: (pose, f) => garca(pose, f, {b: "#e8402a", B: "#b02818", y: "#3a2418", Y: "#22140c", k: "#5a2a1a"}),   // guará: a garça em vermelho
   garca_moura: (pose, f) => garca(pose, f, {b: "#8a96a8", B: "#5e6a7a", y: "#e8b030", Y: "#b88a20", k: "#2a3038"}),   // garça-moura: cinza-azulada
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
-  cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara,
+  cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara, carranca, nego_dagua: negoDagua,
+  martim: (pose, f) => pombo(pose, f, {b: "#2a7ac8", B: "#1a4a8a", n: "#f4f0e4", p: "#e8702a", w: "#4aa8e0", y: "#2a2a2a"}),   // martim-pescador: azul, colar branco e peito laranja
+  carao: (pose, f) => garca(pose, f, {b: "#6a4a32", B: "#4a3222", y: "#c8a050", Y: "#8a6a28", k: "#3a2a1a"}),   // carão: a garça em pardo-escuro
+  cobra_dagua: cobra({b: "#4a5a3a", B: "#2e3a24", k: "#c8b060"}, false),   // cobra-d'água: verde-oliva com a barriga amarela
   jiboia: cobra({b: "#a8885a", B: "#74583a", k: "#4a3220"}, false),   // jiboia: parda, com as manchas escuras em sela
   meia_noite: pessoa({pal: {s: "#5e3a1e", S: "#3a2412", h: "#1a1420"}, shirt: ["#1a1a22", "#0e0e14"], pants: ["#1a1a22", "#0e0e14"], noBand: true, cap: ["#1a1a22", "#0e0e14"]}),   // Homem da Meia-Noite: o boneco de fraque e cartola
   cascavel: cobra({b: "#b89a5a", B: "#7a6234", k: "#4a3a1a"}, true),   // cascavel: cabeça triangular, cor de areia com losangos escuros

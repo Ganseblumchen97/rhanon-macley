@@ -639,6 +639,10 @@ function special() {
   else if (s === "mergulho") say(t("{bicho} mergulha do alto! −{n} PV.", {bicho: foe(1), n: hit(Math.ceil(d * 1.5))}));
   else if (s === "cardume") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Sangramento"}; say(t("O cardume ataca! −{n} PV e sangramento por 3 turnos.", {n})); }
   else if (s === "constricao") { const n = hit(d); p.preso = 2; p.dot = {d: 3, t: 2, n: "Aperto"}; say(t("{bicho} enrola Rhanon! −{n} PV, e nada de fugir.", {bicho: foe(1), n})); }
+  else if (s === "careta") { const n = hit(Math.ceil(d * .7)); p.medo = 2; setTimeout(() => HERO_A.set("scared"), 400); say(t("{bicho} arreganha os dentes de pau numa careta medonha: −{n} PV. Sem defesa por 2 turnos.", {bicho: foe(1), n})); }
+  else if (s === "onda") say(t("{bicho} vem de proa e levanta uma onda em cima de Rhanon! −{n} PV.", {bicho: foe(1), n: hit(Math.ceil(d * 1.4))}));
+  else if (s === "redemoinho") { const n = hit(Math.ceil(d * 1.2)); p.preso = 2; say(t("{bicho} gira a água e puxa Rhanon pro redemoinho! −{n} PV, e nada de fugir por 2 turnos.", {bicho: foe(1), n})); }
+  else if (s === "gargalhada") { const n = hit(Math.ceil(d * .6)); p.medo = 2; p.weak = 2; setTimeout(() => HERO_A.set("scared"), 400); say(t("{bicho} solta uma gargalhada que ecoa no rio: −{n} PV. Rhanon se arrepia: sem defesa e golpes mais fracos por 2 turnos.", {bicho: foe(1), n})); }
   else if (s === "picada") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Veneno"}; say(t("{bicho} pica Rhanon! −{n} PV e veneno por 3 turnos.", {bicho: foe(1), n})); }
 }
 /* ---------- talismãs do Pajé (CHARMS em data/world.js) ---------- */
