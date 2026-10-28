@@ -56,7 +56,7 @@ const VILLAGER_LOOK = {
   // Pajé: cabelo branco comprido, cocar roxo com pena azul, pintura de jenipapo, colar e o cajado com maracá
   xama: {pal: {h: "#d8d0c4", H: "#f4ecd8", g: "#7a2a8a", G: "#4e1a5a", r: "#1a1426", s: "#9a6236", S: "#6e4424", t: "#2a2230", T: "#17121c"}, feather: "#3fb0d8", longHair: true, charm: "#f4ecd8", prop: "staff"},
   // técnico da lan house (feira) e a Dona Graça, cliente do freela no Ver-o-Peso
-  tecnico: {pal: {g: "#2a6ab8", G: "#1a4a8a", r: "#ffd23a", s: "#a86f40", S: "#7d4f2c"}, shirt: ["#3a3a44", "#24242c"], glasses: true, prop: "cloth"},
+  tecnico: {pal: {g: "#2a6ab8", G: "#1a4a8a", r: "#ffd23a", s: "#a86f40", S: "#7d4f2c"}, shirt: ["#3a3a44", "#24242c"], hat: ["#6a645a", "#4a4640", "#2a2a30"], noBand: true, prop: "cloth"},   // chapéu de feltro de inventor
   cordelista: {pal: {g: "#a8743a", G: "#6e4a24", r: "#1a1426", s: "#8a5a32", S: "#5e3a1e", h: "#e8e4d8"}, shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#3a3028", "#24201a"], cap: ["#a8743a", "#6e4a24"], glasses: true},   // Seu Dedé, cordelista do Recife: cabelo branco, chapéu de couro e óculos
   brigadista: {pal: {g: "#e8701c", G: "#a84a10", r: "#1a1426", s: "#a86f40", S: "#7d4f2c", h: "#2a1a14"}, shirt: ["#e8701c", "#b8500e"], pants: ["#8a7a52", "#5e5236"], cap: ["#f0c020", "#b8900e"], longHair: true},   // Iara, brigadista do cerrado: farda laranja e capacete amarelo
   cliente: {pal: {g: "#7a2a8a", G: "#4e1a5a", r: "#1a1426", s: "#9a6236", S: "#6e4424", h: "#3a2a22"}, shirt: ["#6a2a8a", "#4a1a6a"], pants: ["#e8c040", "#b8902a"], longHair: true, prop: "basket"},

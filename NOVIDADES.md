@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.66.1 — voo livre e correções
+
+- O avião não trava mais: dá para voar para a próxima região quando quiser. Se ainda faltar algo na região de agora
+  (chefes de dia ou de noite, o freela), o aeroporto mostra o que falta e pergunta "Partir agora?". Dá para voltar de
+  avião depois e terminar o que ficou.
+- Depois de acalmar o chefe da última trilha de Belém, do Recife ou de Brasília, o mapa da cidade avisa de onde sai o voo.
+- Na batalha, o painel do Rhanon voltou a mostrar o rosto dele, o nível e a defesa.
+- O cenário da última luta não aparece mais atrás do mapa da cidade (depois dos bugs do freela, ficava um fundo de
+  código).
+- O último golpe da Fúria da mata ganhou o baque do acerto: antes parecia sair sem som.
+- O Seu Bugiganga, na Vila Paranã, trocou os óculos (que pareciam dois quadrados pretos) por um chapéu de feltro.
+
 ## 0.66.0 — Ouro Preto, a Mula-madrinha e o Saci
 
 - Cidade nova: Ouro Preto. Depois de acalmar o Muriqui-rei da Serra do Curral, compre a passagem de ônibus no mapa do

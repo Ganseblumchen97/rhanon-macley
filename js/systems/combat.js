@@ -113,7 +113,8 @@ function init(opts = {}) {
   $("over").hidden = true;
   const wet = WATER_BATTLE.has(animal.id);   // bicho de água: laguinho no lugar do chão e ele meio submerso
   // peixes afundam mais; jacaré, ariranha e cobras só um pouco
-  $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : "") + (isTomado(animal) && !opts.rematch ? " tomado" : "");   // tomado: brilho escuro da fumaça $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("meMedal").style.backgroundImage = `url(${heroMedal()})`; $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
+  $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : "") + (isTomado(animal) && !opts.rematch ? " tomado" : "");   // tomado: brilho escuro da fumaça
+  $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("meMedal").style.backgroundImage = `url(${heroMedal()})`; $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
   pick(); render();
   $("cmds").firstChild.focus(); musicStart(getBattleTrackFor(animal));
   // abertura: o Rhanon entra pela esquerda, o bicho chega pela direita e o nome dele aparece numa faixa
@@ -597,7 +598,7 @@ function furyStrike(ds) {
     shown = Math.max(0, shown - d); holdE = last ? null : shown;
     if (i) sfx("spear");
     hitBeast(); slash($("beast")); burst(b, last ? ["#ffd23a", "#ffffff", "#e5001c"] : ["#fff", "#cfd8dc", "#f2a20c"], last ? 20 : 10, last ? 110 : 60);
-    pop(String(d), $("beast"), last ? "crit" : "strong"); sfx(last ? "critico" : "hit"); hitImpact(last ? "furia" : "leve");
+    pop(String(d), $("beast"), last ? "crit" : "strong"); sfx("hit"); if (last) sfx("critico");   // o último leva o baque e o brilho do crítico hitImpact(last ? "furia" : "leve");
     if (last) { say(t(ds.length === 4 ? "FÚRIA! Quatro estocadas: −{n}." : "FÚRIA! Três estocadas: −{n}.", {n: ds.join(", −")})); charmOnHit(ds.reduce((a, b) => a + b, 0)); setTimeout(() => pop(t("FÚRIA!"), $("beast"), "crit"), 200); }
     render();
   }, T0 + FURY_LEAD + i * gap));

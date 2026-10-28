@@ -223,21 +223,28 @@ function weatherOn(day, city = curCity()) {
 const weatherNow = () => { const w = weatherOn(G.day); return G.night && w === "mormaco" ? "limpo" : w; };   // mormaço some de noite
 const weatherBoost = k => (WEATHER[weatherNow()].boost || {})[k] || 1;
 const curCity = () => CITY[G.loc] ? G.loc : "ananindeua";
-/* voos entre regiões, de ida e volta e de graça (pagos pelo freela da região de onde se sai): Belém ↔ São Luís abre
-   com o fim do Norte (os 20 chefes acalmados) e o site da feira entregue; Recife ↔ Cuiabá, com o fim do Nordeste (a
-   calma de Guaraci) e o app de cordel entregue; Brasília ↔ Belo Horizonte, com o fim do Centro-Oeste (o brilho das
-   estrelas) e o mapa de queimadas entregue. lock = aviso no aeroporto enquanto não abre; paid = quem paga */
+/* voos entre regiões, de ida e volta e de graça (pagos pelo freela da região de onde se sai), sempre liberados. open =
+   a região de antes está completa (chefes acalmados e o freela entregue); sem isso, voar para a região nova (de a para b)
+   avisa o que falta (flightMissing) e pergunta antes, mas dá para voltar depois. paid = quem paga */
 const FLIGHTS = [
   {a: "belem", b: "saoluis", open: () => !!G.portfolio.site_feira && NORTE_BOSSES().every(k => BS()[k]), paid: "O voo de ida e volta é pago pela empresa do site da feira.",
-    lock: "Aeroporto de Belém: o voo para São Luís sai quando o site da feira estiver entregue e os 20 chefes do Norte acalmados."},
+},
   {a: "recife", b: "cuiaba", open: () => !!G.portfolio.app_cordel && NORDESTE_BOSSES().every(k => BS()[k]), paid: "O voo de ida e volta é pago com o dinheiro do app de cordel.",
-    lock: "Aeroporto do Recife: o voo para Cuiabá sai quando o app de cordel estiver entregue e os chefes do Nordeste acalmados."},
+},
   {a: "brasilia", b: "bh", open: () => !!G.portfolio.mapa_queimadas && CENTROESTE_BOSSES().every(k => BS()[k]), paid: "O voo de ida e volta é pago com o dinheiro do mapa de queimadas.",
-    lock: "Aeroporto de Brasília: o voo para Belo Horizonte sai quando o mapa de queimadas estiver entregue e os chefes do Centro-Oeste acalmados."}
+}
 ];
 const AIRPORT = {belem: "Aeroporto de Belém", saoluis: "Aeroporto de São Luís", recife: "Aeroporto do Recife", cuiaba: "Aeroporto de Cuiabá", brasilia: "Aeroporto de Brasília", bh: "Aeroporto de Confins"};
 const flightsFrom = c => FLIGHTS.filter(f => f.a === c || f.b === c).map(f => Object.assign({to: f.a === c ? f.b : f.a}, f));
 const flightOpen = (to = "saoluis") => FLIGHTS.some(f => (f.a === to || f.b === to) && f.open());
+// o que falta na região de onde o voo sai (chefes sem acalmar e o freela dela), para o aviso antes de partir
+function flightMissing(f) {
+  const reg = regionOfCity(f.a), all = {norte: NORTE_BOSSES, nordeste: NORDESTE_BOSSES, centroeste: CENTROESTE_BOSSES}[reg]();
+  const left = all.filter(k => !BS()[k]).length, out = [];
+  if (left) out.push(t(left === 1 ? "1 chefe sem acalmar" : "{n} chefes sem acalmar", {n: left}));
+  Object.entries(FREELA_AT).filter(([ph, id]) => regionOfCity(cityOf(ph)) === reg && !G.portfolio[id]).forEach(([, id]) => out.push(t("o freela de {cliente}", {cliente: FREELAS[id].client})));
+  return out;
+}
 const cityOf = k => (SUB[k] && SUB[k].city) || "ananindeua";
 const ROUTE = Object.values(CITY).flatMap(c => c.route);   // todos os locais das duas cidades
 const EDGES = Object.values(CITY).flatMap(c => c.route.slice(1).map((k, i) => [c.route[i], k]));

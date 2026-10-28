@@ -890,7 +890,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
    janela da luta e os montinhos de chão (--platL, --platW na água) trocam as elipses lisas. A imagem tem a superfície
    em cima (7 de 10 linhas): o centro dela fica onde os pés pisavam antes (12-13px abaixo do topo da elipse antiga). ===== */
 .game>.scene-bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;image-rendering:pixelated;pointer-events:none}
-.game:has(#map:not([hidden])) .scene-bg,.game.working-mode .scene-bg,.game.challenge-mode .scene-bg{display:none}
+.game:has(#map:not([hidden])) .scene-bg,.game:has(#local:not([hidden])) .scene-bg,.game.working-mode .scene-bg,.game.challenge-mode .scene-bg{display:none}
 .game>.stage.scenic{background:none;outline:4px solid var(--ink);box-shadow:0 0 0 7px rgba(0,0,0,.25)}
 .game>.stage.scenic .bg-decor{display:none}
 .game>.stage.scenic::before,.game>.stage.scenic::after{background:var(--platL) center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;opacity:1;

@@ -106,7 +106,7 @@ function rigTorch(d, C, x0, y0, x1, y1, f) {   // cabo de (x0,y0) até a chama e
 /* ---------- o personagem ---------- */
 const RIG_CACHE = new Map();
 // pose: {lf, rf: pés [x,y]; lh, rh: mãos; lean, dy: parte de cima; sit; face; weapon; side; pull; f (quadro da chama)}
-// look: {pal, shirt, pants, glasses, noBand, bowBack, longHair, feather, top, prop, charm}
+// look: {pal, shirt, pants, glasses, noBand, bowBack, longHair, feather, top, prop, charm, cap, hat: [feltro, sombra, fita]}
 function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   const key = view + scale + JSON.stringify(pose) + JSON.stringify(look);
   if (RIG_CACHE.has(key)) return RIG_CACHE.get(key);
@@ -186,6 +186,7 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
       .dots([e(-5, 5), e(-4, 5), e(-3, 4), e(-2, 4), e(-4, 6)], C.H);
     if (!look.noBand) d.part().rect(hx - 8, 9 + hy, 17, 2, C.g).rect(hx - 8, 10 + hy, 17, 1, C.G);
     if (look.cap) d.part().ellipse(hx, 8 + hy, 8.5, 4.5, look.cap[0]).rect(hx - 9, 10 + hy, 19, 2, look.cap[1]);   // boné (gente da cidade)
+    if (look.hat) d.part().ellipse(hx, 5 + hy, 6.5, 4.5, look.hat[0]).rect(hx - 6, 7 + hy, 13, 2, look.hat[2]).rect(hx - 11, 9 + hy, 23, 2, look.hat[1]).dots([e(-3, 2), e(-2, 2)], look.hat[2]);   // chapéu de feltro de aba larga
   }
   if (look.feather) d.part().limb(hx + 5, 9 + hy, hx + 7, 2 + hy, 1.5, look.feather);
   // armas na frente do corpo

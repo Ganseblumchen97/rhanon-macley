@@ -50,6 +50,7 @@ function narraPortrait(who) {
 }
 /* fumaça de Pytuna: bolhas cinza-escuras girando devagar e dois olhos vermelhos; k = tamanho, alpha = sumindo */
 function drawSmoke(x, cx, cy, k = 1, now = 0, alpha = 1) {
+  if (!(k > 0)) return;   // primeiro quadro da cena: o relógio pode vir um pouco antes do começo (tamanho negativo)
   x.save(); x.globalAlpha = alpha;
   for (let i = 0; i < 9; i++) {
     const a = i / 9 * Math.PI * 2 + now / 1400, r = (7 + (i % 3) * 3) * k, d = (6 + (i % 2) * 5) * k;
@@ -111,15 +112,15 @@ function bossStory(id, done) {
   });
   if (jaciLight() >= 1 && !G.narrated.norte_fim) steps.push(next => {
     G.narrated.norte_fim = true; save(); musicStart("jaci");   // a lua volta inteira: o tema de Jaci
-    narrate(NARRA_PYT.norte, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Norte"), t(G.portfolio.site_feira ? "A história continua no Nordeste: o voo sai do Aeroporto de Belém." : "A história continua no Nordeste. Antes, entregue o site da Dona Graça no Ver-o-Peso.")); setTimeout(next, 1500); });
+    narrate(NARRA_PYT.norte, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Norte"), t("A história continua no Nordeste: o voo sai do Aeroporto de Belém.")); setTimeout(next, 1500); });
   });
   if (guaraciCalm() >= 1 && !G.narrated.nordeste_fim) steps.push(next => {
     G.narrated.nordeste_fim = true; save(); musicStart("jaci");   // a chuva volta no sertão: o tema da esperança
-    narrate(NARRA_PYT.nordeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Nordeste"), t(G.portfolio.app_cordel ? "A história continua no Centro-Oeste: o voo sai do Aeroporto do Recife." : "A história continua no Centro-Oeste. Antes, entregue o app de cordel do Seu Dedé no Recife Antigo.")); setTimeout(next, 1500); });
+    narrate(NARRA_PYT.nordeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Nordeste"), t("A história continua no Centro-Oeste: o voo sai do Aeroporto do Recife.")); setTimeout(next, 1500); });
   });
   if (estrelaCalm() >= 1 && !G.narrated.centroeste_fim) steps.push(next => {
     G.narrated.centroeste_fim = true; save(); musicStart("jaci");   // as estrelas voltam ao céu do cerrado: o tema da esperança
-    narrate(NARRA_PYT.centroeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Centro-Oeste"), t(G.portfolio.mapa_queimadas ? "A história continua no Sudeste: o voo sai do Aeroporto de Brasília." : "A história continua no Sudeste. Antes, entregue o mapa de queimadas da Iara no Plano Piloto.")); setTimeout(next, 1500); });
+    narrate(NARRA_PYT.centroeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Centro-Oeste"), t("A história continua no Sudeste: o voo sai do Aeroporto de Brasília.")); setTimeout(next, 1500); });
   });
   const run = () => steps.length ? steps.shift()(run) : done && done();
   run();
