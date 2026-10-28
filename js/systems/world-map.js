@@ -56,7 +56,7 @@ function select(id) {
       MAP_REGIONS[CITY[id].map].route.filter(c => c !== id && busLine(id, c) && G[busLine(id, c).pass]).forEach(c => btn(t("Viajar de ônibus para {cidade}", {cidade: LOC[c].s}), () => busRide(c)));
       flightsFrom(id).forEach(f => {   // aeroporto: o voo para a outra região, ou o aviso do que falta (depois de chegar perto)
         if (f.open()) { btn(t("Voar para {cidade} ({aero})", {cidade: LOC[f.to].s, aero: t(AIRPORT[id])}), () => fly(f.to)); i.insertAdjacentHTML("beforeend", `<p class="hint">${t(f.paid)}</p>`); }
-        else if (id === "recife" && (G.portfolio.app_cordel || guaraciCalm() >= 1)) i.insertAdjacentHTML("beforeend", `<p class="hint">${t(f.lock)}</p>`);
+        else if (id === "recife" && (G.portfolio.app_cordel || guaraciCalm() >= 1) || id === "brasilia" && (G.portfolio.mapa_queimadas || estrelaCalm() >= 1)) i.insertAdjacentHTML("beforeend", `<p class="hint">${t(f.lock)}</p>`);
       });
     } else {
       const ln = busLine(G.loc, id);   // dá para ir de ônibus da cidade atual até esta
@@ -134,12 +134,15 @@ function openBrasil() {
   Object.entries(REGIONS).forEach(([k, r]) => btn(r.n + (r.open ? "" : ` <small>${t("em breve")}</small>`), () => { BR_SEL = k; sfx("blip"); openBrasil(); }, false, side));
   side.querySelectorAll(".cmd").forEach((b, j) => b.classList.toggle("sel", Object.keys(REGIONS)[j] === BR_SEL));
   const r = REGIONS[BR_SEL], card = document.createElement("div"); card.className = "br-card";
-  const coOpen = flightOpen("cuiaba");
+  const coOpen = flightOpen("cuiaba"), seOpen = flightOpen("bh");
   card.innerHTML = `<h3 style="color:${r.color}">${r.n}</h3><p>${r.txt}</p>` + (BR_SEL === "nordeste"
     ? `<p class="hint">${G.regions?.nordeste ? t("Calma de Guaraci: {n} de {total} chefes do Nordeste acalmados", {n: NORDESTE_BOSSES().filter(k => BS()[k]).length, total: NORDESTE_BOSSES().length}) : t(flightOpen() ? "O voo para São Luís já sai do Aeroporto de Belém." : "O voo sai do Aeroporto de Belém depois que o site da feira for entregue e os 20 chefes do Norte acalmados.")}</p>` +
       (G.regions?.nordeste ? `<p class="hint">${t(coOpen ? "Aeroporto do Recife: voo de ida e volta para Cuiabá." : "Aeroporto do Recife: o voo para o Centro-Oeste abre com a calma de Guaraci e o app de cordel entregue.")}</p>` : "")
     : BR_SEL === "centroeste"
-    ? `<p class="hint">${G.regions?.centroeste ? t("Brilho das estrelas: {n} de {total} chefes do Centro-Oeste acalmados", {n: CENTROESTE_BOSSES().filter(k => BS()[k]).length, total: CENTROESTE_BOSSES().length}) : t(coOpen ? "O voo para Cuiabá já sai do Aeroporto do Recife." : "O voo sai do Aeroporto do Recife depois que o app de cordel for entregue e os chefes do Nordeste acalmados.")}</p>`
+    ? `<p class="hint">${G.regions?.centroeste ? t("Brilho das estrelas: {n} de {total} chefes do Centro-Oeste acalmados", {n: CENTROESTE_BOSSES().filter(k => BS()[k]).length, total: CENTROESTE_BOSSES().length}) : t(coOpen ? "O voo para Cuiabá já sai do Aeroporto do Recife." : "O voo sai do Aeroporto do Recife depois que o app de cordel for entregue e os chefes do Nordeste acalmados.")}</p>` +
+      (G.regions?.centroeste ? `<p class="hint">${t(seOpen ? "Aeroporto de Brasília: voo de ida e volta para Belo Horizonte." : "Aeroporto de Brasília: o voo para o Sudeste abre com o brilho das estrelas e o mapa de queimadas entregue.")}</p>` : "")
+    : BR_SEL === "sudeste"
+    ? `<p class="hint">${t(G.regions?.sudeste ? "Você já esteve aqui. Por enquanto, Belo Horizonte e a Serra do Curral; Ouro Preto, o Rio e São Paulo vêm em breve." : seOpen ? "O voo para Belo Horizonte já sai do Aeroporto de Brasília." : "O voo sai do Aeroporto de Brasília depois que o mapa de queimadas for entregue e os chefes do Centro-Oeste acalmados.")}</p>`
     : r.open
     ? `<p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p>` +
       `<p class="hint">${t("Entre a aldeia e Belém, vai de barco de linha pelo rio.")}</p>` +

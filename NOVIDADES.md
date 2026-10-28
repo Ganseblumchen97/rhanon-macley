@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.65.0 — o Sudeste começa em Minas
+
+- Região nova: o Sudeste. Com os 10 chefes do Centro-Oeste acalmados e o mapa de queimadas entregue, o Aeroporto de
+  Brasília abre um voo de graça, de ida e volta, para Belo Horizonte. O mapa do Brasil já mostra o Sudeste aberto.
+- O Mercado Central é a fase segura de BH: queijo da Canastra, pão de queijo, pensão, quaresmeiras roxas e mineiros
+  de prosa comprida, que falam "uai" e "sô".
+- Trilha nova: a Serra do Curral (níveis 60 a 62), pela rua da esquerda do Mercado. Campo de pedra cor de ferro,
+  córrego com ponte e bichos novos: tucano-toco, quero-quero, cachorro-do-mato, paca e, de noite, o bacurau.
+- De dia, o chefe é o Muriqui-rei, o maior macaco das Américas, que resolve briga com abraço. De noite, uma árvore
+  seca anda pela trilha: é o Corpo-seco, assombração de Minas.
+- Música nova: em Minas toca sertanejo universitário, na cidade, no mapa e nas batalhas, com o tema do Sudeste
+  cantado em dupla. A tela inicial de quem está no Sudeste mostra as serras de Minas no fim da tarde.
+
 ## 0.64.0 — o Parque Nacional e o fim do Centro-Oeste
 
 - Brasília ganhou o Parque Nacional (níveis 58 a 60): cerrado aberto, capim dourado e piscinas de água mineral. A

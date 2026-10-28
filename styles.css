@@ -88,7 +88,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
 .stage{--plat:46%}
 .stage.zone-fechada{--plat:42%}
-.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-beira,.zone-pantanal,.zone-chapada,.zone-rioprata,.zone-gruta,.zone-parquebsb,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-beira,.zone-pantanal,.zone-chapada,.zone-rioprata,.zone-gruta,.zone-parquebsb,.zone-serracurral,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
 .stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
@@ -123,6 +123,9 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-parquebsb{background:linear-gradient(180deg,#f0d8a0 0 24%,#7a8a3a 24% 30%,#3aa8d8 30% 38%,#a8a856 38% 100%)}
 .stage.zone-parquebsb::before{background:#c8b870;right:9%;top:var(--plat)}
 .stage.zone-parquebsb::after{background:#c8b870;left:4%;bottom:7%}
+.stage.zone-serracurral{background:linear-gradient(180deg,#9ab8e0 0 24%,#5a6a8a 24% 30%,#3a7ab0 30% 38%,#8a8a5a 38% 100%)}
+.stage.zone-serracurral::before{background:#8a7a68;right:9%;top:var(--plat)}
+.stage.zone-serracurral::after{background:#8a7a68;left:4%;bottom:7%}
 .stage.zone-gruta{background:linear-gradient(180deg,#14141e 0 24%,#3a3848 24% 30%,#1a5ad8 30% 38%,#5a5660 38% 100%)}
 .stage.zone-gruta::before{background:#8a8478;right:9%;top:var(--plat)}
 .stage.zone-gruta::after{background:#8a8478;left:4%;bottom:7%}
@@ -919,6 +922,10 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .title-screen[data-region=centroeste]{background:#0a0a1e}
 .title-screen[data-region=centroeste]::before{background:rgba(12,12,34,.88)}
 .title-screen[data-region=centroeste] .title-flies i{background:#d8f0ff;box-shadow:0 0 10px 3px rgba(150,200,255,.5)}
+/* Sudeste (serras de Minas no fim da tarde): faixa azul-ardósia e luzinhas amarelas de poste */
+.title-screen[data-region=sudeste]{background:#0c1220}
+.title-screen[data-region=sudeste]::before{background:rgba(14,20,36,.88)}
+.title-screen[data-region=sudeste] .title-flies i{background:#ffe6a0;box-shadow:0 0 10px 3px rgba(255,200,110,.5)}
 /* letras do logo: pedaços de pergaminho, tábua, folha e o amarelo da lua, com contorno e sombra dura */
 .title .l{box-shadow:3px 3px 0 #06120a;outline:2px solid #06120a}
 .title .l.a{background:linear-gradient(180deg,#f6e9c4,#e8d29a);color:#3a2414}
@@ -1139,6 +1146,7 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 :is(#lsvg,.revela svg)[data-look="litoral"] .land{fill:url(#plitoral)}
 :is(#lsvg,.revela svg)[data-look="sertao"] .land{fill:url(#psertao)}
 :is(#lsvg,.revela svg)[data-look="cerrado"] .land{fill:url(#pcerrado)}
+:is(#lsvg,.revela svg)[data-look="minas"] .land{fill:url(#pminas)}
 #lsvg .river,.revela .river{stroke:#2a7ab8;stroke-width:14}
 .river-hi{fill:none;stroke:#8fd8ff;stroke-width:4;stroke-linecap:round;stroke-dasharray:16 12;opacity:.75}
 .lbay{fill:#2a7ab8;opacity:1}
@@ -1153,6 +1161,7 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 #mapsvg .land path:not(.river){fill:url(#pmata2);stroke:#f6e9c4}
 #mapsvg[data-region="nordeste"] .land path:not(.river){fill:url(#psertao2)}
 #mapsvg[data-region="centroeste"] .land path:not(.river){fill:url(#pcerrado2)}
+#mapsvg[data-region="sudeste"] .land path:not(.river){fill:url(#pminas2)}
 #mapsvg .land .river{stroke:#2a7ab8;stroke-width:7}
 .map-patterns rect{display:inline}   /* o mapa esconde os rect soltos (grade); o fundo dos padrões aparece */
 

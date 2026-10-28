@@ -27,7 +27,9 @@ function stepWork(s, t) {
    mapa do Maranhão: toada de bumba-meu-boi com sanfona e triângulo, e o tema do Nordeste), "pytuna" (cenas de Pytuna,
    com o tema dele), "jaci" (fim de capítulo: a lua volta a brilhar, com o tema dela), "battleNordeste" (batalha em São Luís: forró
    com o tema do Nordeste), "localCentroOeste" (Cuiabá e o mapa do Centro-Oeste: toada caipira com viola ponteada, sanfona e o
-   tema do Centro-Oeste em dueto), "battleCentroOeste" (batalha no Centro-Oeste: pagode de viola com bateria sertaneja), "battleBoss" (chefe: abertura
+   tema do Centro-Oeste em dueto), "battleCentroOeste" (batalha no Centro-Oeste: pagode de viola com bateria sertaneja), "localSudeste" (Belo Horizonte e o mapa do Sudeste: sertanejo
+   universitário com o tema do Sudeste em dupla), "battleMinas" (batalha em Minas: o mesmo, acelerado), "mpbSudeste" e
+   "funkSudeste" (o tema do Sudeste em MPB e em funk carioca, para São Paulo e o Rio; ainda sem uso), "battleBoss" (chefe: abertura
    sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
@@ -114,6 +116,28 @@ const MUS = (() => {
   function triangulo(when, vol, open) {
     for (const [fq, k] of [[2600, 1], [4180, .5], [5930, .3]]) synth("sine", fq, when, open ? .4 : .05, vol * k);
   }
+  // violão: corda beliscada que fecha rápido; aco = de aço (o do sertanejo, brilhante, com a palheta), senão de náilon
+  // (o da MPB e da bossa, macio). strum = o acorde batido, corda por corda (para cima, up, começa pelas agudas)
+  function violao(freq, when, dur, vol, aco) {
+    const f = X.createBiquadFilter(), g = X.createGain(), end = when + Math.min(dur, aco ? 1 : 1.4);
+    f.type = "lowpass"; f.frequency.setValueAtTime(Math.min(aco ? 6500 : 3200, freq * (aco ? 8 : 5)), when); f.frequency.exponentialRampToValueAtTime(Math.min(1800, freq * 2.5), when + .25);
+    g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .003); g.gain.exponentialRampToValueAtTime(vol * .4, when + .1); g.gain.exponentialRampToValueAtTime(.0001, end + .1);
+    f.connect(g).connect(bus.mix);
+    for (const [type, mul, det, k] of aco ? [["sawtooth", 1, -4, .6], ["sawtooth", 1, 5, .45], ["triangle", 2, 0, .3]] : [["triangle", 1, 0, 1], ["sine", 2, 0, .25]]) {
+      const o = X.createOscillator(), og = X.createGain(); o.type = type; o.frequency.value = freq * mul; o.detune.value = det; og.gain.value = k; o.connect(og).connect(f); o.start(when); o.stop(end + .15);
+    }
+    if (aco) noiseHit(when, .01, vol * .4, "highpass", 5000);
+  }
+  function strum(notes, when, dur, vol, up, aco) { (up ? [...notes].reverse() : notes).forEach((m, k) => violao(mtof(m), when + k * .011, dur, vol * (1 - k * .08), aco)); }
+  // funk carioca: o grave do 808 (cai do agudo para a nota e fica soando) e a palma
+  function bumbo808(freq, when, dur, vol) {
+    const o = X.createOscillator(), g = X.createGain(), sat = X.createWaveShaper(), cv = new Float32Array(256);
+    for (let k = 0; k < 256; k++) { const v = k / 128 - 1; cv[k] = Math.tanh(v * 2.2); }
+    sat.curve = cv; o.type = "sine"; o.frequency.setValueAtTime(freq * 3, when); o.frequency.exponentialRampToValueAtTime(freq, when + .05);
+    g.gain.value = 0; g.gain.setValueAtTime(vol, when); g.gain.setValueAtTime(vol * .8, when + dur * .5); g.gain.exponentialRampToValueAtTime(.0001, when + dur);
+    o.connect(sat).connect(g).connect(bus.mix); o.start(when); o.stop(when + dur + .02);
+  }
+  function palma(when, vol) { for (let k = 0; k < 3; k++) noiseHit(when + k * .009, k < 2 ? .01 : .09, vol, "bandpass", 1400, 1.2); }
   function flute(freq, when, dur, vol) {
     const o = X.createOscillator(), g = X.createGain(), lfo = X.createOscillator(), depth = X.createGain();
     o.type = "triangle"; o.frequency.value = freq; lfo.frequency.value = 5; depth.gain.value = freq * .005;
@@ -343,6 +367,20 @@ const MUS = (() => {
         [2, 0, 74, 6], [2, 6, 78, 2], [2, 8, 81, 4], [2, 12, 78, 4], [3, 0, 74, 12],
         [4, 0, 76, 4], [4, 4, 80, 4], [4, 8, 83, 4], [4, 12, 80, 4], [5, 0, 78, 8], [5, 8, 76, 4], [5, 12, 74, 4],
         [6, 0, 73, 4], [6, 4, 71, 4], [6, 8, 73, 4], [6, 12, 76, 4], [7, 0, 69, 12]]
+  };
+  /* Tema do Sudeste (leitmotif): em ré maior, um arpejo que sobe "ré–fá sustenido–lá–si" e cai devagar, no 3-3-2 que
+     cabe em qualquer roupa (sertanejo em Minas, MPB em São Paulo, funk no Rio). A: ré–si com sétima–mi menor–lá com
+     sétima, um acorde a cada dois compassos; no si com sétima o motivo volta meio tom acima (o ré vira ré sustenido).
+     B (a resposta, que abre): sol–sol menor (o empréstimo mineiro)–fá sustenido menor–lá com sétima. */
+  const SUDESTE_THEME = {
+    A: [[0, 0, 74, 3], [0, 3, 78, 3], [0, 6, 81, 2], [0, 8, 83, 4], [0, 12, 81, 4], [1, 0, 78, 6], [1, 6, 76, 2], [1, 8, 74, 8],
+        [2, 0, 75, 3], [2, 3, 78, 3], [2, 6, 81, 2], [2, 8, 83, 4], [2, 12, 81, 4], [3, 0, 78, 6], [3, 6, 76, 2], [3, 8, 71, 8],
+        [4, 0, 79, 3], [4, 3, 76, 3], [4, 6, 71, 2], [4, 8, 74, 4], [4, 12, 76, 4], [5, 0, 79, 6], [5, 6, 78, 2], [5, 8, 76, 8],
+        [6, 0, 73, 3], [6, 3, 76, 3], [6, 6, 79, 2], [6, 8, 78, 4], [6, 12, 76, 4], [7, 0, 73, 4], [7, 4, 71, 2], [7, 6, 73, 2], [7, 8, 74, 8]],
+    B: [[0, 0, 83, 6], [0, 6, 81, 2], [0, 8, 79, 4], [0, 12, 78, 4], [1, 0, 79, 8], [1, 8, 74, 4], [1, 12, 71, 4],
+        [2, 0, 82, 6], [2, 6, 81, 2], [2, 8, 79, 4], [2, 12, 77, 4], [3, 0, 79, 8], [3, 8, 74, 4], [3, 12, 70, 4],
+        [4, 0, 73, 3], [4, 3, 76, 3], [4, 6, 81, 2], [4, 8, 78, 4], [4, 12, 76, 4], [5, 0, 73, 8], [5, 8, 69, 4], [5, 12, 71, 4],
+        [6, 0, 73, 3], [6, 3, 76, 3], [6, 6, 79, 2], [6, 8, 78, 4], [6, 12, 76, 4], [7, 0, 73, 4], [7, 4, 71, 2], [7, 6, 73, 2], [7, 8, 74, 8]]
   };
   /* Tema de Pytuna (leitmotif do vilão, igual em todas as regiões): "ré – mi bemol – lá bemol – dó sustenido", grave e
      lento. Sobe meio tom, salta o trítono (ré a lá bemol, o intervalo mais instável que existe) e cai num dó sustenido
@@ -603,6 +641,103 @@ const MUS = (() => {
         if (part === "B") { sanfona(mtof(m.note), t, len, .017); viola(mtof(this.terca(m.note)), t, len, .016); }   // a sanfona canta, a viola faz a terça
         else { viola(mtof(m.note), t, len, .03); viola(mtof(this.terca(m.note)), t, len, .021); if (m.len >= 8) viola(mtof(m.note), t + d * 4, len * .5, .016); }   // o dueto
         if (part === "A2") sanfona(mtof(m.note - 12), t, len, .012);
+      }
+    },
+    // Belo Horizonte e o mapa do Sudeste: sertanejo universitário. Violão de aço na batida pop (para baixo e para cima),
+    // bateria com palma no 2 e no 4, baixo e a sanfona segurando os acordes; o tema do Sudeste em dupla, uma voz e a
+    // terça embaixo (terca). Forma: introdução de violão - A (a dupla) - B (a sanfona canta a resposta) - A' (oitava
+    // acima, a dupla com a sanfona dobrando)
+    localSudeste: {
+      bpm: 100, wet: .26, level: .32, swing: .04, form: ["I", "A", "B", "A2"], melody: null,
+      chords: [{bass: 38, notes: [50, 54, 57, 62, 66]}, {bass: 47, notes: [47, 51, 54, 57, 59]}, {bass: 40, notes: [52, 55, 59, 62, 64]}, {bass: 45, notes: [52, 55, 57, 61, 64]}],
+      chordsB: [{bass: 43, notes: [50, 55, 59, 62, 67]}, {bass: 43, notes: [50, 55, 58, 62, 67]}, {bass: 42, notes: [49, 54, 57, 61, 64]}, {bass: 45, notes: [52, 55, 57, 61, 64]}],
+      batida: {0: 0, 4: 0, 6: 1, 10: 1, 12: 0, 14: 1},   // passo: 0 = para baixo, 1 = para cima
+      // segunda voz da dupla: a nota da escala de ré maior duas casas abaixo
+      terca(m) { const sc = [2, 4, 6, 7, 9, 11, 1], k = sc.indexOf(((m % 12) + 12) % 12); if (k < 0) return m - 3; const pc = sc[(k + 5) % 7]; const d = ((m % 12) - pc + 12) % 12; return m - (d || 12); },
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? this.chordsB : this.chords)[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(part === "B" ? SUDESTE_THEME.B : SUDESTE_THEME.A, part === "A2" ? 12 : 0, part === "A2");
+        if (s in this.batida) strum(chord.notes.slice(this.batida[s] ? 2 : 0), t, d * 3, this.batida[s] ? .016 : .024, this.batida[s], true);
+        if (part !== "I") {
+          if (s === 0 || s === 8 || (s === 10 && barIn % 2)) kick(t, .1);
+          if (s === 4 || s === 12) { snare(t, .022); palma(t, .012); }
+          if (s % 2 === 0) hat(t, .006);
+          if ([0, 7, 8, 12].includes(s)) synth("triangle", mtof(chord.bass - 12 + (s === 12 ? 7 : s === 7 ? 12 : 0)), t, d * 2.5, .1);
+          if (s === 0 && barIn % 2 === 0) chord.notes.slice(1).forEach(m => sanfona(mtof(m + 12), t, d * 31, .003));
+        }
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        const len = m.len * d * .92;
+        if (part === "B") { sanfona(mtof(m.note), t, len, .018); violao(mtof(this.terca(m.note)), t, len, .012, true); }
+        else { lead(mtof(m.note - 12), t, len, .016); lead(mtof(this.terca(m.note) - 12), t, len, .009); if (part === "A2") sanfona(mtof(m.note), t, len, .012); }   // a dupla
+      }
+    },
+    // batalha em Minas: o mesmo sertanejo universitário acelerado, bumbo dobrado, violão batendo em colcheia e a
+    // guitarra (lead) com o tema. Forma A - A' - B - C (ponte de bateria que cresce)
+    battleMinas: {
+      bpm: 150, wet: .2, level: .44, swing: .02, form: ["A", "A2", "B", "C"], melody: null,
+      play(i, t, d) {
+        const N = TRACKS.localSudeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)], bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "C" ? null : themeLine(part === "B" ? SUDESTE_THEME.B : SUDESTE_THEME.A, part === "A2" ? 12 : 0, part !== "A"); hat(t, .02, true); }
+        if (s === 0 || s === 3 || s === 8 || s === 11) kick(t, .1);
+        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) { snare(t, .03); palma(t, .014); }
+        hat(t, s % 4 === 2 ? .01 : .005);
+        if (bridge) return;
+        if (s % 2 === 0) strum(chord.notes.slice(s % 4 ? 2 : 0), t, d * 1.6, s % 4 ? .005 : .008, s % 4 === 2, true);
+        if (s % 4 === 0 || s === 14) synth("triangle", mtof(chord.bass - 12 + (s === 8 ? 7 : 0)), t, d * 1.8, .1);
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        const len = m.len * d * .9;
+        if (part === "B") { sanfona(mtof(m.note), t, len, .02); sanfona(mtof(N.terca(m.note)), t, len, .01); }
+        else { lead(mtof(m.note - (part === "A2" ? 0 : 12)), t, len, .018); lead(mtof(N.terca(m.note) - 12), t, len, .009); }
+      }
+    },
+    // (para escolher o estilo de São Paulo) MPB: violão de náilon na batida da bossa, piano elétrico com acordes de
+    // sétima e nona, escovinha e o tema do Sudeste na flauta; B no piano elétrico, A' com o vibrafone dobrando
+    mpbSudeste: {
+      bpm: 116, wet: .34, level: .42, swing: .1, form: ["I", "A", "B", "A2"], melody: null,
+      chords: [{bass: 38, notes: [54, 57, 61, 64]}, {bass: 47, notes: [51, 54, 57, 60]}, {bass: 40, notes: [55, 59, 62, 66]}, {bass: 45, notes: [55, 59, 61, 66]}],
+      chordsB: [{bass: 43, notes: [54, 59, 62, 66]}, {bass: 43, notes: [52, 58, 62, 67]}, {bass: 42, notes: [52, 57, 61, 64]}, {bass: 45, notes: [55, 59, 61, 66]}],
+      bossa: [0, 3, 6, 10, 13],   // a batida do violão da bossa (os acordes); o polegar faz o baixo no 1 e no 3
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? this.chordsB : this.chords)[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(part === "B" ? SUDESTE_THEME.B : SUDESTE_THEME.A, 0, part === "A2");
+        if (s === 0 || s === 8) violao(mtof(chord.bass + (s && barIn % 2 ? 7 : 0)), t, d * 6, .05);
+        if (this.bossa.includes(s)) chord.notes.forEach((m, k) => violao(mtof(m), t + k * .006, d * 2.4, .016));
+        if (part !== "I") {
+          noiseHit(t, .05, s % 4 === 0 ? .006 : .003, "bandpass", 4200, .8);   // escovinha
+          if (s === 0 || s === 10) kick(t, .035);
+          if (s === 0 && barIn % 2 === 0) { chord.notes.forEach(m => ep(mtof(m + 12), t, d * 24, .007)); synth("sine", mtof(chord.bass - 12), t, d * 14, .06); }
+        }
+        if (Math.random() < .002) bird(t);
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        const len = m.len * d * .95;
+        if (part === "B") ep(mtof(m.note), t, len, .03);
+        else { flute(mtof(m.note), t, len, .026); if (part === "A2") bell(mtof(m.note + 12), t, .008, 1.2); }
+      }
+    },
+    // (para escolher o estilo do Rio) funk carioca: o tamborzão (o grave do 808 e o tambor), palma, chimbal e um
+    // sintetizador cantando o tema; B com o metal (acordes curtos) respondendo
+    funkSudeste: {
+      bpm: 130, wet: .16, level: .32, form: ["I", "A", "B", "A2"], melody: null,
+      tambor: {0: "b", 3: "t", 6: "b", 8: "t", 10: "b", 12: "t", 14: "t"},   // b = grave do 808, t = tambor
+      play(i, t, d) {
+        const N = TRACKS.localSudeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)], h = this.tambor[s];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(part === "B" ? SUDESTE_THEME.B : SUDESTE_THEME.A, part === "A2" ? 12 : 0, part === "A2");
+        if (h === "b") bumbo808(mtof(chord.bass - 12), t, d * (s === 10 ? 4 : 3), .05);
+        if (h === "t") { atabaque(t, .07, s === 14); noiseHit(t, .06, .012, "bandpass", 700, 1.2); }
+        if (part === "I") return;
+        if (s === 4 || s === 12) palma(t, .02);
+        if (s % 2 === 0) hat(t, s % 4 ? .004 : .007);
+        if (part === "B" && [0, 3, 6].includes(s) && barIn % 2 === 0) chord.notes.slice(1).forEach(m => synth("sawtooth", mtof(m + 12), t, d * 1.2, .006, 2400));   // metal
+        if (s === 0 && barIn % 2 === 0) pad(chord.notes.slice(1), t, d * 32, .006);
+        const m = this.melody && this.melody[i % 128];
+        if (m) { lead(mtof(m.note), t, m.len * d * .85, .016); synth("sawtooth", mtof(m.note - 12), t, m.len * d * .85, .006, 1800); }
       }
     },
     // Pytuna em cena: zumbido grave do coro, vento, coração batendo e a badalada; o tema de Pytuna (PYTUNA_THEME) numa voz
@@ -1068,6 +1203,7 @@ function musicStart(id) {
   id = id || "battleCapo";
   if ((id === "local" && regionOfCity(curCity()) === "nordeste") || (id === "map" && MAP_REGION === "nordeste")) id = "localNordeste";   // Nordeste: a toada do boi
   if ((id === "local" && regionOfCity(curCity()) === "centroeste") || (id === "map" && MAP_REGION === "centroeste")) id = "localCentroOeste";   // Centro-Oeste: a toada caipira
+  if ((id === "local" && regionOfCity(curCity()) === "sudeste") || (id === "map" && MAP_REGION === "sudeste")) id = "localSudeste";   // Sudeste: sertanejo universitário (Minas)
   if (id === "local" && G.night) id = "localNight";   // à noite a música da exploração muda de clima
   if (id === "map" && MAP_REGION === "norte") id = G.night ? "mapParaNight" : "mapPara";   // mapa do Norte: guitarrada de dia e de noite
   if (MUS.has(id)) { legacyStop(); MUS.play(id); }

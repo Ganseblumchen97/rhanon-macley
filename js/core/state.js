@@ -69,8 +69,10 @@ function debugSetup() {
     if (city === "petrolina") G.passagemPET = true;
     if (city === "bonito" || city === "brasilia") G.passagemBON = true;
     if (city === "brasilia") G.passagemBSB = true;
-    if (CITY[city].map === "centroeste") { NORDESTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.app_cordel = true; G.narrated.nordeste_fim = true; G.passagemTHE = G.passagemREC = G.passagemPET = true; }   // e o Nordeste também
-    if (CITY[city].map !== "norte") { NORTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.site_feira = true; G.narrated.norte_fim = true; G.regions = Object.assign({norte: true, nordeste: true}, CITY[city].map === "centroeste" && {centroeste: true}); syncRegion(); buildLocalNodes(); }   // chegou de avião: o Norte está completo
+    const regs = ["norte", "nordeste", "centroeste", "sudeste"], ri = regs.indexOf(CITY[city].map);   // regiões na ordem da viagem
+    if (ri >= 2) { NORDESTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.app_cordel = true; G.narrated.nordeste_fim = true; G.passagemTHE = G.passagemREC = G.passagemPET = true; }   // e o Nordeste também
+    if (ri >= 3) { CENTROESTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.mapa_queimadas = true; G.narrated.centroeste_fim = true; G.passagemBON = G.passagemBSB = true; }   // e o Centro-Oeste
+    if (ri >= 1) { NORTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.site_feira = true; G.narrated.norte_fim = true; G.regions = Object.fromEntries(regs.slice(0, ri + 1).map(k => [k, true])); syncRegion(); buildLocalNodes(); }   // chegou de avião: o Norte está completo
     G.sub = fase;
   }
   save();

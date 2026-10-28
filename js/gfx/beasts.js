@@ -1152,6 +1152,9 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
   cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara, carranca, nego_dagua: negoDagua,
   martim: (pose, f) => pombo(pose, f, {b: "#2a7ac8", B: "#1a4a8a", n: "#f4f0e4", p: "#e8702a", w: "#4aa8e0", y: "#2a2a2a"}),   // martim-pescador: azul, colar branco e peito laranja
+  tucano: (pose, f) => pombo(pose, f, {b: "#1e1e22", B: "#0e0e12", n: "#f8f0e0", p: "#1e1e22", w: "#2a2a30", y: "#f08a1a"}),   // tucano-toco: preto, papo branco e o bicão laranja
+  quero_quero: (pose, f) => garca(pose, f, {b: "#b8b8b0", B: "#7a7a74", n: "#e8e8e0", N: "#2a2a2a", y: "#d8504a", Y: "#a03a3a", k: "#1a1a1a"}),   // quero-quero: cinza, peito preto, pernas vermelhas
+  corpo_seco: pessoa({pal: {s: "#8a8a7a", S: "#5e5e52", h: "#3a3a32"}, shirt: ["#6a5a48", "#4a3e30"], pants: ["#5a4a38", "#3e3226"], noBand: true}),   // Corpo-seco: pele cinza grudada no osso e roupa velha da cor do tronco
   ema: (pose, f) => garca(pose, f, {b: "#9a9488", B: "#6a645a", n: "#8a8478", N: "#5a544a", y: "#3a3428", Y: "#22201a", k: "#6a645a"}),   // ema: penas cinza-pardas, pernas fortes
   papagaio: (pose, f) => pombo(pose, f, {b: "#3aa84a", B: "#22782e", n: "#f0d020", p: "#3aa84a", w: "#2a8a3a", y: "#2a2a2a"}),   // papagaio-verdadeiro: verde, cara amarela
   romaozinho: pessoa({pal: {s: "#b47a48", S: "#8a5a32", h: "#1a1420"}, shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#8a6a3a", "#5e4626"], noBand: true}),   // Romãozinho: menino de camisa velha e calça curta

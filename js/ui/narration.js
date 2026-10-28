@@ -119,7 +119,7 @@ function bossStory(id, done) {
   });
   if (estrelaCalm() >= 1 && !G.narrated.centroeste_fim) steps.push(next => {
     G.narrated.centroeste_fim = true; save(); musicStart("jaci");   // as estrelas voltam ao céu do cerrado: o tema da esperança
-    narrate(NARRA_PYT.centroeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Centro-Oeste"), t("A história continua no Sudeste. Em breve!")); setTimeout(next, 1500); });
+    narrate(NARRA_PYT.centroeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Centro-Oeste"), t(G.portfolio.mapa_queimadas ? "A história continua no Sudeste: o voo sai do Aeroporto de Brasília." : "A história continua no Sudeste. Antes, entregue o mapa de queimadas da Iara no Plano Piloto.")); setTimeout(next, 1500); });
   });
   const run = () => steps.length ? steps.shift()(run) : done && done();
   run();

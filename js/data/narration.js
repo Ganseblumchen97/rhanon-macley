@@ -27,6 +27,12 @@ const NARRA = {
     {r: "E tinha bode pra todo lado, vô. Um deles comeu minha corda do arco."},
     "Bode come tudo, curumim. Até corda de arco. Agora deixa eu contar da caatinga."
   ],
+  bh: [
+    "De avião outra vez, curumim, agora pro Sudeste. Belo Horizonte, no meio das montanhas de Minas.",
+    "Ali a noite é cheia de poste aceso. Tanta luz que Jaci quase some no céu, e os encantados ficam escondidos.",
+    {r: "E o povo me deu pão de queijo antes de dar bom-dia, vô."},
+    "Mineiro é assim: primeiro a comida, depois a prosa. Agora deixa eu contar das serras."
+  ],
   brasilia: [
     "E o menino chegou na cidade do meio, a de concreto, que o Pytuna tinha falado. Brasília.",
     "Prédio branco, céu enorme e, na seca, o horizonte inteiro cor de fumaça. Queimada pra todo lado do cerrado.",
@@ -59,6 +65,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  muriqui_rei: ["O Muriqui-rei é o macaco mais calmo da mata, curumim. Briga de muriqui se resolve com abraço.", "A fumaça desceu nas grotas da serra e ele esqueceu como se abraça sem apertar.", {r: "Ele me deu um abraço que tirou meus pés do chão, vô."}, "Quando a fumaça saiu, o abraço ficou macio. Era o jeito dele de pedir desculpa."],
+  corpo_seco: ["O Corpo-seco foi um homem ruim, curumim. Tão ruim que nem a terra quis ficar com ele. Secou e virou quase árvore.", "A fumaça entrou no tronco dele e deu força pra ele andar de novo pela serra, de noite.", {r: "Ele era só galho e tristeza, vô. Nem ele queria estar ali."}, "Por isso tu acalmou ele, e não brigou. Ele voltou pro tronco dele e ficou quieto, olhando a cidade acesa."],
   tamandua_rei: ["O Tamanduá-rei era o mais velho do cerrado, curumim. Andava devagar, comia cupim e não mexia com ninguém.", "Mas a queimada chegou no cupinzeiro dele. E tamanduá de unha de fora é coisa séria: abraça até onça.", {r: "Ele me deu um abraço que eu senti a costela estalar, vô."}, "Abraço de tamanduá é assim. Depois de acalmado, deitou e se cobriu com o próprio rabo pra dormir."],
   romaozinho: ["O Romãozinho foi um menino ruim com a mãe, curumim. Ela rogou praga, e ele ficou assim: sem crescer, sem morrer, jogando pedra no telhado dos outros.", "A fumaça deixou ele mais bravo ainda. As pedras viravam brasa.", {r: "Eu não briguei com ele, vô. Brinquei. Joguei pedra no rio com ele até cansar."}, "E foi isso que acalmou o menino. Fazia cem anos que ninguém brincava com ele."],
   preguica_gigante: ["A Preguiça-gigante dormia no fundo da gruta havia dez mil anos, curumim. Virou pedra e osso, e o lago azul cobriu ela.", "A fumaça entrou na gruta e acordou o que devia ficar dormindo. Bicho de outro tempo, perdido no nosso.", {r: "Ela era devagar, vô. Mas cada unhada derrubava uma estalactite."}, "E tu cantou pra ela dormir de novo, eu sei. Tu sempre cantou mal, mas bicho velho não liga pra isso."],

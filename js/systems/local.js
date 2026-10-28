@@ -51,6 +51,11 @@ function selectSub(id, msg) {
     btn(t("Entrar na orla"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo do sertão."));
   }
+  else if (id === "mercadocentral") {
+    btn(t("Entrar no Mercado Central"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo de BH."));
+    lh(t("O aeroporto fica no mapa do Sudeste (Esc): de lá sai o voo de volta para Brasília."));
+  }
   else if (id === "planopiloto") {
     btn(t("Entrar no Plano Piloto"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e a Iara, da brigada de incêndio, que precisa de um programador."));

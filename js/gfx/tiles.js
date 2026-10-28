@@ -28,6 +28,12 @@ const TILE_PAL = {
   // Brasília: o Parque Nacional, capim do cerrado verde-amarelado, árvore torta (cerrado: true) e água mineral azul-clara
   parquebsb: {g1: "#a8a856", g2: "#989848", tall: "#b8a84a", tallHi: "#e8d070", path: "#c89060", path2: "#a8744a", leaf: "#5a8a3a", leaf2: "#3a6a2a", leafHi: "#8ab85a", trunk: "#4a3020", rock: "#a89a88", rock2: "#7a6a58", water: "#3aa8d8", water2: "#a8e8f8", wood: "#9c6339", wood2: "#6d4329", cerrado: true},
   // Brasília: o Plano Piloto, calçada de concreto claro, prédio branco de laje cinza e ipê-roxo florido nas quadras
+  // Belo Horizonte: a Serra do Curral, campo de pedra (capim ralo sobre a canga cor de ferro), trilha de terra vermelha,
+  // mata verde-escura nas grotas e pedra escura de minério
+  serracurral: {g1: "#8a8a5a", g2: "#7a7a4e", tall: "#9a9a4a", tallHi: "#c8c070", path: "#a8644a", path2: "#88503a", leaf: "#3a6a3a", leaf2: "#2a5228", leafHi: "#5a8a4a", trunk: "#4a3020", rock: "#6a5a58", rock2: "#4a3e3c", water: "#3a7ab0", water2: "#8ac0e0", wood: "#9c6339", wood2: "#6d4329"},
+  // Belo Horizonte: a rua do Mercado Central, pedra portuguesa clara, casario mineiro branco de janela colorida, telhado
+  // colonial e quaresmeira roxa nas calçadas (o símbolo das serras de Minas)
+  mercadocentral: {g1: "#c8c0b0", g2: "#b8b0a0", tall: "#6a9a4a", tallHi: "#9ac86a", path: "#7e7468", path2: "#625a50", leaf: "#8a4ab8", leaf2: "#6a2a98", leafHi: "#c890e8", trunk: "#5a3a22", rock: "#a89a88", rock2: "#7a6a58", water: "#4a7a9a", water2: "#8ab8d0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22", walls: ["#f0ece0", "#3a6ab8", "#f0ece0", "#e8c048", "#2a8a6a"]},
   planopiloto: {g1: "#c8c8b8", g2: "#b8b8a8", tall: "#7a9a4a", tallHi: "#a8c86a", path: "#8a8a80", path2: "#6e6e66", leaf: "#b85ad8", leaf2: "#8a3aa8", leafHi: "#e09af0", trunk: "#5a3a2a", rock: "#a8a49a", rock2: "#7a766e", water: "#3a8ac8", water2: "#9ad0f0", wood: "#9c6339", wood2: "#6d4329", roof: "#a8a8a0", roof2: "#7a7a72", walls: ["#f0f0e8", "#e8e4d8", "#d8e8f0", "#f0e6c8", "#c8d8e8"]},
   // Bonito: o centro (calçada clara, casa baixa colorida) e o Rio da Prata (mata verde e água azul-turquesa transparente)
   centrobonito: {g1: "#c8bca0", g2: "#b8ac90", tall: "#6a9a4a", tallHi: "#9ac86a", path: "#8a7e6a", path2: "#6e6454", leaf: "#2f7a3a", leaf2: "#22602a", leafHi: "#4a9a4a", trunk: "#6d4329", rock: "#a89a88", rock2: "#7a6a58", water: "#3ab8c8", water2: "#a8f0f0", wood: "#9c6339", wood2: "#6d4329", roof: "#c06a3a", roof2: "#8a4422", walls: ["#f0e6d0", "#8ad0c8", "#f0c860", "#e89aaa", "#a8d888"]},

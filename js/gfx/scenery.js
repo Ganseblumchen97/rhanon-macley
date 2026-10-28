@@ -16,6 +16,7 @@ const SCENES = {
   lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
+  serracurral: {sky: ["#9ab8e0", "#c0cce0", "#e8d8c0"], far: "#5a6a8a", trees: "copa", plat: "pedra", water: true},   // Serra do Curral: céu de serra e a cordilheira azulada lá atrás
   parquebsb:   {sky: ["#f0d8a0", "#e8c890", "#b8c8d8"], far: "#7a8a3a", trees: "campo", plat: "grama", water: true},   // Parque Nacional de Brasília: céu de seca e o campo do cerrado
   gruta:       {sky: ["#14141e", "#1c1c2c", "#24243a"], far: "#3a3848", trees: "campo", plat: "pedra", water: true},   // Gruta do Lago Azul: teto de pedra escuro e o lago azul
   rioprata:    {sky: ["#a8e0f0", "#88d0d8", "#6ac0a8"], far: "#2f7a42", trees: "copa", plat: "areia", water: true},   // Rio da Prata: mata verde e água cristalina
@@ -276,7 +277,7 @@ addEventListener("resize", () => drawScenery());
 /* ---------- tela inicial: o fundo é da região do save ---------- */
 // cada região tem o seu desenho (TITLE_BG) e o montinho de chão debaixo do Rhanon (plat); região sem desenho usa o Norte.
 // A faixa preta inclinada e as letras recortadas (styles.css, com as cores de cada região em [data-region]) dão o Persona
-const TITLE_BG = {norte: {plat: "mata", draw: titleForest}, nordeste: {plat: "caatinga", draw: titleSertao}, centroeste: {plat: "varzea", draw: titlePantanal}};
+const TITLE_BG = {norte: {plat: "mata", draw: titleForest}, nordeste: {plat: "caatinga", draw: titleSertao}, centroeste: {plat: "varzea", draw: titlePantanal}, sudeste: {plat: "serra", draw: titleMinas}};
 function drawTitleBg() {
   const cv = $("titleBg");
   if (!cv || $("titleScreen").hidden) return;
@@ -403,5 +404,43 @@ function titlePantanal(W, H, rect, blob) {
     blob(px + tw / 2, top, 3, ink);
   };
   palm(W * .05, H * .22, 3); palm(W * .12, H * .36, 2); palm(W * .9, H * .18, 3); palm(W * .83, H * .4, 2);
+}
+// Sudeste: as serras de Minas no fim da tarde. Céu do azul ao laranja, Jaci pálida e meio coberta pela fumaça, serras
+// em camadas azuladas, a igrejinha barroca de duas torres no alto do morro e o casario na encosta, cheio de poste aceso
+// (mais luz de poste que de lua)
+function titleMinas(W, H, rect, blob) {
+  const rnd = sceneRng(6161), hz = H * .6, ink = "#0c1220";
+  const sky = ["#1a2244", "#2a3462", "#4a4a80", "#7a5a8a", "#c06a6a", "#f09a5a", "#f8c870"];
+  sky.forEach((c, i) => { const a = Math.round(hz * i / sky.length), b = Math.round(hz * (i + 1) / sky.length); rect(c, 0, a, W, b - a); if (i) for (let px = 0; px < W; px += 2) rect(c, px + (a % 2), a - 1, 1, 1); });
+  for (let i = 0; i < W / 9; i++) rect("#d8d8f0", rnd() * W, rnd() * hz * .3, 1, 1);   // poucas estrelas: a luz da cidade apaga o resto
+  const mx = W * .74, my = hz * .3, mr = Math.min(W, H) * .1;
+  [[1.8, "rgba(220,220,255,.06)"], [1.3, "rgba(220,220,255,.1)"]].forEach(([k, c]) => blob(mx, my, mr * k, c));
+  blob(mx, my, mr, "#d0d0e0"); blob(mx + mr * .3, my - mr * .2, mr * .2, "#b8b8cc");
+  [[-.5, .1, .6], [-.2, .5, .45], [-.8, -.3, .4]].forEach(([dx, dy, k]) => blob(mx + mr * dx, my + mr * dy, mr * k, "#4a4658"));
+  // três camadas de serra, a de trás clara e a da frente quase preta
+  [["#5a6a9a", .5, 18, 1], ["#3a4a72", .62, 14, 2], ["#222c4a", .74, 10, 3]].forEach(([c, base, amp, seed]) => {
+    for (let px = 0; px < W; px += 2) { const y = H * base - Math.abs(Math.sin(px / (40 + seed * 9) + seed) * amp) - Math.sin(px / 17 + seed) * 3; rect(c, px, y, 2, H - y); }
+  });
+  // o morro da frente com a igrejinha no alto
+  const cx = W * .3, top = H * .56;
+  for (let px = 0; px < W; px++) { const d = (px - cx) / (W * .34), y = top + d * d * H * .3; if (y < H) rect(ink, px, y, 1, H - y); }
+  const ch = (x0, y0) => {
+    rect("#e8e0d0", x0 - 9, y0 - 12, 18, 12); rect("#e8e0d0", x0 - 13, y0 - 20, 6, 20); rect("#e8e0d0", x0 + 7, y0 - 20, 6, 20);   // nave e as duas torres
+    rect("#c88a3a", x0 - 13, y0 - 23, 6, 3); rect("#c88a3a", x0 + 7, y0 - 23, 6, 3); rect("#c88a3a", x0 - 10, y0 - 15, 20, 3);   // cúpulas e frontão
+    rect(ink, x0 - 11, y0 - 26, 2, 3); rect(ink, x0 + 9, y0 - 26, 2, 3);   // cruzes
+    rect("#5a3a22", x0 - 2, y0 - 6, 4, 6); rect("#ffd870", x0 - 11, y0 - 16, 2, 2); rect("#ffd870", x0 + 9, y0 - 16, 2, 2);
+  };
+  ch(cx, top + 1);
+  // casario na encosta: janelinhas acesas e postes com halo
+  for (let k = 0; k < 26; k++) {
+    const px = rnd() * W, d = (px - cx) / (W * .34), y = top + d * d * H * .3 + 6 + rnd() * H * .2;
+    if (y > H * .92 || Math.abs(px - cx) < 16) continue;
+    rect("#1c2440", px - 4, y - 4, 8, 5); rect(rnd() < .7 ? "#ffd870" : "#3a4466", px - 2, y - 3, 2, 2); rect("#8a3a22", px - 5, y - 6, 10, 2);
+  }
+  for (let k = 0; k < 9; k++) {
+    const px = W * (.05 + k * .11) + rnd() * 6, d = (px - cx) / (W * .34), y = Math.min(H * .9, top + d * d * H * .3 + 12 + rnd() * 14);
+    blob(px, y - 8, 6, "rgba(255,210,120,.18)"); rect(ink, px, y - 8, 1, 9); rect("#ffe6a0", px - 1, y - 9, 3, 2);
+  }
+  rect(ink, 0, H * .92, W, H);
 }
 addEventListener("resize", () => drawTitleBg());

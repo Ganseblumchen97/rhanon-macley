@@ -163,6 +163,60 @@ const STAGES = {
       "TTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
+  // Belo Horizonte (Sudeste): a rua do Mercado Central, casario mineiro com a pensão (O), barracas de queijo e doce,
+  // quaresmeiras (T) e moradores; a saída da direita volta pro mapa e a passagem da esquerda desce pra Serra do Curral
+  mercadocentral: {
+    safe: true, next: "serracurral",
+    rows: [
+      "########################",
+      "########################",
+      "#..f....-.......OOO...f#",
+      "#.KKK...-..KKK..OOO....#",
+      "#..V....-...C....-.....#",
+      "#..P....-........-..P..#",
+      "G---------------------SE",
+      "#..T....-.....T.....P..#",
+      "#.####..-..####........#",
+      "#.####..-..####..f.....#",
+      "########################"
+    ]
+  },
+  // Belo Horizonte: a Serra do Curral (gerado por tools/gerar_mapas.py)
+  serracurral: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~TTTTTTTT.,..,...,....T",
+      "TTT.TT...,T..,,T..,T..,.o..,T.,.TT,.~~,TTTTT..-----------S-E",
+      "TT...TT.TTTTTTTTa.,...,......,.TT,.T~~T.TTT...-,....,,.....T",
+      "TTTTT..,,.TTT..,---------------.T.TT~~.TTT....-,..a..,,..,TT",
+      "TTToTTT.To..TT.,-.........,..,-.T.T.~~T,,,T,,.-,~~~~~T..TTTT",
+      "TTTT.,TT,.T.TT,,-.,T,..,...T,.-...T,~~..T,T..a-~~~~~~~TT.TTT",
+      "TTT.TTT.,TTT.T,.-...T.aTTTT.,.-.,,..~~.,T.T,..-~~~~~~~.TTTTT",
+      "TTT.T.TTTT,.....-..a..TTTT,,..-.....~~T.T.T.,,-~~~~~~~,.,TTT",
+      "TT..T.TTT,TTT...-.o.TT,.T.B.,.-,,..T~~TTT.....-.~~~~~,....TT",
+      "TT.,T,TTTTTT..oa-........T..,.-..,,.~~TTT,.T..-.,..a.,.,,.TT",
+      "TT..o..T,a,,.,..-,.TTT.T..T...-,,,.T~~T,T.TT.,-----------.TT",
+      "TT,T,,..,....,..-..TTT...T..,.-.,T,.~~T.To..TT......,...-.TT",
+      "TTT.T.-----------..TT.T,.,..T.-.....~~,,.TTTT..TTT.,..,.-.TT",
+      "TTTTT.-.....,,...aT.T.T.TaT...-,...a~~..,TT,T.TTTTT,TTT.-.TT",
+      "TTTTT,-.,..,,,,TTTT.TToTTTT,T.------==---.T.TT,..TTTT..,-.,T",
+      "TTTTf.-...T.,T.o,,TTToo,oTT.TT...,..~~..-,TT,TTTTTT,T,..-.,T",
+      "TTT.,.-.~~~~~TT.TTT..T....,T.T.,.,..~~,.-...TT,T.TTTT.,,-..T",
+      "TTT,..-~~~~~~~.T,T.TT.f,,.,,...,TT.T~~o.-.,,.T..T.,TT.a,-,.T",
+      "TTT,,.-~~~~~~~TTT....,.a....,T.T.TT,~~a.-..,T.TTTT...T,,-.,T",
+      "TT.o,.-~~~~~~~T,,.---------.,,FTTTT,~~,.-..,o.TTT.T,.T,.-.TT",
+      "TTT,.,-.~~~~~T..,.-,..,,,,...,T....T~~..-.,,T..,o,,.....-.TT",
+      "TT,T..-.,TT.T..,,.-.....,....T.TTTTT~~T.-....,..,.......-,TT",
+      "TTT.T.-.,.......,.-..,.a...TT,TT...T~~,.-----------------..T",
+      "TT.T.,-........,..-.fT.TTTTT,..TTT,.~~TT,a.......,......,TTT",
+      "TTT...-------------,,TT.TTTTTT.TTTTT~~.TTTTTTo,f,f.o...TT.TT",
+      "TTTaT..,..,,.,.....TTTTToT,TT,TTT,.T~~TT..T.TTTT,TTTT.TT..TT",
+      "TTT,TT...,,,.,.,.TT..,,T..T..T,T.T,T~~...,,TTT.T.T,.TT..TTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Brasília: o Parque Nacional (gerado por tools/gerar_mapas.py)
   parquebsb: {
     next: null,
