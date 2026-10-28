@@ -868,6 +868,38 @@ function mapinguari(pose, f) {
   return {c: d.canvas(), head: [hx, hy]};
 }
 
+// Pé-de-garrafa (Chapada, de noite): bicho peludo de pé só, pulando, com o pé redondo como fundo de garrafa (a pegada),
+// braços compridos de unha preta e dois olhos acesos no meio do pelo
+function peGarrafa(pose, f) {
+  const d = rigGrid(1, 48, 56), G = 53, C = {b: "#5a4430", B: "#3a2a1c", l: "#7a6044", k: "#1e140c", g: "#4a8a7a", G: "#2a5a50", e: "#ffd23a"};
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  if (pose === "ko") {   // caído de lado, o pé de garrafa pra cima
+    d.part().ellipse(24, 46, 15, 7, C.b, C.B, .5).dots([[16, 43], [22, 41], [28, 42], [33, 44]], C.l);
+    d.part().limb(36, 46, 44, 40, 4, C.b, C.B).ellipse(45, 38, 3.5, 4, C.g, C.G, .6).ellipse(45, 38, 1.6, 2, C.G);
+    d.part().limb(14, 48, 6, 50, 3, C.b, C.B);
+    d.part().ellipse(12, 41, 6, 5.5, C.b, C.B, .6); bEye(d, 10, 40, o); bEye(d, 14, 40, o);
+    return {c: d.canvas(), head: [12, 38]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt";
+  const hop = pose === "idle" ? (f ? -2 : 0) : cr ? 4 : at ? -3 : 0, cx = 25 + (at ? -3 : hu ? 3 : 0), cy = 26 + hop;
+  // a perna única, no meio, e o pé redondo de garrafa (com o fundo marcado)
+  d.part().limb(cx, cy + 12, cx, G - 3 + Math.min(0, hop), 5, C.b, C.B);
+  d.part().ellipse(cx, G - 1 + Math.min(0, hop), 5, 2.6, C.g, C.G, .6).ellipse(cx, G - 1 + Math.min(0, hop), 2.2, 1.1, C.G);
+  d.part().limb(cx + 8, cy - 4, cx + 14, cy + 10, 3.5, C.B).dots([[cx + 13, cy + 12], [cx + 15, cy + 12]], C.k);   // braço de trás
+  d.part().ellipse(cx, cy, 12, 15, C.b, C.B, .5);
+  for (const [x, y] of [[-7, -10], [-2, -13], [5, -11], [9, -4], [-10, 1], [9, 5], [-7, 9], [4, 12], [-1, 3]]) d.limb(cx + x, cy + y, cx + x - 1, cy + y + 3, 1, C.l);   // pelo
+  const hand = at ? [cx - 20, cy - 4] : cr ? [cx - 14, cy + 12] : [cx - 13, cy + 9];
+  d.part().limb(cx - 8, cy - 5, hand[0], hand[1], 3.5, C.b, C.B).dots([[hand[0] - 2, hand[1]], [hand[0] - 1, hand[1] + 2], [hand[0] + 1, hand[1] + 2]], C.k);   // unhas
+  const hx = cx - 1, hy = cy - 14;
+  d.part().ellipse(hx, hy, 8, 7, C.b, C.B, .6);
+  for (const [x, y] of [[-6, -5], [-2, -7], [3, -6], [6, -3]]) d.limb(hx + x, hy + y, hx + x - 1, hy + y - 3, 1, C.l);   // cabelo arrepiado
+  if (o.eye === "shut") d.rect(hx - 5, hy, 3, 1, BN).rect(hx + 1, hy, 3, 1, BN);
+  else { d.ellipse(hx - 3, hy, 1.8, 1.8, C.e).ellipse(hx + 2, hy, 1.8, 1.8, C.e).dots([[hx - 3, hy], [hx + 2, hy]], BN); if (o.eye === "angry") d.limb(hx - 6, hy - 3, hx + 5, hy - 3, 1, BN); }
+  if (at) d.part().ellipse(hx - 1, hy + 4, 2.5, 2, C.k);   // o grito
+  return {c: d.canvas(), head: [hx, hy]};
+}
+
+/* ---------- Belém: pombo, gente da cidade
 /* ---------- Belém: pombo, gente da cidade (malandros) e as visagens ---------- */
 // pombo: corpo cinza, pescoço furta-cor (verde e roxo), pés laranja
 function pombo(pose, f, C = {b: "#8a8a9a", B: "#5e5e6e", n: "#5aa07a", p: "#9a6ab0", w: "#76768a", y: "#e86a3a"}) {
@@ -1120,6 +1152,9 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
   cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara, carranca, nego_dagua: negoDagua,
   martim: (pose, f) => pombo(pose, f, {b: "#2a7ac8", B: "#1a4a8a", n: "#f4f0e4", p: "#e8702a", w: "#4aa8e0", y: "#2a2a2a"}),   // martim-pescador: azul, colar branco e peito laranja
+  seriema: (pose, f) => garca(pose, f, {b: "#b8a888", B: "#8a7a5e", n: "#c8bca0", N: "#8a7a5e", y: "#d8402a", Y: "#a02a1a", k: "#d8402a"}),   // seriema: pardo-cinza, bico e pernas vermelhos
+  arara_vermelha: (pose, f) => pombo(pose, f, {b: "#d8282a", B: "#9a1a1a", n: "#d8282a", p: "#e8402a", w: "#2a6ad8", y: "#f0e8d0"}),   // arara-vermelha: vermelha de asa azul
+  pe_garrafa: peGarrafa,
   tuiuiu: (pose, f) => garca(pose, f, {b: "#f6f6f0", B: "#c8c8c0", n: "#1e1e24", N: "#0e0e12", r: "#d8283a", R: "#a01a28", y: "#1e1e24", Y: "#0e0e12", k: "#1e1e24"}),   // tuiuiú: branco, pescoço preto e colar vermelho
   arara_azul: (pose, f) => pombo(pose, f, {b: "#2a4ac8", B: "#1a2a8a", n: "#3a5ad8", p: "#3a5ad8", w: "#2a3aa8", y: "#f0d020"}),   // arara-azul: azul inteira, de bico amarelo (o amarelo da cara)
   minhocao: cobra({b: "#8a6a48", B: "#5a4430", k: "#b8946a", eye: "#ffd23a"}, false),   // Minhocão do Pantanal: grosso, cor de barro, de anéis claros

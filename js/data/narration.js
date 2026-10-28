@@ -47,6 +47,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  guara_rei: ["O Lobo-guará-rei andava pelo cerrado inteiro, curumim, de perna comprida pra ver por cima do capim. Plantava lobeira por onde passava.", "A queimada comeu o capim dele. Lobo sem capim fica no aberto, com medo, e medo vira raiva.", {r: "Ele não queria brigar, vô. Queria só voltar pra casa."}, "E tu mostrou o caminho. Por isso que o cerrado ainda tem lobo, menino."],
+  pe_garrafa: ["O Pé-de-garrafa grita igual gente perdida no mato, curumim. Quem vai atrás do grito se perde também.", "Mas ele mesmo era o mais perdido. A fumaça apagou as estrelas que ele usava pra voltar pra toca.", {r: "Eu ensinei ele a achar o Cruzeiro do Sul, vô. Ele pulou de alegria. Num pé só."}, "Agora quem se perde na Chapada é ajudado por ele. Dizem que o grito virou assobio de quem mostra a trilha."],
   onca_dagua: ["A Onça-d'água era a dona do Pantanal, curumim. Atravessava corixo nadando e pegava jacaré dentro do rio.", "A fumaça das queimadas deixou ela sem lugar pra ficar. Bicho sem casa fica bravo, igual gente.", {r: "Ela me olhou um tempão antes de ir embora, vô. Parecia que tava agradecendo."}, "Tava mesmo. Onça não esquece quem ajudou. Nem quem atrapalhou."],
   minhocao: ["O Minhocão do Pantanal cava a margem por baixo e o barranco desaba. Os pescadores antigos tinham medo dele.", "Mas ele só cavava assim quando o rio estava doente. A fumaça entrou na água, e ele cavou até quase derrubar a cidade.", {r: "Ele era do tamanho de um barco, vô. Grosso igual tronco de piúva."}, "E tu acalmou ele com uma lança. Eu, se fosse tu, tinha corrido. Mas eu sou velho e sabido."],
   carranca: ["A carranca foi feita pra proteger os barqueiros do Velho Chico, curumim. Cara feia de madeira pra espantar o que mora no fundo do rio.", "A fumaça entrou na madeira, e a carranca esqueceu de quem cuidava. Soltou-se da proa e desceu o rio sozinha, brava com todo mundo.", {r: "Quando ela acalmou, vô, um barqueiro veio buscar ela de canoa. Disse que era da família dele fazia três gerações."}, "Carranca boa volta pra casa. Igual neto."],
@@ -134,6 +136,14 @@ const NARRA_PYT = {
     {p: "Tá vendo? Aqui eu nem preciso trabalhar. Eles mesmos fazem fumaça pra mim."},
     {r: "E fazem festa também, frevo, maracatu. Disso tu não entende nada."},
     "A fumaça não respondeu. Foi embora pro sertão, pro lado do Velho Chico."
+  ],
+  // Centro-Oeste: a fumaça vira queimada de verdade, e ela fala de Brasília, onde se decide o que queima
+  guara_rei: [
+    "No alto da Chapada, com o vale inteiro lá embaixo, a fumaça subiu de uma queimada perto e veio se sentar do lado do menino.",
+    {p: "Viu o tamanho desse céu, curumim? Aqui eu cresço sozinha. Basta um capim seco e um descuidado."},
+    {r: "Tem gente que planta fogo de propósito. Não é descuido."},
+    {p: "Então tu já entendeu. Quem manda no fogo não mora no mato. Mora na cidade do meio, a de concreto."},
+    "E a fumaça foi pro leste, na direção de Brasília."
   ],
   carranca: [
     "Na beira do Velho Chico, quando a carranca voltou pra proa, a fumaça desceu baixinha, sem força.",

@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.60.0 — a Chapada e o sertanejo
+
+- Cuiabá ganhou a Chapada dos Guimarães (níveis 52 a 54): cerrado de árvore torta, paredão de pedra vermelha e um
+  riacho descendo para a cachoeira. A passagem fica no fim do Pantanal, ao lado da Onça-d'água, e abre depois de
+  acalmar ela.
+- Bichos novos na Chapada: seriema, arara-vermelha, tatu-canastra, tamanduá-mirim e, de noite, a coruja-buraqueira.
+- De dia, o chefe é o Lobo-guará-rei, uivando no alto do paredão. Depois dele, o Pytuna aparece e fala de uma
+  "cidade do meio, a de concreto". De noite, um grito de gente ecoa no mato: é o Pé-de-garrafa, peludo e pulando num
+  pé só.
+- As músicas do Centro-Oeste viraram sertanejo de raiz: em Cuiabá e no mapa toca uma toada caipira com viola
+  ponteada, dupla em terças e sanfona; nas lutas, um pagode de viola com bateria e um solo de sanfona.
+- O mapa do Pantanal mudou um pouco para caber a passagem nova.
+
 ## 0.59.0 — o Centro-Oeste e o Pantanal
 
 - A história chegou ao Centro-Oeste. Com os 14 chefes do Nordeste acalmados e o app de cordel do Seu Dedé entregue,

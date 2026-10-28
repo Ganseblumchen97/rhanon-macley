@@ -25,6 +25,8 @@ const TILE_PAL = {
   serra: {g1: "#a87a52", g2: "#986a46", tall: "#5a7a3a", tallHi: "#8aaa5a", path: "#c8986a", path2: "#a87a50", leaf: "#3a6a2e", leaf2: "#2a5222", leafHi: "#5a8a44", trunk: "#5a3a22", rock: "#b0786a", rock2: "#7a4a3a", water: "#4a8aa8", water2: "#8ac0d0", wood: "#9c6339", wood2: "#6d4329"},
   // Cuiabá: o Porto, chão de pedra quente, casario colonial baixo, ipê-amarelo florido (as árvores) e o rio Cuiabá barrento
   portocuiaba: {g1: "#c4a888", g2: "#b49878", tall: "#8a9a4a", tallHi: "#b8c86a", path: "#8a6e58", path2: "#6e5644", leaf: "#e8c020", leaf2: "#b88a10", leafHi: "#ffe878", trunk: "#5a3a22", rock: "#a89a88", rock2: "#7a6a58", water: "#5e6e52", water2: "#9aa87a", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22", walls: ["#f0e6d0", "#e8c860", "#5a8ac8", "#e89aaa", "#f0e6d0"]},
+  // Chapada dos Guimarães: terra vermelha, capim dourado do cerrado, árvore torta (cerrado: true) e muita pedra arenito
+  chapada: {g1: "#b88a52", g2: "#a87a46", tall: "#b8a04a", tallHi: "#e8d070", path: "#d8a070", path2: "#b8804e", leaf: "#5a8a3a", leaf2: "#3a6a2a", leafHi: "#8ab85a", trunk: "#4a3020", rock: "#c8704a", rock2: "#8a4a2e", water: "#3a8ab0", water2: "#9ad8e8", wood: "#9c6339", wood2: "#6d4329", cerrado: true},
   // Pantanal: capim verde-claro de campo alagado, cordilheira de mata baixa e água de baía escura e parada
   pantanal: {g1: "#8ab45a", g2: "#7aa44e", tall: "#5a8a3a", tallHi: "#a8d070", path: "#c8a870", path2: "#a88a54", leaf: "#3a7a3a", leaf2: "#2a5a2a", leafHi: "#5a9a4a", trunk: "#6d4a2a", rock: "#a89a88", rock2: "#7a6a58", water: "#3a7a7a", water2: "#7ab8b0", wood: "#9c6339", wood2: "#6d4329"},
   // Petrolina: a orla do São Francisco, calçada clara e casario baixo de cores quentes
@@ -106,6 +108,14 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
         for (let k = 0; k <= n; k++) x.fillRect(ox + Math.round(a + (c - a) * k / n), oy + Math.round(b + (d - b) * k / n), 1, 1);
       }
     }
+  } else if (ch === "T" && P.cerrado) {   // cerrado: árvore baixa de tronco torto e casca grossa, copa achatada e torta
+    grass();
+    const s = r(91) < .5 ? 1 : -1, cx = 8 + s;
+    x.fillStyle = OUTLINE; x.fillRect(ox + 6, oy + 9, 5, 7); x.fillRect(ox + 7 + s * 2, oy + 6, 4, 5);
+    x.fillStyle = P.trunk; x.fillRect(ox + 7, oy + 10, 3, 5); x.fillRect(ox + 8 + s * 2, oy + 7, 2, 4);
+    x.fillStyle = P.rock2; x.fillRect(ox + 7, oy + 12, 1, 1); x.fillRect(ox + 9, oy + 10, 1, 1);   // casca rachada
+    fillEllipse(x, ox + cx, oy + 5, 8, 4.5, OUTLINE); fillEllipse(x, ox + cx, oy + 5, 7, 3.5, P.leaf2); fillEllipse(x, ox + cx - s, oy + 4, 5, 2.5, P.leaf);
+    fillEllipse(x, ox + cx - s * 3, oy + 3, 2, 1, P.leafHi);
   } else if (ch === "T" && P.dune) {   // dunas dos Lençóis: montinho de areia branca com a crista clara, sem tronco
     grass();
     fillEllipse(x, ox + 8, oy + 10, 9, 6, P.leaf2); fillEllipse(x, ox + 7, oy + 9, 8, 5, P.leaf); fillEllipse(x, ox + 5, oy + 7, 4, 1.5, P.leafHi);

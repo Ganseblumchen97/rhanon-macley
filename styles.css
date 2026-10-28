@@ -88,7 +88,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
 .stage{--plat:46%}
 .stage.zone-fechada{--plat:42%}
-.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-beira,.zone-pantanal,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-beira,.zone-pantanal,.zone-chapada,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
 .stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
@@ -120,6 +120,9 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage.zone-beira{background:linear-gradient(180deg,#f0d090 0 24%,#6a8a4a 24% 30%,#3a8a8a 30% 38%,#b8b07a 38% 100%)}
 .stage.zone-beira::before{background:#d8c08a;right:9%;top:var(--plat)}
 .stage.zone-beira::after{background:#d8c08a;left:4%;bottom:7%}
+.stage.zone-chapada{background:linear-gradient(180deg,#f0a868 0 22%,#b8583a 22% 34%,#b88a52 34% 100%)}
+.stage.zone-chapada::before{background:#c89a62;right:9%;top:var(--plat)}
+.stage.zone-chapada::after{background:#c89a62;left:4%;bottom:7%}
 .stage.zone-pantanal{background:linear-gradient(180deg,#f0b878 0 24%,#4a7a3a 24% 30%,#3a7a7a 30% 38%,#8ab45a 38% 100%)}
 .stage.zone-pantanal::before{background:#a8d070;right:9%;top:var(--plat)}
 .stage.zone-pantanal::after{background:#a8d070;left:4%;bottom:7%}
@@ -1076,9 +1079,9 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
   --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Crect x='1' y='1' width='12' height='12' fill='%23f6f9fd' stroke='%2310305a' stroke-width='2'/%3E%3Cpath d='M7 3l4 4-4 4-4-4z' fill='%232a5aa8'/%3E%3Crect x='16' y='1' width='12' height='12' fill='%23f6f9fd' stroke='%2310305a' stroke-width='2'/%3E%3Cpath d='M22 3l4 4-4 4-4-4z' fill='%232a5aa8'/%3E%3Crect x='31' y='1' width='12' height='12' fill='%23f6f9fd' stroke='%2310305a' stroke-width='2'/%3E%3Cpath d='M37 3l4 4-4 4-4-4z' fill='%232a5aa8'/%3E%3C/svg%3E")}
 .stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-olinda) .plate .lv{background:#10305a}
 /* sertão: papel de cordel com moldura de xilogravura */
-.stage:is(.zone-caatinga,.zone-serra) .plate{background:linear-gradient(180deg,#f0dfb4,#d9c088);color:#1a120a;border:3px solid #1a120a;box-shadow:inset 0 0 0 2px #f0dfb4,inset 0 0 0 4px #1a120a,4px 5px 0 rgba(0,0,0,.35);
+.stage:is(.zone-caatinga,.zone-serra,.zone-chapada) .plate{background:linear-gradient(180deg,#f0dfb4,#d9c088);color:#1a120a;border:3px solid #1a120a;box-shadow:inset 0 0 0 2px #f0dfb4,inset 0 0 0 4px #1a120a,4px 5px 0 rgba(0,0,0,.35);
   --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M22 1l2 4h4l-3 3 1 5-4-3-4 3 1-5-3-3h4z' fill='%231a120a'/%3E%3Cpath d='M2 7h12M30 7h12' stroke='%231a120a' stroke-width='2' stroke-dasharray='2 2'/%3E%3C/svg%3E")}
-.stage:is(.zone-caatinga,.zone-serra) .plate .lv{background:#a8321c}
+.stage:is(.zone-caatinga,.zone-serra,.zone-chapada) .plate .lv{background:#a8321c}
 /* de noite a placa ganha o véu azul do palco */
 .stage.night .plate{box-shadow:inset 0 0 0 999px rgba(30,40,110,.2),4px 5px 0 rgba(0,0,0,.35)}
 /* lista de especiais/itens com rolagem: setinhas piscando onde tem mais */

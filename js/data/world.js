@@ -76,6 +76,7 @@ const SUB = {
   serra: {city: "petrolina", n: "Serra do Araripe", s: "Serra", x: 290, y: 56, txt: "Lá no alto, a chapada: paredão de pedra cheio de fóssil, mata verde na encosta e encruzilhada de estrada de terra. Nas sextas de lua cheia, ninguém sobe."},
   caatinga: {city: "petrolina", n: "Caatinga", x: 120, y: 110, txt: "A mata branca do sertão: galho seco, mandacaru e chão rachado. Bode, preá, tatu-bola... e, de noite, um assobio fino no meio dos espinhos."},
   orla: {city: "petrolina", n: "Orla do Velho Chico", s: "Orla", x: 300, y: 210, txt: "A beira do São Francisco em Petrolina: barquinho de carranca, feira de bode e de queijo, pensão e o povo do sertão, que ri de tudo."},
+  chapada: {city: "cuiaba", n: "Chapada dos Guimarães", s: "Chapada", x: 92, y: 84, txt: "Lá em cima, a serra de arenito vermelho: cerrado de árvore torta, cachoeira caindo do paredão e arara no fim da tarde. De noite, um grito de gente que não é gente."},
   pantanal: {city: "cuiaba", n: "Pantanal", x: 140, y: 262, txt: "Rio abaixo, a planície que alaga: capim alto, baías de água parada, corixo cortando o campo e bicho de todo lado. Tuiuiú, arara-azul, jacaré às centenas... e, de noite, o barranco que desaba sozinho."},
   portocuiaba: {city: "cuiaba", n: "Porto de Cuiabá", s: "Porto", x: 268, y: 206, txt: "O bairro mais velho de Cuiabá, na beira do rio: o mercado do peixe, casario baixo, rede na pensão e gente que fala \"tchá\" e \"pai do céu\" em toda frase."},
   olinda: {city: "recife", n: "Olinda", x: 250, y: 70, txt: "A cidade alta, vizinha do Recife: ladeira de pedra, igreja no alto, casario colorido e quintal cheio de bicho. De noite, dizem, um boneco gigante desce a ladeira sozinho."},
@@ -122,7 +123,7 @@ const CITY = {
     river: "M0,262 C80,280 180,284 300,274 C360,268 400,274 440,262", road: "M300,210 C350,190 400,170 446,160", sign: [356, 150, "Recife →"], home: "orla", gate: "orla"},
   // Cuiabá (Centro-Oeste): o rio Cuiabá descendo pelo meio, com o Porto na margem leste; a estrada atravessa a ponte para
   // Várzea Grande, onde fica o aeroporto. Pantanal e Chapada vêm depois
-  cuiaba: {n: "Cuiabá", look: "cerrado", map: "centroeste", route: ["portocuiaba", "pantanal"], cabin: false,
+  cuiaba: {n: "Cuiabá", look: "cerrado", map: "centroeste", route: ["portocuiaba", "pantanal", "chapada"], cabin: false,
     land: "30,40 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
     river: "M150,0 C170,60 190,110 200,160 C210,210 180,260 170,325", road: "M268,206 C190,200 120,190 60,170 C40,164 20,160 -6,156", sign: [10, 146, "← ✈ Aeroporto"], home: "portocuiaba", gate: "portocuiaba"}
 };
@@ -231,7 +232,7 @@ const FREELAS = {
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

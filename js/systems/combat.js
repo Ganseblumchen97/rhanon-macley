@@ -19,7 +19,7 @@ const BATTLE_WATER = new Set(["rio", "igarape", "manguezal", "varzea"]), BATTLE_
 function getBattleTrackFor(animal) {
   if (animal.boss) return "battleBoss";
   if (regionOfCity(curCity()) === "nordeste" && !animal.bug) return "battleNordeste";   // Nordeste: o tema da região num forró de batalha
-  if (regionOfCity(curCity()) === "centroeste" && !animal.bug) return "battleCentroOeste";   // Centro-Oeste: o rasqueado acelerado
+  if (regionOfCity(curCity()) === "centroeste" && !animal.bug) return "battleCentroOeste";   // Centro-Oeste: pagode de viola
   return animal.bug ? "battleCapo" : BATTLE_CITY.has(curZone) ? "battleGuitarrada" : BATTLE_WATER.has(curZone) ? "battleCarimbo" : "battleCapo";
 }
 
