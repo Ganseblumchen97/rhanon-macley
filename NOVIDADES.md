@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.63.0 — Brasília e o mapa de queimadas
+
+- Cidade nova: Brasília. Depois de acalmar a Preguiça-gigante da Gruta do Lago Azul, compre a passagem de ônibus no
+  mapa do Centro-Oeste (R$ 1.300, vale ida e volta para Bonito).
+- O Plano Piloto é a fase segura de Brasília: superquadra, ipê-roxo, pensão e gente de todo canto do Brasil, de
+  vendedora de pamonha a candango aposentado.
+- Freela novo: a Iara, da brigada de incêndio do cerrado, precisa de um mapa que mostre as queimadas na hora (R$ 700).
+  Para entregar, resolva três bugs: o Falso Positivo, a Coordenada Trocada e o Mapa Lento.
+- Com o mapa de queimadas entregue, a brigada apaga os focos antes: os bichos tomados pela fumaça chegam na luta com
+  10% menos PV, em qualquer lugar do jogo.
+
 ## 0.62.0 — a Gruta do Lago Azul
 
 - Bonito ganhou a última trilha: a Gruta do Lago Azul (níveis 56 a 58), uma caverna de pedra com estalagmites e um

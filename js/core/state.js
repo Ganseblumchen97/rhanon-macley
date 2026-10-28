@@ -33,7 +33,7 @@ function vit() {
   G.skills = G.skills || {};   // degraus aprendidos da árvore de habilidades
   // notebook: jogo novo começa sem ele (missão do começo); save antigo já tem tudo ligado
   if (!G.nb) G.nb = G.tutorial ? {} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};
-  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET; G.passagemBON = !!G.passagemBON;
+  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET; G.passagemBON = !!G.passagemBON; G.passagemBSB = !!G.passagemBSB;
   G.regions = G.regions || {norte: true};   // regiões já visitadas (o aeroporto voa entre elas)
   if (!G.narrated) G.narrated = G.belemVisto ? {belem: true} : {};   // falas do Pajé já contadas (prólogo, Belém, cada chefe)
   G.loseStreak = G.loseStreak || 0;   // lutas perdidas seguidas (2 = o Pajé dá uma dica)   // bugs resolvidos por freela; freelas entregues
@@ -67,7 +67,8 @@ function debugSetup() {
     if (city === "teresina" || city === "recife" || city === "petrolina") G.passagemTHE = true;
     if (city === "recife" || city === "petrolina") G.passagemREC = true;
     if (city === "petrolina") G.passagemPET = true;
-    if (city === "bonito") G.passagemBON = true;
+    if (city === "bonito" || city === "brasilia") G.passagemBON = true;
+    if (city === "brasilia") G.passagemBSB = true;
     if (CITY[city].map === "centroeste") { NORDESTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.app_cordel = true; G.narrated.nordeste_fim = true; G.passagemTHE = G.passagemREC = G.passagemPET = true; }   // e o Nordeste também
     if (CITY[city].map !== "norte") { NORTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.site_feira = true; G.narrated.norte_fim = true; G.regions = Object.assign({norte: true, nordeste: true}, CITY[city].map === "centroeste" && {centroeste: true}); syncRegion(); buildLocalNodes(); }   // chegou de avião: o Norte está completo
     G.sub = fase;

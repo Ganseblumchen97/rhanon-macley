@@ -20,12 +20,12 @@ const MAP_REGIONS = {
     river: "M230 494 C250 440 300 360 363 320 S470 320 519 354",   // rio São Francisco
     route: ["saoluis", "teresina", "recife", "petrolina"], pos: {saoluis: [222, 112], teresina: [276, 188], recife: [564, 280], petrolina: [362, 326]}},
   // Centro-Oeste: Mato Grosso, Mato Grosso do Sul, Goiás e o Distrito Federal (a partir de longitude/latitude) e o rio
-  // Paraguai descendo pelo Pantanal; a estrada desce de Cuiabá para Bonito (Brasília vem depois)
-  centroeste: {n: "Centro-Oeste", aria: "Mapa estilizado do Centro-Oeste, com Cuiabá e Bonito",
+  // Paraguai descendo pelo Pantanal; a estrada desce de Cuiabá para Bonito e de lá atravessa o cerrado até Brasília
+  centroeste: {n: "Centro-Oeste", aria: "Mapa estilizado do Centro-Oeste, com Cuiabá, Bonito e Brasília",
     land: ["M55 94 L148 49 L190 106 L295 109 L391 124 L382 214 L430 220 L514 217 L523 280 L481 310 L460 364 L388 397 L358 424 L313 460 L286 508 L271 550 L238 547 L229 502 L163 493 L169 430 L157 355 L94 319 L97 241 L52 160Z",
       "M452 296 L474 296 L474 312 L452 312Z"],   // a região e o quadradinho do Distrito Federal
     river: "M196 280 C172 300 160 330 170 360 C178 390 164 410 170 430 S160 470 163 493",   // rio Paraguai, pelo Pantanal
-    route: ["cuiaba", "bonito"], pos: {cuiaba: [217, 298], bonito: [205, 463]}},
+    route: ["cuiaba", "bonito", "brasilia"], pos: {cuiaba: [217, 298], bonito: [205, 463], brasilia: [463, 304]}},
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre a aldeia e Curitiba",
     land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
     route: ["ananindeua", "curitiba"], pos: {ananindeua: [268, 172], curitiba: [315, 478]}}
@@ -51,6 +51,7 @@ const LOC = {
   teresina: {n: "Teresina (PI)", s: "Teresina", txt: "A capital mais quente do Brasil, entre dois rios: o Parnaíba e o Poti. No encontro das águas, dizem, mora o Cabeça de Cuia."},
   petrolina: {n: "Petrolina (PE)", s: "Petrolina", txt: "O sertão de Pernambuco, na beira do Velho Chico: caatinga seca, bode solto, carranca na proa dos barcos e um rio que nunca deixa a cidade sem água."},
   recife: {n: "Recife (PE)", s: "Recife", txt: "A Veneza brasileira, cortada por rios e pontes: frevo, maracatu, cordel na feira e Olinda logo ali, no alto da ladeira."},
+  brasilia: {n: "Brasília (DF)", s: "Brasília", txt: "A capital no meio do cerrado, desenhada em forma de avião: eixo, superquadra, concreto branco e um céu enorme. É aqui que se decide o que o país faz com a mata."},
   bonito: {n: "Bonito (MS)", s: "Bonito", txt: "Uma cidade pequena no meio de rios tão transparentes que o peixe parece voar. Gruta, cachoeira, flutuação... e a água mais limpa do Brasil, que a fumaça agora quer sujar."},
   cuiaba: {n: "Cuiabá (MT)", s: "Cuiabá", txt: "O meio da América do Sul, na beira do rio Cuiabá: calor de quarenta graus, viola de cocho, peixe na brasa e o Pantanal começando logo ali. O Centro-Oeste começa aqui."},
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
@@ -78,6 +79,7 @@ const SUB = {
   caatinga: {city: "petrolina", n: "Caatinga", x: 120, y: 110, txt: "A mata branca do sertão: galho seco, mandacaru e chão rachado. Bode, preá, tatu-bola... e, de noite, um assobio fino no meio dos espinhos."},
   orla: {city: "petrolina", n: "Orla do Velho Chico", s: "Orla", x: 300, y: 210, txt: "A beira do São Francisco em Petrolina: barquinho de carranca, feira de bode e de queijo, pensão e o povo do sertão, que ri de tudo."},
   centrobonito: {city: "bonito", n: "Centro de Bonito", s: "Centro", x: 300, y: 150, txt: "A rua principal de Bonito: casinha baixa, sorveteria, guia de turismo em cada esquina, a pensão e uma fonte de água tão clara que dá pra contar as pedrinhas."},
+  planopiloto: {city: "brasilia", n: "Plano Piloto", s: "Plano Piloto", x: 214, y: 172, txt: "O centro de Brasília: superquadra de prédio sobre pilotis, comércio da quadra, ipê-roxo na calçada e a pensão. Na banca da esquina, a brigada de incêndio procura um programador."},
   gruta: {city: "bonito", n: "Gruta do Lago Azul", s: "Gruta", x: 96, y: 92, txt: "Uma caverna funda na serra da Bodoquena, com um lago de água azul lá embaixo. Estalactite, morcego, fóssil de bicho de dez mil anos... e, de noite, um assobio de quem cuida da mata."},
   rioprata: {city: "bonito", n: "Rio da Prata", x: 140, y: 236, txt: "Um rio de água cristalina que nasce no meio da mata: peixe nadando do lado, sucuri no fundo de areia branca e ariranha gritando na margem. De noite, uma luz dourada anda em cima da água."},
   chapada: {city: "cuiaba", n: "Chapada dos Guimarães", s: "Chapada", x: 92, y: 84, txt: "Lá em cima, a serra de arenito vermelho: cerrado de árvore torta, cachoeira caindo do paredão e arara no fim da tarde. De noite, um grito de gente que não é gente."},
@@ -134,7 +136,13 @@ const CITY = {
   // O centro, o Rio da Prata e a Gruta do Lago Azul
   bonito: {n: "Bonito", look: "cerrado", map: "centroeste", route: ["centrobonito", "rioprata", "gruta"], cabin: false,
     land: "26,50 160,20 320,26 420,84 430,200 396,292 270,316 140,312 40,276 14,160",
-    river: "M60,0 C90,80 200,110 230,180 C250,230 220,280 240,325", road: "M300,150 C340,110 390,70 446,40", sign: [360, 30, "Cuiabá →"], home: "centrobonito", gate: "centrobonito"}
+    river: "M60,0 C90,80 200,110 230,180 C250,230 220,280 240,325", road: "M300,150 C340,110 390,70 446,40", sign: [360, 30, "Cuiabá →"], home: "centrobonito", gate: "centrobonito"},
+  // Brasília (Centro-Oeste): o Plano Piloto no meio, o Lago Paranoá à direita e um córrego do cerrado; a estrada sai para
+  // Bonito pelo oeste. Por enquanto só o Plano Piloto
+  brasilia: {n: "Brasília", look: "cerrado", map: "centroeste", route: ["planopiloto"], cabin: false,
+    land: "24,40 170,16 330,22 420,80 432,200 396,292 270,316 140,312 40,278 12,160",
+    bay: "M330,0 L440,0 L440,325 L360,325 C330,280 350,240 320,200 C300,170 330,120 310,80 C300,50 320,20 330,0Z",   // Lago Paranoá
+    river: "M110,0 C120,80 96,160 124,325", road: "M214,172 C160,190 90,200 -6,214", sign: [8, 236, "← Bonito"], home: "planopiloto", gate: "planopiloto"}
 };
 /* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
    que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
@@ -178,11 +186,12 @@ const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15]
   recife: [["limpo", 30], ["chuva", 35], ["neblina", 5], ["mormaco", 20], ["ventania", 10]],   // litoral: chuva de verão e brisa do mar
   teresina: [["limpo", 35], ["chuva", 10], ["neblina", 5], ["mormaco", 45], ["ventania", 5]],   // a capital mais quente do Brasil
   cuiaba: [["limpo", 35], ["chuva", 20], ["neblina", 5], ["mormaco", 30], ["ventania", 10]],   // calorão do meio do Brasil e chuva de verão
-  bonito: [["limpo", 40], ["chuva", 25], ["neblina", 15], ["mormaco", 15], ["ventania", 5]]};   // serra de mata: neblina de manhã cedo
+  bonito: [["limpo", 40], ["chuva", 25], ["neblina", 15], ["mormaco", 15], ["ventania", 5]],   // serra de mata: neblina de manhã cedo
+  brasilia: [["limpo", 40], ["chuva", 15], ["neblina", 5], ["mormaco", 25], ["ventania", 15]]};   // planalto: seca comprida e vento
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
-  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
   for (const [k, w] of odds) if ((r -= w) < 0) return k;
   return "limpo";
 }
@@ -213,7 +222,8 @@ const BUS_LINES = {
   teresina: {from: "saoluis", price: 900, pass: "passagemTHE", open: () => !!BS().lencois, lock: "O ônibus para Teresina sai depois que a Suçuarana dos Lençóis for acalmada."},
   recife:   {from: "teresina", price: 1000, pass: "passagemREC", open: () => !!BS().encontro, lock: "O ônibus para Recife sai depois que o Surubim do Encontro dos rios for acalmado."},
   petrolina: {from: "recife", price: 1100, pass: "passagemPET", open: () => !!BS().olinda, lock: "O ônibus para Petrolina sai depois que o Teiú-rei de Olinda for acalmado."},
-  bonito: {from: "cuiaba", price: 1200, pass: "passagemBON", open: () => !!BS().chapada, lock: "O ônibus para Bonito sai depois que o Lobo-guará-rei da Chapada for acalmado."}
+  bonito: {from: "cuiaba", price: 1200, pass: "passagemBON", open: () => !!BS().chapada, lock: "O ônibus para Bonito sai depois que o Lobo-guará-rei da Chapada for acalmado."},
+  brasilia: {from: "bonito", price: 1300, pass: "passagemBSB", open: () => !!BS().gruta, lock: "O ônibus para Brasília sai depois que a Preguiça-gigante da Gruta do Lago Azul for acalmada."}
 };
 // linha de ônibus entre as cidades a e b (em qualquer sentido), ou nada
 const busLine = (a, b) => (BUS_LINES[b] && BUS_LINES[b].from === a && BUS_LINES[b]) || (BUS_LINES[a] && BUS_LINES[a].from === b && BUS_LINES[a]) || null;
@@ -226,7 +236,7 @@ const NB_DROP = {macaco: "teclado", ariranha: "carregador"};   // bicho que larg
 /* Freelas: um por capital. bugs = lutas em sequência (BUGS em data/animals.js), pay = R$ na entrega, prog = programa que
    fica no notebook (G.portfolio[id]) e dá uma vantagem no jogo. */
 // em que fase fica o cliente de cada freela (W no mapa)
-const FREELA_AT = {veropeso: "site_feira", recifeantigo: "app_cordel"};
+const FREELA_AT = {veropeso: "site_feira", recifeantigo: "app_cordel", planopiloto: "mapa_queimadas"};
 const FREELAS = {
   site_feira: {n: "Site da feira do Ver-o-Peso", client: "Dona Graça", look: "cliente", bugs: ["bug_loop", "bug_404", "bug_prazo"], pay: 300,
     prog: "Lembranças valem 20% a mais na feira (o site mostra o preço certo).",
@@ -239,7 +249,14 @@ const FREELAS = {
     prog: "O caderno mostra o que cada elemento faz nos bichos que você já enfrentou.",
     ask: "Oxente, tu é o programador? Quero meus cordéis num aplicativo, pro povo ler no celular. Pago R$ {n}. Mas o código que me fizeram tá todo bichado...",
     thanks: "Arretado demais! Meus folhetos no celular, com xilogravura e tudo. Toma, que tu mereceu.",
-    after: "O povo agora lê cordel até no ônibus, menino. Já tô escrevendo um sobre tu e a lança de pedra da lua."}
+    after: "O povo agora lê cordel até no ônibus, menino. Já tô escrevendo um sobre tu e a lança de pedra da lua."},
+  // Brasília: a Iara, da brigada de incêndio do cerrado, precisa de um mapa que mostre os focos de queimada na hora;
+  // com ele, os bichos tomados pela fumaça chegam na luta mais fracos (combat.js, init)
+  mapa_queimadas: {n: "Mapa de queimadas da brigada", client: "Iara", look: "brigadista", bugs: ["bug_falso", "bug_coordenada", "bug_lento"], pay: 700,
+    prog: "A brigada apaga os focos antes: os bichos tomados pela fumaça chegam na luta com 10% menos PV.",
+    ask: "Tu que é o programador que veio do Norte? Sou da brigada do cerrado. Preciso de um mapa que mostre os focos de queimada na hora, pra gente chegar antes do fogo. Pago R$ {n}. O sistema que fizeram pra nós vive dando pau...",
+    thanks: "Funcionou! Apareceu um foco agorinha lá pros lados do Parque e a equipe já tá indo. Toma, tu salvou muito cerrado hoje.",
+    after: "Com o teu mapa a gente chega antes do fogo crescer, menino. Tem bicho vivo hoje por causa de umas linhas de código."}
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)

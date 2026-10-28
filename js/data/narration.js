@@ -27,6 +27,12 @@ const NARRA = {
     {r: "E tinha bode pra todo lado, vô. Um deles comeu minha corda do arco."},
     "Bode come tudo, curumim. Até corda de arco. Agora deixa eu contar da caatinga."
   ],
+  brasilia: [
+    "E o menino chegou na cidade do meio, a de concreto, que o Pytuna tinha falado. Brasília.",
+    "Prédio branco, céu enorme e, na seca, o horizonte inteiro cor de fumaça. Queimada pra todo lado do cerrado.",
+    {r: "Foi lá que eu entendi, vô. Que programar também podia ajudar a mata."},
+    "Foi. Ninguém na aldeia acreditava. Nem eu. Agora deixa eu contar da brigada."
+  ],
   bonito: [
     "De Cuiabá o menino desceu de ônibus até Bonito, no Mato Grosso do Sul. E viu a água mais limpa da vida dele.",
     "Rio tão transparente que o peixe parecia voar, curumim. Dava pra ver a areia do fundo, a pedra, a sucuri dormindo.",

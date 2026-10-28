@@ -145,6 +145,24 @@ const STAGES = {
       "~~~~~~~~=~~~~~~~G~~~~~~~"
     ]
   },
+  // Brasília (Centro-Oeste): o Plano Piloto, superquadra com a pensão (O), barracas, moradores e a Iara (W), da brigada
+  // de incêndio, cliente do freela do mapa de queimadas
+  planopiloto: {
+    safe: true, next: null,
+    rows: [
+      "########################",
+      "########################",
+      "#..f....-.......OOO...f#",
+      "#.KKK...-..KKK..OOO....#",
+      "#..V....-...C..........#",
+      "#-----------W......P..SE",
+      "#..P....-..............#",
+      "#.####..-..####....f...#",
+      "#.####..-..####..P.....#",
+      "#..T....-.....T........#",
+      "TTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Bonito (Centro-Oeste): o centro, com a pensão (O), barracas, a fonte de água clara e moradores; G leva ao Rio da Prata
   centrobonito: {
     safe: true, next: "rioprata",

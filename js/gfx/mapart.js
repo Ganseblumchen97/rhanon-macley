@@ -31,6 +31,7 @@ const MAP_ICON = {
   beira: ["#2a7a8a", `<path d="M-8 2 Q0 6 8 2 L6 -1 H-6Z" fill="${MI.t}" ${MI.s}/><path d="M-8 2 Q-10 -3 -7 -6 Q-4 -7 -4 -3 L-5 -1Z" fill="#e5401c" ${MI.s}/><circle cx="-6.5" cy="-4.5" r="1" fill="#ffd23a"/>` + MI_WAVE(7)],   // barquinho com a carranca de juba vermelha
   caatinga: ["#b8763a", `<path d="M-1.6 8 V-7 Q0 -9.5 1.6 -7 V8Z" fill="#5a9a3a" ${MI.s}/><path d="M-1.6 1 H-5 V-4 M1.6 3 H5 V-2" fill="none" stroke="#5a9a3a" stroke-width="2.4" stroke-linecap="round"/>`],
   serra: ["#a84a2a", `<path d="M-9 7 L-3 -6 L1 1 L4 -3 L9 7Z" fill="#d8784a" ${MI.s}/><path d="M-3 -6 L-1 -2 L-5 -2Z" fill="${MI.c}"/>`],
+  planopiloto: ["#3a7ab8", `<rect x="-3" y="-9" width="2.2" height="12" fill="${MI.c}" ${MI.s}/><rect x=".8" y="-9" width="2.2" height="12" fill="${MI.c}" ${MI.s}/><path d="M-9 3 H9 L7 7 H-7Z" fill="#cfd8dc" ${MI.s}/><path d="M-8 3 Q-6.5 -1 -4 -1 V3Z M4 3 V-1 Q6.5 -1 8 3Z" fill="${MI.c}" ${MI.s}/>`],   // o Congresso: as duas torres e as cúpulas
   centrobonito: ["#2a9aa8", MI_HOUSE("#f0e6d0", "#c8603a") + `<circle cx="6" cy="6" r="2.4" fill="${MI.w}" ${MI.s}/>`],   // casinha e a fonte
   gruta: ["#3a3a5a", `<path d="M-9 8 Q-9 -8 0 -8 Q9 -8 9 8Z" fill="#7a7468" ${MI.s}/><path d="M-5 8 Q-5 -3 0 -3 Q5 -3 5 8Z" fill="${MI.k}"/><ellipse cx="0" cy="6" rx="4" ry="1.6" fill="#3a8aff"/><path d="M-2 -3 l1 3 l1 -3 M2 -3 l.6 2 l.6 -2" fill="${MI.c}"/>`],   // boca da gruta, estalactites e o lago azul
   rioprata: ["#2aa8b8", `<path d="M-9 -2 Q0 4 9 -2 V9 H-9Z" fill="#7ae0e8" ${MI.s}/><path d="M-5 3 l4 -2 v4 Z M1 1 q3 -1 5 1 q-2 2 -5 1Z" fill="#e8a020"/>` + MI_WAVE(-4, "#cfeeff", 1.4)],   // água transparente com os peixes
@@ -41,7 +42,7 @@ const MAP_ICON = {
 };
 MAP_ICON.terminal = MAP_ICON.parada;   // o cais de Belém também é o barco de linha
 // no mapa grande, cada cidade aparece com o desenho do lugar dela
-const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", curitiba: "curitiba"};
+const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", brasilia: "planopiloto", curitiba: "curitiba"};
 // disco do ponto do mapa (r = raio): cor da área, aro claro e o desenho; sem desenho, a bolinha de antes
 function mapIcon(k, r = 15) {
   const a = MAP_ICON[k]; if (!a) return `<circle r="10"/>`;
