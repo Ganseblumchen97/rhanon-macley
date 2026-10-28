@@ -145,6 +145,59 @@ const STAGES = {
       "~~~~~~~~=~~~~~~~G~~~~~~~"
     ]
   },
+  // Bonito (Centro-Oeste): o centro, com a pensão (O), barracas, a fonte de água clara e moradores; G leva ao Rio da Prata
+  centrobonito: {
+    safe: true, next: "rioprata",
+    rows: [
+      "########################",
+      "########################",
+      "#..f....-.......OOO...f#",
+      "#.KKK...-..KKK..OOO....#",
+      "#..V....-...C..........#",
+      "G--------------....P..SE",
+      "#..P....-..~~~.........#",
+      "#.T.....-..~~~..T..f...#",
+      "#.......-.......-..P...#",
+      "#..T....-..T....-......#",
+      "TTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
+  // Bonito: o Rio da Prata (gerado por tools/gerar_mapas.py)
+  rioprata: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~TTTTTTTTTT,..,......TT",
+      "TT....,...TTTT.T.TTTTTT..TTT..TT...T~~,.TToa.,TT......,....T",
+      "TTT.T...TT,T.T.T.oTT,T..TT.T..T.T,T.~~TT,..T.T..---------S-E",
+      "TTTT..T,.o....f..T,.T....T.,TT..TTTT~~TTa.....T.-,......,..T",
+      "TTT..TTTTT...,..,....,,...,T.T,.....~~.TT.,TaTT.-.,....o.,TT",
+      "TTT.T.T.T.---------------.,TT..,..,.~~T,..TT....-......T..TT",
+      "TT.,..T.T.-.,,.,........-,..,.......~~..........-....,T.T.TT",
+      "TTT.TT,...-,......T.T...-..T,,------==-------...-...T..TTTTT",
+      "TT.T.T.T..-...,TTT.TT..a-..,..-.,.,.~~.,.,.,-..,-...TT.TTTTT",
+      "TTT,.,....-.~~~~~T..T.,.-.,.,.-...,.~~T..T..-.,.-.a,,...T.TT",
+      "TTa,TT..f.-~~~~~~~TTT,..-.....-.,...~~.T,T.,-..a-.,.....T.TT",
+      "TT,TTTT.,.-~~~~~~~..T..,-..f..-,,..T~~,T....-.,,-------.,TTT",
+      "TT,.TTTT..-~~~~~~~T,,TT.-.....-...T.~~T.T.,.-......,..-,..TT",
+      "TT.TT..,..-.~~~~~..,.,T.-...,.F...TT~~.TT...-..T...,,.-,.TTT",
+      "TT.T......-,,..aT..T.,.,-,TT,.-.....~~TT....-..T,,....-a.TTT",
+      "TTT.-------.TT,TT.T,..,,-.,..,-..T.T~~T..TT.-.T.T.a...-...TT",
+      "TT..-....,a.TT..T..T.TT.-..,.,-,oT,T~~.aT.T.-.TaT.,...-.,TTT",
+      "TT..-..a...TTTTT.TT.,,.,-------..TT.~~..T.,.-..f...,,.-.T.TT",
+      "T..,-...T..T.T.TTT,TT.T.a......T..,.~~..T...-......,..-.T.TT",
+      "T.,.-...TT.TT.T..T.T.T.T.,.ofT.T....~~TT..,.-----------..TTT",
+      "T..,-...T.T.T.T.,.TT.TTTT.TT..T.,TT.~~..oT........,......,TT",
+      "T,..-.,TTT.T,T.T..~~~~~T..o.T...,T.T~~.TT.,T....~~~~~.....TT",
+      "T,..-..TT..TT.T,~~~~~~~~~,.TT.T.T.T.~~T.T.T..,~~~~~~~~~..TTT",
+      "T...-...TT.T.T.T~~~~~~~~~.....TT.,T.~~T.oT.T,.~~~~~~~~~.T.TT",
+      "T.,.-,,.T.T,,..T~~~~~~~~~.,TT..T,T,T~~.TTTa,..~~~~~~~~~TT.TT",
+      "T,.B-...T.,T.,.T..~~~~~TT.T.TTTT.TT.~~.T,,TT.T..~~~~~....TTT",
+      "T.,.,,..TTT.,..TTT...,....,TT.T...TT~~..T.T,TT.T.TT.,.T..TTT",
+      "T..,..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Cuiabá: a Chapada dos Guimarães (gerado por tools/gerar_mapas.py)
   chapada: {
     next: null,

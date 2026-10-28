@@ -27,6 +27,12 @@ const NARRA = {
     {r: "E tinha bode pra todo lado, vô. Um deles comeu minha corda do arco."},
     "Bode come tudo, curumim. Até corda de arco. Agora deixa eu contar da caatinga."
   ],
+  bonito: [
+    "De Cuiabá o menino desceu de ônibus até Bonito, no Mato Grosso do Sul. E viu a água mais limpa da vida dele.",
+    "Rio tão transparente que o peixe parecia voar, curumim. Dava pra ver a areia do fundo, a pedra, a sucuri dormindo.",
+    {r: "Igual o Tapajós na seca, vô. Só que mais azul."},
+    "Pois é. E a fumaça queria sujar justo essa água. Logo essa."
+  ],
   cuiaba: [
     "De avião outra vez, agora pro meio do Brasil. Cuiabá, curumim: tão longe do mar que o mar nem sabe que ela existe.",
     "Lá o céu é enorme, sem morro e sem mata fechada pra esconder. Jaci devia brilhar mais. Foi ali que o menino viu quanto ela já tinha perdido.",
@@ -47,6 +53,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  ariranha_mae: ["A Ariranha-mãe cuidava de todas as tocas do Rio da Prata, curumim. Bando de ariranha é família, e família defende os filhotes.", "A fumaça fez ela achar que o menino vinha pegar os pequenos.", {r: "Eu só queria atravessar o rio, vô. Ela gritou tão alto que meu ouvido zuniu o dia inteiro."}, "Grito de mãe é assim mesmo. O meu também era, e tu nunca reclamou."],
+  mae_ouro: ["A Mãe-do-ouro é uma luz que guarda as riquezas da terra e do rio. Quem é ganancioso, ela faz se perder atrás do brilho.", "A fumaça confundiu ela: achou que o rio inteiro estava sendo roubado. E de certo jeito estava, curumim. Lama de garimpo, lixo, fumaça.", {r: "Ela me deu uma pepita, vô. Eu devolvi pro rio."}, "Por isso ela te deixou passar. Quem devolve, ela protege."],
   guara_rei: ["O Lobo-guará-rei andava pelo cerrado inteiro, curumim, de perna comprida pra ver por cima do capim. Plantava lobeira por onde passava.", "A queimada comeu o capim dele. Lobo sem capim fica no aberto, com medo, e medo vira raiva.", {r: "Ele não queria brigar, vô. Queria só voltar pra casa."}, "E tu mostrou o caminho. Por isso que o cerrado ainda tem lobo, menino."],
   pe_garrafa: ["O Pé-de-garrafa grita igual gente perdida no mato, curumim. Quem vai atrás do grito se perde também.", "Mas ele mesmo era o mais perdido. A fumaça apagou as estrelas que ele usava pra voltar pra toca.", {r: "Eu ensinei ele a achar o Cruzeiro do Sul, vô. Ele pulou de alegria. Num pé só."}, "Agora quem se perde na Chapada é ajudado por ele. Dizem que o grito virou assobio de quem mostra a trilha."],
   onca_dagua: ["A Onça-d'água era a dona do Pantanal, curumim. Atravessava corixo nadando e pegava jacaré dentro do rio.", "A fumaça das queimadas deixou ela sem lugar pra ficar. Bicho sem casa fica bravo, igual gente.", {r: "Ela me olhou um tempão antes de ir embora, vô. Parecia que tava agradecendo."}, "Tava mesmo. Onça não esquece quem ajudou. Nem quem atrapalhou."],

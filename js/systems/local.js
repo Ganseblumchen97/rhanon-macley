@@ -51,6 +51,10 @@ function selectSub(id, msg) {
     btn(t("Entrar na orla"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo do sertão."));
   }
+  else if (id === "centrobonito") {
+    btn(t("Entrar no centro"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo de Bonito."));
+  }
   else if (id === "portocuiaba") {
     btn(t("Entrar no Porto"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo de Cuiabá."));
@@ -115,7 +119,7 @@ function busRide(city, toStage) {
   $("mk").style.display = "none"; veh.style.display = "";
   const volta = G.loc === "recife" || G.loc === "petrolina";   // voltando para o litoral (Teresina, Recife) pelo sertão
   const onRiver = MAP_REGION === "norte";
-  $("info").innerHTML = `<h2>${t(onRiver ? "No rio…" : "Na estrada…")}</h2><p>${t({belem: "O barco desce o Tapajós e o Amazonas rumo a Belém.", ananindeua: "O barco sobe o Amazonas e o Tapajós de volta para a aldeia.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: volta ? "O ônibus desce do sertão de volta para Recife." : "O ônibus atravessa o sertão rumo a Recife.", petrolina: "O ônibus sobe pelo agreste e pelo sertão rumo a Petrolina."}[city])}</p>`;
+  $("info").innerHTML = `<h2>${t(onRiver ? "No rio…" : "Na estrada…")}</h2><p>${t({belem: "O barco desce o Tapajós e o Amazonas rumo a Belém.", ananindeua: "O barco sobe o Amazonas e o Tapajós de volta para a aldeia.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: volta ? "O ônibus desce do sertão de volta para Recife." : "O ônibus atravessa o sertão rumo a Recife.", petrolina: "O ônibus sobe pelo agreste e pelo sertão rumo a Petrolina.", bonito: "O ônibus desce pelo Mato Grosso do Sul rumo a Bonito.", cuiaba: "O ônibus sobe pela estrada de volta para Cuiabá."}[city])}</p>`;
   let t0 = 0, last = null, vrum = 0;
   const f = ts => {
     t0 = t0 || ts;

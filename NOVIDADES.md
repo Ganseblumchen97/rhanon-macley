@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.61.0 — Bonito e o Rio da Prata
+
+- Cidade nova no Centro-Oeste: Bonito, no Mato Grosso do Sul. Depois de acalmar o Lobo-guará-rei da Chapada, compre
+  a passagem de ônibus no mapa do Centro-Oeste (R$ 1.200, vale ida e volta para Cuiabá).
+- O centro de Bonito tem pensão, barracas, uma fonte de água tão clara que dá pra contar as pedrinhas e moradores que
+  contam do rio. A rua da esquerda leva ao Rio da Prata.
+- O Rio da Prata (níveis 54 a 56) é uma trilha de mata com um rio azul transparente no meio. Bichos novos:
+  piraputanga, que nada no rio e cospe água em quem chega perto, mutum, bugio, sucuri-amarela e, de noite, o
+  gato-palheiro.
+- De dia, a chefe é a Ariranha-mãe, que defende as tocas lutando dentro d'água. De noite, uma bola de fogo dourada
+  para em cima do rio: é a Mãe-do-ouro, que guarda o que é do rio.
+
 ## 0.60.0 — a Chapada e o sertanejo
 
 - Cuiabá ganhou a Chapada dos Guimarães (níveis 52 a 54): cerrado de árvore torta, paredão de pedra vermelha e um

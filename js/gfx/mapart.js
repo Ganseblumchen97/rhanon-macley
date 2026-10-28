@@ -31,6 +31,8 @@ const MAP_ICON = {
   beira: ["#2a7a8a", `<path d="M-8 2 Q0 6 8 2 L6 -1 H-6Z" fill="${MI.t}" ${MI.s}/><path d="M-8 2 Q-10 -3 -7 -6 Q-4 -7 -4 -3 L-5 -1Z" fill="#e5401c" ${MI.s}/><circle cx="-6.5" cy="-4.5" r="1" fill="#ffd23a"/>` + MI_WAVE(7)],   // barquinho com a carranca de juba vermelha
   caatinga: ["#b8763a", `<path d="M-1.6 8 V-7 Q0 -9.5 1.6 -7 V8Z" fill="#5a9a3a" ${MI.s}/><path d="M-1.6 1 H-5 V-4 M1.6 3 H5 V-2" fill="none" stroke="#5a9a3a" stroke-width="2.4" stroke-linecap="round"/>`],
   serra: ["#a84a2a", `<path d="M-9 7 L-3 -6 L1 1 L4 -3 L9 7Z" fill="#d8784a" ${MI.s}/><path d="M-3 -6 L-1 -2 L-5 -2Z" fill="${MI.c}"/>`],
+  centrobonito: ["#2a9aa8", MI_HOUSE("#f0e6d0", "#c8603a") + `<circle cx="6" cy="6" r="2.4" fill="${MI.w}" ${MI.s}/>`],   // casinha e a fonte
+  rioprata: ["#2aa8b8", `<path d="M-9 -2 Q0 4 9 -2 V9 H-9Z" fill="#7ae0e8" ${MI.s}/><path d="M-5 3 l4 -2 v4 Z M1 1 q3 -1 5 1 q-2 2 -5 1Z" fill="#e8a020"/>` + MI_WAVE(-4, "#cfeeff", 1.4)],   // água transparente com os peixes
   chapada: ["#b8583a", `<path d="M-9 8 V-4 L-5 -7 H-1 V8Z M3 8 V-6 L6 -8 L9 -5 V8Z" fill="#d8784a" ${MI.s}/><path d="M-1 -5 Q1 -5 1 -3 V8 H3 V-4" fill="none" stroke="${MI.w}" stroke-width="1.8"/>` + MI_WAVE(8)],   // paredão com a cachoeira no meio
   pantanal: ["#3a8a7a", `<path d="M-2 8 V-1 M2 8 V-1" stroke="${MI.k}" stroke-width="1.4"/><ellipse cx="0" cy="-2" rx="5" ry="3.5" fill="${MI.c}" ${MI.s}/><path d="M-3 -3 V-8" stroke="${MI.k}" stroke-width="2.4"/><rect x="-4.2" y="-5" width="2.4" height="1.6" fill="${MI.r}"/><path d="M-3 -8.5 L-9 -7" stroke="${MI.k}" stroke-width="1.6" stroke-linecap="round"/>` + MI_WAVE(8)],   // tuiuiú no alagado
   portocuiaba: ["#c8603a", MI_TREE(-3, 1, 5, "#f0c020") + `<path d="M2 8 V-1 H9 V8Z" fill="${MI.c}" ${MI.s}/><path d="M1 -1 L5.5 -5 L10 -1Z" fill="${MI.r}" ${MI.s}/>`],   // ipê-amarelo e casario
@@ -38,7 +40,7 @@ const MAP_ICON = {
 };
 MAP_ICON.terminal = MAP_ICON.parada;   // o cais de Belém também é o barco de linha
 // no mapa grande, cada cidade aparece com o desenho do lugar dela
-const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", curitiba: "curitiba"};
+const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", curitiba: "curitiba"};
 // disco do ponto do mapa (r = raio): cor da área, aro claro e o desenho; sem desenho, a bolinha de antes
 function mapIcon(k, r = 15) {
   const a = MAP_ICON[k]; if (!a) return `<circle r="10"/>`;

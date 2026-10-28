@@ -1152,6 +1152,9 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
   cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara, carranca, nego_dagua: negoDagua,
   martim: (pose, f) => pombo(pose, f, {b: "#2a7ac8", B: "#1a4a8a", n: "#f4f0e4", p: "#e8702a", w: "#4aa8e0", y: "#2a2a2a"}),   // martim-pescador: azul, colar branco e peito laranja
+  mutum: (pose, f) => pombo(pose, f, {b: "#1e1e26", B: "#0e0e14", n: "#2a2a34", p: "#f0f0e8", w: "#2a2a34", y: "#f0c020"}),   // mutum: preto, barriga branca e bico amarelo
+  sucuri_amarela: cobra({b: "#c8a830", B: "#8a7018", k: "#2a2210"}, false),   // sucuri-amarela: amarela de mancha preta
+  mae_ouro: visagem({w: "#ffd23a", W: "#e8901a", s: "#ffe8a0", h: "#f0b020", e: "#ff5a1c"}),   // Mãe-do-ouro: vestido e cabelo de ouro em brasa
   seriema: (pose, f) => garca(pose, f, {b: "#b8a888", B: "#8a7a5e", n: "#c8bca0", N: "#8a7a5e", y: "#d8402a", Y: "#a02a1a", k: "#d8402a"}),   // seriema: pardo-cinza, bico e pernas vermelhos
   arara_vermelha: (pose, f) => pombo(pose, f, {b: "#d8282a", B: "#9a1a1a", n: "#d8282a", p: "#e8402a", w: "#2a6ad8", y: "#f0e8d0"}),   // arara-vermelha: vermelha de asa azul
   pe_garrafa: peGarrafa,
