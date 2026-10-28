@@ -19,6 +19,13 @@ const MAP_REGIONS = {
       "M210 100 L222 94 L230 103 L220 110Z"],   // continente e a ilha de São Luís
     river: "M230 494 C250 440 300 360 363 320 S470 320 519 354",   // rio São Francisco
     route: ["saoluis", "teresina", "recife", "petrolina"], pos: {saoluis: [222, 112], teresina: [276, 188], recife: [564, 280], petrolina: [362, 326]}},
+  // Centro-Oeste: Mato Grosso, Mato Grosso do Sul, Goiás e o Distrito Federal (a partir de longitude/latitude) e o rio
+  // Paraguai descendo pelo Pantanal; por enquanto só Cuiabá (Bonito e Brasília vêm depois)
+  centroeste: {n: "Centro-Oeste", aria: "Mapa estilizado do Centro-Oeste, com Cuiabá",
+    land: ["M55 94 L148 49 L190 106 L295 109 L391 124 L382 214 L430 220 L514 217 L523 280 L481 310 L460 364 L388 397 L358 424 L313 460 L286 508 L271 550 L238 547 L229 502 L163 493 L169 430 L157 355 L94 319 L97 241 L52 160Z",
+      "M452 296 L474 296 L474 312 L452 312Z"],   // a região e o quadradinho do Distrito Federal
+    river: "M196 280 C172 300 160 330 170 360 C178 390 164 410 170 430 S160 470 163 493",   // rio Paraguai, pelo Pantanal
+    route: ["cuiaba"], pos: {cuiaba: [217, 298]}},
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre a aldeia e Curitiba",
     land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
     route: ["ananindeua", "curitiba"], pos: {ananindeua: [268, 172], curitiba: [315, 478]}}
@@ -31,7 +38,7 @@ const REGIONS = {
     txt: "Onde tudo começou: a aldeia Jasytatá, na beira do Tapajós, e Belém. Os bichos e encantados da floresta ficaram bravos com a fumaça de Pytuna."},
   nordeste:    {n: "Nordeste", pos: [385, 245], color: "#e8a020", open: true, map: "nordeste", airport: "Aeroporto de São Luís",
     txt: "Sertão, dunas e mangue. Dizem que lá a fumaça secou tudo, e a Comadre Fulozinha anda perdida na mata."},
-  centroeste:  {n: "Centro-Oeste", pos: [262, 335], color: "#c8603a", open: false,
+  centroeste:  {n: "Centro-Oeste", pos: [262, 335], color: "#c8603a", open: true, map: "centroeste", airport: "Aeroporto de Cuiabá",
     txt: "O Pantanal, o cerrado e Brasília. Um céu tão grande que a lua devia brilhar mais."},
   sudeste:     {n: "Sudeste", pos: [352, 410], color: "#3a7ab8", open: false,
     txt: "Cidades que não dormem e mata atlântica nas serras. Mais luz de poste que de lua."},
@@ -44,6 +51,7 @@ const LOC = {
   teresina: {n: "Teresina (PI)", s: "Teresina", txt: "A capital mais quente do Brasil, entre dois rios: o Parnaíba e o Poti. No encontro das águas, dizem, mora o Cabeça de Cuia."},
   petrolina: {n: "Petrolina (PE)", s: "Petrolina", txt: "O sertão de Pernambuco, na beira do Velho Chico: caatinga seca, bode solto, carranca na proa dos barcos e um rio que nunca deixa a cidade sem água."},
   recife: {n: "Recife (PE)", s: "Recife", txt: "A Veneza brasileira, cortada por rios e pontes: frevo, maracatu, cordel na feira e Olinda logo ali, no alto da ladeira."},
+  cuiaba: {n: "Cuiabá (MT)", s: "Cuiabá", txt: "O meio da América do Sul, na beira do rio Cuiabá: calor de quarenta graus, viola de cocho, peixe na brasa e o Pantanal começando logo ali. O Centro-Oeste começa aqui."},
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
@@ -68,6 +76,8 @@ const SUB = {
   serra: {city: "petrolina", n: "Serra do Araripe", s: "Serra", x: 290, y: 56, txt: "Lá no alto, a chapada: paredão de pedra cheio de fóssil, mata verde na encosta e encruzilhada de estrada de terra. Nas sextas de lua cheia, ninguém sobe."},
   caatinga: {city: "petrolina", n: "Caatinga", x: 120, y: 110, txt: "A mata branca do sertão: galho seco, mandacaru e chão rachado. Bode, preá, tatu-bola... e, de noite, um assobio fino no meio dos espinhos."},
   orla: {city: "petrolina", n: "Orla do Velho Chico", s: "Orla", x: 300, y: 210, txt: "A beira do São Francisco em Petrolina: barquinho de carranca, feira de bode e de queijo, pensão e o povo do sertão, que ri de tudo."},
+  pantanal: {city: "cuiaba", n: "Pantanal", x: 140, y: 262, txt: "Rio abaixo, a planície que alaga: capim alto, baías de água parada, corixo cortando o campo e bicho de todo lado. Tuiuiú, arara-azul, jacaré às centenas... e, de noite, o barranco que desaba sozinho."},
+  portocuiaba: {city: "cuiaba", n: "Porto de Cuiabá", s: "Porto", x: 268, y: 206, txt: "O bairro mais velho de Cuiabá, na beira do rio: o mercado do peixe, casario baixo, rede na pensão e gente que fala \"tchá\" e \"pai do céu\" em toda frase."},
   olinda: {city: "recife", n: "Olinda", x: 250, y: 70, txt: "A cidade alta, vizinha do Recife: ladeira de pedra, igreja no alto, casario colorido e quintal cheio de bicho. De noite, dizem, um boneco gigante desce a ladeira sozinho."},
   recifeantigo: {city: "recife", n: "Recife Antigo", x: 300, y: 170, txt: "O bairro do Recife Antigo, no Marco Zero: casarão colorido, rua de pedra, o rio Capibaribe chegando no mar e um cordelista que precisa de um programador."},
   trocatroca: {city: "teresina", n: "Troca-Troca", x: 260, y: 170, txt: "O mercado do Troca-Troca, no centro de Teresina: rede, cerâmica, cajuína gelada e gente pechinchando. Tem pensão e comida."},
@@ -109,7 +119,12 @@ const CITY = {
   petrolina: {n: "Petrolina", look: "sertao", map: "nordeste", route: ["orla", "caatinga", "serra", "beira"], cabin: false,
     land: "30,30 170,16 320,26 420,70 432,190 400,250 300,262 160,266 40,250 12,140",
     bay: "M0,250 C80,268 180,272 300,262 C360,256 400,262 440,250 L440,325 L0,325Z",   // o rio São Francisco
-    river: "M0,262 C80,280 180,284 300,274 C360,268 400,274 440,262", road: "M300,210 C350,190 400,170 446,160", sign: [356, 150, "Recife →"], home: "orla", gate: "orla"}
+    river: "M0,262 C80,280 180,284 300,274 C360,268 400,274 440,262", road: "M300,210 C350,190 400,170 446,160", sign: [356, 150, "Recife →"], home: "orla", gate: "orla"},
+  // Cuiabá (Centro-Oeste): o rio Cuiabá descendo pelo meio, com o Porto na margem leste; a estrada atravessa a ponte para
+  // Várzea Grande, onde fica o aeroporto. Pantanal e Chapada vêm depois
+  cuiaba: {n: "Cuiabá", look: "cerrado", map: "centroeste", route: ["portocuiaba", "pantanal"], cabin: false,
+    land: "30,40 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
+    river: "M150,0 C170,60 190,110 200,160 C210,210 180,260 170,325", road: "M268,206 C190,200 120,190 60,170 C40,164 20,160 -6,156", sign: [10, 146, "← ✈ Aeroporto"], home: "portocuiaba", gate: "portocuiaba"}
 };
 /* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
    que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
@@ -151,21 +166,30 @@ const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15]
   saoluis: [["limpo", 30], ["chuva", 25], ["neblina", 5], ["mormaco", 25], ["ventania", 15]],   // ilha de muito sol e vento
   petrolina: [["limpo", 45], ["chuva", 5], ["neblina", 5], ["mormaco", 40], ["ventania", 5]],   // sertão: sol e calor quase todo dia
   recife: [["limpo", 30], ["chuva", 35], ["neblina", 5], ["mormaco", 20], ["ventania", 10]],   // litoral: chuva de verão e brisa do mar
-  teresina: [["limpo", 35], ["chuva", 10], ["neblina", 5], ["mormaco", 45], ["ventania", 5]]};   // a capital mais quente do Brasil
+  teresina: [["limpo", 35], ["chuva", 10], ["neblina", 5], ["mormaco", 45], ["ventania", 5]],   // a capital mais quente do Brasil
+  cuiaba: [["limpo", 35], ["chuva", 20], ["neblina", 5], ["mormaco", 30], ["ventania", 10]]};   // calorão do meio do Brasil e chuva de verão
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
-  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
   for (const [k, w] of odds) if ((r -= w) < 0) return k;
   return "limpo";
 }
 const weatherNow = () => { const w = weatherOn(G.day); return G.night && w === "mormaco" ? "limpo" : w; };   // mormaço some de noite
 const weatherBoost = k => (WEATHER[weatherNow()].boost || {})[k] || 1;
 const curCity = () => CITY[G.loc] ? G.loc : "ananindeua";
-/* voo entre Belém e São Luís (aeroportos de REGIONS): de graça, pago pela empresa do freela, e só depois do fim do
-   capítulo do Norte (os 20 chefes acalmados) e do site da feira entregue */
-const FLIGHT = {belem: "saoluis", saoluis: "belem"};
-const flightOpen = () => !!G.portfolio.site_feira && NORTE_BOSSES().every(k => BS()[k]);
+/* voos entre regiões, de ida e volta e de graça (pagos pelo freela da região de onde se sai): Belém ↔ São Luís abre
+   com o fim do Norte (os 20 chefes acalmados) e o site da feira entregue; Recife ↔ Cuiabá, com o fim do Nordeste (a
+   calma de Guaraci) e o app de cordel entregue. lock = aviso no aeroporto enquanto não abre; paid = quem paga */
+const FLIGHTS = [
+  {a: "belem", b: "saoluis", open: () => !!G.portfolio.site_feira && NORTE_BOSSES().every(k => BS()[k]), paid: "O voo de ida e volta é pago pela empresa do site da feira.",
+    lock: "Aeroporto de Belém: o voo para São Luís sai quando o site da feira estiver entregue e os 20 chefes do Norte acalmados."},
+  {a: "recife", b: "cuiaba", open: () => !!G.portfolio.app_cordel && NORDESTE_BOSSES().every(k => BS()[k]), paid: "O voo de ida e volta é pago com o dinheiro do app de cordel.",
+    lock: "Aeroporto do Recife: o voo para Cuiabá sai quando o app de cordel estiver entregue e os chefes do Nordeste acalmados."}
+];
+const AIRPORT = {belem: "Aeroporto de Belém", saoluis: "Aeroporto de São Luís", recife: "Aeroporto do Recife", cuiaba: "Aeroporto de Cuiabá"};
+const flightsFrom = c => FLIGHTS.filter(f => f.a === c || f.b === c).map(f => Object.assign({to: f.a === c ? f.b : f.a}, f));
+const flightOpen = (to = "saoluis") => FLIGHTS.some(f => (f.a === to || f.b === to) && f.open());
 const cityOf = k => (SUB[k] && SUB[k].city) || "ananindeua";
 const ROUTE = Object.values(CITY).flatMap(c => c.route);   // todos os locais das duas cidades
 const EDGES = Object.values(CITY).flatMap(c => c.route.slice(1).map((k, i) => [c.route[i], k]));
@@ -207,7 +231,7 @@ const FREELAS = {
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

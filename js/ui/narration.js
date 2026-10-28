@@ -110,7 +110,7 @@ function bossStory(id, done) {
   });
   if (guaraciCalm() >= 1 && !G.narrated.nordeste_fim) steps.push(next => {
     G.narrated.nordeste_fim = true; save(); musicStart("jaci");   // a chuva volta no sertão: o tema da esperança
-    narrate(NARRA_PYT.nordeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Nordeste"), t("A história continua no Centro-Oeste. Em breve!")); setTimeout(next, 1500); });
+    narrate(NARRA_PYT.nordeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Nordeste"), t(G.portfolio.app_cordel ? "A história continua no Centro-Oeste: o voo sai do Aeroporto do Recife." : "A história continua no Centro-Oeste. Antes, entregue o app de cordel do Seu Dedé no Recife Antigo.")); setTimeout(next, 1500); });
   });
   const run = () => steps.length ? steps.shift()(run) : done && done();
   run();

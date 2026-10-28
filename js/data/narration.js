@@ -27,6 +27,12 @@ const NARRA = {
     {r: "E tinha bode pra todo lado, vô. Um deles comeu minha corda do arco."},
     "Bode come tudo, curumim. Até corda de arco. Agora deixa eu contar da caatinga."
   ],
+  cuiaba: [
+    "De avião outra vez, agora pro meio do Brasil. Cuiabá, curumim: tão longe do mar que o mar nem sabe que ela existe.",
+    "Lá o céu é enorme, sem morro e sem mata fechada pra esconder. Jaci devia brilhar mais. Foi ali que o menino viu quanto ela já tinha perdido.",
+    {r: "E fazia quarenta graus, vô. A lança esquentava na mão."},
+    "Esquentava mesmo. E o povo de lá ainda come peixe na brasa no meio do dia. Agora deixa eu contar do Pantanal."
+  ],
   teresina: [
     "Teresina! A cidade mais quente do Brasil. O menino suava até a lança.",
     "Ela fica entre dois rios, o Parnaíba e o Poti. E no encontro deles mora uma assombração que os pescadores respeitam.",
@@ -41,6 +47,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  onca_dagua: ["A Onça-d'água era a dona do Pantanal, curumim. Atravessava corixo nadando e pegava jacaré dentro do rio.", "A fumaça das queimadas deixou ela sem lugar pra ficar. Bicho sem casa fica bravo, igual gente.", {r: "Ela me olhou um tempão antes de ir embora, vô. Parecia que tava agradecendo."}, "Tava mesmo. Onça não esquece quem ajudou. Nem quem atrapalhou."],
+  minhocao: ["O Minhocão do Pantanal cava a margem por baixo e o barranco desaba. Os pescadores antigos tinham medo dele.", "Mas ele só cavava assim quando o rio estava doente. A fumaça entrou na água, e ele cavou até quase derrubar a cidade.", {r: "Ele era do tamanho de um barco, vô. Grosso igual tronco de piúva."}, "E tu acalmou ele com uma lança. Eu, se fosse tu, tinha corrido. Mas eu sou velho e sabido."],
   carranca: ["A carranca foi feita pra proteger os barqueiros do Velho Chico, curumim. Cara feia de madeira pra espantar o que mora no fundo do rio.", "A fumaça entrou na madeira, e a carranca esqueceu de quem cuidava. Soltou-se da proa e desceu o rio sozinha, brava com todo mundo.", {r: "Quando ela acalmou, vô, um barqueiro veio buscar ela de canoa. Disse que era da família dele fazia três gerações."}, "Carranca boa volta pra casa. Igual neto."],
   nego_dagua: ["O Nego d'água é o dono do fundo do São Francisco. Ri alto, vira canoa de quem pesca demais e espanta o peixe pra outro lado.", "Pescador sabido deixa um agrado na pedra da margem, e ele deixa a rede encher. A fumaça fez ele esquecer dos agrados.", {r: "Eu deixei um pedaço de rapadura pra ele, vô. Ele riu tanto que a água tremeu."}, "E a rapadura? Pois é. Pagou a passagem do teu barco de volta."],
   tapejara: ["O Tapejara voava por aquelas bandas no tempo dos dinossauros, curumim. Virou pedra, e a pedra guardou ele cem milhões de anos.", "A fumaça acordou o bicho no lugar errado, no tempo errado. O menino acalmou ele, e ele voltou a dormir no paredão.", {r: "Vô, ele piscou pra mim antes de virar pedra de novo."}, "Pedra que pisca. Só tu mesmo pra ver uma coisa dessas."],

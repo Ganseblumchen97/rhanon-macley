@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rhanon Macley — RPG (offline)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Luckiest+Guy&family=JetBrains+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="styles.css?v=0.58.0">
+<link rel="stylesheet" href="styles.css?v=0.59.0">
 </head>
 <body>
 <div class="bg" aria-hidden="true">
@@ -70,6 +70,8 @@
     <pattern id="pcidade" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#4a5a52"/><rect x="2" y="2" width="7" height="7" fill="#5a6a62"/><rect x="11" y="2" width="7" height="7" fill="#52625a"/><rect x="2" y="11" width="7" height="7" fill="#52625a"/><rect x="11" y="11" width="7" height="7" fill="#5e6e66"/></pattern>
     <pattern id="plitoral" width="22" height="20" patternUnits="userSpaceOnUse"><rect width="22" height="20" fill="#5a8a4a"/><circle cx="6" cy="6" r="2.6" fill="#6a9a52"/><circle cx="16" cy="14" r="2.2" fill="#7aa85a"/><circle cx="16" cy="4" r="1" fill="#e8d8a0"/></pattern>
     <pattern id="psertao" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#b8925a"/><circle cx="5" cy="5" r="1.4" fill="#8a6a3a"/><circle cx="14" cy="12" r="1.8" fill="#9a7a44"/><path d="M15 3v4M13 5h4" stroke="#5a8a3a" stroke-width="1.2"/></pattern>
+    <pattern id="pcerrado" width="22" height="20" patternUnits="userSpaceOnUse"><rect width="22" height="20" fill="#a89a52"/><circle cx="6" cy="6" r="2.6" fill="#6a8a3a"/><path d="M6 8v4" stroke="#6a4a2a" stroke-width="1.2"/><circle cx="16" cy="14" r="1.6" fill="#c8b06a"/><circle cx="17" cy="4" r="1" fill="#e8c020"/></pattern>
+    <pattern id="pcerrado2" width="26" height="24" patternUnits="userSpaceOnUse"><rect width="26" height="24" fill="#9a9a4e"/><circle cx="6" cy="7" r="3.4" fill="#6a8a3a"/><path d="M6 10v4" stroke="#6a4a2a" stroke-width="1.4"/><circle cx="19" cy="16" r="2.2" fill="#b8a85e"/><circle cx="19" cy="5" r="1.4" fill="#e8c020"/><circle cx="8" cy="19" r="1.8" fill="#7a9a4a"/></pattern>
     <pattern id="pmata2" width="26" height="24" patternUnits="userSpaceOnUse"><rect width="26" height="24" fill="#2f6a3a"/><circle cx="6" cy="7" r="4" fill="#3f8a46"/><circle cx="19" cy="17" r="4.4" fill="#3a7f42"/><circle cx="18" cy="5" r="2" fill="#4f9a50"/><circle cx="7" cy="19" r="1.8" fill="#275a32"/></pattern>
     <pattern id="psertao2" width="26" height="24" patternUnits="userSpaceOnUse"><rect width="26" height="24" fill="#a8864e"/><circle cx="6" cy="6" r="1.8" fill="#8a6a3a"/><circle cx="18" cy="15" r="2.2" fill="#947440"/><path d="M19 3v5M17 5.5h4" stroke="#5a8a3a" stroke-width="1.4"/><circle cx="8" cy="18" r="2.6" fill="#7a9a4a"/></pattern>
   </defs></svg>
@@ -137,46 +139,46 @@
   </div>
 </main>
 <!-- Ordem importa: utilidades e estado, depois dados, depois quem usa os dados. main.js por último. -->
-<script src="js/core/version.js?v=0.58.0"></script>
-<script src="js/core/utils.js?v=0.58.0"></script>
-<script src="js/core/lang.js?v=0.58.0"></script>   <!-- pede sozinho o js/data/lang/<idioma>.js escolhido -->
-<script src="js/core/state.js?v=0.58.0"></script>
-<script src="js/core/assets.js?v=0.58.0"></script>
-<script src="js/data/sprites.js?v=0.58.0"></script>
-<script src="js/data/animals.js?v=0.58.0"></script>
-<script src="js/data/commands.js?v=0.58.0"></script>
-<script src="js/data/skills.js?v=0.58.0"></script>
-<script src="js/data/narration.js?v=0.58.0"></script>
-<script src="js/data/questions.js?v=0.58.0"></script>
-<script src="js/data/world.js?v=0.58.0"></script>
-<script src="js/data/stages.js?v=0.58.0"></script>
-<script src="js/data/art.js?v=0.58.0"></script>
-<script src="js/audio/sfx.js?v=0.58.0"></script>
-<script src="js/audio/music.js?v=0.58.0"></script>
-<script src="js/gfx/sprites.js?v=0.58.0"></script>
-<script src="js/gfx/rig.js?v=0.58.0"></script>
-<script src="js/gfx/beasts.js?v=0.58.0"></script>
-<script src="js/gfx/fx.js?v=0.58.0"></script>
-<script src="js/gfx/actors.js?v=0.58.0"></script>
-<script src="js/gfx/tiles.js?v=0.58.0"></script>
-<script src="js/gfx/scenery.js?v=0.58.0"></script>
-<script src="js/gfx/mapart.js?v=0.58.0"></script>
-<script src="js/ui/screen-fx.js?v=0.58.0"></script>
-<script src="js/ui/theme.js?v=0.58.0"></script>
-<script src="js/ui/options.js?v=0.58.0"></script>
-<script src="js/ui/cutin.js?v=0.58.0"></script>
-<script src="js/ui/mapnav.js?v=0.58.0"></script>
-<script src="js/ui/gamepad.js?v=0.58.0"></script>
-<script src="js/ui/narration.js?v=0.58.0"></script>
-<script src="js/systems/combat.js?v=0.58.0"></script>
-<script src="js/systems/challenge.js?v=0.58.0"></script>
-<script src="js/systems/world-map.js?v=0.58.0"></script>
-<script src="js/systems/local.js?v=0.58.0"></script>
-<script src="js/systems/journal.js?v=0.58.0"></script>
-<script src="js/systems/equip.js?v=0.58.0"></script>
-<script src="js/systems/skills.js?v=0.58.0"></script>
-<script src="js/systems/explore.js?v=0.58.0"></script>
-<script src="js/systems/secrets.js?v=0.58.0"></script>
-<script src="js/main.js?v=0.58.0"></script>
+<script src="js/core/version.js?v=0.59.0"></script>
+<script src="js/core/utils.js?v=0.59.0"></script>
+<script src="js/core/lang.js?v=0.59.0"></script>   <!-- pede sozinho o js/data/lang/<idioma>.js escolhido -->
+<script src="js/core/state.js?v=0.59.0"></script>
+<script src="js/core/assets.js?v=0.59.0"></script>
+<script src="js/data/sprites.js?v=0.59.0"></script>
+<script src="js/data/animals.js?v=0.59.0"></script>
+<script src="js/data/commands.js?v=0.59.0"></script>
+<script src="js/data/skills.js?v=0.59.0"></script>
+<script src="js/data/narration.js?v=0.59.0"></script>
+<script src="js/data/questions.js?v=0.59.0"></script>
+<script src="js/data/world.js?v=0.59.0"></script>
+<script src="js/data/stages.js?v=0.59.0"></script>
+<script src="js/data/art.js?v=0.59.0"></script>
+<script src="js/audio/sfx.js?v=0.59.0"></script>
+<script src="js/audio/music.js?v=0.59.0"></script>
+<script src="js/gfx/sprites.js?v=0.59.0"></script>
+<script src="js/gfx/rig.js?v=0.59.0"></script>
+<script src="js/gfx/beasts.js?v=0.59.0"></script>
+<script src="js/gfx/fx.js?v=0.59.0"></script>
+<script src="js/gfx/actors.js?v=0.59.0"></script>
+<script src="js/gfx/tiles.js?v=0.59.0"></script>
+<script src="js/gfx/scenery.js?v=0.59.0"></script>
+<script src="js/gfx/mapart.js?v=0.59.0"></script>
+<script src="js/ui/screen-fx.js?v=0.59.0"></script>
+<script src="js/ui/theme.js?v=0.59.0"></script>
+<script src="js/ui/options.js?v=0.59.0"></script>
+<script src="js/ui/cutin.js?v=0.59.0"></script>
+<script src="js/ui/mapnav.js?v=0.59.0"></script>
+<script src="js/ui/gamepad.js?v=0.59.0"></script>
+<script src="js/ui/narration.js?v=0.59.0"></script>
+<script src="js/systems/combat.js?v=0.59.0"></script>
+<script src="js/systems/challenge.js?v=0.59.0"></script>
+<script src="js/systems/world-map.js?v=0.59.0"></script>
+<script src="js/systems/local.js?v=0.59.0"></script>
+<script src="js/systems/journal.js?v=0.59.0"></script>
+<script src="js/systems/equip.js?v=0.59.0"></script>
+<script src="js/systems/skills.js?v=0.59.0"></script>
+<script src="js/systems/explore.js?v=0.59.0"></script>
+<script src="js/systems/secrets.js?v=0.59.0"></script>
+<script src="js/main.js?v=0.59.0"></script>
 </body>
 </html>

@@ -50,11 +50,14 @@ function select(id) {
   if (l.soon) {   // destino que ainda não abre (Belém)
     btn(t("Em breve"), () => {}, true);
     i.insertAdjacentHTML("beforeend", '<p class="hint">Um dia Rhanon vai precisar chegar à capital para pegar um avião. Por enquanto, a aventura é na aldeia.</p>');
-  } else if (CITY[id] && CITY[id].map === "nordeste") {   // cidades do Nordeste: entrar, ônibus para as vizinhas e o voo de São Luís
+  } else if (CITY[id] && CITY[id].map !== "norte") {   // cidades do Nordeste e do Centro-Oeste: entrar, ônibus para as vizinhas e os voos
     if (here) {
       btn(t("Entrar em {cidade}", {cidade: LOC[id].s}), openLocal);
-      MAP_REGIONS.nordeste.route.filter(c => c !== id && busLine(id, c) && G[busLine(id, c).pass]).forEach(c => btn(t("Viajar de ônibus para {cidade}", {cidade: LOC[c].s}), () => busRide(c)));
-      if (FLIGHT[id]) { btn(t("Voar para Belém (Aeroporto de São Luís)"), () => fly("belem")); i.insertAdjacentHTML("beforeend", `<p class="hint">${t("O voo de ida e volta é pago pela empresa do site da feira.")}</p>`); }
+      MAP_REGIONS[CITY[id].map].route.filter(c => c !== id && busLine(id, c) && G[busLine(id, c).pass]).forEach(c => btn(t("Viajar de ônibus para {cidade}", {cidade: LOC[c].s}), () => busRide(c)));
+      flightsFrom(id).forEach(f => {   // aeroporto: o voo para a outra região, ou o aviso do que falta (depois de chegar perto)
+        if (f.open()) { btn(t("Voar para {cidade} ({aero})", {cidade: LOC[f.to].s, aero: t(AIRPORT[id])}), () => fly(f.to)); i.insertAdjacentHTML("beforeend", `<p class="hint">${t(f.paid)}</p>`); }
+        else if (id === "recife" && (G.portfolio.app_cordel || guaraciCalm() >= 1)) i.insertAdjacentHTML("beforeend", `<p class="hint">${t(f.lock)}</p>`);
+      });
     } else {
       const ln = busLine(G.loc, id);   // dá para ir de ônibus da cidade atual até esta
       if (ln && G[ln.pass]) btn(t("Viajar de ônibus para {cidade}", {cidade: LOC[id].s}), () => busRide(id));
@@ -63,8 +66,9 @@ function select(id) {
     }
   } else if (here && id === "belem") {
     btn(t("Entrar em Belém"), openLocal);
-    if (flightOpen()) { btn(t("Voar para São Luís (Aeroporto de Belém)"), () => fly("saoluis")); i.insertAdjacentHTML("beforeend", `<p class="hint">${t("O voo de ida e volta é pago pela empresa do site da feira.")}</p>`); }
-    else if (G.portfolio.site_feira || NORTE_BOSSES().every(k => BS()[k])) i.insertAdjacentHTML("beforeend", `<p class="hint">${t("Aeroporto de Belém: o voo para São Luís sai quando o site da feira estiver entregue e os 20 chefes do Norte acalmados.")}</p>`);
+    const f = flightsFrom("belem")[0];
+    if (f.open()) { btn(t("Voar para {cidade} ({aero})", {cidade: LOC[f.to].s, aero: t(AIRPORT.belem)}), () => fly(f.to)); i.insertAdjacentHTML("beforeend", `<p class="hint">${t(f.paid)}</p>`); }
+    else if (G.portfolio.site_feira || NORTE_BOSSES().every(k => BS()[k])) i.insertAdjacentHTML("beforeend", `<p class="hint">${t(f.lock)}</p>`);
   } else if (id === "belem" || (id === "ananindeua" && G.loc === "belem")) {   // entre as duas cidades só se vai de ônibus
     if (G.passagem && BUS.open) { btn(id === "belem" ? t("Viajar de barco para Belém") : t("Voltar de barco para a aldeia"), () => busRide(id)); i.insertAdjacentHTML("beforeend", `<p class="hint">${t("A passagem do barco vale ida e volta.")}</p>`); }
     else i.insertAdjacentHTML("beforeend", '<p class="hint">Para chegar à capital, compre a passagem do barco no porto do Tapajós, no fim da trilha da aldeia.</p>');
@@ -94,10 +98,10 @@ function buyBusTicket(id) {
   const ln = busLine(G.loc, id); if (!ln || G.money < ln.price || G[ln.pass]) return;
   G.money -= ln.price; G[ln.pass] = true; save(); sfx("more"); drawMap(); select(id);
 }
-/* ---------- voo entre regiões (FLIGHT em data/world.js) ----------
+/* ---------- voo entre regiões (FLIGHTS em data/world.js) ----------
    o mapa do Brasil abre com um aviãozinho indo de uma região à outra; ao pousar, troca o mapa grande e a cidade */
 function fly(city) {
-  if (moving || !FLIGHT[G.loc] || FLIGHT[G.loc] !== city) return;
+  if (moving || !flightsFrom(G.loc).some(f => f.to === city && f.open())) return;
   moving = true; sfx("onibus"); musicStop();
   const from = REGIONS[regionOfCity(G.loc)].pos, to = REGIONS[regionOfCity(city)].pos;
   openBrasil(); const svg = $("brasil").querySelector("svg");
@@ -130,8 +134,12 @@ function openBrasil() {
   Object.entries(REGIONS).forEach(([k, r]) => btn(r.n + (r.open ? "" : ` <small>${t("em breve")}</small>`), () => { BR_SEL = k; sfx("blip"); openBrasil(); }, false, side));
   side.querySelectorAll(".cmd").forEach((b, j) => b.classList.toggle("sel", Object.keys(REGIONS)[j] === BR_SEL));
   const r = REGIONS[BR_SEL], card = document.createElement("div"); card.className = "br-card";
+  const coOpen = flightOpen("cuiaba");
   card.innerHTML = `<h3 style="color:${r.color}">${r.n}</h3><p>${r.txt}</p>` + (BR_SEL === "nordeste"
-    ? `<p class="hint">${G.regions?.nordeste ? t("Calma de Guaraci: {n} de {total} chefes do Nordeste acalmados", {n: NORDESTE_BOSSES().filter(k => BS()[k]).length, total: NORDESTE_BOSSES().length}) : t(flightOpen() ? "O voo para São Luís já sai do Aeroporto de Belém." : "O voo sai do Aeroporto de Belém depois que o site da feira for entregue e os 20 chefes do Norte acalmados.")}</p>`
+    ? `<p class="hint">${G.regions?.nordeste ? t("Calma de Guaraci: {n} de {total} chefes do Nordeste acalmados", {n: NORDESTE_BOSSES().filter(k => BS()[k]).length, total: NORDESTE_BOSSES().length}) : t(flightOpen() ? "O voo para São Luís já sai do Aeroporto de Belém." : "O voo sai do Aeroporto de Belém depois que o site da feira for entregue e os 20 chefes do Norte acalmados.")}</p>` +
+      (G.regions?.nordeste ? `<p class="hint">${t(coOpen ? "Aeroporto do Recife: voo de ida e volta para Cuiabá." : "Aeroporto do Recife: o voo para o Centro-Oeste abre com a calma de Guaraci e o app de cordel entregue.")}</p>` : "")
+    : BR_SEL === "centroeste"
+    ? `<p class="hint">${t(G.regions?.centroeste ? "Você já esteve aqui. Por enquanto, Cuiabá e o Pantanal; a Chapada, Bonito e Brasília vêm em breve." : coOpen ? "O voo para Cuiabá já sai do Aeroporto do Recife." : "O voo sai do Aeroporto do Recife depois que o app de cordel for entregue e os chefes do Nordeste acalmados.")}</p>`
     : r.open
     ? `<p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p>` +
       `<p class="hint">${t("Entre a aldeia e Belém, vai de barco de linha pelo rio.")}</p>` +

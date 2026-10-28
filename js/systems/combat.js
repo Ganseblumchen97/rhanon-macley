@@ -19,6 +19,7 @@ const BATTLE_WATER = new Set(["rio", "igarape", "manguezal", "varzea"]), BATTLE_
 function getBattleTrackFor(animal) {
   if (animal.boss) return "battleBoss";
   if (regionOfCity(curCity()) === "nordeste" && !animal.bug) return "battleNordeste";   // Nordeste: o tema da região num forró de batalha
+  if (regionOfCity(curCity()) === "centroeste" && !animal.bug) return "battleCentroOeste";   // Centro-Oeste: o rasqueado acelerado
   return animal.bug ? "battleCapo" : BATTLE_CITY.has(curZone) ? "battleGuitarrada" : BATTLE_WATER.has(curZone) ? "battleCarimbo" : "battleCapo";
 }
 
@@ -343,7 +344,7 @@ function finish(kind) {
   const xp0 = {lv: G.lv, xp: G.xp};   // para a barra de XP do cartão encher do ponto em que estava
   musicStop(); keepVitals(kind); const rw = kind === "win" ? reward(e, e.rematch ? REMATCH_XP : 1, false, true) : []; if (kind === "win") $("beast").classList.add("dead"); fanfare(kind);
   // cartão: título, uma frase curta e, embaixo, o que ganhou ou perdeu (um item por linha)
-  const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = t({belem: "Acordou no Ver-o-Peso, com metade das forças", saoluis: "Acordou na Praia Grande, com metade das forças", teresina: "Acordou no Troca-Troca, com metade das forças", recife: "Acordou no Recife Antigo, com metade das forças", petrolina: "Acordou na orla do Velho Chico, com metade das forças"}[curCity()] || "Acordou na aldeia, com metade das forças");
+  const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = t({belem: "Acordou no Ver-o-Peso, com metade das forças", saoluis: "Acordou na Praia Grande, com metade das forças", teresina: "Acordou no Troca-Troca, com metade das forças", recife: "Acordou no Recife Antigo, com metade das forças", petrolina: "Acordou na orla do Velho Chico, com metade das forças", cuiaba: "Acordou no Porto de Cuiabá, com metade das forças"}[curCity()] || "Acordou na aldeia, com metade das forças");
   const T = {
     win:  e.bug ? [t("Bug resolvido!"), t("{bicho} sumiu do código.", {bicho: O})] : e.rematch ? [t("Treino concluído!"), t("{bicho} gostou do treino.", {bicho: O})]
       : e.boss ? [t(ending(e, "Chefe acalmado!", "Chefe acalmada!")), t("{bicho} voltou a si. A trilha está livre.", {bicho: O})]
@@ -355,7 +356,7 @@ function finish(kind) {
   setTimeout(() => {
     $("overTitle").textContent = T[0]; $("overTxt").textContent = [T[1], ...rw].filter(Boolean).join("\n");
     const again = kind !== "lose" && !fromExplore;
-    if (fromExplore && kind === "lose") $("toMap").textContent = t({belem: "Voltar ao Ver-o-Peso", saoluis: "Voltar à Praia Grande", teresina: "Voltar ao Troca-Troca", recife: "Voltar ao Recife Antigo", petrolina: "Voltar à orla"}[curCity()] || "Voltar à aldeia");
+    if (fromExplore && kind === "lose") $("toMap").textContent = t({belem: "Voltar ao Ver-o-Peso", saoluis: "Voltar à Praia Grande", teresina: "Voltar ao Troca-Troca", recife: "Voltar ao Recife Antigo", petrolina: "Voltar à orla", cuiaba: "Voltar ao Porto"}[curCity()] || "Voltar à aldeia");
     $("again").style.display = again ? "" : "none"; $("over").hidden = false; (again ? $("again") : $("toMap")).focus();
     overXp(kind === "win" ? xp0 : null);
   }, kind === "win" ? 1700 : kind === "lose" ? 1900 : 1150);

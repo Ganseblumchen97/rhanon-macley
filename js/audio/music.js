@@ -26,7 +26,8 @@ function stepWork(s, t) {
    (batalha na água: carimbó), "battleGuitarrada" (batalha em Belém: guitarrada), "localNordeste" (São Luís e o
    mapa do Maranhão: toada de bumba-meu-boi com sanfona e triângulo, e o tema do Nordeste), "pytuna" (cenas de Pytuna,
    com o tema dele), "jaci" (fim de capítulo: a lua volta a brilhar, com o tema dela), "battleNordeste" (batalha em São Luís: forró
-   com o tema do Nordeste), "battleBoss" (chefe: abertura
+   com o tema do Nordeste), "localCentroOeste" (Cuiabá e o mapa do Centro-Oeste: rasqueado com viola de cocho e o tema do
+   Centro-Oeste), "battleCentroOeste" (batalha no Centro-Oeste: o rasqueado acelerado), "battleBoss" (chefe: abertura
    sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
@@ -96,6 +97,21 @@ const MUS = (() => {
       o.connect(og).connect(f); o.start(when); o.stop(when + dur + .1);
     }
   }
+  // viola de cocho (Cuiabá): corda de tripa beliscada, curta e anasalada, em cordas dobradas (a nota e a oitava, um
+  // pouquinho desafinadas) com o estalo do dedo no começo
+  function viola(freq, when, dur, vol) {
+    const f = X.createBiquadFilter(), g = X.createGain();
+    f.type = "bandpass"; f.frequency.setValueAtTime(Math.min(3600, freq * 5), when); f.frequency.exponentialRampToValueAtTime(Math.min(1400, freq * 2.2), when + .25); f.Q.value = .9;
+    g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .003); g.gain.exponentialRampToValueAtTime(vol * .3, when + .09); g.gain.exponentialRampToValueAtTime(.0001, when + Math.min(dur, .9) + .1);
+    f.connect(g).connect(bus.mix);
+    for (const [type, mul, det] of [["sawtooth", 1, -4], ["triangle", 2, 5], ["square", 1, 3]]) { const o = X.createOscillator(); o.type = type; o.frequency.value = freq * mul; o.detune.value = det; o.connect(f); o.start(when); o.stop(when + Math.min(dur, .9) + .15); }
+    noiseHit(when, .015, vol * .4, "highpass", 4000);
+  }
+  // rasqueado: as cordas da viola raspadas de uma vez, com um tiquinho de atraso entre elas (para baixo ou para cima)
+  function rasga(notes, when, vol, up) { (up ? [...notes].reverse() : notes).forEach((m, k) => viola(mtof(m), when + k * .011, .22, vol)); }
+  // ganzá (chocalho de lata) e o reco-reco de bambu raspado
+  const ganza = (when, vol) => noiseHit(when, .06, vol, "bandpass", 6200, 1.1);
+  function reco(when, vol) { for (let k = 0; k < 4; k++) noiseHit(when + k * .018, .014, vol, "bandpass", 2400, 4); }
   // triângulo: ferro tocado (parciais inarmônicos); aberto soa, fechado (mão abafando) é só um tic
   function triangulo(when, vol, open) {
     for (const [fq, k] of [[2600, 1], [4180, .5], [5930, .3]]) synth("sine", fq, when, open ? .4 : .05, vol * k);
@@ -315,6 +331,15 @@ const MUS = (() => {
         [2, 0, 72, 4], [2, 4, 69, 2], [2, 6, 72, 2], [2, 8, 77, 4], [2, 12, 76, 4], [3, 0, 72, 12],
         [4, 0, 76, 4], [4, 4, 72, 2], [4, 6, 76, 2], [4, 8, 79, 4], [4, 12, 77, 4], [5, 0, 76, 8], [5, 8, 74, 4], [5, 12, 72, 4],
         [6, 0, 74, 4], [6, 4, 78, 2], [6, 6, 81, 2], [6, 8, 79, 4], [6, 12, 78, 4], [7, 0, 74, 12]]
+  };
+  /* Tema do Centro-Oeste (leitmotif): moda de viola em lá maior, que no Mato Grosso vira rasqueado. O motivo desce em
+     terças, "mi–dó sustenido–ré–si", no ritmo 4-2-2 de quem canta e tem sempre uma segunda voz uma terça abaixo (o dueto
+     caipira, ver terca em localCentroOeste). Um acorde a cada dois compassos: lá–ré–mi com sétima–lá. */
+  const CENTROESTE_THEME = {
+    A: [[0, 0, 76, 4], [0, 4, 73, 2], [0, 6, 74, 2], [0, 8, 71, 4], [0, 12, 73, 4], [1, 0, 69, 12],
+        [2, 0, 78, 4], [2, 4, 74, 2], [2, 6, 76, 2], [2, 8, 73, 4], [2, 12, 74, 4], [3, 0, 71, 12],
+        [4, 0, 80, 4], [4, 4, 76, 2], [4, 6, 78, 2], [4, 8, 74, 4], [4, 12, 76, 4], [5, 0, 74, 8], [5, 8, 73, 4], [5, 12, 71, 4],
+        [6, 0, 73, 4], [6, 4, 76, 2], [6, 6, 81, 2], [6, 8, 80, 4], [6, 12, 78, 4], [7, 0, 81, 12]]
   };
   /* Tema de Pytuna (leitmotif do vilão, igual em todas as regiões): "ré – mi bemol – lá bemol – dó sustenido", grave e
      lento. Sobe meio tom, salta o trítono (ré a lá bemol, o intervalo mais instável que existe) e cai num dó sustenido
@@ -545,6 +570,35 @@ const MUS = (() => {
         if (m) { sanfona(mtof(m.note), t, m.len * d * .92, .016); if (part === "A2") flute(mtof(m.note + 12), t, m.len * d * .9, .016); }   // tema na sanfona
       }
     },
+    // Cuiabá e o mapa do Centro-Oeste: rasqueado cuiabano. Viola de cocho no baixo e no rasqueado (boom-chá, com o
+    // "chá" raspado para cima no contratempo), ganzá, reco-reco e o mocho (tamborete de couro) marcando; a viola canta o
+    // tema do Centro-Oeste (CENTROESTE_THEME) com a segunda voz uma terça abaixo, e a flauta dobra na volta A'.
+    // Forma: introdução só de viola e ganzá - A - A' - A
+    localCentroOeste: {
+      bpm: 116, wet: .28, level: .42, swing: .05, form: ["I", "A", "A2", "A"], melody: null,
+      chords: [{bass: 45, notes: [57, 61, 64, 69]}, {bass: 50, notes: [57, 62, 66, 69]}, {bass: 40, notes: [56, 59, 62, 64]}, {bass: 45, notes: [57, 61, 64, 69]}],
+      // segunda voz: a nota da escala de lá maior duas casas abaixo (terça maior ou menor, conforme cair)
+      terca(m) { const sc = [9, 11, 1, 2, 4, 6, 8], k = sc.indexOf(((m % 12) + 12) % 12); if (k < 0) return m - 3; const pc = sc[(k + 5) % 7]; let d = ((m % 12) - pc + 12) % 12; return m - (d || 12); },
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4], chord = this.chords[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(CENTROESTE_THEME.A, part === "A2" ? 12 : 0, part === "A2");   // tema do Centro-Oeste
+        if (s === 0) viola(mtof(chord.bass), t, d * 4, .05);   // boom: o baixo na corda grave
+        if (s === 8) viola(mtof(chord.bass + 7), t, d * 4, .04);
+        if (s === 4 || s === 12) rasga(chord.notes, t, .011);   // chá
+        if (part !== "I" && (s === 6 || s === 14)) rasga(chord.notes.slice(1), t, .007, true);   // rasqueado para cima
+        ganza(t, s % 4 === 0 ? .012 : .006);
+        if (part !== "I" && s % 8 === 2) reco(t, .006);
+        if (part !== "I") { if (s === 0) kick(t, .07); if (s === 10) tapa(t, .02); if (s === 12) tapa(t, .028); }   // mocho
+        if (s === 0 && barIn % 2 === 0) synth("triangle", mtof(chord.bass - 12), t, d * 7, .05);
+        if (Math.random() < .003) bird(t);
+        const m = this.melody && this.melody[i % 128];
+        if (m) {
+          const len = m.len * d * .9; viola(mtof(m.note), t, len, .03); viola(mtof(this.terca(m.note)), t, len, .02);   // o dueto
+          if (m.len >= 8) viola(mtof(m.note), t + d * 4, len * .5, .018);   // nota longa: repicada na viola
+          if (part === "A2") flute(mtof(m.note), t, len, .014);
+        }
+      }
+    },
     // Pytuna em cena: zumbido grave do coro, vento, coração batendo e a badalada; o tema de Pytuna (PYTUNA_THEME) numa voz
     // de fumaça (serra abafada com o grave por baixo), repetindo uma oitava acima na segunda volta. Toca nas cenas dele
     pytuna: {
@@ -594,6 +648,31 @@ const MUS = (() => {
         if (s === 0 && barIn % 2 === 0) pad(chord.notes, t, d * 32, .006);
         const m = this.melody && this.melody[i % 128];
         if (m) { sanfona(mtof(m.note), t, m.len * d * .9, part === "A2" ? .02 : .018); if (part === "A2") flute(mtof(m.note + 12), t, m.len * d * .9, .012); }
+      }
+    },
+    // batalha no Centro-Oeste: o rasqueado acelerado, viola raspando forte no contratempo, mocho e ganzá marcando, baixo
+    // na corda grave e o tema do Centro-Oeste (CENTROESTE_THEME) na viola em dueto de terças. Forma A - A' (oitava acima,
+    // com a flauta) - A - C (C = ponte de percussão com virada crescente)
+    battleCentroOeste: {
+      bpm: 150, wet: .2, level: .46, swing: .04, form: ["A", "A2", "A", "C"], melody: null,
+      play(i, t, d) {
+        const N = TRACKS.localCentroOeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4], chord = N.chords[Math.floor(barIn / 2)];
+        const bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "C" ? null : themeLine(CENTROESTE_THEME.A, part === "A2" ? 12 : 0, part === "A2"); hat(t, .02, true); }   // tema do Centro-Oeste
+        ganza(t, s % 4 === 0 ? .014 : .007);
+        if (s === 0 || s === 8) kick(t, .11);   // mocho
+        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) tapa(t, .032);
+        if (bridge) return;
+        if (s % 8 === 2) reco(t, .007);
+        if (s === 0 || s === 8) viola(mtof(chord.bass + (s ? 7 : 0)), t, d * 3, .06);
+        if (s === 0 || s === 8) synth("triangle", mtof(chord.bass - 12 + (s ? 7 : 0)), t, d * 2, .09);
+        if (s === 4 || s === 12) rasga(chord.notes, t, .013);
+        if (s === 6 || s === 14) rasga(chord.notes.slice(1), t, .009, true);
+        const m = this.melody && this.melody[i % 128];
+        if (m) {
+          const len = m.len * d * .9; viola(mtof(m.note), t, len, .034); viola(mtof(N.terca(m.note)), t, len, .022);
+          if (part === "A2") flute(mtof(m.note + 12), t, len, .012);
+        }
       }
     },
     // batalha: a roda de capoeira acelerada (toque de São Bento Grande), com atabaque, pandeiro, baixo marcado
@@ -972,6 +1051,7 @@ function legacyStop() { if (legacyTimer) clearInterval(legacyTimer); legacyTimer
 function musicStart(id) {
   id = id || "battleCapo";
   if ((id === "local" && regionOfCity(curCity()) === "nordeste") || (id === "map" && MAP_REGION === "nordeste")) id = "localNordeste";   // Nordeste: a toada do boi
+  if ((id === "local" && regionOfCity(curCity()) === "centroeste") || (id === "map" && MAP_REGION === "centroeste")) id = "localCentroOeste";   // Centro-Oeste: o rasqueado
   if (id === "local" && G.night) id = "localNight";   // à noite a música da exploração muda de clima
   if (id === "map" && MAP_REGION === "norte") id = G.night ? "mapParaNight" : "mapPara";   // mapa do Norte: guitarrada de dia e de noite
   if (MUS.has(id)) { legacyStop(); MUS.play(id); }

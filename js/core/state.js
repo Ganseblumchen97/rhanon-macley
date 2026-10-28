@@ -67,7 +67,8 @@ function debugSetup() {
     if (city === "teresina" || city === "recife" || city === "petrolina") G.passagemTHE = true;
     if (city === "recife" || city === "petrolina") G.passagemREC = true;
     if (city === "petrolina") G.passagemPET = true;
-    if (CITY[city].map === "nordeste") { NORTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.site_feira = true; G.narrated.norte_fim = true; G.regions = {norte: true, nordeste: true}; syncRegion(); buildLocalNodes(); }   // chegou de avião: o Norte está completo
+    if (CITY[city].map === "centroeste") { NORDESTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.app_cordel = true; G.narrated.nordeste_fim = true; G.passagemTHE = G.passagemREC = G.passagemPET = true; }   // e o Nordeste também
+    if (CITY[city].map !== "norte") { NORTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.site_feira = true; G.narrated.norte_fim = true; G.regions = Object.assign({norte: true, nordeste: true}, CITY[city].map === "centroeste" && {centroeste: true}); syncRegion(); buildLocalNodes(); }   // chegou de avião: o Norte está completo
     G.sub = fase;
   }
   save();

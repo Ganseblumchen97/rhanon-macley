@@ -1,7 +1,8 @@
 /* Ananindeua: mapa local, descanso, feira, peles, roupas e inventário. */
 const defense = () => ["legs", "torso"].reduce((a, k) => a + ((G.equip && EQUIP[k][G.equip[k]] && EQUIP[k][G.equip[k]].def) || 0), 0) + charmStat("def") + skillStat("def");
 const weaponAtk = () => ((G.equip && EQUIP.weapon[G.equip.weapon] && EQUIP.weapon[G.equip.weapon].atk) || 0) + charmStat("atk") + skillStat("atk");   // com talismã e habilidades
-const unlocked = k => !NEED[k] || !!BS()[NEED[k]];
+// abre com o chefe da fase anterior; se a anterior é segura (orla, Troca-Troca...), basta ter passado por ela
+const unlocked = k => !NEED[k] || !!BS()[NEED[k]] || !!(STAGES[NEED[k]] && STAGES[NEED[k]].safe && G.seen[NEED[k]]);
 function subPath(a, b) {
   const adj = {}; EDGES.forEach(([x, y]) => { (adj[x] = adj[x] || []).push(y); (adj[y] = adj[y] || []).push(x); });
   const prev = {[a]: null}, q = [a];
@@ -49,6 +50,11 @@ function selectSub(id, msg) {
   else if (id === "orla") {
     btn(t("Entrar na orla"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo do sertão."));
+  }
+  else if (id === "portocuiaba") {
+    btn(t("Entrar no Porto"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo de Cuiabá."));
+    lh(t("O aeroporto fica no mapa do Centro-Oeste (Esc): de lá sai o voo de volta para o Recife."));
   }
   else if (id === "recifeantigo") {
     btn(t("Entrar no Recife Antigo"), () => startExplore(id), false, i);

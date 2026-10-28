@@ -3,6 +3,21 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.59.0 — o Centro-Oeste e o Pantanal
+
+- A história chegou ao Centro-Oeste. Com os 14 chefes do Nordeste acalmados e o app de cordel do Seu Dedé entregue,
+  o Aeroporto do Recife abre um voo de graça, de ida e volta, para Cuiabá.
+- Cuiabá tem mapa novo da região (Mato Grosso, Mato Grosso do Sul, Goiás e Brasília) e o Porto, na beira do rio: rede
+  na pensão, mercado do peixe, ipê-amarelo e um povo que fala "tchá" e "pai do céu" em toda frase.
+- O Pantanal (níveis 50 a 52) fica no cais de baixo do Porto: campo alagado, lagoas e um corixo com ponte. Bichos novos:
+  tuiuiú, arara-azul, cervo-do-pantanal, jacaré-do-pantanal, o dourado, que nada no rio, e, de noite, o urutau.
+- De dia, o chefe é a Onça-d'água, que atravessa o corixo nadando. De noite, o barranco desaba sozinho e da água sobe
+  o Minhocão do Pantanal.
+- Música nova do Centro-Oeste: um rasqueado com viola de cocho, que toca no Porto, no mapa e, mais rápido, nas lutas.
+  Com o save lá, a tela inicial mostra o Pantanal no anoitecer, com tuiuiú e a lua apagada pela fumaça.
+- Correção: a Caatinga, Olinda e o Encontro dos rios podiam ficar trancados, com a passagem fechada saindo da orla,
+  do Recife Antigo ou do Troca-Troca. Agora abrem assim que você chega na cidade.
+
 ## 0.58.0 — o fim do Nordeste
 
 - O Pytuna voltou, agora quente e seco: ele aparece depois do último chefe de dia de cada cidade do Nordeste

@@ -127,6 +127,60 @@ const STAGES = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
+  // Cuiabá (Centro-Oeste): o Porto, bairro velho na beira do rio Cuiabá (à esquerda, com a ponte para o aeroporto), com o
+  // mercado do peixe (barracas), a pensão (O), ipês (T) e moradores
+  portocuiaba: {
+    safe: true, next: "pantanal",
+    rows: [
+      "~~~#####################",
+      "~~~#####################",
+      "~~~..f..-.......OOO...f#",
+      "~~~.KKK.-..KKK..OOO....#",
+      "~~~..V..-...C..........#",
+      "E===S----------------..#",
+      "~~~..P..-.......-...P..#",
+      "~~~.T...-..T....-..T...#",
+      "~~~.....-....P..-......#",
+      "~~~..o..-.......-...f..#",
+      "~~~~~~~~=~~~~~~~G~~~~~~~"
+    ]
+  },
+  // Cuiabá: o Pantanal (gerado por tools/gerar_mapas.py)
+  pantanal: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTETTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTT~~TTTTT,.,,,,.,,.,.TTTTT.,.o,,.,-,,T",
+      "TTT,TT,.oTTT.TTTT.oT..T,~~.o....,.,.,...,,...TTa,,,,.o.,S,.T",
+      "TT..T.,T..TT,TTT..,TT.T.~~TT,.---------------,T..,,,....-,.T",
+      "TT,...,T.,,T,T..T,,TT.,.~~TT..-,..,.,...,,,,-..TT,f,,..,-.,T",
+      "TTT.TT,T,.,.,T,.TT~~~~~T~~,..,-,.,a..,.,....-...T,.....,-.,T",
+      "TTTTT...T.T,.T,..~~~~~~~~~TT.,-,....,..TT,..-.,.Ta,.T,.,-.,T",
+      "TTT.T,.T..~~~~~.T~~~~~~~~~T,..-....TT.TT,...-,...,.,T..,-..T",
+      "TT,T,.,,T~~~~~~~T~~~~~~~~~,,..-.,,T,.T,..,,.-,.,.,,,..,.-,oT",
+      "TTTTT,,.~~~~~~~~~T~~~~~,~~.,..-,,aTTT.,.,T..-------------.,T",
+      "TT.,,..,~~~~~~~~~T,TTTTo~~TT.,-,,o.,T.TT..TT,,..,,.,,a..,TTT",
+      "TT.T,TTT~~~~~~~~~.,.T,T.~~T.a.-.T,TTo.,.,..T,.a..,..TT.,,TTT",
+      "TTTT,.T..~~~~~~~.TTT,T,.~~,.T.-......,.........TT.T..TT,,.TT",
+      "TT..T,aT..~~~~~TTT,...TT~~..T.--------F--------.,,T,TT.,TTTT",
+      "TT,.T,,T,,.,o..T,TT,,.T,~~T..T,.,..,,,...,.,,.-,,T,TTTT.T.TT",
+      "TTT.T.,.T.,,f..,T.T.T.TT~~TTTT.TT...,,.,,TTT.,-,.T~~~~~aTTTT",
+      "TTT,TT,..,.,a.,.,...T..T~~T,TT.TaT,T~~~~~TTf..-,.~~~~~~~.,TT",
+      "TT.T,.-------------.,.TT~~T,,.....~~~~~~~~~o.,-.,~~~~~~~,TTT",
+      "TTT...-...,.....,.-..TT,~~,T.,o.TT~~~~~~~~~,,,-.,~~~~~~~,TTT",
+      "TT.,,.-,a,..,,.TT.-,TT,T~~.T...,TT~~~~~~~~~T.,-..,~~~~~.TTTT",
+      "TTa,,,-.~~~~~TT..,-,...T~~TTT,,.,...~~~~~..,.,-,T,.,,T.T.TTT",
+      "TTTf,.-~~~~~~~T,,.-..,T,~~TTTa,.,.,,..,..,..,.-.,,TT,T.TT,TT",
+      "TTT,..-~~~~~~~T..,-.,..T~~T,.TT.---------------..,,T,T..o.TT",
+      "TT.,..-~~~~~~~,.,.-.....~~T.T...-.,,,..,.....,..T..,,TT.,,TT",
+      "TT,,..-.~~~~~TT,.,-..T,T~~.TT.,.-...,..,.,..T.T~~~~~~~TTTTTT",
+      "TT.,,.-,,.o..T.TT.-.,..,~~,.,,.,-a,,.,TTT.T,T~~~~~~~~~~~,TTT",
+      "TT.,,.B.f..,T.TTT.-,,...~~...,..-..,,.T.,..a.~~~~~~~~~~~o.TT",
+      "TT...,f,.,a..T.,..------==-------,.,,TT.,T,TT~~~~~~~~~~~.,TT",
+      "TTTT.,,f.TTTTTTTTT.,..,.~~...,..,TTTTTTTTTTTTTT~~~~~~~TTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Petrolina (sertão): a orla do São Francisco, com a pensão (O), barracas e moradores; G leva à Caatinga
   orla: {
     safe: true, next: "caatinga",

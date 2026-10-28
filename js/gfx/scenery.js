@@ -16,6 +16,7 @@ const SCENES = {
   lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
+  pantanal:    {sky: ["#f0b878", "#e8c898", "#a8d0d8"], far: "#4a7a3a", trees: "campo", plat: "flores", water: true},   // Pantanal: céu enorme de fim de tarde e campo alagado
   beira:       {sky: ["#f0d090", "#e8d8a8", "#a8d0d8"], far: "#6a8a4a", trees: "caatinga", plat: "areia", water: true},   // Velho Chico: sertão na margem do rio largo
   serra:       {sky: ["#f0c890", "#d8b888", "#b8a890"], far: "#8a5a3a", trees: "copa", plat: "barro"},   // Araripe: paredão de terra vermelha e mata na encosta
   caatinga:    {sky: ["#f0d8a0", "#e8c890", "#d8b8a0"], far: "#8a7a62", trees: "caatinga", plat: "areia"},   // sertão: céu de poeira, serra ao longe
@@ -271,7 +272,7 @@ addEventListener("resize", () => drawScenery());
 /* ---------- tela inicial: o fundo é da região do save ---------- */
 // cada região tem o seu desenho (TITLE_BG) e o montinho de chão debaixo do Rhanon (plat); região sem desenho usa o Norte.
 // A faixa preta inclinada e as letras recortadas (styles.css, com as cores de cada região em [data-region]) dão o Persona
-const TITLE_BG = {norte: {plat: "mata", draw: titleForest}, nordeste: {plat: "caatinga", draw: titleSertao}};
+const TITLE_BG = {norte: {plat: "mata", draw: titleForest}, nordeste: {plat: "caatinga", draw: titleSertao}, centroeste: {plat: "varzea", draw: titlePantanal}};
 function drawTitleBg() {
   const cv = $("titleBg");
   if (!cv || $("titleScreen").hidden) return;
@@ -359,5 +360,44 @@ function titleSertao(W, H, rect, blob) {
     }
   };
   cactus(W * .05, 7, H * .2); dryTree(W * .15, 3); cactus(W * .9, 8, H * .14); dryTree(W * .81, 3);
+}
+// Centro-Oeste: o Pantanal no anoitecer. Céu enorme do azul ao rosa, lua grande e apagada (a fumaça de Pytuna comendo um
+// pedaço dela), fumaça de queimada no horizonte, a lagoa refletindo tudo em listras, um tuiuiú parado na água e carandás
+// (palmeira de leque) escuros nas bordas, como moldura
+function titlePantanal(W, H, rect, blob) {
+  const rnd = sceneRng(5353), hz = H * .58, ink = "#0a0a1e";
+  const sky = ["#141838", "#22285a", "#3a3a7a", "#6a4a8a", "#a85a7a", "#e07a6a", "#f8b07a"];
+  sky.forEach((c, i) => { const a = Math.round(hz * i / sky.length), b = Math.round(hz * (i + 1) / sky.length); rect(c, 0, a, W, b - a); if (i) for (let px = 0; px < W; px += 2) rect(c, px + (a % 2), a - 1, 1, 1); });
+  for (let i = 0; i < W / 4; i++) rect(rnd() < .3 ? "#fff6d8" : "#b8b8e8", rnd() * W, rnd() * hz * .45, 1, 1);   // o céu sem morro: estrela de canto a canto
+  // Jaci grande e pálida, com a fumaça cinza cobrindo um pedaço
+  const mx = W * .3, my = hz * .34, mr = Math.min(W, H) * .15;
+  [[2, "rgba(220,220,255,.06)"], [1.5, "rgba(220,220,255,.1)"], [1.2, "rgba(220,220,255,.14)"]].forEach(([k, c]) => blob(mx, my, mr * k, c));
+  blob(mx, my, mr, "#d8d8e8"); blob(mx - mr * .3, my - mr * .25, mr * .22, "#c0c0d4"); blob(mx + mr * .2, my + mr * .3, mr * .14, "#c0c0d4");
+  [[.55, -.2, .55], [.8, .25, .5], [.35, .45, .4], [1, -.05, .38]].forEach(([dx, dy, k]) => blob(mx + mr * dx, my + mr * dy, mr * k, "#4a4658"));
+  // a queimada lá longe: brilho laranja no horizonte e a coluna de fumaça subindo torta
+  const fx = W * .78;
+  [[.2, "rgba(255,120,60,.18)"], [.12, "rgba(255,150,70,.25)"]].forEach(([k, c]) => blob(fx, hz, W * k, c));
+  for (let y = hz, x0 = fx, r = 3; y > hz * .25; y -= 3, x0 -= .9 + rnd() * .8, r += .35) blob(x0 + (rnd() - .5) * 3, y, r, y > hz * .8 ? "#5a4048" : "#3e3650");
+  // horizonte reto com mata baixa (capão) e a lagoa refletindo o céu em listras
+  for (let px = 0; px < W; px += 2) rect("#1a1a3a", px, hz - 1 - Math.floor(rnd() * 3) - (Math.abs(px - W * .55) < W * .12 ? 4 + rnd() * 3 : 0), 2, 6);
+  rect("#1a1a3a", 0, hz, W, 2);
+  [...sky].reverse().forEach((c, i) => { const a = hz + 2 + i * (H * .26 / sky.length), h = H * .26 / sky.length; rect(c, 0, a, W, h); for (let k = 0; k < W / 10; k++) rect("#0a0a1e", rnd() * W, a + rnd() * h, 3 + rnd() * 6, 1); });
+  for (let k = 0; k < 6; k++) rect("#f0f0ff", mx - mr * .6 + rnd() * mr * 1.2, hz + 4 + k * 3, 2 + rnd() * 5, 1);   // a lua na água
+  // margem de capim e o chão escuro na frente
+  rect("#141432", 0, H * .84, W, H);
+  for (let px = 0; px < W; px += 1 + Math.floor(rnd() * 3)) rect("#141432", px, H * .84 - 1 - Math.floor(rnd() * 4), 1, 5);
+  rect(ink, 0, H * .9, W, H);
+  // tuiuiú na água: pernas compridas, corpo branco, pescoço preto com o colar vermelho e o bico grande
+  const tx = W * .46, ty = H * .82;
+  rect(ink, tx - 1, ty - 12, 1, 12); rect(ink, tx + 2, ty - 12, 1, 12);
+  blob(tx + 1, ty - 15, 4, "#e8e8f0"); rect("#e8e8f0", tx - 3, ty - 17, 9, 4); rect("#3a3a48", tx + 3, ty - 17, 4, 2);
+  rect(ink, tx - 2, ty - 25, 2, 9); rect("#d82a3a", tx - 2, ty - 18, 2, 2); blob(tx - 1, ty - 26, 2, ink); rect(ink, tx - 7, ty - 26, 6, 1); rect(ink, tx - 6, ty - 25, 4, 1);
+  // carandás nas bordas: tronco fino e alto com a copa de leque
+  const palm = (px, top, tw) => {
+    rect(ink, px, top, tw, H - top);
+    for (let k = 0; k < 9; k++) { const a = Math.PI * (1.1 + k * .1), len = 8 + rnd() * 6; for (let j = 0; j < len; j++) rect(ink, px + tw / 2 + Math.cos(a) * j, top + Math.sin(a) * j * .7 + j * j * .03, 2, 2); }
+    blob(px + tw / 2, top, 3, ink);
+  };
+  palm(W * .05, H * .22, 3); palm(W * .12, H * .36, 2); palm(W * .9, H * .18, 3); palm(W * .83, H * .4, 2);
 }
 addEventListener("resize", () => drawTitleBg());

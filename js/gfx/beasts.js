@@ -658,15 +658,16 @@ function poraque(pose, f) {
 }
 
 /* ---------- igarapé: garça, boto (e o Boto encantado, de chapéu) e pirarucu ---------- */
-// garça em pé numa perna só, pescoço em "S" e bico comprido; C troca as cores (o socó da várzea usa a mesma)
+// garça em pé numa perna só, pescoço em "S" e bico comprido; C troca as cores (o socó da várzea usa a mesma);
+// C.n = pescoço e cabeça de outra cor e C.r = o colar na base do pescoço (o tuiuiú: pescoço preto e colar vermelho)
 function garca(pose, f, C = {b: "#f4f4ee", B: "#c8c8c0", y: "#e8c040", Y: "#b8902a", k: "#2a2a2a"}) {
   const d = rigGrid(1, 48, 52), G = 49, o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
   if (pose === "ko") {   // deitada, asa aberta e pescoço esticado no chão
     d.part().limb(30, 45, 40, 43, 1.5, C.k).limb(32, 46, 42, 47, 1.5, C.k);
     d.part().poly([[22, 42], [36, 38], [40, 44]], C.B);
     d.part().ellipse(27, 45, 11, 4.5, C.b, C.B, .5);
-    d.part(); bChain(d, [[18, 45], [13, 46], [10, 46]], [3, 2], C.b, C.B);
-    d.part().ellipse(9, 45, 3.5, 3, C.b, C.B, .6).limb(6, 46, 1, 48, 1.5, C.y, C.Y);
+    d.part(); bChain(d, [[18, 45], [13, 46], [10, 46]], [3, 2], C.n || C.b, C.N || C.B);
+    d.part().ellipse(9, 45, 3.5, 3, C.n || C.b, C.N || C.B, .6).limb(6, 46, 1, 48, 1.5, C.y, C.Y);
     bEye(d, 9, 44, o);
     return {c: d.canvas(), head: [9, 43]};
   }
@@ -680,8 +681,9 @@ function garca(pose, f, C = {b: "#f4f4ee", B: "#c8c8c0", y: "#e8c040", Y: "#b890
   d.part().poly([[cx + 8, cy - 2], [cx + 15, cy + 1], [cx + 8, cy + 4]], C.B);   // cauda
   d.part().ellipse(cx, cy, 10, 6.5, C.b, C.B, .55).ellipse(cx + 3, cy - 1, 7, 4.5, C.b, C.B, .6);
   d.dots([[cx + 8, cy + 1], [cx + 9, cy + 2]], C.B);
-  d.part(); bChain(d, [N[0], N[1], N[2], [hx + 1, hy + 1]], [3.5, 2], C.b, C.B);
-  d.part().ellipse(hx, hy, 3.5, 3, C.b, C.B, .6);
+  d.part(); bChain(d, [N[0], N[1], N[2], [hx + 1, hy + 1]], [3.5, 2], C.n || C.b, C.N || C.B);
+  if (C.r) d.part().ellipse(N[0][0], N[0][1], 3.2, 2.6, C.r, C.R, .6);   // colar vermelho
+  d.part().ellipse(hx, hy, 3.5, 3, C.n || C.b, C.N || C.B, .6);
   d.part().limb(hx - 2, hy + 1, hx - (at ? 9 : 10), hy + (at ? 1 : 2), 1.5, C.y, C.Y);
   if (at) d.part().limb(hx - 2, hy + 2, hx - 8, hy + 4, 1, C.Y);   // bico aberto
   bEye(d, hx - 1, hy - 1, o);
@@ -1118,6 +1120,9 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
   cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara, carranca, nego_dagua: negoDagua,
   martim: (pose, f) => pombo(pose, f, {b: "#2a7ac8", B: "#1a4a8a", n: "#f4f0e4", p: "#e8702a", w: "#4aa8e0", y: "#2a2a2a"}),   // martim-pescador: azul, colar branco e peito laranja
+  tuiuiu: (pose, f) => garca(pose, f, {b: "#f6f6f0", B: "#c8c8c0", n: "#1e1e24", N: "#0e0e12", r: "#d8283a", R: "#a01a28", y: "#1e1e24", Y: "#0e0e12", k: "#1e1e24"}),   // tuiuiú: branco, pescoço preto e colar vermelho
+  arara_azul: (pose, f) => pombo(pose, f, {b: "#2a4ac8", B: "#1a2a8a", n: "#3a5ad8", p: "#3a5ad8", w: "#2a3aa8", y: "#f0d020"}),   // arara-azul: azul inteira, de bico amarelo (o amarelo da cara)
+  minhocao: cobra({b: "#8a6a48", B: "#5a4430", k: "#b8946a", eye: "#ffd23a"}, false),   // Minhocão do Pantanal: grosso, cor de barro, de anéis claros
   carao: (pose, f) => garca(pose, f, {b: "#6a4a32", B: "#4a3222", y: "#c8a050", Y: "#8a6a28", k: "#3a2a1a"}),   // carão: a garça em pardo-escuro
   cobra_dagua: cobra({b: "#4a5a3a", B: "#2e3a24", k: "#c8b060"}, false),   // cobra-d'água: verde-oliva com a barriga amarela
   jiboia: cobra({b: "#a8885a", B: "#74583a", k: "#4a3220"}, false),   // jiboia: parda, com as manchas escuras em sela
