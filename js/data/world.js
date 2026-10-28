@@ -27,11 +27,11 @@ const MAP_REGIONS = {
     river: "M196 280 C172 300 160 330 170 360 C178 390 164 410 170 430 S160 470 163 493",   // rio Paraguai, pelo Pantanal
     route: ["cuiaba", "bonito", "brasilia"], pos: {cuiaba: [217, 298], bonito: [205, 463], brasilia: [463, 304]}},
   // Sudeste: Minas Gerais, Espírito Santo, Rio de Janeiro e São Paulo (a partir de longitude/latitude) e o rio São
-  // Francisco nascendo na serra da Canastra; por enquanto só Belo Horizonte (o Rio e São Paulo vêm depois)
-  sudeste: {n: "Sudeste", aria: "Mapa estilizado do Sudeste, com Belo Horizonte",
+  // Francisco nascendo na serra da Canastra; a estrada desce de Belo Horizonte para Ouro Preto (o Rio e São Paulo vêm depois)
+  sudeste: {n: "Sudeste", aria: "Mapa estilizado do Sudeste, com Belo Horizonte e Ouro Preto",
     land: ["M112 273 L238 222 L268 126 L322 84 L398 54 L532 113 L566 205 L587 277 L537 344 L490 415 L440 420 L377 436 L310 462 L238 512 L213 487 L154 420 L70 403 L24 394 L87 331Z"],
     river: "M306 302 C330 250 360 200 365 150 S390 80 398 54",   // rio São Francisco, da Canastra para o norte
-    route: ["bh"], pos: {bh: [409, 290]}},
+    route: ["bh", "ouropreto"], pos: {bh: [409, 290], ouropreto: [446, 336]}},
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre a aldeia e Curitiba",
     land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
     route: ["ananindeua", "curitiba"], pos: {ananindeua: [268, 172], curitiba: [315, 478]}}
@@ -61,6 +61,7 @@ const LOC = {
   bonito: {n: "Bonito (MS)", s: "Bonito", txt: "Uma cidade pequena no meio de rios tão transparentes que o peixe parece voar. Gruta, cachoeira, flutuação... e a água mais limpa do Brasil, que a fumaça agora quer sujar."},
   cuiaba: {n: "Cuiabá (MT)", s: "Cuiabá", txt: "O meio da América do Sul, na beira do rio Cuiabá: calor de quarenta graus, viola de cocho, peixe na brasa e o Pantanal começando logo ali. O Centro-Oeste começa aqui."},
   bh: {n: "Belo Horizonte (MG)", s: "Belo Horizonte", txt: "A capital de Minas, cercada de serra por todo lado: pão de queijo, Mercado Central, ladeira e gente que fala \"uai\". O Sudeste começa aqui."},
+  ouropreto: {n: "Ouro Preto (MG)", s: "Ouro Preto", txt: "A cidade do ouro, toda de ladeira, pedra e igreja barroca: sino tocando, casarão de janela azul e mina velha cavada na serra. De noite, dizem, um menino de uma perna só apronta nas ruas."},
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
@@ -92,6 +93,8 @@ const SUB = {
   rioprata: {city: "bonito", n: "Rio da Prata", x: 140, y: 236, txt: "Um rio de água cristalina que nasce no meio da mata: peixe nadando do lado, sucuri no fundo de areia branca e ariranha gritando na margem. De noite, uma luz dourada anda em cima da água."},
   chapada: {city: "cuiaba", n: "Chapada dos Guimarães", s: "Chapada", x: 92, y: 84, txt: "Lá em cima, a serra de arenito vermelho: cerrado de árvore torta, cachoeira caindo do paredão e arara no fim da tarde. De noite, um grito de gente que não é gente."},
   pantanal: {city: "cuiaba", n: "Pantanal", x: 140, y: 262, txt: "Rio abaixo, a planície que alaga: capim alto, baías de água parada, corixo cortando o campo e bicho de todo lado. Tuiuiú, arara-azul, jacaré às centenas... e, de noite, o barranco que desaba sozinho."},
+  ladeiras: {city: "ouropreto", n: "Ladeiras de Ouro Preto", s: "Ladeiras", x: 120, y: 240, txt: "Ruas de pedra que sobem e descem entre igreja e casarão, com quintal de mata no meio. De dia, bicho e espertalhão vendendo ouro de tolo; de noite, um assobio e um redemoinho no meio da rua."},
+  tiradentes: {city: "ouropreto", n: "Praça Tiradentes", s: "Praça", x: 248, y: 150, txt: "O coração de Ouro Preto: a praça no alto do morro, o museu, a igreja, casarão colorido de janela azul, pensão e o povo da cidade, que fala devagar e conta causo."},
   serracurral: {city: "bh", n: "Serra do Curral", s: "Serra", x: 150, y: 282, txt: "A serra que fecha Belo Horizonte pelo sul: campo de pedra cor de ferro, mata nas grotas e a cidade inteira lá embaixo. De noite, dizem, uma árvore seca anda pela trilha."},
   mercadocentral: {city: "bh", n: "Mercado Central", s: "Mercado", x: 226, y: 196, txt: "O mercado mais famoso de Minas: queijo da Canastra, doce de leite, pimenta, gaiola de passarinho e cheiro de pão de queijo. Do lado, a pensão e uns mineiros de prosa comprida."},
   portocuiaba: {city: "cuiaba", n: "Porto de Cuiabá", s: "Porto", x: 268, y: 206, txt: "O bairro mais velho de Cuiabá, na beira do rio: o mercado do peixe, casario baixo, rede na pensão e gente que fala \"tchá\" e \"pai do céu\" em toda frase."},
@@ -157,7 +160,12 @@ const CITY = {
   // o norte, até o Aeroporto de Confins. O Mercado Central e a Serra do Curral, lá embaixo, depois do ribeirão
   bh: {n: "Belo Horizonte", look: "minas", map: "sudeste", route: ["mercadocentral", "serracurral"], cabin: false,
     land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
-    river: "M0,236 C90,226 160,250 240,236 C320,222 380,240 440,226", road: "M226,196 C240,140 270,90 300,40 C310,24 316,10 320,-6", sign: [326, 18, "✈ Confins ↑"], home: "mercadocentral", gate: "mercadocentral"}
+    river: "M0,236 C90,226 160,250 240,236 C320,222 380,240 440,226", road: "M226,196 C240,140 270,90 300,40 C310,24 316,10 320,-6", sign: [326, 18, "✈ Confins ↑"], home: "mercadocentral", gate: "mercadocentral"},
+  // Ouro Preto (Sudeste): a Praça Tiradentes no alto, as ladeiras descendo para o sudoeste e o ribeirão do Funil lá
+  // embaixo; a estrada sobe para Belo Horizonte, ao norte
+  ouropreto: {n: "Ouro Preto", look: "minas", map: "sudeste", route: ["tiradentes", "ladeiras"], cabin: false,
+    land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
+    river: "M0,290 C100,280 180,300 260,286 C340,272 390,290 440,280", road: "M248,150 C270,110 300,70 330,30 C336,20 340,10 344,-6", sign: [350, 18, "Belo Horizonte ↑"], home: "tiradentes", gate: "tiradentes"}
 };
 /* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
    que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
@@ -203,11 +211,12 @@ const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15]
   cuiaba: [["limpo", 35], ["chuva", 20], ["neblina", 5], ["mormaco", 30], ["ventania", 10]],   // calorão do meio do Brasil e chuva de verão
   bonito: [["limpo", 40], ["chuva", 25], ["neblina", 15], ["mormaco", 15], ["ventania", 5]],   // serra de mata: neblina de manhã cedo
   brasilia: [["limpo", 40], ["chuva", 15], ["neblina", 5], ["mormaco", 25], ["ventania", 15]],   // planalto: seca comprida e vento
+  ouropreto: [["limpo", 30], ["chuva", 30], ["neblina", 25], ["mormaco", 5], ["ventania", 10]],   // cidade alta: neblina e chuva fina
   bh: [["limpo", 35], ["chuva", 25], ["neblina", 20], ["mormaco", 10], ["ventania", 10]]};   // serra: neblina de manhã e chuva de verão
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
-  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31, bh: 37}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31, bh: 37, ouropreto: 41}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
   for (const [k, w] of odds) if ((r -= w) < 0) return k;
   return "limpo";
 }
@@ -242,6 +251,7 @@ const BUS_LINES = {
   recife:   {from: "teresina", price: 1000, pass: "passagemREC", open: () => !!BS().encontro, lock: "O ônibus para Recife sai depois que o Surubim do Encontro dos rios for acalmado."},
   petrolina: {from: "recife", price: 1100, pass: "passagemPET", open: () => !!BS().olinda, lock: "O ônibus para Petrolina sai depois que o Teiú-rei de Olinda for acalmado."},
   bonito: {from: "cuiaba", price: 1200, pass: "passagemBON", open: () => !!BS().chapada, lock: "O ônibus para Bonito sai depois que o Lobo-guará-rei da Chapada for acalmado."},
+  ouropreto: {from: "bh", price: 1400, pass: "passagemOPR", open: () => !!BS().serracurral, lock: "O ônibus para Ouro Preto sai depois que o Muriqui-rei da Serra do Curral for acalmado."},
   brasilia: {from: "bonito", price: 1300, pass: "passagemBSB", open: () => !!BS().gruta, lock: "O ônibus para Brasília sai depois que a Preguiça-gigante da Gruta do Lago Azul for acalmada."}
 };
 // linha de ônibus entre as cidades a e b (em qualquer sentido), ou nada
@@ -279,7 +289,7 @@ const FREELAS = {
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

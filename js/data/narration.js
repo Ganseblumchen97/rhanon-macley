@@ -27,6 +27,12 @@ const NARRA = {
     {r: "E tinha bode pra todo lado, vô. Um deles comeu minha corda do arco."},
     "Bode come tudo, curumim. Até corda de arco. Agora deixa eu contar da caatinga."
   ],
+  ouropreto: [
+    "Depois de BH, curumim, o menino pegou o ônibus pra Ouro Preto. Cidade velha, do tempo em que tiravam ouro da terra.",
+    "Tiraram tanto que a serra ficou oca por dentro. E nos buracos que sobraram a fumaça achou onde se esconder.",
+    {r: "E é tudo ladeira, vô. Minha perna doeu três dias."},
+    "E foi numa ladeira dessas que tu conheceu um menino que só tinha uma. Mas isso eu conto depois."
+  ],
   bh: [
     "De avião outra vez, curumim, agora pro Sudeste. Belo Horizonte, no meio das montanhas de Minas.",
     "Ali a noite é cheia de poste aceso. Tanta luz que Jaci quase some no céu, e os encantados ficam escondidos.",
@@ -65,6 +71,8 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  mula_madrinha: ["A Mula-madrinha guiou as tropas do ouro, curumim. As outras mulas iam atrás do sino dela, ladeira acima, ladeira abaixo.", "A fumaça entrou nas minas velhas e ela achou que a tropa tinha se perdido lá dentro. Ficou brava de tanto procurar.", {r: "Eu toquei o sino dela de volta, vô. Ela parou na hora pra escutar."}, "Sino de madrinha a gente não esquece. Ela foi pro pasto devagar, balançando o cincerro."],
+  saci: ["O Saci é o mais levado dos encantados, curumim. Esconde as coisas, trança a crina dos cavalos, azeda o leite... mas nunca fez mal de verdade.", "A fumaça de Pytuna virou redemoinho de brasa no pito dele. Aí a brincadeira ficou perigosa.", {r: "Eu peguei o gorro dele, vô. Ele ficou sem graça e prometeu se comportar."}, "E tu devolveu o gorro, não foi? Por isso ele ainda te deve um favor. Saci não esquece quem foi justo com ele."],
   muriqui_rei: ["O Muriqui-rei é o macaco mais calmo da mata, curumim. Briga de muriqui se resolve com abraço.", "A fumaça desceu nas grotas da serra e ele esqueceu como se abraça sem apertar.", {r: "Ele me deu um abraço que tirou meus pés do chão, vô."}, "Quando a fumaça saiu, o abraço ficou macio. Era o jeito dele de pedir desculpa."],
   corpo_seco: ["O Corpo-seco foi um homem ruim, curumim. Tão ruim que nem a terra quis ficar com ele. Secou e virou quase árvore.", "A fumaça entrou no tronco dele e deu força pra ele andar de novo pela serra, de noite.", {r: "Ele era só galho e tristeza, vô. Nem ele queria estar ali."}, "Por isso tu acalmou ele, e não brigou. Ele voltou pro tronco dele e ficou quieto, olhando a cidade acesa."],
   tamandua_rei: ["O Tamanduá-rei era o mais velho do cerrado, curumim. Andava devagar, comia cupim e não mexia com ninguém.", "Mas a queimada chegou no cupinzeiro dele. E tamanduá de unha de fora é coisa séria: abraça até onça.", {r: "Ele me deu um abraço que eu senti a costela estalar, vô."}, "Abraço de tamanduá é assim. Depois de acalmado, deitou e se cobriu com o próprio rabo pra dormir."],

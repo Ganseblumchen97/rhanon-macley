@@ -142,7 +142,7 @@ function openBrasil() {
     ? `<p class="hint">${G.regions?.centroeste ? t("Brilho das estrelas: {n} de {total} chefes do Centro-Oeste acalmados", {n: CENTROESTE_BOSSES().filter(k => BS()[k]).length, total: CENTROESTE_BOSSES().length}) : t(coOpen ? "O voo para Cuiabá já sai do Aeroporto do Recife." : "O voo sai do Aeroporto do Recife depois que o app de cordel for entregue e os chefes do Nordeste acalmados.")}</p>` +
       (G.regions?.centroeste ? `<p class="hint">${t(seOpen ? "Aeroporto de Brasília: voo de ida e volta para Belo Horizonte." : "Aeroporto de Brasília: o voo para o Sudeste abre com o brilho das estrelas e o mapa de queimadas entregue.")}</p>` : "")
     : BR_SEL === "sudeste"
-    ? `<p class="hint">${t(G.regions?.sudeste ? "Você já esteve aqui. Por enquanto, Belo Horizonte e a Serra do Curral; Ouro Preto, o Rio e São Paulo vêm em breve." : seOpen ? "O voo para Belo Horizonte já sai do Aeroporto de Brasília." : "O voo sai do Aeroporto de Brasília depois que o mapa de queimadas for entregue e os chefes do Centro-Oeste acalmados.")}</p>`
+    ? `<p class="hint">${t(G.regions?.sudeste ? "Você já esteve aqui. Por enquanto, Belo Horizonte e Ouro Preto; as minas, o Rio e São Paulo vêm em breve." : seOpen ? "O voo para Belo Horizonte já sai do Aeroporto de Brasília." : "O voo sai do Aeroporto de Brasília depois que o mapa de queimadas for entregue e os chefes do Centro-Oeste acalmados.")}</p>`
     : r.open
     ? `<p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p>` +
       `<p class="hint">${t("Entre a aldeia e Belém, vai de barco de linha pelo rio.")}</p>` +

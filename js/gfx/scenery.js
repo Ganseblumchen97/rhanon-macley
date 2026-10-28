@@ -16,6 +16,7 @@ const SCENES = {
   lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
+  ladeiras:    {sky: ["#b8c0d8", "#d0c8d0", "#e8d0b8"], far: "#6a6a8a", trees: "casario", plat: "pedra"},   // Ladeiras de Ouro Preto: tarde de neblina e o casario lá atrás
   serracurral: {sky: ["#9ab8e0", "#c0cce0", "#e8d8c0"], far: "#5a6a8a", trees: "copa", plat: "pedra", water: true},   // Serra do Curral: céu de serra e a cordilheira azulada lá atrás
   parquebsb:   {sky: ["#f0d8a0", "#e8c890", "#b8c8d8"], far: "#7a8a3a", trees: "campo", plat: "grama", water: true},   // Parque Nacional de Brasília: céu de seca e o campo do cerrado
   gruta:       {sky: ["#14141e", "#1c1c2c", "#24243a"], far: "#3a3848", trees: "campo", plat: "pedra", water: true},   // Gruta do Lago Azul: teto de pedra escuro e o lago azul

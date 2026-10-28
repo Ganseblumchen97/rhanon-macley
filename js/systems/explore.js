@@ -202,6 +202,7 @@ function startExplore(zone, after, from) {
     else if (jaciLight() >= 1 && !G.narrated.norte_fim || guaraciCalm() >= 1 && !G.narrated.nordeste_fim || estrelaCalm() >= 1 && !G.narrated.centroeste_fim) { EX.locked = true; setTimeout(() => bossStory("", () => { if (EX) EX.locked = false; }), 700); }   // save que já acalmou a região toda
     else if (cityOf(zone) === "belem" && !G.narrated.belem) { G.narrated.belem = true; save(); setTimeout(() => narrate(NARRA.belem), 600); }   // primeira vez na capital
     else if (cityOf(zone) === "saoluis" && !G.narrated.saoluis) { G.narrated.saoluis = true; save(); setTimeout(() => narrate(NARRA.saoluis), 600); }   // chegou no Nordeste
+    else if (cityOf(zone) === "ouropreto" && !G.narrated.ouropreto) { G.narrated.ouropreto = true; save(); setTimeout(() => narrate(NARRA.ouropreto), 600); }
     else if (cityOf(zone) === "bh" && !G.narrated.bh) { G.narrated.bh = true; save(); setTimeout(() => narrate(NARRA.bh), 600); }   // chegou no Sudeste
     else if (cityOf(zone) === "brasilia" && !G.narrated.brasilia) { G.narrated.brasilia = true; save(); setTimeout(() => narrate(NARRA.brasilia), 600); }
     else if (cityOf(zone) === "bonito" && !G.narrated.bonito) { G.narrated.bonito = true; save(); setTimeout(() => narrate(NARRA.bonito), 600); }
@@ -219,6 +220,7 @@ const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta 
   portocuiaba: " · lembranças, comida e rede na pensão: chega perto e aperta Z. O cais de baixo leva pro Pantanal",
   centrobonito: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda vai pro Rio da Prata",
   mercadocentral: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda sobe pra Serra do Curral",
+  tiradentes: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A ladeira da esquerda desce pras ruas de pedra",
   planopiloto: " · lembranças, comida, rede na pensão e a Iara, da brigada, que tem um freela: chega perto e aperta Z",
   recifeantigo: " · lembranças, comida, rede na pensão e o Seu Dedé, que tem um freela: chega perto e aperta Z",
   parada: " · compra a passagem na bilheteria e embarca no barco", terminal: " · o barco volta pra aldeia; a trilha da esquerda vai pro Ver-o-Peso"};
@@ -799,9 +801,9 @@ const SPOT_LABEL = {segredo: "examinar", bau: "abrir o baú", fogueira: "descans
 const VILLAGER_NAME = {aldeao1: "Mateiro", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 // pensões das cidades (fase com O): nome do painel; dormir passa pela cena do quarto (motelScene)
-const PENSAO_NAME = {veropeso: "Pensão do Ver-o-Peso", praiagrande: "Pensão da Praia Grande", trocatroca: "Pensão do Troca-Troca", recifeantigo: "Pensão do Recife Antigo", orla: "Pensão da Orla", portocuiaba: "Pensão do Porto", centrobonito: "Pensão de Bonito", planopiloto: "Pensão da Superquadra", mercadocentral: "Pensão do Mercado"};
+const PENSAO_NAME = {veropeso: "Pensão do Ver-o-Peso", praiagrande: "Pensão da Praia Grande", trocatroca: "Pensão do Troca-Troca", recifeantigo: "Pensão do Recife Antigo", orla: "Pensão da Orla", portocuiaba: "Pensão do Porto", centrobonito: "Pensão de Bonito", planopiloto: "Pensão da Superquadra", mercadocentral: "Pensão do Mercado", tiradentes: "Pensão da Praça"};
 // aviso de quando o Rhanon acorda na cidade (abertura do jogo, startIntro)
-const CITY_WAKE = {belem: "Belém · manhã no Ver-o-Peso...", saoluis: "São Luís · manhã na Praia Grande...", teresina: "Teresina · manhã no Troca-Troca...", recife: "Recife · manhã no Recife Antigo...", petrolina: "Petrolina · manhã na beira do Velho Chico...", cuiaba: "Cuiabá · manhã no Porto, já fazendo calor...", bonito: "Bonito · manhã fresquinha no centro...", brasilia: "Brasília · manhã seca no Plano Piloto...", bh: "Belo Horizonte · manhã com cheiro de pão de queijo..."};
+const CITY_WAKE = {belem: "Belém · manhã no Ver-o-Peso...", saoluis: "São Luís · manhã na Praia Grande...", teresina: "Teresina · manhã no Troca-Troca...", recife: "Recife · manhã no Recife Antigo...", petrolina: "Petrolina · manhã na beira do Velho Chico...", cuiaba: "Cuiabá · manhã no Porto, já fazendo calor...", bonito: "Bonito · manhã fresquinha no centro...", brasilia: "Brasília · manhã seca no Plano Piloto...", bh: "Belo Horizonte · manhã com cheiro de pão de queijo...", ouropreto: "Ouro Preto · manhã de neblina e sino tocando..."};
 // Petrolina: quem é cada morador da orla do São Francisco e o que eles contam
 const PETROLINA_NAME = {urbano1: "Vendedora de queijo coalho", urbano2: "Artesão de carranca", urbano3: "Vaqueiro"};
 const PETROLINA_TIPS = [
@@ -833,6 +835,16 @@ const BH_TIPS = [
   "Ô trem esquisito: de uns tempos pra cá a fumaça desce da serra de noite e entra nas mina velha. Os antigos não gostam nada disso.",
   "Lá pra Ouro Preto a cidade é toda ladeira e igreja. E de noite, dizem, o Saci apronta nas ruas de pedra. Nó, eu é que não vou.",
   "No Sudeste tem tanto poste aceso que a lua quase some. Os encantados daqui ficaram com medo de aparecer, sabia?"
+];
+// Ouro Preto: quem é cada morador da Praça Tiradentes e o que eles contam (mineiro de cidade velha, que conta causo)
+const OUROPRETO_NAME = {urbano1: "Artesã de pedra-sabão", urbano2: "Sineiro da igreja", urbano3: "Guia de mina"};
+const OUROPRETO_TIPS = [
+  "Uai, chegou de BH? Aqui é tudo ladeira, sô. Desce de lado que escorrega menos, e sobe devagar que a cidade não foge.",
+  "Essa panela é de pedra-sabão, tirada da serra. Esquenta devagar e não esfria nunca. Igual mineiro.",
+  "Eu toco o sino da igreja faz quarenta anos. De uns tempos pra cá, ele toca sozinho de noite. Ô trem esquisito.",
+  "A serra é toda furada de mina velha, do tempo do ouro. Lá dentro é escuro e frio, e tem coisa que a fumaça acordou.",
+  "Cuidado com quem vende pepita na rua. Ouro de verdade não brilha tanto assim, não. Aquilo é ouro de tolo.",
+  "De noite, um redemoinho desce a ladeira assobiando. É o Saci, menino. Se pegar o gorro dele, ele te deve um favor."
 ];
 // Brasília: quem é cada morador do Plano Piloto e o que eles contam (gente de todo canto do Brasil)
 const BRASILIA_NAME = {urbano1: "Vendedora de pamonha", urbano2: "Servidor público", urbano3: "Candango aposentado"};
@@ -883,7 +895,7 @@ const SAOLUIS_TIPS = [
   "De noite, dizem que a carruagem de Ana Jansen passa nas ruas de pedra, puxada por cavalo sem cabeça. Vixe, nem quero ver."
 ];
 // moradores de cada cidade fora do Norte: nomes e falas (journal.js, villagerTalk)
-const CITY_FOLK = () => ({saoluis: [SAOLUIS_NAME, SAOLUIS_TIPS], teresina: [TERESINA_NAME, TERESINA_TIPS], recife: [RECIFE_NAME, RECIFE_TIPS], petrolina: [PETROLINA_NAME, PETROLINA_TIPS], cuiaba: [CUIABA_NAME, CUIABA_TIPS], bonito: [BONITO_NAME, BONITO_TIPS], brasilia: [BRASILIA_NAME, BRASILIA_TIPS], bh: [BH_NAME, BH_TIPS]})[curCity()];
+const CITY_FOLK = () => ({saoluis: [SAOLUIS_NAME, SAOLUIS_TIPS], teresina: [TERESINA_NAME, TERESINA_TIPS], recife: [RECIFE_NAME, RECIFE_TIPS], petrolina: [PETROLINA_NAME, PETROLINA_TIPS], cuiaba: [CUIABA_NAME, CUIABA_TIPS], bonito: [BONITO_NAME, BONITO_TIPS], brasilia: [BRASILIA_NAME, BRASILIA_TIPS], bh: [BH_NAME, BH_TIPS], ouropreto: [OUROPRETO_NAME, OUROPRETO_TIPS]})[curCity()];
 const BELEM_TIPS = [
   "Aqui na capital tem malandro esperto, segura a bolsa! Se um fi de rapariga desses levar teu dinheiro, vence ele que ele devolve.",
   "Os urubus do Ver-o-Peso tão aqui desde antes de mim. Não mexe com eles que eles não mexem contigo.",

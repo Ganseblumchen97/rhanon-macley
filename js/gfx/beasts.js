@@ -285,6 +285,19 @@ const QUADS = {
     },
     tail: (d, P, C) => bChain(d, [[P.cx + P.rx - 2, P.cy - 2], [P.cx + P.rx + 5, P.cy + 3], [P.cx + P.rx + 6, P.cy + 10]], [3, 2], "#1e120a"),
     pattern: (d, P, C) => d.rect(P.cx - 6, P.cy - P.ry + 1, 10, 4, "#7a2a1a").rect(P.cx - 6, P.cy - P.ry + 4, 10, 1, "#c8a040")},   // sela
+  // Mula-madrinha (Ouro Preto): a mula que guiava a tropa, de orelha comprida e cincerro (sino) no pescoço
+  mula_madrinha: {W: 60, H: 44, cx: 32, rx: 16, ry: 8, leg: 13, lw: 3.5, neck: 6, hu: 10, hr: 5,
+    C: {b: "#8a6a4a", B: "#5e4630", l: "#a8885e", k: "#3a2a1e"}, paw: ["#9aa0a8", "#6a7078"],   // ferraduras
+    head: (d, x, y, o, C) => {
+      d.part().poly([[x + 1, y - 3], [x + 2, y - 13], [x + 5, y - 12], [x + 4, y - 3]], C.b, C.B, x + 3).poly([[x + 4, y - 3], [x + 8, y - 12], [x + 10, y - 10], [x + 6, y - 2]], C.B);   // orelhas compridas
+      d.part().ellipse(x, y, 5, 4.5, C.b, C.B, .6).poly([[x - 3, y - 2], [x - 11, y + 2], [x - 10, y + 6], [x - 2, y + 4]], C.b, C.B, x - 7);   // cara comprida
+      d.part().ellipse(x - 10, y + 4, 2, 1.6, C.k);   // focinho
+      d.dots([[x - 10, y + 3]], BN); bEye(d, x - 1, y - 1, {eye: o.eye === "open" ? "angry" : o.eye});
+      if (o.mouth) bMouth(d, x - 10, y + 5, 4, false); if (o.tongue) d.dots([[x - 9, y + 6]], BR);
+      d.part().ellipse(x + 3, y + 7, 2.4, 2.6, "#e8c040", "#a8862a", .6).dots([[x + 3, y + 9]], "#5a4a1a");   // cincerro
+    },
+    tail: (d, P, C) => bChain(d, [[P.cx + P.rx - 2, P.cy - 2], [P.cx + P.rx + 4, P.cy + 3], [P.cx + P.rx + 5, P.cy + 10]], [2.5, 1.5], C.k),
+    pattern: (d, P, C) => d.rect(P.cx - 7, P.cy - P.ry + 1, 12, 4, "#5a3a7a").rect(P.cx - 7, P.cy - P.ry + 4, 12, 1, "#e8c040")},   // manta da tropa
   preguica: {W: 44, H: 38, cx: 24, rx: 11, ry: 8, leg: 10, lw: 3, splay: 3, neck: 1, hu: 6, hr: 5,
     C: {b: "#9a8a70", B: "#6e604a", l: "#b8a888"},
     head: (d, x, y, o, C) => {
@@ -931,6 +944,16 @@ function pessoa(look) {
     return {c, head: pose === "ko" ? [18 * S, 20 * S] : [16 * S, 13 * S]};
   };
 }
+// Saci (Ouro Preto, à noite): a gente de pessoa(), com os dois pés juntos no meio, que vira uma perna só (menos
+// desmaiado, sentado no chão)
+const SACI_LOOK = {pal: {s: "#5a3420", S: "#3e2214", h: "#1a1010"}, shirt: ["#5a3420", "#3e2214"], pants: ["#d8282a", "#a01a1a"], noBand: true, cap: ["#e5201c", "#a81010"]};
+function saciFrame(pose, f) {
+  const P = {idle: {dy: f}, blink: {face: "blink"}, crouch: {dy: 2}, attack: {lean: -2, lh: [1, 20], face: "happy"}, hurt: {lean: 2, face: "hurt"},
+    ko: {sit: true, lean: 2, dy: 1, face: "hurt", lh: [7, 39], rh: [27, 39]}}[pose] || {};
+  if (pose !== "ko") Object.assign(P, {lf: [16, 40], rf: [16, 40]});
+  const S = 1.4, c = rigCanvas("front", P, SACI_LOOK, S);
+  return {c, head: pose === "ko" ? [18 * S, 20 * S] : [16 * S, 13 * S]};
+}
 // Cabeça de Cuia (Teresina, à noite): pescador sem camisa, de calção, com a cabeça enorme em forma de cuia, cabelo molhado
 // e olhos acesos; desmaiado, fica deitado na beira com a cabeça no chão
 function cabecaCuia(pose, f) {
@@ -1152,6 +1175,10 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   bigua: (pose, f) => garca(pose, f, {b: "#2a2a30", B: "#16161a", y: "#e8a030", Y: "#b07a20", k: "#e8a030"}),   // biguá: a garça toda preta, de bico amarelo
   cabeca_cuia: cabecaCuia, fulozinha, lobisomem, tapejara, carranca, nego_dagua: negoDagua,
   martim: (pose, f) => pombo(pose, f, {b: "#2a7ac8", B: "#1a4a8a", n: "#f4f0e4", p: "#e8702a", w: "#4aa8e0", y: "#2a2a2a"}),   // martim-pescador: azul, colar branco e peito laranja
+  sabia: (pose, f) => pombo(pose, f, {b: "#8a7a5a", B: "#5e5238", n: "#e8843a", p: "#e8843a", w: "#7a6a4a", y: "#d8b040"}),   // sabiá-laranjeira: pardo de peito laranja
+  jacu: (pose, f) => pombo(pose, f, {b: "#2a2a30", B: "#16161a", n: "#d8282a", p: "#3a3a44", w: "#22222a", y: "#9aa0a8"}),   // jacu: preto, papo vermelho
+  pepita: pessoa({pal: {s: "#c8905a", S: "#9a6a3e", h: "#3a2a1e"}, shirt: ["#d8c8a0", "#b0a078"], pants: ["#5a4a3a", "#3e3226"], noBand: true, cap: ["#d8b860", "#a88a38"]}),   // vendedor de ouro de tolo: chapéu de palha e camisa de garimpeiro
+  saci: saciFrame,   // Saci: pele escura, calção e gorro vermelhos e uma perna só
   tucano: (pose, f) => pombo(pose, f, {b: "#1e1e22", B: "#0e0e12", n: "#f8f0e0", p: "#1e1e22", w: "#2a2a30", y: "#f08a1a"}),   // tucano-toco: preto, papo branco e o bicão laranja
   quero_quero: (pose, f) => garca(pose, f, {b: "#b8b8b0", B: "#7a7a74", n: "#e8e8e0", N: "#2a2a2a", y: "#d8504a", Y: "#a03a3a", k: "#1a1a1a"}),   // quero-quero: cinza, peito preto, pernas vermelhas
   corpo_seco: pessoa({pal: {s: "#8a8a7a", S: "#5e5e52", h: "#3a3a32"}, shirt: ["#6a5a48", "#4a3e30"], pants: ["#5a4a38", "#3e3226"], noBand: true}),   // Corpo-seco: pele cinza grudada no osso e roupa velha da cor do tronco

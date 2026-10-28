@@ -38,6 +38,8 @@ const MAP_ICON = {
   rioprata: ["#2aa8b8", `<path d="M-9 -2 Q0 4 9 -2 V9 H-9Z" fill="#7ae0e8" ${MI.s}/><path d="M-5 3 l4 -2 v4 Z M1 1 q3 -1 5 1 q-2 2 -5 1Z" fill="#e8a020"/>` + MI_WAVE(-4, "#cfeeff", 1.4)],   // água transparente com os peixes
   chapada: ["#b8583a", `<path d="M-9 8 V-4 L-5 -7 H-1 V8Z M3 8 V-6 L6 -8 L9 -5 V8Z" fill="#d8784a" ${MI.s}/><path d="M-1 -5 Q1 -5 1 -3 V8 H3 V-4" fill="none" stroke="${MI.w}" stroke-width="1.8"/>` + MI_WAVE(8)],   // paredão com a cachoeira no meio
   pantanal: ["#3a8a7a", `<path d="M-2 8 V-1 M2 8 V-1" stroke="${MI.k}" stroke-width="1.4"/><ellipse cx="0" cy="-2" rx="5" ry="3.5" fill="${MI.c}" ${MI.s}/><path d="M-3 -3 V-8" stroke="${MI.k}" stroke-width="2.4"/><rect x="-4.2" y="-5" width="2.4" height="1.6" fill="${MI.r}"/><path d="M-3 -8.5 L-9 -7" stroke="${MI.k}" stroke-width="1.6" stroke-linecap="round"/>` + MI_WAVE(8)],   // tuiuiú no alagado
+  tiradentes: ["#2a5aa8", `<rect x="-8" y="-2" width="16" height="9" fill="${MI.c}" ${MI.s}/><rect x="-8" y="-8" width="4" height="6" fill="${MI.c}" ${MI.s}/><rect x="4" y="-8" width="4" height="6" fill="${MI.c}" ${MI.s}/><path d="M-8 -8 L-6 -10 L-4 -8 M4 -8 L6 -10 L8 -8" fill="#c88a3a" stroke="#1a1426" stroke-width="1"/><path d="M-1.6 7 V2 H1.6 V7" fill="#6d4329"/><circle cy="-1" r="1.3" fill="#2a5aa8"/>`],   // igreja barroca de duas torres
+  ladeiras: ["#6a5a4a", `<path d="M-9 8 L9 -2 L9 8Z" fill="#8a847a" ${MI.s}/><path d="M-5 6 l2 -1 M0 3 l2 -1 M5 0 l2 -1" stroke="#5a544a" stroke-width="1.2"/><rect x="-8" y="-6" width="7" height="7" fill="${MI.c}" ${MI.s}/><path d="M-9 -6 L-4.5 -9.5 L0 -6Z" fill="${MI.r}" ${MI.s}/><rect x="-6" y="-4" width="2" height="2" fill="#2a5aa8"/>`],   // ladeira de pedra e casarão
   serracurral: ["#4a6a8a", `<path d="M-9 7 L-4 -3 L-1 1 L3 -7 L9 7Z" fill="#8a6a5a" ${MI.s}/><path d="M3 -7 L5 -3 L1 -3Z" fill="${MI.c}"/><path d="M-9 7 L-6 3 L-3 5 L0 2 L4 4 L9 7Z" fill="#5a8a4a"/>`],   // a serra cor de ferro com mata embaixo
   mercadocentral: ["#3a7ab8", `<path d="M-8 -1 V5 Q0 9 8 5 V-1Z" fill="#e8c860" ${MI.s}/><ellipse cy="-1" rx="8" ry="3.4" fill="#f8e6a0" ${MI.s}/><path d="M0 -1 L8 -1 L8 5 L0 5Z" fill="#f8e6a0" ${MI.s}/><circle cx="3" cy="2" r=".9" fill="#c8a040"/><circle cx="5.5" cy="3.5" r=".7" fill="#c8a040"/>`],   // queijo minas com a fatia cortada
   portocuiaba: ["#c8603a", MI_TREE(-3, 1, 5, "#f0c020") + `<path d="M2 8 V-1 H9 V8Z" fill="${MI.c}" ${MI.s}/><path d="M1 -1 L5.5 -5 L10 -1Z" fill="${MI.r}" ${MI.s}/>`],   // ipê-amarelo e casario
@@ -45,7 +47,7 @@ const MAP_ICON = {
 };
 MAP_ICON.terminal = MAP_ICON.parada;   // o cais de Belém também é o barco de linha
 // no mapa grande, cada cidade aparece com o desenho do lugar dela
-const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", brasilia: "planopiloto", bh: "mercadocentral", curitiba: "curitiba"};
+const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", brasilia: "planopiloto", bh: "mercadocentral", ouropreto: "tiradentes", curitiba: "curitiba"};
 // disco do ponto do mapa (r = raio): cor da área, aro claro e o desenho; sem desenho, a bolinha de antes
 function mapIcon(k, r = 15) {
   const a = MAP_ICON[k]; if (!a) return `<circle r="10"/>`;

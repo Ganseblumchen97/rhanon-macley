@@ -33,7 +33,7 @@ function vit() {
   G.skills = G.skills || {};   // degraus aprendidos da árvore de habilidades
   // notebook: jogo novo começa sem ele (missão do começo); save antigo já tem tudo ligado
   if (!G.nb) G.nb = G.tutorial ? {} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};
-  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET; G.passagemBON = !!G.passagemBON; G.passagemBSB = !!G.passagemBSB;
+  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET; G.passagemBON = !!G.passagemBON; G.passagemBSB = !!G.passagemBSB; G.passagemOPR = !!G.passagemOPR;
   G.regions = G.regions || {norte: true};   // regiões já visitadas (o aeroporto voa entre elas)
   if (!G.narrated) G.narrated = G.belemVisto ? {belem: true} : {};   // falas do Pajé já contadas (prólogo, Belém, cada chefe)
   G.loseStreak = G.loseStreak || 0;   // lutas perdidas seguidas (2 = o Pajé dá uma dica)   // bugs resolvidos por freela; freelas entregues
@@ -69,6 +69,7 @@ function debugSetup() {
     if (city === "petrolina") G.passagemPET = true;
     if (city === "bonito" || city === "brasilia") G.passagemBON = true;
     if (city === "brasilia") G.passagemBSB = true;
+    if (city === "ouropreto") G.passagemOPR = true;
     const regs = ["norte", "nordeste", "centroeste", "sudeste"], ri = regs.indexOf(CITY[city].map);   // regiões na ordem da viagem
     if (ri >= 2) { NORDESTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.app_cordel = true; G.narrated.nordeste_fim = true; G.passagemTHE = G.passagemREC = G.passagemPET = true; }   // e o Nordeste também
     if (ri >= 3) { CENTROESTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.mapa_queimadas = true; G.narrated.centroeste_fim = true; G.passagemBON = G.passagemBSB = true; }   // e o Centro-Oeste

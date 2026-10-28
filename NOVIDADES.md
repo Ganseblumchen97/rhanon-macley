@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.66.0 — Ouro Preto, a Mula-madrinha e o Saci
+
+- Cidade nova: Ouro Preto. Depois de acalmar o Muriqui-rei da Serra do Curral, compre a passagem de ônibus no mapa do
+  Sudeste (R$ 1.400, vale ida e volta para Belo Horizonte).
+- A Praça Tiradentes é a fase segura de Ouro Preto: casarão de janela azul, pensão, artesã de pedra-sabão, o sineiro
+  da igreja e um guia de mina, que contam causo da cidade.
+- Trilha nova: as Ladeiras de Ouro Preto (níveis 62 a 64), ruas de pedra entre casarões, pela ladeira da esquerda da
+  praça. Bichos novos: sabiá-laranjeira, gavião-carijó e jacu. Cuidado com o vendedor de ouro de tolo: ele leva o seu
+  dinheiro e só devolve quando é vencido. De noite aparecem a coruja-orelhuda e o gato preto do beco.
+- De dia, o chefe é a Mula-madrinha, a mula do sino que guiava as tropas do ouro. De noite, um redemoinho desce a
+  ladeira assobiando: é o Saci, de gorro vermelho e uma perna só.
+
 ## 0.65.0 — o Sudeste começa em Minas
 
 - Região nova: o Sudeste. Com os 10 chefes do Centro-Oeste acalmados e o mapa de queimadas entregue, o Aeroporto de

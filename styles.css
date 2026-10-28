@@ -88,7 +88,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* --plat = altura da plataforma do bicho: o bicho (combat.js, actors.js) pisa nela, então cada cenário muda só a variável */
 .stage{--plat:46%}
 .stage.zone-fechada{--plat:42%}
-.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-beira,.zone-pantanal,.zone-chapada,.zone-rioprata,.zone-gruta,.zone-parquebsb,.zone-serracurral,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
+.stage:is(.zone-mata,.zone-rio,.zone-igarape,.zone-manguezal,.zone-mangueilha,.zone-lencois,.zone-encontro,.zone-olinda,.zone-caatinga,.zone-serra,.zone-beira,.zone-pantanal,.zone-chapada,.zone-rioprata,.zone-gruta,.zone-parquebsb,.zone-serracurral,.zone-ladeiras,.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-varzea,.zone-seringal),.stage.aquatic{--plat:44%}
 .stage::before{inset:auto;right:7%;top:var(--plat);width:44%;height:26px;background:#3f7a4f;border-radius:50%;clip-path:none;opacity:1;box-shadow:0 6px 0 #0c1610;z-index:1}
 .stage::after{inset:auto;left:6%;bottom:6%;width:50%;height:30px;background:#3f7a4f;border-radius:50%;clip-path:none;box-shadow:0 6px 0 #0c1610;z-index:1}
 /* Cenários variados por zona (Ananindeua) */
@@ -143,7 +143,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .stage:is(.zone-manguezal,.zone-mangueilha)::before{background:#6a6248;right:9%;top:var(--plat)}
 .stage:is(.zone-manguezal,.zone-mangueilha)::after{background:#6a6248;left:4%;bottom:7%}
 /* Belém: céu de fim de tarde e casarões coloridos (Cidade Velha), galpões cinza (Porto) e palafitas sobre a água (Baixadas) */
-.stage:is(.zone-cidadevelha,.zone-olinda){background:linear-gradient(180deg,#e8a070 0 18%,#9a7a9a 18% 46%,#8a8478 46% 100%)}
+.stage:is(.zone-cidadevelha,.zone-olinda,.zone-ladeiras){background:linear-gradient(180deg,#e8a070 0 18%,#9a7a9a 18% 46%,#8a8478 46% 100%)}
 .stage.zone-porto{background:linear-gradient(180deg,#9aa8b0 0 30%,#7a8a96 30% 46%,#6a6a6e 46% 100%)}
 .stage.zone-baixadas{background:linear-gradient(180deg,#c89a8a 0 22%,#8a8aa0 22% 34%,#4a6a5a 34% 46%,#5e5e48 46% 100%)}
 .stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas)::before{background:#6e685c;right:9%;top:var(--plat)}
@@ -1090,10 +1090,10 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .stage:is(.zone-varzea,.zone-lencois) .plate{background:linear-gradient(180deg,#b8963a,#7a5e1e);border-color:#3e2e0c;color:#fff8e0;
   --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M4 14q2-8 0-14M10 14q-1-7 3-13M18 14q2-9-1-13M26 14q-2-8 2-14M34 14q1-7-2-13M40 14q-1-8 2-13' fill='none' stroke='%233e2e0c' stroke-width='3.5'/%3E%3Cpath d='M4 14q2-8 0-14M10 14q-1-7 3-13M18 14q2-9-1-13M26 14q-2-8 2-14M34 14q1-7-2-13M40 14q-1-8 2-13' fill='none' stroke='%23e8d070' stroke-width='1.4'/%3E%3C/svg%3E")}
 /* cidade: azulejo português (Cidade Velha, porto, Baixadas, Olinda) */
-.stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-olinda) .plate{color:#10305a;border-color:#10305a;
+.stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-olinda,.zone-ladeiras) .plate{color:#10305a;border-color:#10305a;
   background:repeating-conic-gradient(from 45deg,#dce8f6 0 25%,#f6f9fd 0 50%) 0 0/14px 14px,#f6f9fd;
   --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Crect x='1' y='1' width='12' height='12' fill='%23f6f9fd' stroke='%2310305a' stroke-width='2'/%3E%3Cpath d='M7 3l4 4-4 4-4-4z' fill='%232a5aa8'/%3E%3Crect x='16' y='1' width='12' height='12' fill='%23f6f9fd' stroke='%2310305a' stroke-width='2'/%3E%3Cpath d='M22 3l4 4-4 4-4-4z' fill='%232a5aa8'/%3E%3Crect x='31' y='1' width='12' height='12' fill='%23f6f9fd' stroke='%2310305a' stroke-width='2'/%3E%3Cpath d='M37 3l4 4-4 4-4-4z' fill='%232a5aa8'/%3E%3C/svg%3E")}
-.stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-olinda) .plate .lv{background:#10305a}
+.stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-olinda,.zone-ladeiras) .plate .lv{background:#10305a}
 /* sertão: papel de cordel com moldura de xilogravura */
 .stage:is(.zone-caatinga,.zone-serra,.zone-chapada) .plate{background:linear-gradient(180deg,#f0dfb4,#d9c088);color:#1a120a;border:3px solid #1a120a;box-shadow:inset 0 0 0 2px #f0dfb4,inset 0 0 0 4px #1a120a,4px 5px 0 rgba(0,0,0,.35);
   --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M22 1l2 4h4l-3 3 1 5-4-3-4 3 1-5-3-3h4z' fill='%231a120a'/%3E%3Cpath d='M2 7h12M30 7h12' stroke='%231a120a' stroke-width='2' stroke-dasharray='2 2'/%3E%3C/svg%3E")}

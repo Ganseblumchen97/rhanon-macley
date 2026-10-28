@@ -28,6 +28,10 @@ const TILE_PAL = {
   // Brasília: o Parque Nacional, capim do cerrado verde-amarelado, árvore torta (cerrado: true) e água mineral azul-clara
   parquebsb: {g1: "#a8a856", g2: "#989848", tall: "#b8a84a", tallHi: "#e8d070", path: "#c89060", path2: "#a8744a", leaf: "#5a8a3a", leaf2: "#3a6a2a", leafHi: "#8ab85a", trunk: "#4a3020", rock: "#a89a88", rock2: "#7a6a58", water: "#3aa8d8", water2: "#a8e8f8", wood: "#9c6339", wood2: "#6d4329", cerrado: true},
   // Brasília: o Plano Piloto, calçada de concreto claro, prédio branco de laje cinza e ipê-roxo florido nas quadras
+  // Ouro Preto: a Praça Tiradentes, pedra de calçamento escura, casario branco de janela azul e amarela, telhado colonial
+  tiradentes: {g1: "#a8a090", g2: "#948c7c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#6e685e", path2: "#56504a", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#a84a2a", roof2: "#7a3018", walls: ["#f0ece0", "#2a5aa8", "#f0ece0", "#e8c048", "#f0ece0"]},
+  // Ouro Preto: as Ladeiras, pé-de-moleque de pedra, casarão branco com barrado colorido e quintal de mata
+  ladeiras: {g1: "#8a8a6a", g2: "#7a7a5c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#6e685e", path2: "#56504a", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#a84a2a", roof2: "#7a3018", walls: ["#f0ece0", "#2a5aa8", "#e8c048", "#f0ece0", "#2a8a6a", "#f0ece0"]},
   // Belo Horizonte: a Serra do Curral, campo de pedra (capim ralo sobre a canga cor de ferro), trilha de terra vermelha,
   // mata verde-escura nas grotas e pedra escura de minério
   serracurral: {g1: "#8a8a5a", g2: "#7a7a4e", tall: "#9a9a4a", tallHi: "#c8c070", path: "#a8644a", path2: "#88503a", leaf: "#3a6a3a", leaf2: "#2a5228", leafHi: "#5a8a4a", trunk: "#4a3020", rock: "#6a5a58", rock2: "#4a3e3c", water: "#3a7ab0", water2: "#8ac0e0", wood: "#9c6339", wood2: "#6d4329"},
