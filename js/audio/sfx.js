@@ -164,6 +164,16 @@ function animalCry(id, boss = false, k = 1) {
   const t = AC.currentTime, c = CRIES[CRY_OF[ART[id] || id]] || CRIES.porco;
   c(t, k * 1.6); if (boss) SFX.roar(t);
 }
+/* entrada do chefe: o grito do próprio bicho vem na frente (animalCry) e este ronco grave entra logo depois, mais baixo,
+   com altura e "rouquidão" tiradas do id. Antes um rugido fixo igual para todos abafava o grito: todo chefe soava igual */
+function bossRoar(id) {
+  if (!AC || muted) return;
+  let h = 7; for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) % 9973;
+  const f = 52 + h % 46, t = AC.currentTime + .45, wave = ["sawtooth", "square", "triangle"][h % 3];
+  noise(t, .8, .11, 160 + h % 520);
+  tone(f, t, .95, wave, .09, f * (.4 + (h % 5) * .08));
+  tone(f * (1.5 + (h % 4) * .25), t + .06, .6, "square", .03, f * .8);
+}
 function toggleMute() {
   muted = !muted; if (master) master.gain.value = muted ? 0 : .5;
   $("mute").setAttribute("aria-pressed", muted);
@@ -248,6 +258,23 @@ function xpFillSound(dur, from = 0, to = 1) {
   g.gain.setValueAtTime(.022, t); g.gain.setValueAtTime(.022, t + dur - .02); g.gain.linearRampToValueAtTime(0, t + dur);
   lfo.connect(lg).connect(g.gain); o.connect(g).connect(sfxOut);
   o.start(t); lfo.start(t); o.stop(t + dur + .02); lfo.stop(t + dur + .02);
+}
+// PV e PE enchendo no descanso: um "lilili" suave subindo (triângulo, mais manso que o da barra de XP)
+function healFillSound(dur) {
+  if (!AC || muted || dur <= 0) return;
+  const t = AC.currentTime + .02, o = AC.createOscillator(), g = AC.createGain(), lfo = AC.createOscillator(), lg = AC.createGain();
+  o.type = "triangle"; o.frequency.setValueAtTime(hz(64), t); o.frequency.linearRampToValueAtTime(hz(81), t + dur);
+  lfo.type = "square"; lfo.frequency.value = 14; lg.gain.value = .03;
+  g.gain.setValueAtTime(.04, t); g.gain.setValueAtTime(.04, t + dur - .03); g.gain.linearRampToValueAtTime(0, t + dur);
+  lfo.connect(lg).connect(g.gain); o.connect(g).connect(sfxOut);
+  o.start(t); lfo.start(t); o.stop(t + dur + .02); lfo.stop(t + dur + .02);
+}
+// descansou tudo: o acorde da região subindo em arpejo e a nota de casa, devagar (a cantiga da fogueira)
+function restJingle() {
+  if (!AC || muted) return;
+  const t = AC.currentTime + .03, J = jingleMotif();
+  J.chord.forEach((m, i) => { tone(hz(m + 12), t + i * .13, .5, "triangle", .045); tone(hz(m + 24), t + i * .13, .12, "sine", .015); });
+  tone(hz(J.home + 12), t + .42, .9, "triangle", .05); tone(hz(J.bass), t + .42, .9, "triangle", .07);
 }
 function xpDing() { if (!AC || muted) return; const t = AC.currentTime + .02; tone(hz(84), t, .09, "square", .04); tone(hz(91), t + .08, .22, "square", .035); }
 // chefe acalmado: um pedaço da luz de Jaci volta. O começo do tema dela (JACI_THEME) em sinos, e um brilho subindo no fim

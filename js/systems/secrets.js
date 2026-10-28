@@ -40,7 +40,7 @@ const secretSolid = ch => ch === "J" || (ch === "Y" && !secretState(EX.zone));
 const secretSpecial = () => SPECIALS.find(s => s.elem === SECRETS[EX.zone].elem);
 function secretPanel(say, d) {
   const S = SECRETS[EX.zone], sp = secretSpecial(), lock = specialLock(sp);
-  say(S.n, S.d + (lock ? " " + t("Precisa de {elemento}: {golpe}.", {elemento: ELEMENTS[S.elem].n.toLowerCase(), golpe: sp.n}) : ""));
+  say(S.n, S.d + (lock ? " " + t("Precisa de {elemento}.", {elemento: ELEMENTS[S.elem].n.toLowerCase()}) : ""));
   if (!lock) btn(t("Usar {golpe} · {n} PE", {golpe: sp.n, n: sp.cost}), () => secretOpen(sp), G.sp < sp.cost, d);
 }
 function secretOpen(sp) {
@@ -60,9 +60,9 @@ function secretChest(say, d) {
 function secretLoot() {
   vit(); const z = EX.zone, S = SECRETS[z]; if (secretState(z) >= SECRET_LOOTED) return;
   const money = 30 + (ZONES[z].lv || 1) * 8, food = S.item;
-  G.secrets[z] = SECRET_LOOTED; G.money += money; G.items[food] = (G.items[food] || 0) + 2; save(); sfx("more"); exHud(); exCloseDialog();
+  G.secrets[z] = SECRET_LOOTED; G.money += money; EX.locked = true; exKeys.clear(); G.items[food] = (G.items[food] || 0) + 2; save(); sfx("more"); exHud(); exCloseDialog();
   exToast(t("No baú: R$ {n} e {item} ×2.", {n: money, item: ITEMS[food].n.toLowerCase()}));
-  setTimeout(() => narrate([S.lore]), 900);   // o Pajé lembra uma história daquele lugar
+  setTimeout(() => narrate([S.lore], () => { if (EX) EX.locked = false; }), 900);   // o Pajé lembra uma história daquele lugar (tudo parado até ele terminar)
 }
 // o que fecha a entrada, desenhado por cima do chão (some quando o segredo abre): cada elemento tem o seu
 function drawSecretBlock(x, sx, sy, elem, now) {

@@ -127,13 +127,15 @@ function applyTheme() {
   if (!themeReady) r.dataset.theme = t; else wipe(() => { r.dataset.theme = t; });
 }
 // chefe chegando: a tela escurece, faixas de alerta listradas batem nas bordas e "CUIDADO!" aparece em letras de recorte
-function bossWarn(sub) {
+// treino = revanche com o chefe aliado: "HORA DO TREINO!" em verde e dourado, sem a sirene
+function bossWarn(sub, treino) {
   const st = $("stage"); st.querySelector(".boss-warn")?.remove();
-  const b = document.createElement("div"); b.className = "boss-warn"; b.setAttribute("aria-hidden", "true");
+  const b = document.createElement("div"); b.className = "boss-warn" + (treino ? " treino" : ""); b.setAttribute("aria-hidden", "true");
   b.innerHTML = `<div class="bw-tape top"></div><div class="bw-tape bottom"></div><h2 class="title bw-title"></h2><div class="bw-sub">${sub}</div>`;
   st.appendChild(b);
-  ransom(b.querySelector(".bw-title"), [t("CUIDADO!")], 7);
-  sfx("alarme"); impactSound();
+  ransom(b.querySelector(".bw-title"), [treino ? t("HORA DO TREINO!") : t("CUIDADO!")], treino ? 14 : 7);
+  if (treino) sfx("missao"); else sfx("alarme");
+  impactSound();
   setTimeout(() => b.classList.add("out"), REDUCE ? 500 : 1150);
   setTimeout(() => b.remove(), REDUCE ? 600 : 1550);
 }

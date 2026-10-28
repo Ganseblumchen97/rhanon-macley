@@ -32,17 +32,24 @@ function cmdButton(html, desc, fn, off) {
   $("cmds").appendChild(b);
 }
 function buildCmds() {
-  subMenu = null; const box = $("cmds"); box.innerHTML = ""; box.style.minHeight = ""; box.classList.remove("scroll");
-  CMDS.forEach((c, n) => cmdButton(`<i class="key">${n + 1}</i>${cmdName(c)}<small></small>`, c.d, () => act(c.id)));   // o número é a tecla de atalho (1-6)
+  subMenu = null; const box = $("cmds"); box.innerHTML = ""; box.style.minHeight = ""; box.classList.remove("scroll"); $("cmdsUp").hidden = $("cmdsDown").hidden = true;
+  CMDS.forEach(c => cmdButton(`<i class="zk"></i>${cmdName(c)}<small></small>`, c.d, () => act(c.id)));   // zk = selo do Z (ou botão do controle) no escolhido
   box.style.minHeight = box.offsetHeight + "px"; box.style.setProperty("--cmdsH", box.offsetHeight + "px");   // a lista principal fixa a altura: Especial/Itens abrem no mesmo espaço
 }
-// opts: [{label, small, desc, fn, off}]; números escolhem, Esc volta sem gastar o turno
+// opts: [{label, small, desc, fn, off}]; setas escolhem, Z confirma, X/Esc volta sem gastar o turno
 function openSubMenu(opts, backDesc, from) {
   subMenu = opts; subFrom = from; sfx("look"); $("cmds").innerHTML = "";
-  opts.forEach((o, n) => cmdButton(`<i class="key">${n + 1}</i>${o.label}<small>${o.small || ""}</small>`, o.desc, o.fn, o.off));
+  opts.forEach(o => cmdButton(`<i class="zk"></i>${o.label}<small>${o.small || ""}</small>`, o.desc, o.fn, o.off));
   cmdButton(`${padBadge("x")}${t("Voltar")}`, backDesc, closeSubMenu);
   $("cmds").classList.toggle("scroll", opts.length >= CMDS.length);   // bolsa cheia: não passa da altura dos comandos, rola com as setas
-  $("cmds").firstChild.focus();
+  $("cmds").firstChild.focus(); cmdsMore();
+}
+// setinhas piscando quando a lista tem mais itens para cima ou para baixo (chamada também ao rolar, em main.js)
+function cmdsMore() {
+  const c = $("cmds"), up = $("cmdsUp"), dn = $("cmdsDown"), sc = c.classList.contains("scroll");
+  up.hidden = !sc || c.scrollTop <= 2; dn.hidden = !sc || c.scrollTop + c.clientHeight >= c.scrollHeight - 2;
+  const x = c.offsetLeft + c.offsetWidth - 22 + "px";
+  up.style.left = dn.style.left = x; up.style.top = c.offsetTop + "px"; dn.style.top = c.offsetTop + c.offsetHeight - 18 + "px";
 }
 function closeSubMenu() { const from = subFrom; buildCmds(); render(); $("cmds").children[from].focus(); }
 const bagIds = () => Object.keys(ITEMS).filter(k => (p.items[k] || 0) > 0);
@@ -51,8 +58,15 @@ function openItemMenu() {
 }
 // por que um especial ainda não pode ser usado ("" = pode): flecha precisa de arco, os comprados precisam ter sido comprados
 const specialLock = s => s.id === "flecha" && !G.equip.ranged ? t("sem arco") : s.price && !G.owned[s.id] ? t("na feira") : s.skill && !hasSkill(s.skill) ? t("habilidade") : "";
+/* especiais já liberados, na ordem em que o Rhanon conseguiu cada um (G.specOrder); o que ainda não tem não aparece.
+   Os que liberam juntos (save antigo) entram pela ordem de compra: Object.keys(G.owned) guarda a ordem em que comprou */
+function specialsInOrder() {
+  const keys = Object.keys(G.owned), rank = s => s.id === "flecha" ? keys.findIndex(k => EQUIP.ranged[k]) : s.price ? keys.indexOf(s.id) : s.skill ? 1e4 : -1;
+  SPECIALS.filter(s => !specialLock(s) && !G.specOrder.includes(s.id)).sort((a, b) => rank(a) - rank(b)).forEach(s => G.specOrder.push(s.id));
+  return G.specOrder.map(id => SPECIALS.find(s => s.id === id)).filter(s => s && !specialLock(s));
+}
 function openSpecialMenu() {
-  openSubMenu(SPECIALS.map(s => ({label: s.n, small: specialLock(s) || s.cost + " " + t("PE"), desc: s.d + (s.price && !G.owned[s.id] ? " " + t("À venda no artesão da feira.") : s.skill && !hasSkill(s.skill) ? " " + t("Aprenda na árvore do Pajé (H).") : ""), off: !avail(s.id), fn: () => { buildCmds(); act(s.id); }})),
+  openSubMenu(specialsInOrder().map(s => ({label: s.n, small: s.cost + " " + t("PE"), desc: s.d, off: !avail(s.id), fn: () => { buildCmds(); act(s.id); }})),
     t("Volta aos comandos sem gastar o turno."), CMDS.findIndex(c => c.id === "especial"));
 }// usa um item da bolsa: gasta o turno, como os outros comandos
 function useItem(k) {
@@ -95,7 +109,7 @@ function init(opts = {}) {
   $("over").hidden = true;
   const wet = WATER_BATTLE.has(animal.id);   // bicho de água: laguinho no lugar do chão e ele meio submerso
   // peixes afundam mais; jacaré, ariranha e cobras só um pouco
-  $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : ""); $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
+  $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : ""); $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("meMedal").style.backgroundImage = `url(${heroMedal()})`; $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
   pick(); render();
   $("cmds").firstChild.focus(); musicStart(getBattleTrackFor(animal));
   // abertura: o Rhanon entra pela esquerda, o bicho chega pela direita e o nome dele aparece numa faixa
@@ -117,20 +131,23 @@ const BOSS_INTRO = {warn: 450, roar: 1500, ready: 2700, name: 3600, go: 4500};
 function bossIntro(done) {
   const me = e, at = (ms, fn) => setTimeout(() => { if (e === me && mode === "hunt" && e.hp > 0 && p.hp > 0) fn(); }, ms);   // outra batalha começou ou a luta acabou: para
   BEAST_A.slide("42vw", "0px", 700, () => { BEAST_A.set("idle"); BEAST_A.dust(); });
-  at(BOSS_INTRO.warn, () => bossWarn(t("Um chefe bloqueia o caminho")));
+  const treino = e.rematch;   // treino com o chefe aliado: aviso amigável e um grito só, sem o tremor de ameaça
+  at(BOSS_INTRO.warn, () => treino ? bossWarn(t("{bicho} topou treinar contigo", {bicho: theName(e, true)}), true) : bossWarn(t("Um chefe bloqueia o caminho")));
   at(BOSS_INTRO.roar, () => {
-    BEAST_A.set("bigroar"); animalCry(e.id, true, 1.4); sfx("rugidoChefe"); musicDuck(900);
+    BEAST_A.set("bigroar"); animalCry(e.id, false, treino ? 1 : 1.4);   // o grito do bicho na frente...
+    if (treino) return shake("gshake-s");
+    bossRoar(e.id); musicDuck(1400);   // ...e o ronco do chefe, diferente para cada um
     hitImpact("forte"); shake("gshake"); setTimeout(() => shake("gshake"), 380); setTimeout(() => shake("gshake-s"), 760);
   });
   at(BOSS_INTRO.ready, () => { HERO_A.set("ready"); sfx("spear"); setTimeout(() => sfx("bloqueio"), 600); });
-  at(BOSS_INTRO.name, () => encounterBanner(e.name, t("chefe!")));
+  at(BOSS_INTRO.name, () => encounterBanner(e.name, treino ? t("treino!") : t("chefe!")));
   at(BOSS_INTRO.go, done);
 }
 // etiquetas de fraqueza e resistência na placa do bicho: só as que o Rhanon já descobriu usando o elemento nele
 function plateElem(a) {
   const el = $("plate").querySelector(".elem") || $("plate").appendChild(document.createElement("span")), [w, ...r] = ELEM_OF[a.id] || [];
   el.className = "elem"; el.innerHTML = !w ? "" : [[w, false], ...r.map(k => [k, true])].filter(([k]) => elemKnown(a, k))
-    .map(([k, res]) => `<i class="${res ? "resiste" : "fraco"}" style="--ec:${ELEMENTS[k].c}" title="${t(res ? "Resiste: {elemento}" : "Fraco: {elemento}", {elemento: ELEMENTS[k].n})}">${res ? "▲" : "▼"} ${ELEMENTS[k].n}</i>`).join("");
+    .map(([k, res]) => `<i class="${res ? "resiste" : "fraco"}" style="--ec:${ELEMENTS[k].c}" title="${t(res ? "Resiste: {elemento}" : "Fraco: {elemento}", {elemento: ELEMENTS[k].n})}">${elemIcon(res ? "resiste" : "fraco")} ${ELEMENTS[k].n}</i>`).join("");
 }
 function pick() {
   const r = Math.random() * 100;
@@ -167,7 +184,7 @@ function render() {
     const b = $("cmds").children[i];
     if (c.id === "atacar" && b.dataset.f !== String(furyReady())) {   // fúria pronta: a lança vira o golpe da fúria
       b.dataset.f = furyReady(); b.classList.toggle("furia-cmd", furyReady());
-      b.firstChild.innerHTML = `<i class="key">1</i>${furyReady() ? t(bugMode ? "Estado de flow!" : "Fúria!") : cmdName(c)}<small></small>`;
+      b.firstChild.innerHTML = `<i class="zk"></i>${furyReady() ? t(bugMode ? "Estado de flow!" : "Fúria!") : cmdName(c)}<small></small>`;
     }
     b.setAttribute("aria-disabled", avail(c.id) ? "false" : "true");
     b.querySelector("small").textContent = c.id === "item" ? "×" + itemCount(p.items) : c.id === "especial" ? t("PE") : "";
@@ -327,10 +344,11 @@ function finish(kind) {
   // cartão: título, uma frase curta e, embaixo, o que ganhou ou perdeu (um item por linha)
   const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = t({belem: "Acordou no Ver-o-Peso, com metade das forças", saoluis: "Acordou na Praia Grande, com metade das forças", teresina: "Acordou no Troca-Troca, com metade das forças", recife: "Acordou no Recife Antigo, com metade das forças", petrolina: "Acordou na orla do Velho Chico, com metade das forças"}[curCity()] || "Acordou na aldeia, com metade das forças");
   const T = {
-    win:  e.bug ? [t("Bug resolvido!"), t("{bicho} sumiu do código.", {bicho: O})] : e.boss ? [t(ending(e, "Chefe acalmado!", "Chefe acalmada!")), t("{bicho} voltou a si. A trilha está livre.", {bicho: O})]
+    win:  e.bug ? [t("Bug resolvido!"), t("{bicho} sumiu do código.", {bicho: O})] : e.rematch ? [t("Treino concluído!"), t("{bicho} gostou do treino.", {bicho: O})]
+      : e.boss ? [t(ending(e, "Chefe acalmado!", "Chefe acalmada!")), t("{bicho} voltou a si. A trilha está livre.", {bicho: O})]
       : [t(pick(["Vitória!", "Mandou bem!", "É isso aí!"])), t(WATER_BATTLE.has(e.id) ? "{bicho} sumiu na água." : pick(["{bicho} saiu correndo.", "{bicho} desistiu da briga.", "{bicho} não quer mais conversa."]), {bicho: O})],
     flee: [t("Fugiu!"), t("{bicho} fica pra próxima.", {bicho: O})],
-    lose: [t("Desmaiou..."), t("{bicho} levou a melhor.", {bicho: O})]
+    lose: e.rematch ? [t("Fim do treino"), t("{bicho} venceu dessa vez. Bora de novo?", {bicho: O})] : [t("Desmaiou..."), t("{bicho} levou a melhor.", {bicho: O})]
   }[kind];
   if (kind === "lose") rw.push(home, G.lastLoss && t("R$ {n} a menos", {n: G.lastLoss}));
   setTimeout(() => {

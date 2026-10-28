@@ -1,6 +1,6 @@
 /* Teclado fora da batalha e da exploração.
-   Mapas (Brasil e Ananindeua): setas escolhem o local na direção apertada, Enter faz a ação principal do painel,
-   1-9 apertam os botões numerados, Esc volta de Ananindeua para o mapa grande (Pará).
+   Mapas (Brasil e Ananindeua): setas (ou WASD) escolhem o local na direção apertada, Enter/Z faz a ação principal do
+   painel, Esc/X volta de Ananindeua para o mapa grande (Pará). Sem atalhos de número: tudo é escolher e confirmar.
    Tela inicial: Enter começa. Entrevistas e missões: 1-3 (ou A-C) respondem. */
 const NAV = {map: {nodes: "nodes", panel: "info"}, local: {nodes: "lnodes", panel: "linfo"}};
 const navSel = {map: null, local: null};
@@ -60,7 +60,6 @@ function setupMapNav() {
     const onControl = document.activeElement && document.activeElement.matches("button, .node");
     if (dir) { ev.preventDefault(); navMove(which, ...dir); }
     else if ((ev.key === "Enter" && !onControl) || ev.key === "z" || ev.key === "Z") { ev.preventDefault(); pressPanel(panelButtons(which).find(b => b.getAttribute("aria-disabled") !== "true")); }   // Z = Enter
-    else if (/^[1-9]$/.test(ev.key)) pressPanel(panelButtons(which)[+ev.key - 1]);
     else if ((ev.key === "Escape" || ev.key === "x" || ev.key === "X") && which === "local") closeLocal();   // X = voltar
   });
 }

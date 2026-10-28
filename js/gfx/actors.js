@@ -463,7 +463,13 @@ const WALKER = (() => {
       }
     }
   }
-  return {tick};
+  // monta o Rhanon no marcador já (o pergaminho do caminho novo copia o mapa antes de ele aparecer na tela, e mostrava o pino)
+  function prime(id) {
+    setup(id, id === "mk" ? 30 : 26);
+    const g = $(id), img = g && g.querySelector("image");
+    if (img && !img.getAttribute("href")) img.setAttribute("href", frame("stand0"));
+  }
+  return {tick, prime};
 })();
 
 // toda vez que o jogo redesenha o herói, ele vira um ator animado

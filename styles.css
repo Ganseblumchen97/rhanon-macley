@@ -569,6 +569,9 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .ex-dialog h2{margin:0 0 4px}
 .ex-dialog p{margin:0 0 8px}
 .ex-dialog .cmd{font-size:clamp(18px,2.2vw,26px)}
+/* o botão escolhido cresce e joga a sombra para baixo e para o lado: o último ganha folga para não criar barra de rolagem */
+.ex-dialog{overflow-x:hidden}
+.ex-dialog>.cmd:last-child,.ex-dialog .cmd:last-of-type{margin-bottom:16px}
 /* armeiro: lista de nomes à esquerda e a ficha do item escolhido à direita */
 .forge{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start;margin:4px 0 8px}
 .forge-list .cmd small{font-size:.5em}
@@ -996,3 +999,89 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .br-card p{margin:4px 0;font:13px/1.45 var(--mono);color:var(--brown)}
 @media(max-width:640px){.br-wrap{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.br-dot.open circle{animation:none}}
+
+/* ===== HUD do guardião da floresta: medalhão com o rosto do Rhanon (heroMedal), barras de tronco com a cor de cada
+   coisa (PV folha, PE água, XP semente) e, na batalha, a placa do bicho com o tema da área (classe zone-<fase>) ===== */
+.medal{position:relative;display:inline-block;flex:none;width:44px;height:44px;border-radius:50%;background:#173a22 center/cover no-repeat;image-rendering:pixelated;
+  border:3px solid var(--wood2);box-shadow:0 0 0 2px #8fd46a,0 0 0 5px var(--wood2),3px 5px 0 5px rgba(0,0,0,.3)}
+.medal::before,.medal::after{content:"";position:absolute;top:-7px;width:13px;height:8px;background:linear-gradient(160deg,#7ad06a,#2f7a3a);border:2px solid #173a22;border-radius:0 100% 0 100%}
+.medal::before{left:-9px;rotate:-28deg}
+.medal::after{right:-9px;rotate:28deg;scale:-1 1}
+.medal em{position:absolute;left:50%;bottom:-9px;translate:-50% 0;white-space:nowrap;font:700 10px/1 var(--mono);font-style:normal;color:var(--parch);
+  background:linear-gradient(180deg,var(--leafB),var(--leafBD));border:2px solid #173a22;border-radius:3px;padding:2px 4px}
+/* barras de tronco: casca escura por fora, o conteúdo com brilho em cima */
+.gbar,.me .bar{position:relative;display:block;height:11px;background:#2a1a0e;border:2px solid var(--wood2);border-radius:7px;box-shadow:inset 0 2px 0 rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.18);overflow:hidden}
+.gbar u,.me .bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(180deg,#b6f58e,#46a83e 55%,#2a6a2a);box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.gbar.pe u,.me .bar.sp i{background:linear-gradient(180deg,#b4ecff,#2f98e0 55%,#1a5a9a)}
+.gbar.xp u,.me .bar.xp i{background:linear-gradient(180deg,#fff0a0,#e0b018 55%,#a07808)}
+/* exploração: maior que antes, com o medalhão à esquerda */
+#exHud{display:flex;flex-wrap:nowrap;align-items:center;gap:10px 14px;max-width:min(560px,72%);padding:8px 16px 12px 12px;font:700 13px var(--mono);border-radius:3px 26px 26px 3px;
+  border:2px solid var(--wood2);box-shadow:inset 0 2px 0 rgba(255,255,255,.15),4px 5px 0 rgba(0,0,0,.35)}
+#exHud .gst{display:grid;gap:3px;min-width:0}
+#exHud b{font:400 17px/1 var(--display);text-transform:uppercase;letter-spacing:.04em;margin-bottom:1px}
+#exHud .grow{display:grid;grid-template-columns:22px minmax(70px,120px) auto;align-items:center;gap:6px;white-space:nowrap}
+.grow small{font:700 11px var(--mono);opacity:.9}
+.glbl{font:700 10px/1 var(--mono);text-align:center;color:var(--wood2);background:var(--parch2);border-radius:3px;padding:2px 0}
+.grow.xp .gbar{height:7px}
+.gmoney{align-self:flex-start;font:700 13px var(--mono);white-space:nowrap;background:rgba(0,0,0,.25);border-radius:10px;padding:3px 9px}
+.gmoney::before{content:"";display:inline-block;width:9px;height:9px;margin-right:5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3a0,#e0a818 60%,#8a6008);vertical-align:-1px}
+@media (pointer:coarse),(max-width:760px){#exHud{max-width:100%;gap:8px}.medal{width:34px;height:34px}#exHud .grow{grid-template-columns:20px minmax(48px,80px) auto}#exHud b{font-size:14px}}
+/* batalha: o medalhão no título do painel */
+.me h2{display:inline-flex;align-items:center;gap:10px}
+.me h2 .medal{width:36px;height:36px;margin:-10px 2px -8px -6px}
+.me h2 .medal::before,.me h2 .medal::after{display:none}
+.game.challenge-mode .me h2 .medal{display:none}
+/* placa do bicho: cada área com a sua cara (madeira com folhas, a da mata, é o padrão) */
+.plate{clip-path:none;border-radius:3px 18px 3px 18px;box-shadow:inset 0 2px 0 rgba(255,255,255,.18),4px 5px 0 rgba(0,0,0,.35)}
+.plate .bar{height:12px;border:2px solid rgba(0,0,0,.55);border-radius:7px;background:#2a1a0e;overflow:hidden}
+.plate .bar i{border-radius:5px;background:linear-gradient(180deg,#ff9a8a,#e2363d 55%,#9a1a20)}
+.plate::after{content:"";position:absolute;pointer-events:none;right:12px;bottom:-8px;width:44px;height:14px;background:var(--orn) center/contain no-repeat}
+.plate{--orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M2 7q10-9 20 0q-10 9-20 0z' fill='%233f9a5c' stroke='%23173a22' stroke-width='2'/%3E%3Cpath d='M22 7q10-9 20 0q-10 9-20 0z' fill='%236fc06a' stroke='%23173a22' stroke-width='2'/%3E%3C/svg%3E")}
+.stage:is(.zone-rio,.zone-igarape,.zone-encontro) .plate{background:linear-gradient(180deg,#3a7a9a,#1f4f6e);border-color:#123248;color:#eaf6ff;
+  --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M1 8q5-6 10 0t10 0t10 0t10 0' fill='none' stroke='%23123248' stroke-width='5'/%3E%3Cpath d='M1 8q5-6 10 0t10 0t10 0t10 0' fill='none' stroke='%239fe0ff' stroke-width='2'/%3E%3C/svg%3E")}
+.stage:is(.zone-manguezal,.zone-mangueilha) .plate{background:linear-gradient(180deg,#6a5a3a,#3f3220);border-color:#241a10;color:#f3ead0;
+  --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M4 1q4 6 0 12M12 1q-4 6 2 12M22 1q4 6-2 12M32 1q-3 6 3 12M40 1q3 6-1 12' fill='none' stroke='%23241a10' stroke-width='4'/%3E%3Cpath d='M4 1q4 6 0 12M12 1q-4 6 2 12M22 1q4 6-2 12M32 1q-3 6 3 12M40 1q3 6-1 12' fill='none' stroke='%23a08a5a' stroke-width='1.6'/%3E%3C/svg%3E")}
+.stage.zone-seringal .plate{background:linear-gradient(180deg,#7a6a5a,#4a3e34);border-color:#2a221c;color:#fbf6ea;
+  --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M8 0v6a3 3 0 0 0 6 0V0M26 0v9a3 3 0 0 0 6 0V0' fill='%23fbf6ea' stroke='%232a221c' stroke-width='2'/%3E%3C/svg%3E")}
+.stage:is(.zone-varzea,.zone-lencois) .plate{background:linear-gradient(180deg,#b8963a,#7a5e1e);border-color:#3e2e0c;color:#fff8e0;
+  --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M4 14q2-8 0-14M10 14q-1-7 3-13M18 14q2-9-1-13M26 14q-2-8 2-14M34 14q1-7-2-13M40 14q-1-8 2-13' fill='none' stroke='%233e2e0c' stroke-width='3.5'/%3E%3Cpath d='M4 14q2-8 0-14M10 14q-1-7 3-13M18 14q2-9-1-13M26 14q-2-8 2-14M34 14q1-7-2-13M40 14q-1-8 2-13' fill='none' stroke='%23e8d070' stroke-width='1.4'/%3E%3C/svg%3E")}
+/* cidade: azulejo português (Cidade Velha, porto, Baixadas, Olinda) */
+.stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-olinda) .plate{color:#10305a;border-color:#10305a;
+  background:repeating-conic-gradient(from 45deg,#dce8f6 0 25%,#f6f9fd 0 50%) 0 0/14px 14px,#f6f9fd;
+  --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Crect x='1' y='1' width='12' height='12' fill='%23f6f9fd' stroke='%2310305a' stroke-width='2'/%3E%3Cpath d='M7 3l4 4-4 4-4-4z' fill='%232a5aa8'/%3E%3Crect x='16' y='1' width='12' height='12' fill='%23f6f9fd' stroke='%2310305a' stroke-width='2'/%3E%3Cpath d='M22 3l4 4-4 4-4-4z' fill='%232a5aa8'/%3E%3Crect x='31' y='1' width='12' height='12' fill='%23f6f9fd' stroke='%2310305a' stroke-width='2'/%3E%3Cpath d='M37 3l4 4-4 4-4-4z' fill='%232a5aa8'/%3E%3C/svg%3E")}
+.stage:is(.zone-cidadevelha,.zone-porto,.zone-baixadas,.zone-olinda) .plate .lv{background:#10305a}
+/* sertão: papel de cordel com moldura de xilogravura */
+.stage:is(.zone-caatinga,.zone-serra) .plate{background:linear-gradient(180deg,#f0dfb4,#d9c088);color:#1a120a;border:3px solid #1a120a;box-shadow:inset 0 0 0 2px #f0dfb4,inset 0 0 0 4px #1a120a,4px 5px 0 rgba(0,0,0,.35);
+  --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 14'%3E%3Cpath d='M22 1l2 4h4l-3 3 1 5-4-3-4 3 1-5-3-3h4z' fill='%231a120a'/%3E%3Cpath d='M2 7h12M30 7h12' stroke='%231a120a' stroke-width='2' stroke-dasharray='2 2'/%3E%3C/svg%3E")}
+.stage:is(.zone-caatinga,.zone-serra) .plate .lv{background:#a8321c}
+/* de noite a placa ganha o véu azul do palco */
+.stage.night .plate{box-shadow:inset 0 0 0 999px rgba(30,40,110,.2),4px 5px 0 rgba(0,0,0,.35)}
+/* lista de especiais/itens com rolagem: setinhas piscando onde tem mais */
+.cmds-box{position:relative}
+.cmds-more{position:absolute;z-index:2;width:18px;height:18px;display:grid;place-items:center;font:700 11px/1 var(--mono);color:var(--parch);background:var(--leafBD);border:2px solid var(--wood2);border-radius:50%;pointer-events:none;animation:moreBlink .8s steps(2) infinite}
+.cmds-more[hidden]{display:none}
+@keyframes moreBlink{50%{opacity:.35}}
+/* selo do botão de confirmar no item escolhido (no lugar dos números de atalho): Z no teclado, o botão de baixo do
+   controle (A, ✕ ou B) com a cor dele. Ocupa o espaço sempre, só aparece no escolhido: nada pula de lugar */
+.cmd .zk{display:inline-block;visibility:hidden;font:700 .42em/1 var(--mono);font-style:normal;vertical-align:middle;margin-right:.5em;padding:.18em .45em;
+  background:var(--parch);color:var(--brown);border:2px solid var(--brown);border-radius:3px;rotate:-4deg}
+.cmd .zk::before{content:"Z"}
+.cmd:is(:hover,:focus,.sel) .zk{visibility:visible}
+.cmd[aria-disabled="true"] .zk{visibility:hidden}
+body[data-pad="xbox"] .cmd .zk{background:#3fae3f;color:#fff;border-color:#1a5a1a;border-radius:50%}
+body[data-pad="xbox"] .cmd .zk::before{content:"A"}
+body[data-pad="ps"] .cmd .zk{background:#1a1a2a;color:#7ab0ff;border-color:#7ab0ff;border-radius:50%}
+body[data-pad="ps"] .cmd .zk::before{content:"✕"}
+body[data-pad="nintendo"] .cmd .zk{background:#2a2a2a;color:#fff;border-color:#000;border-radius:50%}
+body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
+@media (pointer:coarse){.cmd .zk{display:none}}
+/* ícones de elemento (elemIcon em ui/theme.js): rachadura na fraqueza, escudo de casco na resistência */
+.elem i{display:inline-flex;align-items:center;gap:4px}
+.elem .ei{width:12px;height:12px;flex:none}
+.elem i.fraco{--ei-bg:var(--ec)}
+.elem i.resiste{--ei-bg:var(--paper)}
+.elem-key .ei{width:12px;height:12px;vertical-align:-2px}
+/* treino com o chefe aliado: o aviso em verde e dourado, sem o pulsar vermelho */
+.boss-warn.treino{background:radial-gradient(ellipse at center,rgba(40,140,60,.25),rgba(0,0,0,.5));animation:none}
+.boss-warn.treino .bw-tape{background:repeating-linear-gradient(-45deg,#ffd23a 0 22px,#2f7a3a 22px 44px);box-shadow:0 4px 0 #173a22,0 -4px 0 #173a22}
+.boss-warn.treino .bw-sub{background:var(--leafB)}

@@ -38,6 +38,7 @@ function vit() {
   if (!G.narrated) G.narrated = G.belemVisto ? {belem: true} : {};   // falas do Pajé já contadas (prólogo, Belém, cada chefe)
   G.loseStreak = G.loseStreak || 0;   // lutas perdidas seguidas (2 = o Pajé dá uma dica)   // bugs resolvidos por freela; freelas entregues
   G.owned = G.owned || {tanga: true, lanca: true}; G.equip = G.equip || {legs: "tanga", torso: null, weapon: "lanca"};
+  G.specOrder = G.specOrder || [];   // especiais na ordem em que foram liberados (menu Especial)
 }
 /* Opções do modo de teste (todas opcionais, juntas com &):
    fase=varzea   entra direto nessa fase, com os chefes das fases anteriores vencidos (e o mapa revelado até ela)

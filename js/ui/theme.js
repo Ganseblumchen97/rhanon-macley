@@ -68,4 +68,13 @@ function statusList() {
   return out;
 }
 
+/* ícone do elemento na placa do bicho e no caderno: fraqueza = rachadura (o golpe entra fundo), resistência = escudo de
+   casco (de tartaruga), normal = traço, ainda não descoberto = "?". Desenho com a cor do texto (currentColor) */
+const ELEM_ICON = {
+  fraco: '<path d="M7 0L5 4L8 6.2L4.2 9L5.4 12M8 6.2L11.5 7.4M5 4L1.5 2.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="bevel"/>',
+  resiste: '<path d="M6 .5L11 2.4V6c0 3-2.4 5-5 5.8C3.4 11 1 9 1 6V2.4z" fill="currentColor"/><path d="M6 3.4l2 1.2v2.4l-2 1.2-2-1.2V4.6zM6 3.4V1.4M8 7l2 1M4 7l-2 1" fill="none" stroke="var(--ei-bg,#fff)" stroke-width="1"/>',
+  normal: '<path d="M2 6h8" stroke="currentColor" stroke-width="2"/>'
+};
+const elemIcon = cls => cls === "nao-sei" ? "?" : `<svg class="ei" viewBox="0 0 12 12" aria-hidden="true">${ELEM_ICON[cls]}</svg>`;
+
 document.documentElement.style.setProperty("--moldura", `url(${vineFrame()})`);

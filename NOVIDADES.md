@@ -3,6 +3,24 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.54.0 — descanso de verdade e um HUD de guardião
+
+- Na fogueira da aldeia voltou a opção "Descansar": recupera toda a vida e a energia sem passar o tempo. Na pensão de
+  Belém custa R$ 8. Ao descansar, as barras enchem aos poucos com um somzinho e um jingle no fim.
+- O HUD ficou com cara de guardião da floresta: um medalhão com o rosto do Rhanon e barras de tronco, maiores na
+  exploração. Na batalha, a placa do bicho muda com o lugar: ondas no rio, raízes no mangue, azulejo em Belém e
+  cordel no sertão.
+- Os menus não usam mais números: ande com as setas ou WASD, confirme com Z (ou Espaço) e volte com X (ou Esc). O
+  item escolhido mostra o "Z" ou o botão do controle.
+- No Especial aparecem só os golpes que você já tem, na ordem em que conseguiu, com setinhas quando a lista rola.
+  Fraqueza agora é uma rachadura e resistência um escudo de casco.
+- A noite ficou mais difícil: os bichos vêm uns níveis acima. Cada chefe tem o próprio rugido, e o treino com um
+  chefe aliado começa com "HORA DO TREINO!".
+- O técnico da feira virou o Seu Bugiganga, de óculos. A piranha agora é uma só, as dicas dos cantos escondidos
+  não entregam mais o golpe e o Curupira ficou do tamanho do Rhanon.
+- Correções: o mundo para enquanto o Pajé conta a história do baú, clicar de volta na janela não troca mais a música,
+  o Rhanon não senta mais em cima da árvore na fogueira e a fumaça do Pytuna aparece inteira na tela.
+
 ## 0.53.0 — a serra e o Lobisomem
 
 - Depois de acalmar o Bode-rei, a passagem no alto da Caatinga leva à Serra do Araripe: terra vermelha, mata verde

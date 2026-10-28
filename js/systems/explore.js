@@ -148,7 +148,9 @@ function exSpits(dt, now) {
   EX.spits = EX.spits.filter(s => !s.done);
 }
 function makeAnimalEnt(a, tx, ty) {
-  const img = artCanvas("animal/" + a.id + "/mapa") || codeAnimalSprite(a), k = +img.dataset.scale || 1, x = tx * TILE + 8, y = ty * TILE + 12;
+  if (G.night && NIGHT_ZONES[EX?.zone]) a = nightBeast(a);   // de noite os bichos da fase vêm mais fortes
+  // ow = escala só na exploração (bicho desenhado pequeno perto do Rhanon, como o Curupira)
+  const img = artCanvas("animal/" + a.id + "/mapa") || codeAnimalSprite(a), k = (+img.dataset.scale || 1) / (a.ow || 1), x = tx * TILE + 8, y = ty * TILE + 12;
   // traço novo: segundo quadro (respirando/andando) e o desmaiado, para quando cai com um golpe só
   const rig = img.dataset.rig, img2 = rig && beastFrame(a.id, "idle", 1), ko = rig && beastFrame(a.id, "ko"), blink = rig && beastFrame(a.id, "blink");
   return {a, img, img2, ko, blink, w: img.width / k, h: img.height / k, x, y, homeX: x, homeY: y, hw: Math.min(7, Math.round(img.width / k / 3)), hh: 3,
@@ -376,6 +378,7 @@ function exAnimal(en, dt, now) {
 function exUpdate(dt, now) {
   const h = EX.hero;
   if (EX.boarding && busPull(now)) return;
+  if (EX.fill) hudFillTick(now);
   EX.cool = Math.max(0, EX.cool - dt); EX.jab = Math.max(0, EX.jab - dt); EX.shoot = Math.max(0, (EX.shoot || 0) - dt);
   if (EX.draw && (EX.draw.t += dt) >= BOW_DRAW) exRelease();
   if (EX.spits.length && !EX.dialog && !EX.camp) { exSpits(dt, now); if (!EX || EX.locked) return; }
@@ -653,17 +656,20 @@ function exDraw(now) {
 // chamado pelo laço de animação (gfx/actors.js) a cada quadro
 function exploreFrame(t, dt) {
   if (!EX || $("explore").hidden) return;
-  exUpdate(dt, t);
+  if ($("narra").hidden) exUpdate(dt, t);   // com o Pajé (ou o Pytuna) falando, o mundo para
   if (EX && !$("explore").hidden) exDraw(t);
 }
 
 /* ---------- textos na tela ---------- */
-function exHud() {
-  vit();
-  const bar = (v, m, cls) => `<i class="hb ${cls}"><u style="width:${Math.round(100 * v / m)}%"></u></i>`;   // HUD: nome do lugar e chips com barrinhas
-  $("exHud").innerHTML = `<b>${ZONES[EX.zone] ? zoneDef(EX.zone).n : G.night ? t("{zona} à noite", {zona: SUB[EX.zone].n}) : SUB[EX.zone].n}</b><span>${t("Nv")} ${G.lv}</span>`
-    + `<span>${t("PV")} ${G.hp}/${maxHP(G.lv)}${bar(G.hp, maxHP(G.lv), "pv")}</span><span>${t("PE")} ${G.sp}/${maxSP(G.lv)}${bar(G.sp, maxSP(G.lv), "pe")}</span>`
-    + `<span>XP ${G.xp}/${need(G.lv)}${bar(G.xp, need(G.lv), "xp")}</span><span>R$ ${G.money}</span>`;
+// show = {hp, sp} no lugar do que está no save (as barras enchendo no descanso)
+function exHud(show) {
+  vit(); const hp = show ? show.hp : G.hp, sp = show ? show.sp : G.sp;
+  // HUD do guardião: medalhão com o rosto e o nível, o nome do lugar, barras de tronco (PV folha, PE água, XP semente) e o dinheiro
+  const row = (lbl, v, m, cls) => `<span class="grow ${cls}"><span class="glbl">${lbl}</span><i class="gbar ${cls}"><u style="width:${Math.round(100 * v / m)}%"></u></i><small>${v}/${m}</small></span>`;
+  $("exHud").innerHTML = `<i class="medal" style="background-image:url(${heroMedal()})"><em>${t("Nv")} ${G.lv}</em></i><span class="gst">`
+    + `<b>${ZONES[EX.zone] ? zoneDef(EX.zone).n : G.night ? t("{zona} à noite", {zona: SUB[EX.zone].n}) : SUB[EX.zone].n}</b>`
+    + row(t("PV"), hp, maxHP(G.lv), "pv") + row(t("PE"), sp, maxSP(G.lv), "pe") + row("XP", G.xp, need(G.lv), "xp")
+    + `</span><span class="gmoney">R$ ${G.money}</span>`;
   $("exSkills").classList.toggle("pts", skillPoints() > 0);   // ponto de habilidade para gastar: o botão chama atenção
 }
 function exToast(msg) {
@@ -756,7 +762,7 @@ function drawMemento(x, s, cx, cy, now) {
 }
 const SPOTS = {Y: "segredo", J: "bau", F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", X: "xama", L: "tecnico", W: "cliente", P: "aldeao", Q: "cabine", U: "onibus"};
 const PEOPLE = ["peles", "comida", "artesao", "armeiro", "xama", "tecnico", "cliente", "aldeao"];
-const SPOT_LABEL = {segredo: "examinar", bau: "abrir o baú", fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", tecnico: "falar com o técnico", cliente: "falar com a Dona Graça", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "falar com o chefe"};
+const SPOT_LABEL = {segredo: "examinar", bau: "abrir o baú", fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", tecnico: "falar com o Seu Bugiganga", cliente: "falar com a Dona Graça", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "falar com o chefe"};
 const VILLAGER_NAME = {aldeao1: "Mateiro", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 // pensões das cidades (fase com O): nome do painel; dormir passa pela cena do quarto (motelScene)
@@ -870,8 +876,9 @@ function exOpenDialog(kind, msg, look) {
   const d = $("exDialog"); EX.dialog = kind; exKeys.clear(); sfx("blip");
   const say = (title, text) => { d.innerHTML = `<h2>${title}</h2><p>${text}</p>`; };
   if (kind === "fogueira" && EX.st.safe) {   // fogueira da aldeia: escolhe até quando descansar
-    say(t("Fogueira"), (G.night ? t("Noite alta. Dormir aqui recupera tudo e já começa o outro dia.")
-      : t("O fogo estala. Descansar até a noite recupera metade (e de noite a mata muda). Dormir até o outro dia recupera tudo.")) + " " + t("Amanhã: {clima}.", {clima: WEATHER[weatherOn(G.day + 1)].n.toLowerCase()}));
+    say(t("Fogueira"), (G.night ? t("Noite alta. Descansar recupera tudo sem passar o tempo; dormir já começa o outro dia.")
+      : t("O fogo estala. Descansar recupera tudo sem passar o tempo. Até a noite recupera metade (e de noite a mata muda); dormir até o outro dia, tudo.")) + " " + t("Amanhã: {clima}.", {clima: WEATHER[weatherOn(G.day + 1)].n.toLowerCase()}));
+    btn(t("Descansar"), () => exCampRest("fogueira"), false, d);
     if (!G.night) btn(t("Descansar até a noite"), () => exCampRest("noite"), false, d);
     btn(t("Dormir até o dia seguinte"), () => exCampRest("dormir"), false, d);
   }
@@ -886,6 +893,10 @@ function exOpenDialog(kind, msg, look) {
       if (G.money < PENSAO[k]) { sfx("blip"); return exOpenDialog("tenda", t("Falta dinheiro: a diária é R$ {n}.", {n: PENSAO[k]})); }
       G.money -= PENSAO[k]; exNap(k);
     });
+    btn(`${t("Descansar")} (R$ ${PENSAO.descanso})`, ask(t("Pagar R$ {n} para descansar um pouco na rede?", {n: PENSAO.descanso}), () => {
+      if (G.money < PENSAO.descanso) { sfx("blip"); return exOpenDialog("tenda", t("Falta dinheiro: a diária é R$ {n}.", {n: PENSAO.descanso})); }
+      G.money -= PENSAO.descanso; exQuickRest();
+    }), false, d);
     if (!G.night) btn(`${t("Descansar até a noite")} (R$ ${PENSAO.noite})`, nap("noite"), false, d);
     btn(`${t("Dormir até o dia seguinte")} (R$ ${PENSAO.dormir})`, nap("dormir"), false, d);
   }
@@ -918,13 +929,13 @@ function exOpenDialog(kind, msg, look) {
 const nbMissing = () => NB_PARTS.filter(k => !G.nb[k]);
 const nbReady = () => G.nb.tem && !nbMissing().length;
 const nbPartName = k => ({bateria: t("bateria"), teclado: t("teclado"), carregador: t("carregador")})[k];
-// técnico da lan house (feira): diz o que falta, vende a bateria e dá a pista das outras peças
+// Seu Bugiganga, o juntador de tralha da feira: diz o que falta, vende a bateria e dá a pista das outras peças
 function nbTechnician(say, d) {
-  if (!G.nb.tem) return say(t("Técnico"), t("Conserto computador, celular, rádio... Se um dia aparecer contigo um notebook, me traz."));
-  if (G.nb.on) return say(t("Técnico"), t("E aí, programador! O notebook tá aguentando? Cuida da bateria, viu."));
-  if (nbReady()) return say(t("Técnico"), t("Tá tudo aí! Agora só falta tomada. Na rodoviária da BR-316, do lado da cabine, tem uma."));
+  if (!G.nb.tem) return say(t("Seu Bugiganga"), t("Tudo que a cheia traz eu junto: rádio, celular, fio... e conserto. Se um dia aparecer contigo um notebook, me traz."));
+  if (G.nb.on) return say(t("Seu Bugiganga"), t("E aí, programador! O notebook tá aguentando? Cuida da bateria, viu."));
+  if (nbReady()) return say(t("Seu Bugiganga"), t("Tá tudo aí! Agora só falta tomada. Na rodoviária da BR-316, do lado da cabine, tem uma."));
   const miss = nbMissing().map(nbPartName).join(", ");
-  say(t("Técnico"), t("Égua, um notebook! Falta {pecas}.", {pecas: miss}) + (G.nb.teclado ? "" : " " + t("Teclado? Vi um macaco-prego na mata correndo com um debaixo do braço.")) +
+  say(t("Seu Bugiganga"), t("Égua, um notebook! Falta {pecas}.", {pecas: miss}) + (G.nb.teclado ? "" : " " + t("Teclado? Vi um macaco-prego na mata correndo com um debaixo do braço.")) +
     (G.nb.carregador ? "" : " " + t("Carregador... as ariranhas do rio vivem brincando com fio que a cheia leva.")));
   if (!G.nb.bateria) btn(t("Comprar bateria · R$ {n}", {n: NB_BATTERY}), ask(t("Comprar a bateria do notebook por R$ {n}?", {n: NB_BATTERY}), () => {
     if (G.money < NB_BATTERY || G.nb.bateria) return;
@@ -1031,7 +1042,8 @@ function drawBus(x, b, cx, cy, now) {
 function exNap(k) {
   exCloseDialog(); EX.locked = true; exKeys.clear();
   const night = k === "noite", label = night ? t("Anoiteceu") : t("Amanheceu · Dia {n}", {n: G.day + 1});
-  const wake = hide => dawnWipe(() => { if (hide) hide(); const msg = rest(k, true, true); EX.night = G.night; exHud(); musicStart("local"); setTimeout(() => { if (!EX) return; EX.locked = false; exToast(msg); }, DAWN_MS * .6); }, label, night);
+  const from = {hp: G.hp, sp: G.sp};   // acordou: as barras enchem do que tinha antes de dormir
+  const wake = hide => dawnWipe(() => { if (hide) hide(); const msg = rest(k, true, true); EX.night = G.night; exHud(from); musicStart("local"); setTimeout(() => { if (!EX) return; EX.locked = false; exToast(msg); hudFillStart(from); }, DAWN_MS * .6); }, label, night);
   if (PENSAO_NAME[EX.zone]) motelScene(k, wake); else wake();
 }
 /* quarto do motel: uns 3 s com o Rhanon dormindo na cama e a janela mudando de cor (noite: escurece; dormir: escurece e
@@ -1109,7 +1121,41 @@ const ask = (text, fn) => () => EX && EX.dialog && !$("explore").hidden ? exConf
 function exCampRest(kind) {
   const h = EX.hero, f = EX.spots.filter(s => s.kind === "fogueira").sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y))[0];
   $("exDialog").hidden = true; EX.dialog = null; exKeys.clear();
-  EX.camp = {kind, startNight: EX.night, t0: performance.now(), dur: campWake(kind) + 2600, x: f.x + (h.x < f.x ? -14 : 14), y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
+  const seat = campSeat(f, h.x < f.x ? -1 : 1), from = {hp: G.hp, sp: G.sp};
+  // descanso sem passar o tempo: recupera já e as barras enchem com ele sentado; levanta quando encheram
+  let W = campWake(kind), msg = null;
+  if (kind === "fogueira") { msg = rest(kind, true, true); W = hudFillStart(from, 700) || 700; }
+  EX.camp = {kind, from, msg, W, startNight: EX.night, t0: performance.now(), dur: W + 2600, x: seat.x, y: seat.y, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
+}
+// descanso rápido sem cena (rede da pensão): as barras enchem com o Rhanon parado
+function exQuickRest() {
+  exCloseDialog(); EX.locked = true; exKeys.clear();
+  const from = {hp: G.hp, sp: G.sp}, msg = rest("rede", true, true), dur = hudFillStart(from);
+  setTimeout(() => { if (!EX) return; EX.locked = false; exToast(msg); }, dur + 400);
+}
+/* barras enchendo no descanso: o HUD mostra o PV e o PE de antes subindo até o de agora, com o som de encher
+   (healFillSound) e o jingle do descanso no fim. Devolve quanto tempo (ms) leva, contando o atraso (0 = já estava cheio). */
+const FILL_MS = [900, 2400];
+function hudFillStart(from, delay = 0) {
+  vit();
+  const gain = Math.max((G.hp - from.hp) / maxHP(G.lv), (G.sp - from.sp) / maxSP(G.lv));
+  if (gain <= 0) { EX.fill = null; exHud(); return 0; }
+  const dur = REDUCE ? 1 : FILL_MS[0] + (FILL_MS[1] - FILL_MS[0]) * gain;
+  EX.fill = {from, t0: performance.now() + delay, dur, sound: false}; exHud(from);
+  return delay + dur;
+}
+function hudFillTick(now) {
+  const f = EX.fill; if (now < f.t0) return;
+  if (!f.sound) { f.sound = true; healFillSound(f.dur / 1000); }
+  const k = Math.min(1, (now - f.t0) / f.dur), at = (a, b) => Math.round(a + (b - a) * k);
+  exHud({hp: at(f.from.hp, G.hp), sp: at(f.from.sp, G.sp)});
+  if (k >= 1) { EX.fill = null; exHud(); restJingle(); }
+}
+// lugar para sentar do lado da fogueira: o lado de onde o Rhanon chegou; se tiver árvore ou água ali, o outro lado, e por último embaixo
+function campSeat(f, side) {
+  const free = (x, y) => !boxBlocked(x, y, 5, 3) && !boxBlocked(x, y - 10, 5, 3);
+  for (const [x, y] of [[f.x + side * 14, f.y + 5], [f.x - side * 14, f.y + 5], [f.x, f.y + 16]]) if (free(x, y)) return {x, y};
+  return {x: f.x + side * 14, y: f.y + 5};
 }
 // cena de abertura: amanhece, Rhanon acorda do lado da fogueira da aldeia, se espreguiça e o jogo começa
 // a aventura sempre começa de manhã, na cidade onde o save está: na aldeia (fogueira) ou, em Belém, no quarto do motel
@@ -1123,8 +1169,8 @@ function startIntro() {
   startExplore("aldeia", exIntro);
 }
 function exIntro() {
-  const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), side = solidAt(f.x - 14, f.y + 5) ? 1 : -1;
-  EX.camp = {kind: "intro", t0: performance.now(), dur: campWake("intro") + 2600, x: f.x + side * 14, y: f.y + 5, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
+  const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), seat = campSeat(f, -1);
+  EX.camp = {kind: "intro", W: campWake("intro"), t0: performance.now(), dur: campWake("intro") + 2600, x: seat.x, y: seat.y, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
   h.x = EX.camp.x; h.y = EX.camp.y; h.dir = "down"; h.aim = {x: 0, y: 1};
   exToast(t("Ananindeua (PA) · manhã na aldeia..."));
 }
@@ -1148,7 +1194,7 @@ function showTutorial() {
   d.hidden = false;
 }
 function endTutorial() {
-  G.tutorial = false; if (!G.nb.tem) { G.nb.tem = true; setTimeout(() => exToast(t("O Mateiro te deu um notebook que a cheia trouxe. Não liga: falta bateria, teclado e carregador. O técnico da feira entende disso.")), 2600); }
+  G.tutorial = false; if (!G.nb.tem) { G.nb.tem = true; setTimeout(() => exToast(t("O Mateiro te deu um notebook que a cheia trouxe. Não liga: falta bateria, teclado e carregador. O Seu Bugiganga, da feira, entende disso.")), 2600); }
   save();
   $("exDialog").hidden = true; EX.dialog = null; $("explore").classList.remove("no-help"); sfx("more");
   exToast(t("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata."));
@@ -1161,11 +1207,12 @@ function campSkip() {
 }
 // fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
-  const kind = EX.camp.kind; EX.camp = null; EX.dialog = null; exKeys.clear();
+  const {kind, from, msg} = EX.camp; EX.camp = null; EX.dialog = null; exKeys.clear();
   if (G.night && !G.tutorial && !G.narrated.pyt_noite && (kind === "noite")) { G.narrated.pyt_noite = true; save(); setTimeout(() => pytunaScene(NARRA_PYT.noite), 500); }   // anoiteceu pela primeira vez
   if (kind === "intro" && G.tutorial && !G.narrated.prologo) { G.narrated.prologo = true; save(); return narrate(NARRA.prologo, startTutorial); }   // o Pajé abre a história
   if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast(t("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata."));
-  exToast(rest(kind, true, true)); exHud();
+  if (msg) { if (EX.fill) { EX.fill = null; restJingle(); } exToast(msg); exHud(); }   // descanso: já recuperou na cena (pulou: as barras completam)
+  else { exToast(rest(kind, true, true)); hudFillStart(from); }   // dormir/anoitecer: as barras enchem depois de acordar
   if (EX.zone === "aldeia" && kind !== "fogueira") setTimeout(() => EX && announceOffer(), 2400);   // novo dia ou noite: pode ter pedido novo   // dormir: o galo já cantou no amanhecer da cena
 }
 /* Linha do tempo das cenas que acordam (ms desde o começo):
@@ -1176,12 +1223,12 @@ function exCampEnd() {
    "!" (W..W+400), sorri (W+500..W+1100), levanta e se espreguiça (W+1300..W+2000) e fica de pé. */
 const CAMP_DAWN_AT = {dormir: 2600, noite: 2400}, CAMP_INTRO_WAKE = 1500;
 const campWake = kind => kind === "intro" ? CAMP_INTRO_WAKE : CAMP_DAWN_AT[kind] ? CAMP_DAWN_AT[kind] + DAWN_MS + 200 : 0;
-const campAsleep = (c, el) => c.kind === "intro" ? el < campWake("intro") : !!CAMP_DAWN_AT[c.kind] && el > 900 && el < campWake(c.kind);
+const campAsleep = (c, el) => c.kind === "intro" ? el < campWake("intro") : !!CAMP_DAWN_AT[c.kind] && el > 900 && el < c.W;
 // escuridão da noite (some quando a faixa do amanhecer cobre a tela)
 // (dormir já de noite: o escuro da noite já está na tela; anoitecer: só escurece um pouco antes da faixa)
 const campDark = (c, el) => !CAMP_DAWN_AT[c.kind] || c.day || c.startNight ? 0 : (c.kind === "noite" ? .35 : .65) * Math.max(0, Math.min(1, (el - 900) / 1500));
 function drawCampHero(x, cx, cy, now) {
-  const c = EX.camp, el = now - c.t0, W = campWake(c.kind), sx = snap(c.x - cx), sy = snap(c.y - cy);
+  const c = EX.camp, el = now - c.t0, W = c.W, sx = snap(c.x - cx), sy = snap(c.y - cy);
   const sleep = campAsleep(c, el);
   let face = sleep || el % 1700 < 140 ? "blink" : (W ? el > W + 500 && el < W + 1100 : el > 800 && el < 1250) ? "happy" : undefined;
   const up = W && el > W + 1300;   // acordou: levanta e se espreguiça com a lança para o alto
@@ -1278,7 +1325,7 @@ function drawCampSky(x, cx, cy, now) {
   drawFire(x, c.ftx * TILE - cx, c.fty * TILE - cy, now); drawCampHero(x, cx, cy, now);
 }
 function exCloseDialog() { $("exDialog").hidden = true; if (EX) EX.dialog = null; sfx("blip"); }
-// teclado com o painel aberto: setas escolhem, Z/Enter/Espaço confirmam, 1-9 apertam direto, X/Esc voltam ou fecham
+// teclado com o painel aberto: setas (ou WASD) escolhem, Z/Enter/Espaço confirmam, X/Esc voltam ou fecham
 function dialogKey(ev) {
   if (EX.dialog === "tutorial") {   // Z, Espaço ou Enter passam a página; Esc encerra a conversa
     if (["z", "Z", " ", "Enter"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); pressPanel($("exDialog").querySelector(".cmd")); }
@@ -1288,8 +1335,7 @@ function dialogKey(ev) {
   }
   const d = $("exDialog");
   if ((EX.dialog === "armeiro" || EX.dialog === "xama") && !EX.confirming && forgeKey(ev)) return;
-  if (/^[1-9]$/.test(ev.key)) { ev.preventDefault(); pressPanel(d.querySelectorAll(".cmd[data-key]")[+ev.key - 1]); }
-  else if (menuKey(ev, d)) return;   // setas escolhem, Z/Enter/Espaço confirmam
+  if (menuKey(ev, d)) return;   // setas escolhem, Z/Enter/Espaço confirmam
   else if (["Escape", "x", "X", "i", "I"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); EX.confirming ? exOpenDialog(EX.confirming) : exCloseDialog(); }   // X volta (na pergunta, é o "Não")
   else if (ev.key.startsWith("Arrow")) ev.preventDefault();
 }

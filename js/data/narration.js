@@ -85,6 +85,16 @@ const NARRA_PYT = {
     {p: "Pytuna. A noite sem lua. Quando Jaci apagar de vez, ninguém vai ver o que eu levo da mata."},
     "E sumiu no escuro, deixando um cheiro de mato queimado."
   ],
+  // quem acalma o último chefe de Ananindeua antes de passar uma noite na mata conhece o Pytuna aqui (e não na primeira noite)
+  bufalo_touro_primeiro: [
+    "Quando o último bicho de Ananindeua voltou a si, uma fumaça desceu do céu, devagar, e ficou olhando pro menino.",
+    {p: "Então tu é o curumim da lança de pedra da lua... Acalmou meus bichos tudinho."},
+    {r: "Quem é tu?"},
+    {p: "Pytuna. A noite sem lua. Quando Jaci apagar de vez, ninguém vai ver o que eu levo da mata."},
+    {p: "Tu acalma um, acalma dez... A fumaça não acaba, curumim. Ela vem de toda parte."},
+    {r: "Então eu vou atrás de onde ela vem."},
+    {p: "Vem. Te espero na cidade grande."}
+  ],
   bufalo_touro: [
     "Quando o último bicho de Ananindeua voltou a si, a fumaça apareceu de novo. Mais fina. Mais brava.",
     {p: "Tu acalma um, acalma dez... A fumaça não acaba, curumim. Ela vem de toda parte."},

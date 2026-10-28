@@ -69,7 +69,7 @@ const jaciLight = () => { const all = NORTE_BOSSES(); return all.filter(k => BS(
 function pytunaScene(lines, done) {
   if (!EX) return narrate(lines, done);
   EX.locked = true; exKeys.clear();
-  EX.pyt = {t0: performance.now(), x: EX.hero.x + 28, y: EX.hero.y - 26};
+  EX.pyt = {t0: performance.now(), x: EX.hero.x + 28, y: EX.hero.y - 16};   // do lado do Rhanon, na altura do peito
   sfx("rugidoChefe"); musicStart("pytuna");   // o tema de Pytuna toca enquanto ele está em cena
   setTimeout(() => narrate(lines, () => {
     if (!EX || !EX.pyt) return done && done();
@@ -81,7 +81,9 @@ function pytunaScene(lines, done) {
 function drawPytuna(x, cx, cy, now) {
   const p = EX.pyt; if (!p) return;
   const inK = Math.min(1, (now - p.t0) / 800), out = p.leave ? Math.min(1, (now - p.leave) / 1100) : 0;
-  drawSmoke(x, p.x - cx + out * 30, p.y - cy + out * 120, 1.2 * inK + out, now, (1 - out) * .95);
+  // no canto da fase (chefe lá no alto da trilha) a fumaça ficava fora da tela: segura ela dentro, com folga
+  const M = 34, sx = Math.max(M, Math.min(VIEW_W - M, p.x - cx)), sy = Math.max(M + 18, Math.min(VIEW_H - M - 70, p.y - cy));   // em cima a faixa do HUD, embaixo o painel da fala
+  drawSmoke(x, sx + out * 30, sy + out * 120, 1.2 * inK + out, now, (1 - out) * .95);
 }
 // fim do capítulo do Norte: faixa grande com letras de recorte
 function chapterBanner(title, sub) {
@@ -93,7 +95,11 @@ function chapterBanner(title, sub) {
 // depois do comentário do Pajé sobre um chefe: Pytuna (se for o último de uma cidade) e o fim do Norte, nessa ordem
 function bossStory(id, done) {
   const steps = [];
-  if (NARRA_PYT[id] && !G.narrated["pyt_" + id]) steps.push(next => { G.narrated["pyt_" + id] = true; save(); pytunaScene(NARRA_PYT[id], next); });
+  // ainda não viu o Pytuna (nenhuma noite na mata): ele se apresenta aqui, e a cena da primeira noite não repete
+  if (NARRA_PYT[id] && !G.narrated["pyt_" + id]) steps.push(next => {
+    const first = !G.narrated.pyt_noite && NARRA_PYT[id + "_primeiro"];
+    G.narrated["pyt_" + id] = true; if (first) G.narrated.pyt_noite = true; save(); pytunaScene(first || NARRA_PYT[id], next);
+  });
   if (jaciLight() >= 1 && !G.narrated.norte_fim) steps.push(next => {
     G.narrated.norte_fim = true; save(); musicStart("jaci");   // a lua volta inteira: o tema de Jaci
     narrate(NARRA_PYT.norte, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Norte"), t(G.portfolio.site_feira ? "A história continua no Nordeste: o voo sai do Aeroporto de Belém." : "A história continua no Nordeste. Antes, entregue o site da Dona Graça no Ver-o-Peso.")); setTimeout(next, 1500); });

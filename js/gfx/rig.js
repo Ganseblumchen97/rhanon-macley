@@ -3,7 +3,7 @@
    automático desenha o contorno escuro por fora e entre as partes.
    Base 32x44 pixels; scale desenha já na resolução final (0.75 = 24x33, usado na exploração).
    rigCanvas(view, pose, look, scale) -> canvas;  view = "front" (de frente) ou "back" (de costas). */
-const RIG_W = 32, RIG_H = 44, RIG_K = "#1a1426";
+const RIG_W = 32, RIG_H = 44, RIG_K = "#1a1426", RIG_LENS = "#bfe0ea";   // RIG_LENS: lente dos óculos
 const RIG_PAL = {h: "#2a2238", H: "#4d4170", s: "#d0925a", S: "#99603a", g: "#3fb35f", G: "#237a40", r: "#e2363d",
   t: "#a0663a", T: "#6b4126", w: "#f6eedb", p: SPEAR_WOOD, P: "#a9823f", m: "#e6edf0", b: "#9c6339", f: "#7a4a1e"};
 const FLAMES = [["#d62828", "#f2740c", "#ffd23a"], ["#f2740c", "#ffd23a", "#fff3a0"], ["#d62828", "#ffd23a", "#f2740c"]];
@@ -172,7 +172,8 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   } else {
     d.part().ellipse(hx, 14 + hy, 7.5, 7.5, C.s, C.S, .55);
     const F = pose.face || "normal", e = (x, y) => [hx + x, y + hy];
-    if (look.glasses) d.rect(hx - 6, 14 + hy, 13, 2, RIG_K);
+    if (look.glasses) d.rect(hx - 6, 13 + hy, 5, 5, RIG_K).rect(hx + 2, 13 + hy, 5, 5, RIG_K).rect(hx - 1, 14 + hy, 3, 1, RIG_K)   // óculos redondinhos: aro, lente e o olho atrás
+      .rect(hx - 5, 14 + hy, 3, 3, RIG_LENS).rect(hx + 3, 14 + hy, 3, 3, RIG_LENS).rect(hx - 4, 15 + hy, 1, 2, RIG_K).rect(hx + 4, 15 + hy, 1, 2, RIG_K).dots([e(-5, 14), e(3, 14)], C.w);
     else if (F === "blink") d.rect(hx - 4, 16 + hy, 2, 1, RIG_K).rect(hx + 3, 16 + hy, 2, 1, RIG_K);
     else if (F === "happy") d.dots([e(-5, 16), e(-4, 15), e(-3, 16), e(2, 16), e(3, 15), e(4, 16)], RIG_K);
     else if (F === "hurt") d.limb(hx - 5, 15 + hy, hx - 3, 16 + hy, 1, RIG_K).limb(hx - 3, 16 + hy, hx - 5, 17 + hy, 1, RIG_K).limb(hx + 4, 15 + hy, hx + 2, 16 + hy, 1, RIG_K).limb(hx + 2, 16 + hy, hx + 4, 17 + hy, 1, RIG_K);
@@ -247,6 +248,18 @@ function rhanonLook() {
   else { if (T) look.shirt = [T.color, T.shade]; if (L && L.color) look.pants = [L.color, L.shade]; }
   return look;
 }
+// medalhão do HUD (exploração e batalha): o rosto do Rhanon num círculo de mata, como o guardião da floresta.
+// Devolve a imagem (data URL), guardada por roupa/arma em uso
+const MEDAL_CACHE = {};
+function heroMedal() {
+  const look = rhanonLook(), key = JSON.stringify(look);
+  if (MEDAL_CACHE[key]) return MEDAL_CACHE[key];
+  const c = document.createElement("canvas"), x = c.getContext("2d"); c.width = c.height = 32; x.imageSmoothingEnabled = false;
+  const g = x.createRadialGradient(16, 12, 2, 16, 16, 20); g.addColorStop(0, "#6fd07e"); g.addColorStop(1, "#173a22");
+  x.beginPath(); x.arc(16, 16, 16, 0, Math.PI * 2); x.fillStyle = g; x.fill(); x.clip();
+  x.drawImage(rigCanvas("front", {}, look, 1), 0, 3);   // cabeça e ombros
+  return MEDAL_CACHE[key] = c.toDataURL();
+}
 // pés de cada passo (walkA/walkB levantam um pé) e pose de combate (pernas abertas)
 const RIG_LEGS = {stand: {}, walkA: {lf: [12, 38]}, walkB: {rf: [20, 38]}, stance: {lf: [10, 40], rf: [22, 40]}};
 
@@ -291,7 +304,7 @@ function rigSideCanvas(pose = {}, look = {}, scale = 1) {
   // rosto de perfil
   d.part().ellipse(hx + 3, 14 + hy, 5.5, 6.5, C.s, C.S, .8);
   d.poly([[hx + 7, 12 + hy], [hx + 10, 16 + hy], [hx + 7, 17 + hy]], C.s);   // nariz
-  if (look.glasses) d.rect(hx + 3, 13 + hy, 5, 2, RIG_K);
+  if (look.glasses) d.rect(hx + 3, 12 + hy, 5, 5, RIG_K).rect(hx + 4, 13 + hy, 3, 3, RIG_LENS).rect(hx + 5, 14 + hy, 1, 2, RIG_K).rect(hx + 1, 13 + hy, 2, 1, RIG_K);
   else if (pose.face === "blink") d.rect(hx + 5, 15 + hy, 2, 1, RIG_K);
   else d.rect(hx + 5, 13 + hy, 2, 3, RIG_K).dots([[hx + 5, 13 + hy]], C.w);
   d.dots([[hx + 5, 18 + hy], [hx + 6, 18 + hy], [hx + 5, 19 + hy]], C.r).dots([[hx + 7, 20 + hy], [hx + 8, 19 + hy]], C.S);

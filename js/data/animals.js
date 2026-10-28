@@ -13,7 +13,7 @@ const ANIMALS = [
   {id:"cassaco", lv:2, name:"Cassaco", hp:26, xp:18, gold:[6,12], damage:[2,5], size:"pequeno", emoji:"🦨", special:"fedor", moves:MV("Mordida","Investida","Fedor"), intro:"Um cassaco sai do mato de rabo erguido. Mau sinal."},
   {id:"macaco", lv:3, name:"Macaco-prego", hp:34, xp:24, gold:[8,16], damage:[3,6], size:"médio", emoji:"🐒", special:"roubo", moves:MV("Arranhão","Pulo","Roubo"), intro:"Lá do galho, um macaco-prego olha a mandioca da bolsa. Ele tem planos."},
   {id:"queixada", lv:6, name:"Queixada", hp:48, xp:34, gold:[14,24], damage:[5,9], size:"médio", emoji:"🐗", special:"estouro", moves:MV("Mordida","Investida","Estouro do bando"), intro:"Um bando de queixadas estala os dentes no meio das folhas."},
-  {id:"piranha", lv:8, name:"Cardume de piranhas", hp:28, xp:22, gold:[8,14], damage:[2,5], size:"médio", emoji:"🐟", special:"cardume", moves:MV("Mordidas","Frenesi","Cardume"), intro:"A água ferve: um cardume de piranhas sentiu cheiro de sangue."},
+  {id:"piranha", lv:8, name:"Piranha", hp:28, xp:22, gold:[8,14], damage:[2,5], size:"médio", emoji:"🐟", special:"cardume", moves:MV("Mordidas","Frenesi","Cardume"), intro:"A água ferve: uma piranha sentiu cheiro de sangue."},
   {id:"sucuri", lv:10, name:"Sucuri", hp:70, xp:55, gold:[30,45], damage:[5,9], size:"grande", emoji:"🐍", special:"constricao", moves:MV("Mordida","Bote","Constrição"), intro:"Um tronco se mexe na margem. Não é tronco: é uma sucuri."},
   {id:"surucucu", lv:5, name:"Surucucu", hp:44, xp:40, gold:[18,30], damage:[4,8], size:"médio", emoji:"🐍", special:"picada", moves:MV("Mordida","Bote","Picada"), intro:"Uma surucucu se enrola nas folhas secas. Um passo errado e já era."},
   {id:"harpia", lv:7, name:"Harpia", hp:52, xp:48, gold:[22,36], damage:[6,11], size:"grande", emoji:"🦅", special:"mergulho", moves:MV("Garras","Voo rasante","Mergulho"), intro:"Uma harpia pousa no galho mais alto e encara Rhanon como presa."},
@@ -56,7 +56,7 @@ const ANIMALS = [
   {id:"cobra_cipo", lv:14, name:"Cobra-cipó", hp:90, xp:94, gold:[36,54], damage:[10,15], size:"médio", special:"salto", moves:MV("Mordida","Bote","Bote do galho"), intro:"O cipó verde se mexe. Era uma cobra-cipó."},
   {id:"ourico", lv:15, name:"Ouriço-cacheiro", hp:104, xp:100, gold:[40,58], damage:[9,15], size:"médio", special:"espinhos", moves:MV("Mordida","Investida","Chuva de espinhos"), intro:"Um ouriço-cacheiro se arrepia todo. Cada espinho é uma agulha."},
   {id:"gaviao_real", lv:18, boss:true, name:"Gavião-real", hp:205, xp:300, gold:[170,210], damage:[11,17], size:"chefe", tint:"sepia(.5) saturate(1.4) brightness(.9)", special:"mergulho", moves:MV("Garras","Voo rasante","Mergulho do alto"), intro:"Uma sombra enorme cobre o seringal. O gavião-real desce pra briga."},
-  {id:"curupira", lv:19, boss:true, name:"Curupira", hp:210, xp:320, gold:[180,220], damage:[11,18], size:"chefe", special:["confusao", "fogo"], moves:MV("Pancada","Corrida para trás","Pegadas trocadas"), intro:"Pegadas ao contrário e um cabelo de fogo entre as árvores: o Curupira."},
+  {id:"curupira", lv:19, boss:true, ow:1.5, name:"Curupira", hp:210, xp:320, gold:[180,220], damage:[11,18], size:"chefe", special:["confusao", "fogo"], moves:MV("Pancada","Corrida para trás","Pegadas trocadas"), intro:"Pegadas ao contrário e um cabelo de fogo entre as árvores: o Curupira."},
   // várzea dos búfalos (depois do seringal): a última trilha de Ananindeua antes de Belém
   {id:"bufalo", lv:17, name:"Búfalo", hp:120, xp:110, gold:[44,64], damage:[11,17], size:"grande", special:"estouro", moves:MV("Chifrada","Investida","Estouro na lama"), intro:"Um búfalo levanta a cabeça do capim alagado e bufa. Aqui quem manda é ele."},
   {id:"soco", lv:16, name:"Socó-boi", hp:100, xp:104, gold:[40,58], damage:[10,16], size:"médio", special:"mergulho", moves:MV("Bicada","Asa aberta","Bicada certeira"), intro:"Um socó-boi parado de bico pro alto... até Rhanon chegar perto."},
@@ -207,13 +207,21 @@ const NIGHT_ZONES = {
   mangueilha: {pool: [["siri",3],["garca_moura",2],["rato_dagua",2],["carcara",1]], boss: "serpente"},
   baixadas: {pool: [["rato_dagua",3],["cachorro_bravo",3],["ladrao_bike",3],["mucura",2]], boss: "visagem_mare"}
 };
+/* noite mais forte (quem limpou tudo de dia ainda tem desafio): bicho comum +3 níveis, chefe da noite +2, com PV, dano e
+   XP subindo junto. nightBeast(a) devolve a versão da noite (explore.js chama ao pôr o bicho na fase) */
+const NIGHT_LV = {beast: 3, boss: 2};
+function nightBeast(a) {
+  if (a.night || a.bug) return a;
+  const b = a.boss ? NIGHT_LV.boss : NIGHT_LV.beast, dmg = a.damage || [1, 3];
+  return {...a, night: true, lv: (a.lv || 1) + b, hp: a.hp + b * (a.boss ? 8 : 6), damage: [dmg[0] + Math.round(b * .7), dmg[1] + Math.round(b * .8)], xp: Math.round(a.xp * (1 + b * .1))};
+}
 const zoneDef = z => G.night && NIGHT_ZONES[z] ? {...ZONES[z], ...NIGHT_ZONES[z], n: ZONES[z].n + " à noite"} : ZONES[z];
 // chefe vencido: de dia é a zona; à noite, "zona:noite" (os chefes do folclore não abrem passagens)
 const bossKey = z => G.night && NIGHT_ZONES[z] ? z + ":noite" : z;
 // gênero e nome próprio, para as frases: "a onça-pintuda saiu correndo", "o Curupira caiu" (bicho novo feminino: id em FEM)
 const FEM = new Set(["jiboia", "fulozinha", "rasga_mortalha", "onca", "preguica", "sucuri", "surucucu", "harpia", "cotia", "jaguatirica", "anta", "caranguejeira", "capivara", "ariranha",
   "cobra_grande", "coruja", "mula", "garca", "matinta", "cobra_cipo", "jararaca", "iguana", "iguana_rei", "mulher_branco", "ratazana", "gaivota",
-  "cobra_norato", "mucura", "visagem_mare", "onca_rei", "garca_moura", "serpente", "cascavel", "raposa", "traira", "asa_branca", "sucuarana", "lontra"]);
+  "cobra_norato", "mucura", "visagem_mare", "onca_rei", "garca_moura", "serpente", "cascavel", "raposa", "traira", "asa_branca", "sucuarana", "lontra", "piranha"]);
 const PROPER = new Set(["lobisomem", "fulozinha", "meia_noite", "cabeca_cuia", "boi_bumba", "serpente", "cobra_grande", "chupacabra", "mula", "boitata", "boto_encantado", "matinta", "curupira", "mapinguari", "mulher_branco", "cobra_norato", "onca_rei", "bug_loop", "bug_404", "bug_prazo", "bug_memoria", "bug_acento", "bug_mutante"]);
 const theName = (a, cap) => { if (LANG !== "pt" && TX[LANG] && TX[LANG].article) return TX[LANG].article(a, cap); const t = (FEM.has(a.id) ? "a " : "o ") + (PROPER.has(a.id) ? a.name : a.name.toLowerCase()); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
 const ending = (a, m, f) => FEM.has(a.id) ? f : m;   // "vencido"/"vencida"

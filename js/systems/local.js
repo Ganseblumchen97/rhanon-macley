@@ -87,7 +87,7 @@ function rest(kind, quiet, toast) {
   if (kind === "noite") G.night = true;
   save(); sfx("heal");
   const msg = kind === "dormir" ? t("Rhanon dormiu até o dia seguinte. Dia {n}.", {n: G.day}) : kind === "noite" ? t("Rhanon descansou até a noite. De noite a mata é outra: cuidado com o escuro.")
-    : t("Rhanon recuperou tudo junto à fogueira.");
+    : kind === "rede" ? t("Rhanon cochilou na rede e recuperou tudo.") : t("Rhanon recuperou tudo junto à fogueira.");
   if (toast) return msg;
   localDone("aldeia", msg);
 }
@@ -363,7 +363,7 @@ const pendingReveal = () => { vit(); return CITY[curCity()].route.find(k => unlo
 function revealNext(done) { const k = pendingReveal(); if (k) revealPath(k, done); else if (done) done(); }
 let revealReady = false, revealDone = null;
 function revealPath(k, done) {
-  drawLocal();   // o mapa escondido mostra só o que já foi visto
+  drawLocal(); WALKER.prime("lmk");   // o mapa escondido mostra só o que já foi visto
   const o = $("revela"), box = o.querySelector(".revela"), svg = $("lsvg").cloneNode(true), NS = "http://www.w3.org/2000/svg";
   svg.removeAttribute("id"); svg.querySelectorAll("[id]").forEach(e => e.removeAttribute("id"));   // cópia sem ids repetidos
   box.innerHTML = `<h2>${t("Caminho aberto!")}</h2>`; box.append(svg);

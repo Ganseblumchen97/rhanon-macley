@@ -89,7 +89,6 @@ function setupEquip() {
     ev.stopImmediatePropagation();
     const k = ev.key, flip = {ArrowUp: 1, ArrowDown: 1, ArrowLeft: 2, ArrowRight: 2}[k];   // cima/baixo: mesma coluna; lados: troca de coluna
     if (flip) { ev.preventDefault(); EQ_SEL ^= flip; sfx("blip"); openEquip(); }
-    else if (/^[1-9]$/.test(k)) pressPanel($("equipar").querySelectorAll(".eq-pick .cmd")[+k - 1]);
     else if ((k === "Enter" || k === " " || k === "z" || k === "Z") && !ev.repeat) {   // Z troca para o próximo item
       ev.preventDefault();
       const s = EQ_SLOTS[EQ_SEL], list = eqChoices(s), at = list.findIndex(c => c.id === G.equip[s.slot]);

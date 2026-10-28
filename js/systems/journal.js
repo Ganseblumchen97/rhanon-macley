@@ -19,13 +19,14 @@ function habitat(id) {
   }
   return out.join(", ") || "?";
 }
-// os cinco elementos no caderno, como a análise do Persona: ▼ fraco, ▲ resiste, = normal e ? (ainda não usou esse nele)
+// os cinco elementos no caderno, como a análise do Persona: rachadura = fraco, escudo = resiste, traço = normal e ? (ainda não usou esse nele)
+const ELEM_KEY_ICONS = () => Object.fromEntries(["fraco", "resiste", "normal"].map(k => [k, elemIcon(k)]));   // legenda do caderno
 function elemTags(a) {
   const [w, ...r] = ELEM_OF[a.id] || [];
   if (!w) return "";
   return `<span class="elem cad">${Object.entries(ELEMENTS).map(([k, el]) => {
     const cls = !elemKnown(a, k) ? "nao-sei" : k === w ? "fraco" : r.includes(k) ? "resiste" : "normal";
-    return `<i class="${cls}" style="--ec:${el.c}">${{"nao-sei": "?", fraco: "▼", resiste: "▲", normal: "="}[cls]} ${el.n}</i>`;
+    return `<i class="${cls}" style="--ec:${el.c}">${elemIcon(cls)} ${el.n}</i>`;
   }).join("")}</span>`;
 }
 function journalCard(a) {
@@ -45,7 +46,7 @@ function openJournal() {
   vit();
   const o = $("caderno"), box = o.querySelector(".info"), seen = ANIMALS.filter(a => G.bestiary[a.id] && G.bestiary[a.id].seen).length;
   o.classList.toggle("papel", !G.nb.on);   // antes do notebook ligar, o caderno é de papel (desenho à mão); depois, digital
-  box.innerHTML = `<h2>${t(G.nb.on ? "Caderno de bichos · digital" : "Caderno de bichos")}</h2><p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p><p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><p class="hint">${t("Elementos: ▼ fraco · ▲ resiste · = normal · ? use o golpe no bicho pra descobrir")}</p><div class="cad-grid"></div>`;
+  box.innerHTML = `<h2>${t(G.nb.on ? "Caderno de bichos · digital" : "Caderno de bichos")}</h2><p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p><p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><p class="hint"><span class="elem-key">${t("Elementos: {fraco} fraco · {resiste} resiste · {normal} normal · ? use o golpe no bicho pra descobrir", ELEM_KEY_ICONS())}</span></p><div class="cad-grid"></div>`;
   const grid = box.querySelector(".cad-grid");
   ANIMALS.forEach(a => grid.append(journalCard(a)));
   btn("Fechar", closeJournal, false, box);

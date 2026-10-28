@@ -34,7 +34,7 @@ function buildMapNodes() {
 function btn(txt, fn, off, host) {
   host = host || $("info");
   const b = document.createElement("button"), n = host.querySelectorAll(".cmd[data-key]").length + 1;
-  b.className = "cmd"; b.type = "button"; b.innerHTML = `<span>${n <= 9 ? `<i class="key">${n}</i>` : ""}${txt}</span>`;
+  b.className = "cmd"; b.type = "button"; b.innerHTML = `<span><i class="zk"></i>${txt}</span>`;   // data-key = ordem do botão (Enter/Z no mapa aperta o primeiro)
   b.dataset.key = n;
   if (off) b.setAttribute("aria-disabled", "true");
   b.addEventListener("click", () => { if (!off) fn(); });
