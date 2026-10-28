@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.56.0 — a aldeia no Tapajós e o barco de linha
+
+- O Rhanon agora mora na Aldeia Jasytatá ("estrela", em tupi), na beira do rio Tapajós, no meio da Amazônia. A feira
+  virou a Vila Paranã, uma vila ribeirinha. Seu save continua de onde parou.
+- Para ir a Belém não tem mais ônibus: no fim da trilha fica o Porto do Tapajós. Compre a passagem com o comandante
+  na bilheteria e suba no barco de linha. Ele apita, desce o Tapajós e o Amazonas no mapa e chega ao Cais da
+  Escadinha, em Belém.
+- O mapa do Pará virou o mapa do Norte inteiro, com o Amazonas, o Tapajós e a ilha de Marajó.
+- O manguezal virou igapó, a mata alagada da Amazônia, de água escura e árvore com o pé no rio.
+- Os mapas ficaram mais bonitos: terreno com textura (mata, cidade, litoral ou sertão), rio em dois tons, trilha de
+  terra e cada lugar com um desenho próprio, como a oca da aldeia, a canoa do igarapé e o mandacaru da Caatinga.
+- Com a habilidade Fúria da onça, a Fúria de quatro golpes ganhou um golpe novo: o Rhanon rodopia e acerta de lado.
+
 ## 0.55.0 — a fumaça nos olhos e a Fúria de verdade
 
 - Os bichos agora mostram que estão tomados pela fumaça de Pytuna: olho vermelho aceso, cara brava e uma fumaça

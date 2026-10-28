@@ -213,7 +213,7 @@ const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta 
   trocatroca: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   orla: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   recifeantigo: " · lembranças, comida, rede na pensão e o Seu Dedé, que tem um freela: chega perto e aperta Z",
-  parada: " · compra a passagem na cabine e embarca no ônibus", terminal: " · o ônibus volta pra Ananindeua; a trilha da esquerda vai pro Ver-o-Peso"};
+  parada: " · compra a passagem na bilheteria e embarca no barco", terminal: " · o barco volta pra aldeia; a trilha da esquerda vai pro Ver-o-Peso"};
 function exitExplore() {
   if (!EX || EX.locked) return;
   EX.locked = true;
@@ -235,7 +235,7 @@ function resumeExplore(result) {
   musicStart("local"); exHud();
   if (en && result === "win" && en.rematch) exToast(t("Treino vencido: {chefe} gostou da luta!", {chefe: theName(en.a)}));
   else if (en && result === "win" && en.boss) exToast(NIGHT_ZONES[EX.zone] && en.a.id === NIGHT_ZONES[EX.zone].boss ? t("{chefe} voltou a si! A aldeia vai falar disso por muitas noites.", {chefe: theName(en.a, true)})
-    : EX.st.next === "parada" ? t("Último chefe de Ananindeua vencido! A passagem leva à BR-316.") : EX.st.next ? t("Caminho livre: {lugar}! Segue a trilha até a passagem.", {lugar: SUB[EX.st.next].n}) : t("Último chefe daqui vencido!"));
+    : EX.st.next === "parada" ? t("Último chefe da trilha vencido! A passagem leva ao porto do Tapajós.") : EX.st.next ? t("Caminho livre: {lugar}! Segue a trilha até a passagem.", {lugar: SUB[EX.st.next].n}) : t("Último chefe daqui vencido!"));
   const reveal = () => { if (en && result === "win" && en.boss && pendingReveal()) { EX.locked = true; setTimeout(() => revealNext(() => { if (EX) EX.locked = false; }), 700); } };   // o mapa mostra o caminho novo
   if (en && result === "win" && en.boss && !en.rematch && NARRA_BOSS[en.a.id] && !G.narrated[en.a.id]) {
     G.narrated[en.a.id] = true; save(); EX.locked = true;
@@ -787,7 +787,7 @@ function drawMemento(x, s, cx, cy, now) {
 }
 const SPOTS = {Y: "segredo", J: "bau", F: "fogueira", N: "tenda", O: "tenda", V: "peles", C: "comida", R: "artesao", M: "armeiro", X: "xama", L: "tecnico", W: "cliente", P: "aldeao", Q: "cabine", U: "onibus"};
 const PEOPLE = ["peles", "comida", "artesao", "armeiro", "xama", "tecnico", "cliente", "aldeao"];
-const SPOT_LABEL = {segredo: "examinar", bau: "abrir o baú", fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", tecnico: "falar com o Seu Bugiganga", cliente: "falar com a Dona Graça", aldeao: "conversar", cabine: "falar com o cobrador", onibus: "embarcar no ônibus", lembranca: "falar com o chefe"};
+const SPOT_LABEL = {segredo: "examinar", bau: "abrir o baú", fogueira: "descansar na fogueira", tenda: "dormir", peles: "vender lembranças", comida: "comprar comida", artesao: "ver roupas", armeiro: "ver armas e armaduras", xama: "falar com o Pajé", tecnico: "falar com o Seu Bugiganga", cliente: "falar com a Dona Graça", aldeao: "conversar", cabine: "falar com o comandante", onibus: "embarcar no barco", lembranca: "falar com o chefe"};
 const VILLAGER_NAME = {aldeao1: "Mateiro", aldeao2: "Ancião", aldeao3: "Aldeã", urbano1: "Peixeira", urbano2: "Erveira", urbano3: "Estivador"};
 // dicas da gente do Ver-o-Peso (em Belém)
 // pensões das cidades (fase com O): nome do painel; dormir passa pela cena do quarto (motelScene)
@@ -959,7 +959,7 @@ const nbPartName = k => ({bateria: t("bateria"), teclado: t("teclado"), carregad
 function nbTechnician(say, d) {
   if (!G.nb.tem) return say(t("Seu Bugiganga"), t("Tudo que a cheia traz eu junto: rádio, celular, fio... e conserto. Se um dia aparecer contigo um notebook, me traz."));
   if (G.nb.on) return say(t("Seu Bugiganga"), t("E aí, programador! O notebook tá aguentando? Cuida da bateria, viu."));
-  if (nbReady()) return say(t("Seu Bugiganga"), t("Tá tudo aí! Agora só falta tomada. Na rodoviária da BR-316, do lado da cabine, tem uma."));
+  if (nbReady()) return say(t("Seu Bugiganga"), t("Tá tudo aí! Agora só falta tomada. No porto do Tapajós, do lado da bilheteria, tem uma."));
   const miss = nbMissing().map(nbPartName).join(", ");
   say(t("Seu Bugiganga"), t("Égua, um notebook! Falta {pecas}.", {pecas: miss}) + (G.nb.teclado ? "" : " " + t("Teclado? Vi um macaco-prego na mata correndo com um debaixo do braço.")) +
     (G.nb.carregador ? "" : " " + t("Carregador... as ariranhas do rio vivem brincando com fio que a cheia leva.")));
@@ -987,8 +987,8 @@ function nbView(host) {
   };
   const miss = nbMissing().map(nbPartName).join(", ");
   p.textContent = news.length ? t("Peça nova no lugar: {peca}!", {peca: news.map(nbPartName).join(", ")}) + (miss ? " " + t("Faltam: {pecas}.", {pecas: miss}) : "")
-    : G.nb.on ? t("Ligado. O caderno de bichos agora é digital.") : nbReady() ? t("Tudo no lugar! Só falta tomada: a cabine da BR-316 tem uma.") : t("Faltam: {pecas}.", {pecas: miss});
-  if (news.length && !nbMissing().length && !G.nb.on) p.textContent += " " + t("Tudo no lugar! Só falta tomada: a cabine da BR-316 tem uma.");
+    : G.nb.on ? t("Ligado. O caderno de bichos agora é digital.") : nbReady() ? t("Tudo no lugar! Só falta tomada: a bilheteria do porto tem uma.") : t("Faltam: {pecas}.", {pecas: miss});
+  if (news.length && !nbMissing().length && !G.nb.on) p.textContent += " " + t("Tudo no lugar! Só falta tomada: a bilheteria do porto tem uma.");
   requestAnimationFrame(tick);
 }
 // anim = peça encaixando agora ({part, u de 0 a 1, later = as que vêm depois}); snapT = quando cada uma encaixou (brilha)
@@ -1081,61 +1081,63 @@ const busDest = () => EX.zone === "parada" ? "belem" : "ananindeua";
 const busSide = () => EX.zone === "parada" ? -1 : 1;   // a estrada sai pela esquerda rumo a Belém e pela direita rumo a Ananindeua
 function busCabin(say, d) {
   if (EX.zone === "parada" && nbReady() && !G.nb.on) {   // tomada do lado da cabine: o notebook liga aqui
-    say(t("Cobrador"), t("Tomada? Tem ali do lado da cabine, pode usar à vontade."));
+    say(t("Comandante"), t("Tomada? Tem ali do lado da bilheteria, pode usar à vontade."));
     btn(t("Ligar o notebook"), nbTurnOn, false, d);
     return;
   }
-  if (EX.zone === "terminal") return say(t("Guichê do terminal"), G.passagem ? t("Tua passagem vale ida e volta. O ônibus pra Ananindeua sai assim que tu subir.") : t("Sem passagem não embarca, maninho."));
-  if (G.passagem) return say(t("Cobrador"), t("Passagem na mão! É só subir no ônibus. Vale ida e volta: do terminal de Belém tu volta quando quiser."));
-  if (!BUS.open) return say(t("Cobrador"), t("O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!"));
-  say(t("Cobrador"), t("Passagem pra Belém, a capital: R$ {n}, ida e volta. Tu tem R$ {tem}.", {n: BUS.price, tem: G.money}) + (G.money < BUS.price ? " " + t("Faltam R$ {n}. Lembrança de bicho forte vale bem mais na feira, viu?", {n: BUS.price - G.money}) : ""));
+  if (EX.zone === "terminal") return say(t("Bilheteria do cais"), G.passagem ? t("Tua passagem vale ida e volta. O barco pro Tapajós sai assim que tu subir.") : t("Sem passagem não embarca, maninho."));
+  if (G.passagem) return say(t("Comandante"), t("Passagem na mão! É só subir no barco. Vale ida e volta: do cais de Belém tu volta quando quiser."));
+  if (!BUS.open) return say(t("Comandante"), t("O barco pra Belém ainda não tá saindo. Volta daqui uns dias!"));
+  say(t("Comandante"), t("Passagem pra Belém, a capital: R$ {n}, ida e volta. Tu tem R$ {tem}.", {n: BUS.price, tem: G.money}) + (G.money < BUS.price ? " " + t("Faltam R$ {n}. Lembrança de bicho forte vale bem mais na feira, viu?", {n: BUS.price - G.money}) : ""));
   btn(t("Comprar passagem · R$ {n}", {n: BUS.price}), ask(t("Comprar a passagem para Belém por R$ {n}?", {n: BUS.price}), () => {
     if (G.passagem || G.money < BUS.price) return;
     G.money -= BUS.price; G.passagem = true; save(); sfx("more"); exHud();
-    exOpenDialog("cabine", t("Passagem comprada! Agora é só subir no ônibus."));
+    exOpenDialog("cabine", t("Passagem comprada! Agora é só subir no barco."));
   }), G.money < BUS.price, d);
 }
 function busDoor(say, d) {
-  const dest = busDest(), n = dest === "belem" ? "Belém" : "Ananindeua";
-  if (!G.passagem || !BUS.open) return say(t("Ônibus da BR-316"), t("O motorista aponta para a cabine: \"Sem passagem não sobe, maninho. Compra ali com o cobrador.\""));
-  say(t("Ônibus da BR-316"), t("O motor já está ligado. Destino: {lugar}.", {lugar: n}));
+  const dest = busDest(), n = dest === "belem" ? "Belém" : LOC.ananindeua.s;
+  if (!G.passagem || !BUS.open) return say(t("Barco de linha"), t("O marinheiro aponta para a bilheteria: \"Sem passagem não sobe, maninho. Compra ali com o comandante.\""));
+  say(t("Barco de linha"), t("O motor já está ligado. Destino: {lugar}.", {lugar: n}));
   btn(t("Embarcar para {lugar}", {lugar: n}), busLeave, false, d);
 }
 // sobe no ônibus: ele arranca e sai pela estrada; depois a viagem segue no mapa do Pará e entra na fase da outra cidade
 function busLeave() {
-  exCloseDialog(); EX.locked = true; exKeys.clear(); sfx("look");
+  exCloseDialog(); EX.locked = true; exKeys.clear(); sfx("apito");   // o barco apita e sai
   EX.boarding = {t0: performance.now(), vrum: 0};
 }
 function busPull(now) {
   const b = EX.bus, el = now - EX.boarding.t0;
   if (el > 350) b.dx = busSide() * ((el - 350) / 1000) ** 2 * 260;   // espera a porta fechar e acelera
-  if (now - EX.boarding.vrum > 520) { EX.boarding.vrum = now; sfx("onibus"); }
+  if (now - EX.boarding.vrum > 520) { EX.boarding.vrum = now; sfx("barco"); }
   if (el < 2000) return false;
   const dest = busDest();
   EX.boarding = null; $("explore").hidden = true; $("exDialog").hidden = true; EX = null; exKeys.clear();
   busRide(dest, true);
   return true;
 }
-// ônibus vermelho visto de lado, frente virada para o lado em que a estrada sai (b.dx = quanto já andou)
+// barco de linha (recreio) visto de lado: casco azul, dois conveses brancos com redes coloridas, proa virada para o lado
+// em que o rio sai (b.dx = quanto já andou). O bloco U (4x2) fica na água do porto
 function drawBus(x, b, cx, cy, now) {
-  const f = busSide(), X = Math.round(b.x + b.dx - cx), Y = Math.round(b.y - cy), W = b.w, run = b.dx !== 0, bob = run && Math.floor(now / 90) % 2;
-  x.fillStyle = "rgba(0,0,0,.3)"; x.fillRect(X + 3, Y + 27, W - 6, 4);
-  const y = Y + bob;
-  x.fillStyle = OUTLINE; x.fillRect(X, y + 3, W, 24);
-  x.fillStyle = "#d62828"; x.fillRect(X + 1, y + 4, W - 2, 22);
-  x.fillStyle = "#f4ecd8"; x.fillRect(X + 1, y + 4, W - 2, 3);   // teto claro
-  x.fillStyle = "#9c1a1a"; x.fillRect(X + 1, y + 22, W - 2, 4);   // saia escura
-  x.fillStyle = "#f2c230"; x.fillRect(X + 1, y + 18, W - 2, 2);   // faixa amarela
-  const front = f < 0 ? X + 1 : X + W - 9;
-  for (let k = 0; k < 6; k++) { const wx = f < 0 ? X + 12 + k * 8 : X + 3 + k * 8; x.fillStyle = OUTLINE; x.fillRect(wx, y + 8, 7, 8); x.fillStyle = "#9ad0e8"; x.fillRect(wx + 1, y + 9, 5, 6); x.fillStyle = "#e8f6ff"; x.fillRect(wx + 1, y + 9, 2, 2); }
-  x.fillStyle = OUTLINE; x.fillRect(front, y + 7, 8, 12); x.fillStyle = "#bfe8ff"; x.fillRect(front + 1, y + 8, 6, 9);   // para-brisa
-  const door = f < 0 ? X + 11 : X + W - 19; x.fillStyle = OUTLINE; x.fillRect(door - 1, y + 8, 1, 17);   // porta perto da frente
-  x.fillStyle = "#ffe98a"; x.fillRect(f < 0 ? X + 1 : X + W - 3, y + 21, 2, 2);   // farol
-  for (const wx of [X + 10, X + W - 14]) {
-    x.fillStyle = OUTLINE; x.fillRect(wx, Y + 23, 8, 7); x.fillStyle = "#3a3a40"; x.fillRect(wx + 1, Y + 24, 6, 5);
-    x.fillStyle = "#a8a8b0"; x.fillRect(wx + 3, Y + 26, 2, 1); if (run && Math.floor(now / 70) % 2) x.fillRect(wx + 3, Y + 25, 1, 3);
-  }
-  if (run) { x.fillStyle = "#c8c4b8a0"; x.fillRect(f < 0 ? X + W + 2 : X - 5, Y + 24 - (Math.floor(now / 120) % 3), 3, 2); }   // fumaça do escapamento
+  const f = busSide(), X = Math.round(b.x + b.dx - cx), Y = Math.round(b.y - cy), W = b.w, run = b.dx !== 0;
+  const y = Y + (Math.floor(now / (run ? 160 : 600)) % 2);   // balança na água
+  const R = (a, bb, w, h, col) => { x.fillStyle = col; x.fillRect(a, bb, w, h); };
+  const bow = f < 0 ? X : X + W - 8;   // proa
+  // casco (com a proa inclinada) e a faixa vermelha
+  R(X + 2, y + 18, W - 4, 11, OUTLINE); R(X + 3, y + 19, W - 6, 9, "#1f4a8a"); R(X + 3, y + 19, W - 6, 2, "#d62828");
+  for (let k = 0; k < 8; k++) { const px = f < 0 ? X + k : X + W - 1 - k; R(px, y + 18 + k, 1, 11 - k, k ? "#1f4a8a" : OUTLINE); }
+  // convés de baixo (janelas) e de cima (redes coloridas penduradas)
+  R(X + 6, y + 9, W - 14, 10, OUTLINE); R(X + 7, y + 10, W - 16, 8, "#f4f1e8");
+  for (let k = 0; k < 6; k++) { const wx = X + 9 + k * 8; R(wx, y + 12, 5, 4, "#2a5a8a"); R(wx, y + 12, 2, 2, "#bfe8ff"); }
+  R(X + 10, y + 1, W - 22, 9, OUTLINE); R(X + 11, y + 2, W - 24, 7, "#f4f1e8"); R(X + 9, y + 1, W - 18, 2, "#2a8a5a");   // teto verde
+  const redes = ["#e2363d", "#ffd23a", "#3a8ad8", "#e87ab0", "#7ac83a"];
+  for (let k = 0; k < 5; k++) { const rx = X + 14 + k * 7; R(rx, y + 5, 5, 2, redes[k]); R(rx + 1, y + 7, 3, 1, redes[k]); }
+  R(f < 0 ? X + W - 10 : X + 8, y - 3, 2, 5, OUTLINE);   // chaminé
+  R(bow + (f < 0 ? 2 : 4), y + 15, 2, 2, "#ffe98a");   // luz da proa
+  // marola: parada, só uma linha; andando, espuma atrás
+  x.fillStyle = "#ffffffc0"; x.fillRect(X + 4, Y + 29, W - 8, 1);
+  if (run) for (let k = 0; k < 3; k++) { const ex = f < 0 ? X + W + 2 + k * 5 : X - 6 - k * 5; R(ex, Y + 24 + (Math.floor(now / 90 + k) % 3), 3, 2, "#e8f6ff"); }
+  if (run && Math.floor(now / 200) % 2) R(f < 0 ? X + W - 10 : X + 8, y - 6 - (Math.floor(now / 100) % 3), 2, 2, "#c8c4b8");   // fumaça da chaminé
 }
 // dormir numa rede ou tenda: passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
 // no motel do Ver-o-Peso, antes da faixa passa a cena do quarto (Rhanon dormindo e a janela escurecendo ou clareando)
@@ -1272,7 +1274,7 @@ function exIntro() {
   const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), seat = campSeat(f, -1);
   EX.camp = {kind: "intro", W: campWake("intro"), t0: performance.now(), dur: campWake("intro") + 2600, x: seat.x, y: seat.y, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
   h.x = EX.camp.x; h.y = EX.camp.y; h.dir = "down"; h.aim = {x: 0, y: 1};
-  exToast(t("Ananindeua (PA) · manhã na aldeia..."));
+  exToast(t("Aldeia Jasytatá (PA) · manhã na beira do Tapajós..."));
 }
 /* tutorial (jogo novo): depois de acordar, o caçador ensina os controles; só então o Rhanon anda e a ajuda aparece */
 const TUTORIAL = [

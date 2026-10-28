@@ -1,0 +1,42 @@
+/* desenhos dos pontos dos mapas: cada área tem um disco da cor dela com um desenhinho que lembra o lugar (oca na aldeia,
+   canoa no igarapé, mandacaru na caatinga...). MAP_ICON[k] = [cor do disco, desenho em SVG numa caixa de -9 a 9].
+   No mapa grande, as cidades usam o desenho do lugar de chegada (CITY_ICON). */
+const MI = {k: "#1a1426", c: "#f6e9c4", l: "#6fc06a", L: "#2f7a3a", t: "#7a4a24", w: "#8fd8ff", r: "#e2363d", s: 'stroke="#1a1426" stroke-width="1.2"'};
+const MI_TREE = (x, y, r, col) => `<rect x="${x - 1.3}" y="${y}" width="2.6" height="${r + 2}" fill="${MI.t}"/><circle cx="${x}" cy="${y - r * .55}" r="${r}" fill="${col}" ${MI.s}/>`;
+const MI_WAVE = (y, col = MI.w, w = 1.8) => `<path d="M-8 ${y} q2 -2.6 4 0 t4 0 t4 0 t4 0" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+const MI_HOUSE = (wall, roof) => `<rect x="-7.5" y="-3" width="15" height="10" fill="${wall}" ${MI.s}/><path d="M-9 -3 L0 -9 L9 -3Z" fill="${roof}" ${MI.s}/><rect x="-5" y="-0.5" width="3" height="3" fill="${MI.c}"/><rect x="2" y="-0.5" width="3" height="3" fill="${MI.c}"/><rect x="-1.5" y="3" width="3" height="4" fill="${MI.k}"/>`;
+const MAP_ICON = {
+  aldeia: ["#a8541c", `<path d="M-8 7 Q-8 -9 0 -9 Q8 -9 8 7Z" fill="#d8b060" ${MI.s}/><path d="M-5 -4 Q0 -7 5 -4 M-6 1 Q0 -2 6 1" fill="none" stroke="#9a7430" stroke-width="1"/><path d="M-2 7 V2 H2 V7" fill="${MI.k}"/>`],
+  feira: ["#c8902a", `<rect x="-8" y="-1" width="16" height="8" fill="${MI.c}" ${MI.s}/><path d="M-9.5 -1 L-6.5 -8 H6.5 L9.5 -1Z" fill="${MI.r}" ${MI.s}/><path d="M-2.5 -8 L-3.5 -1 M2.5 -8 L3.5 -1" stroke="${MI.c}" stroke-width="1.6"/><circle cx="-4" cy="3" r="1.6" fill="#7a3ab0"/><circle cx="1" cy="3" r="1.6" fill="#ffd23a"/>`],
+  mata: ["#3f9a5c", MI_TREE(0, 1, 6.5, MI.l)],
+  fechada: ["#1f5a34", MI_TREE(-3.5, 2, 5, MI.L) + MI_TREE(3.5, 0, 5.5, "#4a9a4a")],
+  rio: ["#2a7ab8", MI_WAVE(-3) + MI_WAVE(3) + MI_WAVE(8, "#cfeeff", 1.2)],
+  igarape: ["#1f6a8a", `<path d="M-9 1 Q0 7 9 1Z" fill="${MI.t}" ${MI.s}/><path d="M3 -8 L-1 4" stroke="${MI.c}" stroke-width="1.6" stroke-linecap="round"/>` + MI_WAVE(7)],
+  manguezal: ["#3a4a2a", `<circle cy="-5" r="5.5" fill="${MI.L}" ${MI.s}/><path d="M0 -1 V6 M0 2 Q-5 3 -6 6 M0 2 Q5 3 6 6" fill="none" stroke="#c8a060" stroke-width="1.8" stroke-linecap="round"/>` + MI_WAVE(6, "#c8a060", 1.4) + MI_WAVE(9, "#8fd8ff", 1.2)],   // igapó: árvore com o pé na água
+  seringal: ["#6a5a4a", `<rect x="-3" y="-3" width="6" height="11" fill="#8a6a4a" ${MI.s}/><ellipse cy="-6" rx="8" ry="4.5" fill="#4a8a42" ${MI.s}/><path d="M-3 0 L3 2.5 M-3 3.5 L3 6" stroke="${MI.c}" stroke-width="1.2"/><path d="M3 4 h4.5 v3.5 h-4.5z" fill="${MI.c}" ${MI.s}/>`],
+  varzea: ["#a8862a", `<ellipse cy="2" rx="5" ry="6" fill="#4a4a54" ${MI.s}/><path d="M-4.5 -2 Q-10 -4 -8 -9 M4.5 -2 Q10 -4 8 -9" fill="none" stroke="${MI.c}" stroke-width="2" stroke-linecap="round"/><circle cx="-2" cy="1" r="1" fill="${MI.c}"/><circle cx="2" cy="1" r="1" fill="${MI.c}"/>`],
+  parada: ["#1f5a8a", `<path d="M-9 1 H9 L6 6 H-7Z" fill="#1f4a8a" ${MI.s}/><rect x="-6" y="-5" width="11" height="6" fill="${MI.c}" ${MI.s}/><rect x="-7" y="-7" width="13" height="2" fill="#2a8a5a" ${MI.s}/><path d="M-4 -3 h2 M0 -3 h2 M4 -3 h1" stroke="#2a5a8a" stroke-width="1.4"/>` + MI_WAVE(8, "#cfeeff", 1.2)],
+  veropeso: ["#1f5a8a", `<path d="M-8 7 V-2 L-5 -7 L-2 -2 V7Z M2 7 V-2 L5 -7 L8 -2 V7Z" fill="#9fd0e8" ${MI.s}/><rect x="-2" y="0" width="4" height="7" fill="${MI.c}" ${MI.s}/>` + MI_WAVE(8, "#cfeeff", 1.2)],
+  cidadevelha: ["#2a4a8a", MI_HOUSE("#5a8ad8", MI.r)],
+  porto: ["#4a5a6a", `<path d="M-6 8 V-8 H8 M-6 -3 L3 -8 M6 -8 V-1" fill="none" stroke="${MI.c}" stroke-width="2" stroke-linecap="round"/><rect x="3.5" y="-1" width="5" height="3.5" fill="${MI.r}" ${MI.s}/>`],
+  baixadas: ["#5a6a3a", `<rect x="-7" y="-5" width="14" height="6" fill="#d8b060" ${MI.s}/><path d="M-8.5 -5 L0 -9.5 L8.5 -5Z" fill="${MI.t}" ${MI.s}/><path d="M-5 1 V8 M0 1 V8 M5 1 V8" stroke="${MI.t}" stroke-width="1.6"/>` + MI_WAVE(6)],
+  praiagrande: ["#1f6a9a", MI_HOUSE("#cfe4f6", "#e8743a") + `<path d="M-6 4 h12" stroke="#2a5aa8" stroke-width="1" stroke-dasharray="1.5 1.5"/>`],
+  mangueilha: ["#5a4a2a", `<circle cy="-5" r="5" fill="${MI.L}" ${MI.s}/><path d="M0 -2 V8 M0 1 Q-6 3 -7 8 M0 1 Q6 3 7 8" fill="none" stroke="#c8a060" stroke-width="1.8" stroke-linecap="round"/><ellipse cx="5" cy="6" rx="3" ry="2" fill="${MI.r}" ${MI.s}/>`],
+  lencois: ["#2a8ac8", `<path d="M-9 6 Q-4 -5 1 6Z" fill="${MI.c}" ${MI.s}/><path d="M-2 6 Q4 -8 9 6Z" fill="#f0dca0" ${MI.s}/>` + MI_WAVE(8, "#cfeeff", 1.4)],
+  trocatroca: ["#b85a2a", `<rect x="-8" y="-1" width="16" height="8" fill="${MI.c}" ${MI.s}/><path d="M-9.5 -1 L-6.5 -8 H6.5 L9.5 -1Z" fill="#2a8a5a" ${MI.s}/><circle cx="-3" cy="3" r="1.6" fill="#e8a020"/><circle cx="2" cy="3" r="1.6" fill="${MI.r}"/>`],
+  encontro: ["#2a6a8a", `<path d="M-9 -6 Q-3 -2 0 2 M9 -6 Q3 -2 0 2 M0 2 V9" fill="none" stroke="${MI.w}" stroke-width="2.6" stroke-linecap="round"/><path d="M9 -6 Q3 -2 0 2" fill="none" stroke="#c8a060" stroke-width="2.6" stroke-linecap="round"/>`],
+  recifeantigo: ["#8a3a6a", MI_HOUSE("#f0c040", "#2a8a8a")],
+  olinda: ["#3a7a4a", `<path d="M-9 9 Q0 2 9 9Z" fill="${MI.l}" ${MI.s}/><rect x="-4" y="-3" width="8" height="8" fill="${MI.c}" ${MI.s}/><path d="M-5 -3 L0 -7 L5 -3Z" fill="${MI.r}" ${MI.s}/><path d="M0 -11 V-7 M-1.6 -9.4 H1.6" stroke="${MI.k}" stroke-width="1.2"/>`],
+  orla: ["#2a7a9a", `<path d="M-9 1 Q0 7 9 1 L7 -1 H-7Z" fill="${MI.t}" ${MI.s}/><path d="M-9 1 Q-10 -4 -7 -6 L-6 -2Z" fill="#e8a020" ${MI.s}/><path d="M1 -1 V-9 L6 -2Z" fill="${MI.c}" ${MI.s}/>` + MI_WAVE(7)],
+  caatinga: ["#b8763a", `<path d="M-1.6 8 V-7 Q0 -9.5 1.6 -7 V8Z" fill="#5a9a3a" ${MI.s}/><path d="M-1.6 1 H-5 V-4 M1.6 3 H5 V-2" fill="none" stroke="#5a9a3a" stroke-width="2.4" stroke-linecap="round"/>`],
+  serra: ["#a84a2a", `<path d="M-9 7 L-3 -6 L1 1 L4 -3 L9 7Z" fill="#d8784a" ${MI.s}/><path d="M-3 -6 L-1 -2 L-5 -2Z" fill="${MI.c}"/>`],
+  curitiba: ["#4a3a8a", `<rect x="-1.2" y="-1" width="2.4" height="9" fill="${MI.t}"/><path d="M-8 -1 Q0 -6 8 -1 M-6 -5 Q0 -9 6 -5" fill="none" stroke="#3a7a3a" stroke-width="2.6" stroke-linecap="round"/>`]
+};
+MAP_ICON.terminal = MAP_ICON.parada;   // o cais de Belém também é o barco de linha
+// no mapa grande, cada cidade aparece com o desenho do lugar dela
+const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", curitiba: "curitiba"};
+// disco do ponto do mapa (r = raio): cor da área, aro claro e o desenho; sem desenho, a bolinha de antes
+function mapIcon(k, r = 15) {
+  const a = MAP_ICON[k]; if (!a) return `<circle r="10"/>`;
+  return `<g class="micon"><circle class="mdisc" r="${r}" fill="${a[0]}"/><g transform="scale(${(r / 13).toFixed(2)})">${a[1]}</g></g>`;
+}

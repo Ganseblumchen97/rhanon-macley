@@ -45,7 +45,7 @@ const ANIMALS = [
   {id:"sapo", lv:10, name:"Sapo-cururu", hp:66, xp:58, gold:[24,36], damage:[6,11], size:"pequeno", special:"picada", moves:MV("Linguada","Pulo","Leite venenoso"), intro:"Um sapo-cururu do tamanho de um prato coaxa no barranco. As costas brilham de veneno."},
   {id:"pirarucu", lv:14, boss:true, name:"Pirarucu", hp:165, xp:210, gold:[120,160], damage:[9,15], size:"chefe", special:"estouro", moves:MV("Mordida","Rabanada","Pulo para fora d'água"), intro:"Uma sombra de três metros sobe pra respirar. O pirarucu viu Rhanon."},
   {id:"boto_encantado", lv:15, boss:true, name:"Boto encantado", hp:175, xp:230, gold:[130,170], damage:[9,15], size:"chefe", special:["encanto", "drenar"], moves:MV("Focinhada","Salto","Encanto"), intro:"Uma música toca longe e um boto de chapéu branco aparece na beira."},
-  // manguezal (depois do igarapé)
+  // igapó, a mata alagada (depois do igarapé; o id continua "manguezal" por causa dos saves)
   {id:"caranguejo", lv:12, name:"Caranguejo-uçá", hp:92, xp:84, gold:[34,50], damage:[8,14], size:"médio", special:"prender", moves:MV("Pinçada","Investida de lado","Prender na garra"), intro:"A lama borbulha e um caranguejo-uçá sai de garras abertas."},
   {id:"guaxinim", lv:13, name:"Mão-pelada", hp:90, xp:88, gold:[36,52], damage:[9,14], size:"médio", special:"roubo", moves:MV("Arranhão","Investida","Mão leve"), intro:"Um mão-pelada larga o caranguejo que lavava e olha pra bolsa."},
   {id:"macarico", lv:12, name:"Maçarico", hp:80, xp:80, gold:[30,46], damage:[9,14], size:"pequeno", special:"mergulho", moves:MV("Bicada","Corrida na lama","Bicada certeira"), intro:"Um bando de maçaricos corre na lama. Um deles não foi com a cara do Rhanon."},
@@ -183,7 +183,7 @@ const ZONES = {
   baixadas: {n: "Baixadas", lv: 24, pool: [["mucura",3],["rato_dagua",3],["cachorro_bravo",3],["ladrao_bike",3]], boss: "jacare_canal"},
   varzea: {n: "Várzea dos búfalos", lv: 16, pool: [["bufalo",3],["soco",3],["jararaca",3],["capivara",1],["jacaretinga",1]], boss: "bufalo_touro"},
   seringal: {n: "Seringal abandonado", lv: 14, pool: [["urubu",3],["cobra_cipo",3],["ourico",3],["guaxinim",1]], boss: "gaviao_real"},
-  manguezal: {n: "Manguezal", lv: 12, pool: [["caranguejo",3],["guaxinim",3],["macarico",3],["garca",1],["jacaretinga",1],["piranha",2]], boss: "caranguejo_rei"},
+  manguezal: {n: "Igapó", lv: 12, pool: [["caranguejo",3],["guaxinim",3],["macarico",3],["garca",1],["jacaretinga",1],["piranha",2]], boss: "caranguejo_rei"},
   fechada: {n: "Mata fechada", lv: 3, pool: [["surucucu",3],["onca",2],["harpia",2],["queixada",2],["jaguatirica",3],["anta",1],["caranguejeira",3]], boss: "onca_rei"}
 };
 // na batalha, estes bichos ficam meio dentro de um laguinho (os outros, no chão de terra)
@@ -279,10 +279,10 @@ const ANIMAL_FACTS = {
   sapo: "O cururu solta um leite venenoso pelas glândulas atrás da cabeça quando é apertado.",
   pirarucu: "Um dos maiores peixes de água doce do mundo. Sobe pra respirar a cada poucos minutos, e as escamas viram lixa.",
   boto_encantado: "Lenda da Amazônia: em noite de festa o boto vira um moço de branco, de chapéu pra esconder o furo da cabeça, e encanta quem passa.",
-  caranguejo: "Vive em tocas na lama do mangue e troca de casca pra crescer. Na época de acasalar sai todo mundo de uma vez: é a \"andada\".",
+  caranguejo: "A Amazônia tem caranguejo de água doce: vive escondido nas raízes do igapó e troca de casca pra crescer.",
   guaxinim: "O mão-pelada tem as patas da frente sem pelo, como mãos, e costuma molhar a comida antes de comer.",
   macarico: "Muitos maçaricos voam milhares de quilômetros do norte do mundo até as praias e mangues do Pará.",
-  caranguejo_rei: "Os catadores contam de um caranguejo velho e enorme que nunca sai da toca de dia e manda no mangue inteiro.",
+  caranguejo_rei: "Os pescadores contam de um caranguejo velho e enorme que nunca sai das raízes de dia e manda no igapó inteiro.",
   matinta: "Lenda do Pará: uma velha que vira pássaro e assobia de noite. Quem promete fumo para ela, no outro dia recebe a visita da velha cobrando.",
   urubu: "O urubu-rei tem a cabeça colorida e o faro mais fino entre os urubus: os outros esperam ele abrir a carcaça.",
   cobra_cipo: "Fina e comprida, some no meio dos galhos. Caça lagartos e sapos no alto das árvores.",

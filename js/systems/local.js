@@ -35,15 +35,15 @@ function selectSub(id, msg) {
   }
   else if (id === "parada") {   // cobrador vende a passagem para Belém (BUS em data/world.js)
     btn(t("Ir até a estrada"), () => startExplore(id), false, i);
-    if (G.passagem && BUS.open) { btn(t("Embarcar no ônibus para Belém"), () => busRide("belem"), false, i); lh(t("A passagem vale ida e volta: do terminal de Belém dá pra voltar quando quiser.")); }
-    else if (G.passagem) lh(t("Passagem comprada! Quando o ônibus pra Belém voltar a rodar, é só embarcar aqui."));
+    if (G.passagem && BUS.open) { btn(t("Embarcar no barco para Belém"), () => busRide("belem"), false, i); lh(t("A passagem vale ida e volta: do cais de Belém dá pra voltar quando quiser.")); }
+    else if (G.passagem) lh(t("Passagem comprada! Quando o barco pra Belém voltar a sair, é só embarcar aqui."));
     else btn(t("Comprar passagem para Belém · R$ {n}", {n: BUS.price}), buyTicket, !BUS.open || G.money < BUS.price, i);
-    if (!BUS.open) lh(t("O cobrador avisa: \"O ônibus pra Belém ainda não tá saindo. Volta daqui uns dias!\" (em breve: episódio 2)"));
+    if (!BUS.open) lh(t("O comandante avisa: \"O barco pra Belém ainda não tá saindo. Volta daqui uns dias!\" (em breve: episódio 2)"));
     else if (!G.passagem && G.money < BUS.price) lh(t("Faltam R$ {n}. Lembrança de bicho forte vale bem mais na feira.", {n: BUS.price - G.money}));
   }
   else if (id === "terminal") {   // em Belém: o mesmo ônibus volta pela BR-316
-    btn(t("Entrar no terminal"), () => startExplore(id), false, i);
-    btn(t("Voltar para Ananindeua"), () => busRide("ananindeua"), false, i);
+    btn(t("Entrar no cais"), () => startExplore(id), false, i);
+    btn(t("Voltar para a aldeia"), () => busRide("ananindeua"), false, i);
     lh(t("A passagem vale ida e volta. Na aldeia tem a fogueira e as matas de sempre."));
   }
   else if (id === "orla") {
@@ -91,8 +91,9 @@ function rest(kind, quiet, toast) {
   if (toast) return msg;
   localDone("aldeia", msg);
 }
-/* viagem de ônibus pela BR-316 (passagem de ida e volta): dá para embarcar na cabine/terminal ou direto no mapa do
-   Pará. O ônibus anda pela estrada do mapa grande, de uma cidade até a outra, e o mapa entra na cidade de chegada. */
+/* viagem entre cidades (passagem de ida e volta): no Norte, o barco de linha desce o rio (porto do Tapajós <-> cais de
+   Belém); no Nordeste, o ônibus pela estrada. Dá para embarcar no porto/cais ou direto no mapa grande; o veículo anda
+   pelo caminho do mapa (#route), de uma cidade até a outra, e o mapa entra na cidade de chegada. */
 const BUS_MS = 3600;
 // toStage = embarcou na fase da rodovia: chegando, entra direto na fase da cabine/terminal da outra cidade
 function busRide(city, toStage) {
@@ -104,20 +105,22 @@ function busRide(city, toStage) {
   const road = $("route"), L = road.getTotalLength(), R = MAP_REGIONS[MAP_REGION].route;
   const at = k => { const n = R.indexOf(k); if (R.length === 2) return n ? L : 0; let s = 0; for (let j = 1; j <= n; j++) s += Math.hypot(LOC[R[j]].x - LOC[R[j - 1]].x, LOC[R[j]].y - LOC[R[j - 1]].y); return s; };
   const L0 = at(G.loc), L1 = at(city);
-  $("mk").style.display = "none"; $("mkbus").style.display = "";
+  const veh = $(MAP_REGION === "norte" ? "mkboat" : "mkbus");   // no Norte se viaja de barco pelo rio; no Nordeste, de ônibus
+  $("mk").style.display = "none"; veh.style.display = "";
   const volta = G.loc === "recife" || G.loc === "petrolina";   // voltando para o litoral (Teresina, Recife) pelo sertão
-  $("info").innerHTML = `<h2>${t("Na estrada…")}</h2><p>${t({belem: "O ônibus segue pela BR-316 rumo a Belém.", ananindeua: "O ônibus volta pela BR-316 para Ananindeua.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: volta ? "O ônibus desce do sertão de volta para Recife." : "O ônibus atravessa o sertão rumo a Recife.", petrolina: "O ônibus sobe pelo agreste e pelo sertão rumo a Petrolina."}[city])}</p>`;
+  const onRiver = MAP_REGION === "norte";
+  $("info").innerHTML = `<h2>${t(onRiver ? "No rio…" : "Na estrada…")}</h2><p>${t({belem: "O barco desce o Tapajós e o Amazonas rumo a Belém.", ananindeua: "O barco sobe o Amazonas e o Tapajós de volta para a aldeia.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: volta ? "O ônibus desce do sertão de volta para Recife." : "O ônibus atravessa o sertão rumo a Recife.", petrolina: "O ônibus sobe pelo agreste e pelo sertão rumo a Petrolina."}[city])}</p>`;
   let t0 = 0, last = null, vrum = 0;
   const f = ts => {
     t0 = t0 || ts;
     const u = Math.min(1, (ts - t0) / (REDUCE ? 400 : BUS_MS)), e = u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2, p = road.getPointAtLength(L0 + (L1 - L0) * e);
-    const flip = last && p.x < last.x - .01 ? -1 : last && p.x > last.x + .01 ? 1 : $("mkbus").dataset.f || 1;   // o ônibus vira para o lado em que anda
-    $("mkbus").dataset.f = flip; $("mkbus").setAttribute("transform", `translate(${p.x} ${p.y}) scale(${1.6 * flip} 1.6) translate(0 ${Math.floor(ts / 120) % 2})`);
+    const flip = last && p.x < last.x - .01 ? -1 : last && p.x > last.x + .01 ? 1 : veh.dataset.f || 1;   // o veículo vira para o lado em que anda
+    veh.dataset.f = flip; veh.setAttribute("transform", `translate(${p.x} ${p.y}) scale(${1.6 * flip} 1.6) translate(0 ${Math.floor(ts / 120) % 2})`);
     last = p;
-    if (ts - vrum > 650) { vrum = ts; sfx("onibus"); }
+    if (ts - vrum > 650) { vrum = ts; sfx(veh.id === "mkboat" ? "barco" : "onibus"); }
     if (u < 1) return requestAnimationFrame(f);
     G.loc = city; G.sub = CITY[city].gate; G.seen[G.sub] = true; save();
-    $("mkbus").style.display = "none"; $("mk").style.display = ""; moving = false; drawMap(); sfx("more");
+    veh.style.display = "none"; $("mk").style.display = ""; moving = false; drawMap(); sfx("more");
     buildLocalNodes();
     if (toStage) { if (city === "belem") G.belemVisto = true; save(); return startExplore(G.sub); }   // desce do ônibus na fase do terminal (ou da BR-316)
     openLocal();   // entra na cidade de chegada, no terminal (ou na cabine da BR-316)
@@ -129,7 +132,7 @@ function busRide(city, toStage) {
 function buyTicket() {
   if (!BUS.open || G.passagem || G.money < BUS.price) return;
   G.money -= BUS.price; G.passagem = true; save(); sfx("more");
-  localDone("parada", t("Passagem pra Belém comprada! Vale ida e volta: embarca aqui na cabine ou direto no mapa do Pará."));
+  localDone("parada", t("Passagem pra Belém comprada! Vale ida e volta: embarca aqui no porto ou direto no mapa do Norte."));
 }
 // compra um item da barraca de comida (vai para a bolsa)
 function buy(id) {
@@ -311,7 +314,7 @@ function buyGear(slot, id) {
 /* ---------- inventário (no mapa de Ananindeua e, com I, dentro das fases) ---------- */
 // resumo da bolsa: roupa e arma ficam no Equipamento (E); aqui só a defesa, o pedido e o valor das peles
 // situação do notebook na bolsa (enquanto não liga)
-const nbLine = () => !G.nb.tem || G.nb.on ? "" : " · " + (nbReady() ? t("Notebook: pronto, falta só uma tomada (rodoviária da BR-316)") : t("Notebook: falta {pecas}", {pecas: nbMissing().map(nbPartName).join(", ")}));
+const nbLine = () => !G.nb.tem || G.nb.on ? "" : " · " + (nbReady() ? t("Notebook: pronto, falta só uma tomada (porto do Tapajós)") : t("Notebook: falta {pecas}", {pecas: nbMissing().map(nbPartName).join(", ")}));
 function invSummary() {
   const ids = peltIds();
   return t("Defesa: {def} · Dinheiro: R$ {n}", {def: defense(), n: G.money}) + (ids.length ? " · " + t("Lembranças valem R$ {n} na feira", {n: peltsTotal()}) : "") + nbLine() + questLine();
@@ -393,7 +396,7 @@ function revealPath(k, done) {
     node.animate([{transform: `translate(${x}px,${y}px) scale(0)`}, {transform: `translate(${x}px,${y}px) scale(1.35)`, offset: .6}, {transform: `translate(${x}px,${y}px) scale(1)`}], {duration: 420, easing: "ease-out"});
     if (k === CITY[curCity()].gate) svg.querySelector(".lroad")?.parentNode.style.removeProperty("display");   // a estrada aparece com a cabine
     sfx("missao"); G.seen[k] = true; save();
-    box.insertAdjacentHTML("beforeend", `<p class="hint">${k === "parada" ? t("Fim da trilha: a BR-316, de onde sai o ônibus pra Belém.") : t("Agora a trilha segue até: {lugar}.", {lugar: SUB[k].n})}</p>`);
+    box.insertAdjacentHTML("beforeend", `<p class="hint">${k === "parada" ? t("Fim da trilha: o porto do Tapajós, de onde sai o barco pra Belém.") : t("Agora a trilha segue até: {lugar}.", {lugar: SUB[k].n})}</p>`);
     btn(t("Continuar"), closeReveal, false, box); box.querySelector(".cmd").focus({preventScroll: true});
     revealReady = true;
   };
@@ -433,7 +436,9 @@ function buildLocalNodes() {
     const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
     return `M${p1} C${c1} ${c2} ${p2}`;
   };
-  $("lriver").setAttribute("d", C.river);
+  $("lriver").setAttribute("d", C.river); $("lriver2").setAttribute("d", C.river);
+  $("lsvg").dataset.look = C.look || "mata";   // terreno do mapa: mata, cidade, litoral ou sertão (padrões em index.html)
+  $("lroad").classList.toggle("rio", C.map === "norte");   // no Norte a saída é pelo rio (barco), não pela estrada
   $("lroad").innerHTML = `<path class="lroad" d="${C.road}"/><path class="lroad-faixa" d="${C.road}"/><text class="lroad-txt" x="${C.sign[0]}" y="${C.sign[1]}">${C.sign[2]}</text>`;
   $("lroutes").innerHTML = ROUTE.slice(1).map((k, i) => `<path class="lroute-base" data-b="${k}" d="${curve(i)}"/><path class="lroute" data-a="${ROUTE[i]}" data-b="${k}" d="${curve(i)}"/>`).join("");
   // pontes: anda pela trilha procurando onde ela passa por cima do rio, e põe uma ponte de tábuas alinhada com a trilha
@@ -453,7 +458,7 @@ function buildLocalNodes() {
   $("lbridges").innerHTML = bridges;
   const mark = k => k === C.gate && C.cabin !== false   // a BR-316 (e o terminal de Belém) é uma cabine de cobrador, não uma bolinha
     ? '<g class="cabin"><circle r="13" class="hit"/><rect x="-9" y="-12" width="18" height="15"/><path d="M-12 -12L0 -21L12 -12Z"/><rect class="win" x="-5" y="-8" width="10" height="5"/></g>'
-    : '<circle r="10"/>';
+    : mapIcon(k);   // desenho do lugar (gfx/mapart.js)
   $("lnodes").innerHTML = ROUTE.map(k => [k, SUB[k]]).map(([k, l]) => `<g class="node" id="ln-${k}" data-k="${k}" transform="translate(${l.x} ${l.y})" tabindex="0" role="button" aria-label="${l.n}">${mark(k)}<text y="28" text-anchor="middle">${l.s || l.n}</text></g>`).join("");   // s = nome curto no mapa
   document.querySelectorAll("#lnodes .node").forEach(n => {
     const k = n.dataset.k, pick = () => { if (!moving) selectSub(k); };

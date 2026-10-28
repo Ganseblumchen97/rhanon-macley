@@ -56,7 +56,7 @@ function makeHeroActor() {
     if (!cv || !cv.isConnected || !cv.offsetParent) return;
     const el = t - since, battle = mode === "battle";
     const pose = {...(battle ? RIG_LEGS.stance : RIG_LEGS.stand), weapon: weaponOn ? "up" : null};
-    let lift = 0, ox = 0, flash = false, rot = 0, flip = false, coil = false;
+    let lift = 0, ox = 0, flash = false, rot = 0, flip = false, coil = false, view = "back";   // view: o giro da Fúria passa por perfil e frente
     const breathe = REDUCE ? 0 : Math.floor(t / (battle ? 420 : 650)) % 2;
     const walk = speed => { const f = Math.floor(t / speed) % 4; Object.assign(pose, RIG_LEGS[["walkA", "stand", "walkB", "stand"][f]]); pose.dy = f % 2 ? 0 : 1; };
     switch (state) {
@@ -83,13 +83,18 @@ function makeHeroActor() {
         pose.lean = el < 180 ? -1 : el < 620 ? 2 : 0; pose.weapon = el >= 180 && el < 620 ? "stab" : "guard";
         if (el > 850) set("idle");
         break;
-      case "fury": {   // Fúria: estocada alta (pulando), estocada baixa (agachado) e, no último, gira a lança e salta no golpe final
+      case "fury": {   // Fúria: estocada alta (pulando), estocada baixa (agachado), com 4 golpes um giro no lugar, e no último gira a lança e salta
         const n = FURY_HITS, gap = REDUCE ? 1 : FURY_GAP, i = Math.max(0, Math.min(n - 1, Math.floor((el - (FURY_LEAD - 150)) / gap)));
-        const loc = el - (FURY_LEAD - 150 + i * gap), last = i === n - 1, wind = loc < 150, kind = last ? "final" : i % 2 ? "baixa" : "alta";
+        const loc = el - (FURY_LEAD - 150 + i * gap), last = i === n - 1, wind = loc < 150;
+        const kind = last ? "final" : n >= 4 && i === n - 2 ? "giro" : i % 2 ? "baixa" : "alta";
         if (el < FURY_LEAD - 150) { pose.weapon = "guard"; pose.lean = 1; break; }   // correndo até o bicho
         if (kind === "alta") {
           if (wind) { pose.weapon = "guard"; pose.lean = -1; pose.dy = 1; }
           else { pose.weapon = "stab"; pose.lean = 2; lift = loc < 260 ? Math.round(Math.sin((loc - 150) / 110 * Math.PI) * 4) : 0; }
+        } else if (kind === "giro") {   // rodopia (costas, perfil, frente, perfil) e acerta de lado com a lança na diagonal
+          if (wind) { const f = Math.floor(loc / 38) % 4; view = ["back", "side", "front", "side"][f]; flip = f === 3; pose.weapon = "guard"; lift = 1; }
+          else { pose.weapon = "diag"; pose.lean = 3; ox = 2; }
+          if (!wind && lastFx !== 8) { lastFx = 8; const [gx, gy] = grid(SX + 26, SY + 18); PFX.burst(10, "ring", ["#ffffff", "#bff3ff"], gx, gy, 22, {life: .5}); }
         } else if (kind === "baixa") {
           if (wind) { pose.weapon = "raise"; pose.lean = -1; }
           else { pose.weapon = "stab"; pose.lean = 3; pose.dy = 2; Object.assign(pose, {lf: [8, 40], rf: [24, 40]}); }
@@ -180,7 +185,7 @@ function makeHeroActor() {
     const sw = rot ? 40 : Math.max(8, 22 - Math.round(lift));
     g.fillRect(Math.round((W - sw) / 2) + ox, H - 1, sw, 1);
 
-    const art = heroArt(t), base = art || rigCanvas("back", pose, look, 1), src = flash ? whiteOf(base) : base;
+    const art = heroArt(t), base = art || (view === "side" ? rigSideCanvas({}, look, 1) : rigCanvas(view, pose, look, 1)), src = flash ? whiteOf(base) : base;
     // arte em imagem: pés na mesma linha do desenho de 32x44
     const put = () => art ? g.drawImage(src, 16 - art.width / k / 2, 44 - art.height / k, art.width / k, art.height / k) : g.drawImage(src, 0, 0);
     g.save();

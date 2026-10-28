@@ -1,16 +1,17 @@
 /* Locais do mapa grande (Pará ou Brasil), sublocais de Ananindeua e de Belém, loja e equipamentos. */
 const REQ = {lv: 4, money: 150};   // para Curitiba aparecer e a passagem
 const CURITIBA_OPEN = false;       // false = Curitiba fica escondida (foco em Ananindeua por enquanto)
-/* Mapa grande: "para" (por enquanto: Ananindeua aberta e Belém, a capital, em breve) ou "brasil" (Ananindeua e Curitiba).
+/* Mapa grande: um por região ("norte", "nordeste") ou "brasil" (a aldeia e Curitiba).
    Cada mapa tem o contorno (land), um rio opcional, a trilha tracejada (route) e onde fica cada local de LOC. */
-let MAP_REGION = "para";   // mapa grande da cidade atual (CITY[...].map); muda quando o Rhanon voa para outra região (syncRegion)
+let MAP_REGION = "norte";   // mapa grande da cidade atual (CITY[...].map); muda quando o Rhanon voa para outra região (syncRegion)
 const MAP_REGIONS = {
-  para: {n: "Pará", aria: "Mapa estilizado do Pará, com Ananindeua e Belém",
-    land: ["M63 224 L97 167 L154 110 L211 91 L241 103 L306 179 L333 224 L382 259 L431 255 L458 236 L485 209 L530 221 L549 232 L530 285 L500 323 L466 384 L454 437 L428 490 L393 559 L287 544 L173 540 L127 502 L82 464 L127 357 L150 285 L97 262Z",
-      "M367 213 L401 194 L439 202 L447 221 L424 243 L386 247Z"],   // continente e a ilha de Marajó (a partir de longitude/latitude)
-    river: "M63 281 C130 286 190 282 230 276 S310 240 338 222",   // rio Amazonas
-    // a BR-316 sai de Ananindeua para o sudoeste e faz uma volta antes de chegar a Belém (curve: os dois pontos de controle)
-    route: ["ananindeua", "belem"], pos: {ananindeua: [494, 238], belem: [398, 312]}, curve: [18, 74, 86, -2]},
+  // Norte inteiro (a partir de longitude/latitude): contorno da região, ilha de Marajó, rio Amazonas e rio Tapajós.
+  // A aldeia fica na beira do Tapajós; o barco de linha desce o Tapajós e o Amazonas até Belém (path = caminho do barco)
+  norte: {n: "Norte", aria: "Mapa estilizado da região Norte, com a aldeia no Tapajós e Belém",
+    land: ["M23 379 L45 334 L102 315 L113 252 L102 215 L117 205 L152 186 L168 202 L226 194 L209 145 L254 143 L293 120 L310 139 L316 190 L348 198 L385 186 L426 182 L459 180 L480 139 L492 166 L512 190 L515 213 L500 227 L488 244 L504 260 L533 260 L543 246 L558 239 L592 248 L588 280 L570 309 L566 334 L582 360 L594 383 L599 438 L590 492 L562 498 L533 500 L508 490 L500 430 L451 420 L381 418 L344 377 L336 408 L305 424 L299 502 L266 494 L217 481 L199 444 L172 430 L135 453 L92 453 L90 422 L53 424Z",
+      "M500 235 L521 229 L545 239 L543 252 L521 262 L500 252Z"],
+    river: "M102 315 Q102 315 128 304 Q154 293 182 296 Q209 299 238 300 Q266 301 287 296 Q308 291 332 288 Q357 284 386 280 Q416 276 438 269 Q459 262 474 255 Q488 248 498 242 L508 237 M361 403 Q361 403 367 382 Q373 362 382 342 Q390 321 396 309 Q402 297 409 286 L416 276",
+    route: ["ananindeua", "belem"], pos: {ananindeua: [379, 342], belem: [543, 257]}, path: "M379 342 Q379 342 384 332 Q390 321 396 309 Q402 297 409 286 Q416 276 438 269 Q459 262 474 259 Q488 256 500 261 Q512 266 520 265 Q529 264 536 260 L543 257"},
   // Nordeste: o contorno da região (a partir de longitude/latitude), a ilha de São Luís e o rio São Francisco; a estrada
   // liga as cidades em ordem (São Luís, Teresina, Recife e Petrolina, que volta para o sertão na beira do São Francisco)
   nordeste: {n: "Nordeste", aria: "Mapa estilizado do Nordeste, com São Luís, Teresina, Recife e Petrolina",
@@ -18,16 +19,16 @@ const MAP_REGIONS = {
       "M210 100 L222 94 L230 103 L220 110Z"],   // continente e a ilha de São Luís
     river: "M230 494 C250 440 300 360 363 320 S470 320 519 354",   // rio São Francisco
     route: ["saoluis", "teresina", "recife", "petrolina"], pos: {saoluis: [222, 112], teresina: [276, 188], recife: [564, 280], petrolina: [362, 326]}},
-  brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre Ananindeua e Curitiba",
+  brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre a aldeia e Curitiba",
     land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
-    route: ["ananindeua", "curitiba"], pos: {ananindeua: [322, 168], curitiba: [315, 478]}}
+    route: ["ananindeua", "curitiba"], pos: {ananindeua: [268, 172], curitiba: [315, 478]}}
 };
 /* Regiões do Brasil (mapa do Brasil, systems/world-map.js; ver HISTORIA.md): a viagem vai do Norte ao Sul. pos = ponto no
    contorno de MAP_REGIONS.brasil (viewBox 600x620); map = mapa grande da região (por enquanto só o Pará, no Norte);
    airport = aeroporto que abre os voos de ida e volta para as regiões já visitadas (G.regions). open: false = em breve. */
 const REGIONS = {
-  norte:       {n: "Norte", pos: [215, 200], color: "#3f9a5c", open: true, map: "para", airport: "Aeroporto de Belém",
-    txt: "Onde tudo começou: a aldeia, Ananindeua e Belém. Os bichos e encantados da floresta ficaram bravos com a fumaça de Pytuna."},
+  norte:       {n: "Norte", pos: [215, 200], color: "#3f9a5c", open: true, map: "norte", airport: "Aeroporto de Belém",
+    txt: "Onde tudo começou: a aldeia Jasytatá, na beira do Tapajós, e Belém. Os bichos e encantados da floresta ficaram bravos com a fumaça de Pytuna."},
   nordeste:    {n: "Nordeste", pos: [385, 245], color: "#e8a020", open: true, map: "nordeste", airport: "Aeroporto de São Luís",
     txt: "Sertão, dunas e mangue. Dizem que lá a fumaça secou tudo, e a Comadre Fulozinha anda perdida na mata."},
   centroeste:  {n: "Centro-Oeste", pos: [262, 335], color: "#c8603a", open: false,
@@ -38,7 +39,7 @@ const REGIONS = {
     txt: "Onde a mata de pinheiro acaba. Foi pra lá que a fumaça fugiu. E é lá que fica Curitiba."}
 };
 const LOC = {
-  ananindeua: {n: "Ananindeua (PA)", s: "Ananindeua", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor anda brava, e cada lembrança que os bichos deixam rende uns trocados."},
+  ananindeua: {n: "Aldeia Jasytatá (PA)", s: "Jasytatá", x: 322, y: 168, txt: "Sua aldeia. A mata ao redor anda brava, e cada lembrança que os bichos deixam rende uns trocados."},
   belem: {n: "Belém (PA)", s: "Belém", txt: "A capital do Pará, na beira da baía do Guajará. Prédios, casarões de azulejo, o Ver-o-Peso... e bicho e malandro bem mais fortes que os da mata."},
   teresina: {n: "Teresina (PI)", s: "Teresina", txt: "A capital mais quente do Brasil, entre dois rios: o Parnaíba e o Poti. No encontro das águas, dizem, mora o Cabeça de Cuia."},
   petrolina: {n: "Petrolina (PE)", s: "Petrolina", txt: "O sertão de Pernambuco, na beira do Velho Chico: caatinga seca, bode solto, carranca na proa dos barcos e um rio que nunca deixa a cidade sem água."},
@@ -46,23 +47,23 @@ const LOC = {
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
-/* Mapa de Ananindeua (viewBox 440x325): uma trilha só, em zigue-zague, na ordem de dificuldade (ROUTE).
+/* Mapa da aldeia no Tapajós (viewBox 440x325): uma trilha só, em zigue-zague, na ordem de dificuldade (ROUTE).
    Embaixo, da esquerda para a direita, até cruzar o rio; no meio, de volta para a esquerda, cruzando de novo;
-   e no fim, lá em cima, a cabine do cobrador na BR-316, de onde sai o ônibus para a capital. */
+   e no fim, lá em cima, o porto do Tapajós, de onde sai o barco de linha para a capital. */
 const SUB = {
   aldeia:  {n: "Aldeia", x: 48, y: 242, txt: "A casa do Rhanon. Fogueira pra descansar, tenda pra dormir e gente conhecida."},
-  feira:   {n: "Feira", x: 122, y: 262, txt: "Mandioca, peixe assado, açaí e maniçoba. Aqui se vende lembrança e se compra comida."},
+  feira:   {n: "Vila Paranã", s: "Vila", x: 122, y: 262, txt: "A vila ribeirinha do Tapajós, com feira na beira do rio: mandioca, peixe assado, açaí e maniçoba. Aqui se vende lembrança e se compra comida."},
   mata:    {n: "Mata", x: 188, y: 236, txt: "Trilhas conhecidas. Bichos pequenos e médios, bons para começar."},
   fechada: {n: "Mata fechada", x: 254, y: 264, txt: "Folhas altas, pouca luz e predadores de verdade."},
   rio:     {n: "Beira do rio", x: 376, y: 240, txt: "Do outro lado da ponte: água, lama e dentes. Olho no que se mexe na margem."},
   igarape: {n: "Igarapé", x: 402, y: 156, txt: "Rio acima, a água entra na mata em canais estreitos. Tracajá, garça, boto... e algo enorme lá no fundo."},
-  manguezal: {n: "Manguezal", x: 290, y: 128, txt: "A mata vira lama e raiz. Caranguejo, mão-pelada e, de noite, um assobio que ninguém quer ouvir."},
+  manguezal: {n: "Igapó", x: 290, y: 128, txt: "A mata alagada: árvore com o pé dentro do rio e água escura parada. Caranguejo de água doce, mão-pelada e, de noite, um assobio que ninguém quer ouvir."},
   seringal: {n: "Seringal", x: 212, y: 160, txt: "Seringueiras velhas com marca de faca e a casa do seringueiro caindo aos pedaços. Lá ninguém anda de noite."},
   varzea: {n: "Várzea", x: 120, y: 134, txt: "Campo alagado de capim alto, como no Marajó. Búfalo, socó escondido e, dizem os vaqueiros, um gigante que fede de longe."},
-  parada: {n: "Cabine da BR-316", s: "BR-316", x: 52, y: 62, txt: "No fim da trilha, a estrada. Na cabine de madeira, o cobrador vende a passagem do ônibus pra Belém."},
+  parada: {n: "Porto do Tapajós", s: "Porto", x: 52, y: 62, txt: "No fim da trilha, o porto do rio. Na bilheteria de madeira, o comandante vende a passagem do barco de linha pra Belém."},
   /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
      pela Cidade Velha, pelo Porto e pelas Baixadas, cada vez mais difícil */
-  terminal: {city: "belem", n: "Terminal rodoviário", s: "Terminal", x: 392, y: 262, txt: "O ônibus da BR-316 para aqui. A passagem vale ida e volta: dá pra voltar pra Ananindeua quando quiser."},
+  terminal: {city: "belem", n: "Cais da Escadinha", s: "Cais", x: 392, y: 262, txt: "O barco de linha encosta aqui, na escadinha do cais. A passagem vale ida e volta: dá pra voltar pra aldeia quando quiser."},
   serra: {city: "petrolina", n: "Serra do Araripe", s: "Serra", x: 290, y: 56, txt: "Lá no alto, a chapada: paredão de pedra cheio de fóssil, mata verde na encosta e encruzilhada de estrada de terra. Nas sextas de lua cheia, ninguém sobe."},
   caatinga: {city: "petrolina", n: "Caatinga", x: 120, y: 110, txt: "A mata branca do sertão: galho seco, mandacaru e chão rachado. Bode, preá, tatu-bola... e, de noite, um assobio fino no meio dos espinhos."},
   orla: {city: "petrolina", n: "Orla do Velho Chico", s: "Orla", x: 300, y: 210, txt: "A beira do São Francisco em Petrolina: barquinho de carranca, feira de bode e de queijo, pensão e o povo do sertão, que ri de tudo."},
@@ -79,31 +80,32 @@ const SUB = {
   baixadas: {city: "belem", n: "Baixadas", x: 262, y: 146, txt: "Do outro lado do canal, palafitas ligadas por pontes de tábua. Na maré cheia, a rua vira rio."}
 };
 /* cada cidade tem o seu mapa local (viewBox 440x325): a trilha única em ordem (route), o contorno (land), o rio ou
-   canal que a trilha cruza (com as pontes calculadas) e a estrada que sai do mapa (road), com a placa (sign) */
+   canal que a trilha cruza (com as pontes calculadas) e a estrada que sai do mapa (road), com a placa (sign);
+   look = terreno do mapa (mata, cidade, litoral ou sertão; sem look, mata) */
 const CITY = {
-  ananindeua: {n: "Ananindeua", map: "para", route: ["aldeia", "feira", "mata", "fechada", "rio", "igarape", "manguezal", "seringal", "varzea", "parada"],
+  ananindeua: {n: "Jasytatá", map: "norte", cabin: false, route: ["aldeia", "feira", "mata", "fechada", "rio", "igarape", "manguezal", "seringal", "varzea", "parada"],
     land: "10,70 60,20 190,8 305,18 395,55 430,140 428,235 398,300 300,316 170,314 60,304 12,255 5,160",
     river: "M318,24 C305,70 358,96 346,140 C334,190 300,222 316,318", road: "M52,62 C34,44 18,32 -4,26", sign: [6, 18, "← Belém"], home: "aldeia", gate: "parada"},
-  belem: {n: "Belém", map: "para", route: ["terminal", "veropeso", "cidadevelha", "porto", "baixadas"],
+  belem: {n: "Belém", look: "cidade", map: "norte", cabin: false, route: ["terminal", "veropeso", "cidadevelha", "porto", "baixadas"],
     land: "40,40 150,14 300,10 400,40 432,130 430,240 400,300 300,316 160,316 40,300 22,230 36,150 20,90",
     bay: "M0,0 L44,0 C28,40 46,80 28,110 C40,150 22,200 38,240 C28,270 34,300 46,325 L0,325Z",   // baía do Guajará
-    river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Ananindeua →"], home: "veropeso", gate: "terminal"},
+    river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Tapajós →"], home: "veropeso", gate: "terminal"},
   // São Luís (Nordeste): a ilha, com o rio Anil e a estrada para o aeroporto; a Praia Grande, o manguezal e os Lençóis
-  saoluis: {n: "São Luís", map: "nordeste", route: ["praiagrande", "mangueilha", "lencois"], cabin: false,
+  saoluis: {n: "São Luís", look: "litoral", map: "nordeste", route: ["praiagrande", "mangueilha", "lencois"], cabin: false,
     land: "30,120 80,60 170,30 280,26 370,56 420,120 426,210 390,280 300,312 180,316 80,290 26,220",
     bay: "M0,0 L120,0 C90,30 60,60 34,96 C20,130 12,170 0,190Z",   // baía de São Marcos
     river: "M260,40 C250,90 236,120 226,150 C214,186 236,230 230,290", road: "M262,200 C320,230 380,250 446,262", sign: [350, 290, "✈ Aeroporto"], home: "praiagrande", gate: "praiagrande"},
   // Teresina (Nordeste): entre o Parnaíba (oeste) e o Poti (leste), que se encontram ao norte; a estrada vai para São Luís
-  teresina: {n: "Teresina", map: "nordeste", route: ["trocatroca", "encontro"], cabin: false,
+  teresina: {n: "Teresina", look: "sertao", map: "nordeste", route: ["trocatroca", "encontro"], cabin: false,
     land: "40,40 180,20 320,30 420,90 430,200 400,290 280,316 150,312 50,280 20,170",
     river: "M60,320 C90,240 70,160 110,100 C130,70 150,40 160,0", road: "M300,200 C350,220 400,250 446,270", sign: [340, 300, "São Luís →"], home: "trocatroca", gate: "trocatroca"},
   // Recife (Nordeste): o Recife Antigo, numa ilha entre o Capibaribe e o mar; a estrada vai para Teresina. Olinda vem depois
-  recife: {n: "Recife", map: "nordeste", route: ["recifeantigo", "olinda"], cabin: false,
+  recife: {n: "Recife", look: "litoral", map: "nordeste", route: ["recifeantigo", "olinda"], cabin: false,
     land: "20,40 160,20 330,30 420,80 430,200 400,290 260,316 120,312 30,270 10,160",
     bay: "M330,0 L440,0 L440,325 L410,325 C400,240 420,160 380,90 C360,50 340,20 330,0Z",   // o mar
     river: "M0,200 C80,190 160,210 240,180 C300,160 330,170 370,150", road: "M120,200 C80,230 40,250 -6,262", sign: [8, 300, "← Teresina"], home: "recifeantigo", gate: "recifeantigo"},
   // Petrolina (Nordeste, sertão): a orla do São Francisco, embaixo, e a caatinga subindo para o norte; a estrada vai para Recife
-  petrolina: {n: "Petrolina", map: "nordeste", route: ["orla", "caatinga", "serra"], cabin: false,
+  petrolina: {n: "Petrolina", look: "sertao", map: "nordeste", route: ["orla", "caatinga", "serra"], cabin: false,
     land: "30,30 170,16 320,26 420,70 432,190 400,250 300,262 160,266 40,250 12,140",
     bay: "M0,250 C80,268 180,272 300,262 C360,256 400,262 440,250 L440,325 L0,325Z",   // o rio São Francisco
     river: "M0,262 C80,280 180,284 300,274 C360,268 400,274 440,262", road: "M300,210 C350,190 400,170 446,160", sign: [356, 150, "Recife →"], home: "orla", gate: "orla"}
@@ -119,8 +121,8 @@ const SECRETS = {
     lore: "Na seca o rio recua e o barro endurece igual pedra. Na cheia, desmancha. O menino só fez a cheia chegar mais cedo."},
   igarape:  {elem: "vento", item: "acai", n: "Monte de folhas", d: "Um monte de folhas secas, alto que só, esconde um buraco no mato. Um vento forte espalhava tudo.",
     lore: "Debaixo das folhas do igarapé tem caminho que só o Boto conhece. E agora o Rhanon. O Boto não gostou muito, não."},
-  manguezal: {elem: "planta", item: "acai", n: "Raízes trançadas", d: "As raízes do mangue se trançaram e fecharam um vão na lama.",
-    lore: "O mangue é berçário de tudo: caranguejo, peixe, garça. Escondido nas raízes, o menino achou o que um pescador deixou pra trás."},
+  manguezal: {elem: "planta", item: "acai", n: "Raízes trançadas", d: "As raízes das árvores alagadas se trançaram e fecharam um vão na água rasa.",
+    lore: "No igapó, a cheia sobe até a copa das árvores e o peixe come fruta. Escondido nas raízes, o menino achou o que um pescador deixou pra trás."},
   seringal: {elem: "fogo", item: "manicoba", n: "Galhada seca", d: "Galhos secos de seringueira velha empilhados. Pegam fogo rapidinho.",
     lore: "No seringal abandonado ficou muita coisa dos seringueiros. Gente que trabalhou muito e ganhou pouco. O menino guardou o que achou com respeito."},
   varzea:   {elem: "vento", item: "manicoba", n: "Capim alto e embolado", d: "Um capinzal alto e embolado, mais alto que o Rhanon. Uma ventania abria caminho.",
@@ -180,7 +182,7 @@ const BUS_LINES = {
 const busLine = (a, b) => (BUS_LINES[b] && BUS_LINES[b].from === a && BUS_LINES[b]) || (BUS_LINES[a] && BUS_LINES[a].from === b && BUS_LINES[a]) || null;
 /* Notebook do Rhanon (missão do começo, só em jogo novo; ver HISTORIA.md): o Mateiro entrega quebrado depois do tutorial,
    o técnico da feira vende a BATERIA, o macaco-prego larga o TECLADO e a ariranha o CARREGADOR quando são acalmados, e
-   ele liga na tomada da cabine da BR-316. Ligado, chega o primeiro freela e o caderno vira digital. */
+   ele liga na tomada da bilheteria do porto do Tapajós. Ligado, chega o primeiro freela e o caderno vira digital. */
 const NB_PARTS = ["bateria", "teclado", "carregador"];
 const NB_BATTERY = 40;                                     // preço da bateria no técnico
 const NB_DROP = {macaco: "teclado", ariranha: "carregador"};   // bicho que larga a peça ao ser acalmado

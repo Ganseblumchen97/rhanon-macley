@@ -8,8 +8,8 @@ const TILE_PAL = {
   encontro: {g1: "#9ab84f", g2: "#88a845", tall: "#46893a", tallHi: "#86d064", path: "#e8d29a", path2: "#bb9763", leaf: "#3a8a45", leaf2: "#2b6a37", leafHi: "#5aaa55", trunk: "#6d4329", rock: "#a09d90", rock2: "#706d64", water: "#2a86c4", water2: "#6cc4f0", wood: "#a8703f", wood2: "#6d4329"},   // Teresina: o rio do sertão, capim mais seco e praia de areia clara
   // igarapé: água escura cor de chá (folhas na água), mata úmida e passarelas de tábua clara
   igarape: {g1: "#4f9a52", g2: "#438a48", tall: "#357a3e", tallHi: "#6ab85e", path: "#b89a66", path2: "#9a7e50", leaf: "#2a7a48", leaf2: "#1d5a36", leafHi: "#46a05a", trunk: "#5a3a22", rock: "#8a8a7e", rock2: "#5e5e54", water: "#4a5a2a", water2: "#8a9a4a", wood: "#c8a070", wood2: "#7a5a36"},
-  // manguezal: chão de lama cinza-marrom, mangue de folha escura, água salobra esverdeada
-  manguezal: {g1: "#7a7458", g2: "#6a6448", tall: "#5a5a3a", tallHi: "#8a8a5a", path: "#a08a62", path2: "#86704c", leaf: "#3a5a32", leaf2: "#2a4424", leafHi: "#5a7a44", trunk: "#5a4a3a", rock: "#8a8478", rock2: "#5e5a50", water: "#4a6a6a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30"},
+  // igapó (id manguezal): chão de lama escura, mata de folha escura, água preta de mata alagada com reflexo âmbar
+  manguezal: {g1: "#5a6a48", g2: "#4e5e3e", tall: "#3e5032", tallHi: "#6a8250", path: "#8a7a52", path2: "#6e5e3e", leaf: "#2f5a30", leaf2: "#21441f", leafHi: "#4a7a40", trunk: "#4a3a2a", rock: "#7a7468", rock2: "#5a5448", water: "#3a3222", water2: "#8a6a3a", wood: "#b08a5a", wood2: "#6a4e30"},
   mangueilha: {g1: "#7a7458", g2: "#6a6448", tall: "#5a5a3a", tallHi: "#8a8a5a", path: "#a08a62", path2: "#86704c", leaf: "#3a5a32", leaf2: "#2a4424", leafHi: "#5a7a44", trunk: "#5a4a3a", rock: "#8a8478", rock2: "#5e5a50", water: "#4a6a6a", water2: "#7a9a8a", wood: "#b08a5a", wood2: "#6a4e30"},   // São Luís: o mesmo mangue
   lencois: {g1: "#f0e6cc", g2: "#e6dabc", tall: "#9ab86a", tallHi: "#c8e08a", path: "#d8c8a0", path2: "#c4b28a", leaf: "#f8f2e2", leaf2: "#e0d2ae", leafHi: "#ffffff", trunk: "#d8c8a0", rock: "#e8dcc0", rock2: "#c8b890", water: "#2a9ad8", water2: "#7ad0f0", wood: "#b08a5a", wood2: "#6a4e30", dune: true},   // Lençóis: areia branca e lagoa azul
   // seringal: chão de folha seca, seringueiras de casca clara e copa verde-escura
@@ -36,7 +36,7 @@ const TILE_PAL = {
 };
 const OUTLINE = "#1a2418";
 // tipo de terreno desenhado embaixo das letras especiais
-const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "r", Y: ".", J: "."};   // Y e J: entrada e baú do segredo (systems/secrets.js)
+const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "~", Y: ".", J: "."};   // U: o barco de linha fica na água; Y e J: entrada e baú do segredo (systems/secrets.js)
 
 function fillEllipse(x, cx, cy, rx, ry, col) {
   x.fillStyle = col;

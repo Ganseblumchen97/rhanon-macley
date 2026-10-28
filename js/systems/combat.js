@@ -694,7 +694,7 @@ function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: 
     a.bug ? null : drop ? t("{pele} no chão: passa por cima", {pele: peltName(a.id)}) : got > 1 ? t("{pele} ×{q} (R$ {n} cada na feira)", {pele: peltName(a.id), q: got, n: peltValue(a.id)}) : t("{pele} (R$ {n} na feira)", {pele: peltName(a.id), n: peltValue(a.id)}),
     G.lv > L0 && t("Nível {n}!", {n: G.lv}),
     CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv && t("Destino novo no mapa"),
-    a.boss && NEXT_Z[curZone] ? t("Liberou: {lugar}", {lugar: ZONES[NEXT_Z[curZone]].n}) : a.boss && NEED.parada === curZone && !G.night && t("Liberou: {lugar}", {lugar: "BR-316"}),
+    a.boss && NEXT_Z[curZone] ? t("Liberou: {lugar}", {lugar: ZONES[NEXT_Z[curZone]].n}) : a.boss && NEED.parada === curZone && !G.night && t("Liberou: {lugar}", {lugar: SUB.parada.n}),
     [...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) && t("Roupa nova na feira")
   ].filter(Boolean);
 }

@@ -57,7 +57,7 @@ const NARRA_BOSS = {
   onca_rei: ["A Onça-Rei! Até eu tremi quando ele me contou. Era uma onça do tamanho de uma anta.", {r: "Do tamanho de uma capivara, vô."}, "Uma capivara bem grande, então."],
   cobra_grande: ["A Cobra-Grande dormia no fundo do rio fazia cem anos. Acordou de mau humor por causa da fumaça. Quem não acordaria?"],
   pirarucu: ["O Pirarucu respira fora d'água, sabia? Depois que voltou a si, subiu pra respirar e ficou um tempão olhando o menino, agradecido."],
-  caranguejo_rei: ["No manguezal ele enfrentou um jacaré do tamanho de uma canoa.", {r: "Era um caranguejo, vô."}, "Um caranguejo do tamanho de uma canoa! Foi o que eu disse."],
+  caranguejo_rei: ["No igapó ele enfrentou um jacaré do tamanho de uma canoa.", {r: "Era um caranguejo, vô."}, "Um caranguejo do tamanho de uma canoa! Foi o que eu disse."],
   gaviao_real: ["O Gavião-real viu o menino lá do alto e desceu pra brigar. Depois que acalmou, ficou rodando em cima dele a tarde inteira, de guarda."],
   bufalo_touro: ["O Búfalo-touro da várzea era teimoso que só. A fumaça saiu pelo nariz dele, feito chaleira."],
   iguana_rei: ["A Iguana-rei tomava sol na praça desde antes da igreja. Acalmada, voltou pro banco dela como se nada fosse."],
@@ -87,7 +87,7 @@ const NARRA_PYT = {
   ],
   // quem acalma o último chefe de Ananindeua antes de passar uma noite na mata conhece o Pytuna aqui (e não na primeira noite)
   bufalo_touro_primeiro: [
-    "Quando o último bicho de Ananindeua voltou a si, uma fumaça desceu do céu, devagar, e ficou olhando pro menino.",
+    "Quando o último bicho do Tapajós voltou a si, uma fumaça desceu do céu, devagar, e ficou olhando pro menino.",
     {p: "Então tu é o curumim da lança de pedra da lua... Acalmou meus bichos tudinho."},
     {r: "Quem é tu?"},
     {p: "Pytuna. A noite sem lua. Quando Jaci apagar de vez, ninguém vai ver o que eu levo da mata."},
@@ -96,7 +96,7 @@ const NARRA_PYT = {
     {p: "Vem. Te espero na cidade grande."}
   ],
   bufalo_touro: [
-    "Quando o último bicho de Ananindeua voltou a si, a fumaça apareceu de novo. Mais fina. Mais brava.",
+    "Quando o último bicho do Tapajós voltou a si, a fumaça apareceu de novo. Mais fina. Mais brava.",
     {p: "Tu acalma um, acalma dez... A fumaça não acaba, curumim. Ela vem de toda parte."},
     {r: "Então eu vou atrás de onde ela vem."},
     {p: "Vem. Te espero na cidade grande."}

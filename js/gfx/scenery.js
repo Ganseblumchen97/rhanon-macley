@@ -10,7 +10,7 @@ const SCENES = {
   fechada:     {sky: ["#1d4a2c", "#24583a", "#2c6640"], far: "#163f26", trees: "fechada", plat: "musgo", vines: true},
   rio:         {sky: ["#9ad4e8", "#7cc4a8", "#5aae78"], far: "#3a8a45", trees: "copa", plat: "areia", water: true},
   igarape:     {sky: ["#5a9a62", "#4a8a52", "#3c7a46"], far: "#24603a", trees: "copa", plat: "barro", water: true, vines: true},
-  manguezal:   {sky: ["#a8b8a0", "#8aa08a", "#6e8a70"], far: "#3a5a32", trees: "mangue", plat: "lama", water: true},
+  manguezal:   {sky: ["#9ab89a", "#7a9a7a", "#5a7a5a"], far: "#2f5030", trees: "mangue", plat: "lama", water: true},   // igapó: raízes em arco dentro da água
   mangueilha:  {sky: ["#d8e4c0", "#b4ccac", "#86a88a"], far: "#3a5a32", trees: "mangue", plat: "lama", water: true},   // São Luís: o mangue com o sol do Nordeste
   encontro:    {sky: ["#f0c870", "#e8d898", "#a8d4e0"], far: "#5a8a3a", trees: "copa", plat: "areia", water: true},   // Teresina: céu quente sobre o rio
   lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas

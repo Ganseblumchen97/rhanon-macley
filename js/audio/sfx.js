@@ -41,6 +41,8 @@ const SFX = {
   // o anel ficou verde: tique discreto marcando a janela do tempo certo
   janela: t => tone(1568, t, .03, "triangle", .035),
   // ônibus na estrada: ronco grave do motor
+  barco: t => { tone(58, t, .35, "sawtooth", .05, 54); tone(116, t + .02, .12, "square", .02, 110); tone(116, t + .18, .12, "square", .02, 110); noise(t, .25, .03, 300); },   // motor do barco de linha: toc-toc grave
+  apito: t => { tone(196, t, .7, "sawtooth", .06, 192); tone(247, t, .7, "square", .025, 244); tone(196, t + .85, 1.1, "sawtooth", .06, 190); tone(247, t + .85, 1.1, "square", .025, 240); },   // apito do barco saindo
   onibus: t => { tone(70, t, .4, "sawtooth", .05, 60); tone(105, t + .05, .3, "square", .025, 95); noise(t, .3, .04, 200); },
   // esquiva: um "fuup" de ar (ruído agudo descendo) e um toque leve no chão
   esquiva: t => { noise(t, .16, .1, 2200); tone(900, t, .12, "triangle", .04, 300); tone(140, t + .1, .06, "sine", .06, 90); },

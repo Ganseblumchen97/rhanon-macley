@@ -7,7 +7,8 @@
    V comprador de lembranças   C barraca de comida   R artesão (roupas e especiais)   M armeiro (armas e armaduras)
    X Pajé (talismãs com o luar dos chefes)   L técnico da lan house (notebook)   W cliente do freela
    Cidade (Belém): # prédio/casarão (bloqueia; fachada desenhada onde a quadra termina embaixo)
-   Rodovia (BR-316 e terminal): r asfalto   U ônibus (bloco 4x2)   Q cabine do cobrador (bloco 2x2)
+   Portos (porto do Tapajós e cais de Belém): U barco de linha na água (bloco 4x2)   Q bilheteria (bloco 2x2)
+   (r asfalto ainda existe no desenho, para estradas)
    Ver-o-Peso: O motel onde o Rhanon dorme (bloco 3x2; a conversa é na porta, embaixo do meio dele)
    As fases são ligadas na ordem do mapa da cidade (next): G leva para a próxima e E volta para a anterior (chegando
    na passagem dela); E sem fase anterior volta para o mapa. Cada uma entra e sai pelo lado em que fica no mapa.
@@ -357,16 +358,16 @@ const STAGES = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
-  // BR-316 (fim da trilha de Ananindeua): a estrada em cima com o ônibus parado e a cabine do cobrador
+  // porto do Tapajós (fim da trilha da aldeia): o rio em cima com o barco de linha no trapiche e a bilheteria
   parada: {
     safe: true, next: null,
     rows: [
       "TTTTTTTTTTTTTTTTTTTTTTTT",
       "T..,,....f.....,,..f...T",
-      "rrrrrrrrrrrrrrrrrrrrrrrr",
-      "rrrrrrUUUUrrrrrrrrrrrrrr",
-      "rrrrrrUUUUrrrrrrrrrrrrrr",
-      "T.......-....QQ.......,T",
+      "~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~UUUU~~~~~~~~~~~~~~",
+      "~~~~~~UUUU~~~~~~~~~~~~~~",
+      "T....======..QQ.......,T",
       "T..,....-....QQ...f....T",
       "T.......------.........T",
       "T..f.....-.....,,......T",
@@ -377,16 +378,16 @@ const STAGES = {
       "TTTTTTTTTETTTTTTTTTTTTTT"
     ]
   },
-  // terminal rodoviário de Belém: a mesma estrada entre os prédios da capital; a trilha segue para o Ver-o-Peso
+  // cais da Escadinha, em Belém: a baía entre os prédios com o barco de linha encostado; a trilha segue para o Ver-o-Peso
   terminal: {
     safe: true, next: "veropeso",
     rows: [
       "########################",
       "########################",
-      "rrrrrrrrrrrrrrrrrrrrrrrr",
-      "rrrrrrrrrrrrrrUUUUrrrrrr",
-      "rrrrrrrrrrrrrrUUUUrrrrrr",
-      "#......f.....QQ........#",
+      "~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~UUUU~~~~~~",
+      "~~~~~~~~~~~~~~UUUU~~~~~~",
+      "#......f.....QQ======..#",
       "#.T..........QQ.S....T.#",
       "G---------------------.#",
       "#.....,.....#####.....,#",

@@ -287,8 +287,8 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 #mapsvg .land{fill:var(--moss);stroke:var(--jaguar);stroke-width:4;stroke-linejoin:round}
 #route{stroke:var(--bone);stroke-width:3;stroke-dasharray:6 8;opacity:.7}
 .node{cursor:pointer}
-.node circle{fill:var(--jaguar);stroke:var(--bone);stroke-width:3}
-.node:hover circle,.node:focus-visible circle{fill:var(--blood)}
+.node>circle{fill:var(--jaguar);stroke:var(--bone);stroke-width:3}
+.node:hover>circle,.node:focus-visible>circle{fill:var(--blood)}
 .node:focus-visible{outline:none}
 .node text{font-family:var(--display);font-size:15px;fill:var(--bone);paint-order:stroke;stroke:var(--ink);stroke-width:4px}
 #mk{pointer-events:none}
@@ -395,8 +395,8 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 #mapsvg rect{display:none}
 #mapsvg .land{fill:var(--ink);stroke:var(--paper);stroke-width:5;stroke-linejoin:miter}
 #route{stroke:var(--accent);stroke-width:4}
-.node circle{fill:var(--accent);stroke:var(--paper);stroke-width:4}
-.node:hover circle,.node:focus-visible circle{fill:var(--paper);stroke:var(--accent)}
+.node>circle{fill:var(--accent);stroke:var(--paper);stroke-width:4}
+.node:hover>circle,.node:focus-visible>circle{fill:var(--paper);stroke:var(--accent)}
 .node text{font-family:var(--display);font-size:20px;fill:var(--paper);stroke:var(--ink);stroke-width:6px;paint-order:stroke;letter-spacing:.04em;text-transform:uppercase}
 #mk .pin path,#mk .pin circle{fill:var(--blood);stroke:var(--paper)}
 .hud{background:var(--paper);color:var(--ink);transform:none;rotate:-2deg;box-shadow:none;clip-path:polygon(2% 0,100% 8%,98% 100%,0 92%);padding:8px 24px;font:700 13px var(--mono)}
@@ -555,7 +555,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .cutin.ambush .ci-dim{background:rgba(50,0,0,.7)}
 
 /* ===== teclado nos mapas ===== */
-.node.sel circle{fill:var(--paper);stroke:var(--blood);stroke-width:5}
+.node.sel>circle{fill:var(--paper);stroke:var(--blood);stroke-width:5}
 .node.sel text{fill:var(--accent)}
 .cmd .key{display:inline-block;font:700 .42em var(--mono);font-style:normal;vertical-align:middle;background:var(--paper);color:var(--ink);padding:.12em .45em;margin-right:.5em;rotate:-4deg;border:2px solid currentColor}
 .info .cmd:hover .key,.info .cmd:focus-visible .key{background:var(--ink);color:var(--paper)}
@@ -613,7 +613,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 /* mapa do Pará: rio Amazonas e destino ainda fechado (Belém) */
 #mapsvg .land .river{fill:none;stroke:#19a8d8;stroke-width:6;stroke-linecap:round}
 #nodes .node.soon{opacity:.55}
-#nodes .node.soon circle{stroke-dasharray:3 3}
+#nodes .node.soon>circle{stroke-dasharray:3 3}
 /* amanhecer (dawnWipe): a faixa da transição fica mais tempo, com o sol no canto e o galo cantando na listra */
 .wipe.dawn{background:#1e1838}
 .wipe.dawn::after{background:#ffb52e}
@@ -1104,3 +1104,37 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 .nb-canvas{display:block;width:min(360px,100%);aspect-ratio:3/2;margin:4px auto 6px;image-rendering:pixelated;border-radius:6px;
   background:repeating-linear-gradient(90deg,#c8a86a 0 6px,#b8965a 6px 12px);box-shadow:inset 0 0 0 3px var(--wood2),inset 0 -14px 0 rgba(0,0,0,.12)}
 .nb-txt{text-align:center}
+
+/* mapas bonitos: terreno com textura por cidade (padrões no index.html; CITY[...].look), rio em dois tons, trilha de terra
+   e cada ponto com o desenho do lugar (mapIcon em gfx/mapart.js); trancado = apagado, escolhido = aro dourado */
+#lsvg .land,.revela .land{fill:url(#pmata);stroke:#f6e9c4;stroke-width:5;stroke-linejoin:round}
+:is(#lsvg,.revela svg)[data-look="cidade"] .land{fill:url(#pcidade)}
+:is(#lsvg,.revela svg)[data-look="litoral"] .land{fill:url(#plitoral)}
+:is(#lsvg,.revela svg)[data-look="sertao"] .land{fill:url(#psertao)}
+#lsvg .river,.revela .river{stroke:#2a7ab8;stroke-width:14}
+.river-hi{fill:none;stroke:#8fd8ff;stroke-width:4;stroke-linecap:round;stroke-dasharray:16 12;opacity:.75}
+.lbay{fill:#2a7ab8;opacity:1}
+.lroute-base{stroke:#6a4a26;stroke-width:9}
+.lroute{stroke:#e8c890;stroke-width:2.5;stroke-dasharray:4 6}
+.micon .mdisc{stroke:#f6e9c4;stroke-width:2.5}
+.node:hover .micon .mdisc,.node:focus-visible .micon .mdisc{stroke:#ffd23a;stroke-width:3.5}
+.node.sel .micon .mdisc{stroke:#ffd23a;stroke-width:4}
+.node.sel .micon{filter:drop-shadow(0 0 4px rgba(255,210,58,.8))}
+.node.locked .micon{filter:grayscale(1) brightness(.8)}
+#nodes .node.soon .micon .mdisc{stroke-dasharray:3 3}
+#mapsvg .land path:not(.river){fill:url(#pmata2);stroke:#f6e9c4}
+#mapsvg[data-region="nordeste"] .land path:not(.river){fill:url(#psertao2)}
+#mapsvg .land .river{stroke:#2a7ab8;stroke-width:7}
+.map-patterns rect{display:inline}   /* o mapa esconde os rect soltos (grade); o fundo dos padrões aparece */
+
+/* barco de linha no mapa do Norte (#mkboat, viaja pelo rio em busRide) */
+#mkboat{pointer-events:none}
+#mapsvg #mkboat rect{display:inline}
+#mkboat .casco{fill:#1f4a8a;stroke:#1a1426;stroke-width:1.5}
+#mkboat .conves{fill:#f4f1e8;stroke:#1a1426;stroke-width:1}
+#mkboat .teto{fill:#2a8a5a;stroke:#1a1426;stroke-width:.8}
+#mkboat .win{fill:#2a5a8a}
+#mapsvg[data-region="norte"] #route{stroke:#cfeeff;stroke-width:2.5;stroke-dasharray:3 5}
+.rio>.lroad{stroke:#2a7ab8;stroke-width:12}
+.rio>.lroad-faixa{stroke:#cfeeff;stroke-width:2;stroke-dasharray:3 7}
+.map-patterns{position:absolute;width:0;height:0;overflow:hidden}

@@ -973,7 +973,7 @@ function musicStart(id) {
   id = id || "battleCapo";
   if ((id === "local" && regionOfCity(curCity()) === "nordeste") || (id === "map" && MAP_REGION === "nordeste")) id = "localNordeste";   // Nordeste: a toada do boi
   if (id === "local" && G.night) id = "localNight";   // à noite a música da exploração muda de clima
-  if (id === "map" && MAP_REGION === "para") id = G.night ? "mapParaNight" : "mapPara";   // mapa do Pará: guitarrada de dia e de noite
+  if (id === "map" && MAP_REGION === "norte") id = G.night ? "mapParaNight" : "mapPara";   // mapa do Norte: guitarrada de dia e de noite
   if (MUS.has(id)) { legacyStop(); MUS.play(id); }
   else { MUS.stop(.4); legacyStart(id); }
 }
