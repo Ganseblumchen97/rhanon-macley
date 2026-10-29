@@ -7,17 +7,14 @@ syncRegion();   // mapa grande da cidade do save (Pará ou Maranhão)
 buildLocalNodes();
 setupExploreInput();
 setupMapNav(); setupGamepad(); setupNarration();
-setupOptions();
+setupOptions(); setupSaves();
 setupEquip(); setupSkills(); setupBrasil();
 setupReveal();
 $("stage").addEventListener("pointerdown", () => qtePress());   // no celular: tocar no palco na hora certa
 loadArt();   // imagens de data/art.js (carregam enquanto a tela inicial está aberta)
 
 /* ----- botões fixos ----- */
-$("startAdventure").addEventListener("click", () => {
-  audio(); musicStop();
-  startIntro();   // a aventura começa com Rhanon acordando na fogueira da aldeia (a tela inicial some por trás da transição)
-});
+$("startAdventure").addEventListener("click", () => { audio(); openSaves(); });   // escolhe o espaço de save (ui/saves.js); a aventura começa de lá
 $("homeButton").addEventListener("click", () => {
   $("local").hidden = true;
   musicStop();

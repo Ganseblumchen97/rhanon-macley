@@ -2549,6 +2549,15 @@ TX.en = {
     "{aliado} acerta {bicho} em cheio: −{n}.": "{aliado} hits {bicho} square on: −{n}.",
     "{aliado} volta e acerta {bicho}: −{n}.": "{aliado} comes back and hits {bicho}: −{n}.",
     "chegue ao {regiao}": "reach the {regiao}",
-    "Abre quando o Rhanon chegar ao {regiao}.": "Opens when Rhanon reaches the {regiao}."
+    "Abre quando o Rhanon chegar ao {regiao}.": "Opens when Rhanon reaches the {regiao}.",
+    "Vazio": "Empty",
+    "Nv {lv} · {lugar} · dia {dia} · {n} chefes": "Lv {lv} · {lugar} · day {dia} · {n} bosses",
+    "Escolher save": "Choose save",
+    "Três espaços: cada um guarda uma aventura.": "Three slots: each one keeps an adventure.",
+    "Espaço {n}": "Slot {n}",
+    "Apagar o espaço {n}? Não dá para desfazer.": "Delete slot {n}? This can't be undone.",
+    "Sim, apagar": "Yes, delete",
+    "Apagar": "Delete",
+    "Começar aqui": "Start here"
   }
 };

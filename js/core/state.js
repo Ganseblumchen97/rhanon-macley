@@ -2,7 +2,11 @@
 // modo de teste pela URL (index.html?debug&fase=varzea&nv=16): usa um save à parte, que começa do zero a cada
 // abertura, então o save de verdade nunca é tocado. As opções são aplicadas por debugSetup() no fim do main.js.
 const DEBUG = /[?&]debug(&|=|$)/.test(location.search) ? new URLSearchParams(location.search) : null;
-const KEY = DEBUG ? "rhanon-save-debug" : "rhanon-save-v1";
+/* três espaços de save (tela "Escolher save", ui/saves.js): o 1 é o save de antes dos espaços ("rhanon-save-v1"), os outros
+   ganham o número no fim; o espaço em uso fica em localStorage[SLOT_KEY]. useSlot(n) troca o G sem recarregar a página. */
+const SLOTS = 3, SLOT_KEY = "rhanon-espaco", slotKey = n => n === 1 ? "rhanon-save-v1" : "rhanon-save-v1-" + n;
+let SLOT = 1; try { SLOT = Math.min(SLOTS, Math.max(1, +localStorage.getItem(SLOT_KEY) || 1)); } catch (_) {}
+let KEY = DEBUG ? "rhanon-save-debug" : slotKey(SLOT);
 const need = l => 20 + 20 * l;                 // XP para passar do nível l
 // talismã em uso (EQUIP.amulet, feito pelo Pajé): charmStat("atk" | "def" | "hp" | "sp") soma ao status; charm() = o item inteiro
 const charm = () => (typeof EQUIP !== "undefined" && G.equip && EQUIP.amulet && EQUIP.amulet[G.equip.amulet]) || {};
@@ -14,8 +18,16 @@ const hasSkill = fx => skillsOn().some(n => n.fx === fx);
 const maxHP = l => 40 + 6 * (l - 1) + charmStat("hp") + skillStat("hp"), maxSP = l => 20 + 2 * (l - 1) + charmStat("sp") + skillStat("sp");
 
 let G = {lv: 1, xp: 0, money: 0, loc: "ananindeua"};
-if (!DEBUG) try { Object.assign(G, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (_) {}
-G.jobXp = G.jobXp || 0; G.jobMissions = G.jobMissions || 0; G.job = !!G.job; G.betterJob = !!G.betterJob;
+function loadG() {   // lê o save do espaço em uso (vazio = jogo novo)
+  G = {lv: 1, xp: 0, money: 0, loc: "ananindeua"};
+  if (!DEBUG) try { Object.assign(G, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (_) {}
+  G.jobXp = G.jobXp || 0; G.jobMissions = G.jobMissions || 0; G.job = !!G.job; G.betterJob = !!G.betterJob;
+}
+loadG();
+function useSlot(n) {   // muda o espaço em uso; quem chama redesenha o que depende do save (useSlotDone em ui/saves.js)
+  SLOT = n; KEY = slotKey(n); try { localStorage.setItem(SLOT_KEY, n); } catch (_) {}
+  loadG();
+}
 
 function save() { try { localStorage.setItem(KEY, JSON.stringify(G)); } catch (_) {} }
 // completa os campos que saves antigos não têm e limita PV/PE ao máximo do nível

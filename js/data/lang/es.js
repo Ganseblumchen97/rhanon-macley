@@ -2552,6 +2552,15 @@ TX.es = {
     "{aliado} acerta {bicho} em cheio: −{n}.": "{aliado} le da de lleno a {bicho}: −{n}.",
     "{aliado} volta e acerta {bicho}: −{n}.": "{aliado} vuelve y golpea a {bicho}: −{n}.",
     "chegue ao {regiao}": "llega al {regiao}",
-    "Abre quando o Rhanon chegar ao {regiao}.": "Se abre cuando Rhanon llegue al {regiao}."
+    "Abre quando o Rhanon chegar ao {regiao}.": "Se abre cuando Rhanon llegue al {regiao}.",
+    "Vazio": "Vacío",
+    "Nv {lv} · {lugar} · dia {dia} · {n} chefes": "Nv {lv} · {lugar} · día {dia} · {n} jefes",
+    "Escolher save": "Elegir partida",
+    "Três espaços: cada um guarda uma aventura.": "Tres espacios: cada uno guarda una aventura.",
+    "Espaço {n}": "Espacio {n}",
+    "Apagar o espaço {n}? Não dá para desfazer.": "¿Borrar el espacio {n}? No se puede deshacer.",
+    "Sim, apagar": "Sí, borrar",
+    "Apagar": "Borrar",
+    "Começar aqui": "Empezar aquí"
   }
 };

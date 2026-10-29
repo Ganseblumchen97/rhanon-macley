@@ -766,6 +766,9 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 /* opções: janela por cima de tudo (também na tela inicial) */
 .opcoes-wrap{position:fixed;inset:0;z-index:1500;display:grid;place-items:center;background:rgba(10,20,14,.55)}
 .opcoes-wrap[hidden]{display:none}
+/* escolher save (ui/saves.js): um botão por espaço, com o resumo embaixo do nome */
+.info.saves{min-width:min(420px,92vw)}
+.info.saves .cmd small{text-transform:none}
 .opcoes{width:min(420px,90vw)}
 .opt-row{display:grid;grid-template-columns:80px 1fr 48px;align-items:center;gap:10px;margin:10px 0;font:700 14px var(--mono);color:var(--brown)}
 .opt-row input{accent-color:var(--leafB)}

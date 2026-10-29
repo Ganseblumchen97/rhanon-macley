@@ -2555,6 +2555,15 @@ TX.fr = {
     "{aliado} acerta {bicho} em cheio: −{n}.": "{aliado} frappe {bicho} de plein fouet : −{n}.",
     "{aliado} volta e acerta {bicho}: −{n}.": "{aliado} revient et frappe {bicho} : −{n}.",
     "chegue ao {regiao}": "atteins le {regiao}",
-    "Abre quando o Rhanon chegar ao {regiao}.": "S'ouvre quand Rhanon atteindra le {regiao}."
+    "Abre quando o Rhanon chegar ao {regiao}.": "S'ouvre quand Rhanon atteindra le {regiao}.",
+    "Vazio": "Vide",
+    "Nv {lv} · {lugar} · dia {dia} · {n} chefes": "Nv {lv} · {lugar} · jour {dia} · {n} chefs",
+    "Escolher save": "Choisir la sauvegarde",
+    "Três espaços: cada um guarda uma aventura.": "Trois emplacements : chacun garde une aventure.",
+    "Espaço {n}": "Emplacement {n}",
+    "Apagar o espaço {n}? Não dá para desfazer.": "Effacer l'emplacement {n} ? Impossible d'annuler.",
+    "Sim, apagar": "Oui, effacer",
+    "Apagar": "Effacer",
+    "Começar aqui": "Commencer ici"
   }
 };

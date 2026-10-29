@@ -3,6 +3,13 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.71.0 — três saves
+
+- Agora dá para ter três aventuras ao mesmo tempo. Em "Iniciar aventura", escolha um dos três espaços: cada um mostra
+  o nível, onde o Rhanon está, o dia e quantos chefes já foram acalmados. Num espaço com jogo, continue ou apague (o
+  jogo pergunta antes); num espaço vazio, comece uma aventura nova.
+- O seu save de antes não se perde: ele fica no espaço 1.
+
 ## 0.70.0 — habilidades novas e os chefes como aliados
 
 - **Chamado do aliado:** o último chefe de dia de cada cidade, depois de acalmado, vira aliado de verdade. Aprenda o
