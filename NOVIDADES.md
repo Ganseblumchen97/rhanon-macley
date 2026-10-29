@@ -3,6 +3,12 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.66.2 — página nova no GitHub
+
+- A página do jogo no GitHub ganhou uma apresentação de verdade: o prólogo da história contado pelo Pajé, como é o
+  jogo, imagens e GIFs das regiões e das batalhas, oito músicas da trilha para ouvir, os controles e as inspirações.
+  Bom para mostrar o jogo para quem ainda não teve tempo de jogar.
+
 ## 0.66.1 — voo livre e correções
 
 - O avião não trava mais: dá para voar para a próxima região quando quiser. Se ainda faltar algo na região de agora
