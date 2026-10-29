@@ -3,6 +3,12 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.66.3 — a trilha sonora para ouvir
+
+- Página nova no site do jogo para ouvir a trilha sonora direto no navegador, com tocador em cada faixa: os temas do
+  Rhanon, de Pytuna e de Jaci e as músicas do Norte, do Nordeste, do Centro-Oeste, de Minas e dos chefes. O link fica na
+  página do jogo no GitHub.
+
 ## 0.66.2 — página nova no GitHub
 
 - A página do jogo no GitHub ganhou uma apresentação de verdade: o prólogo da história contado pelo Pajé, como é o

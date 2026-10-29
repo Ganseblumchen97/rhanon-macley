@@ -1,4 +1,4 @@
-# Rhanon Macley — RPG (alfa 0.66.2)
+# Rhanon Macley — RPG (alfa 0.66.3)
 
 ### ▶ [Jogar no navegador](https://ganseblumchen97.github.io/rhanon-macley/)
 
@@ -64,16 +64,10 @@ Toda a música é feita pelo próprio jogo, em tempo real, sem arquivos de áudi
 **tema fixo (leitmotif)**: a mesma melodia volta em arranjos diferentes, na cidade, na batalha, no chefe, para ficar na
 cabeça e contar a história pelo som. A ideia veio do trabalho do Toby Fox em Deltarune.
 
-Clique para ouvir (abre no navegador):
+### 🎧 [Ouvir a trilha no navegador](https://ganseblumchen97.github.io/rhanon-macley/trilha.html)
 
-- [Tema do Rhanon](midia/tema-rhanon.webm), na tela inicial
-- [Norte: batalha na mata](midia/norte-batalha.webm), roda de capoeira
-- [Nordeste: São Luís](midia/nordeste.webm), toada de bumba-meu-boi com sanfona
-- [Centro-Oeste: Cuiabá](midia/centro-oeste.webm), toada caipira de viola
-- [Sudeste: Minas](midia/sudeste-minas.webm), sertanejo universitário
-- [Chefe](midia/chefe.webm)
-- [Tema de Pytuna](midia/tema-pytuna.webm), o vilão
-- [Tema de Jaci](midia/tema-jaci.webm), a lua voltando a brilhar
+Oito faixas com tocador: os temas do Rhanon, de Pytuna e de Jaci, a batalha na mata do Norte, o bumba-meu-boi de São
+Luís, a toada caipira de Cuiabá, o sertanejo de Minas e a música dos chefes.
 
 ## Controles
 
