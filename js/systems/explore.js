@@ -95,7 +95,7 @@ function drawAmbient(x, cx, cy, now, night) {
   x.globalAlpha = 1;
 }
 // peixes vivem só na água: nadam de um lado para o outro, cospem água quando veem o Rhanon e só a flecha alcança
-const AQUATIC = new Set(["bagre_cego", "piraputanga", "dourado", "piau", "piranha", "poraque", "boto", "traira"]);
+const AQUATIC = new Set(["tubarao", "bagre_cego", "piraputanga", "dourado", "piau", "piranha", "poraque", "boto", "traira"]);
 // where: "terra" (sem peixes, para os "a" do mapa), "agua" (só peixes) ou nada (qualquer um, usado na batalha)
 function pickFromPool(zone, where) {
   const z = zoneDef(zone), pool = where ? z.pool.filter(([id]) => (where === "agua") === AQUATIC.has(id)) : z.pool;
@@ -217,6 +217,8 @@ const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta 
   praiagrande: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   trocatroca: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   orla: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
+  rodo_slz: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z", rodo_the: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z",
+  rodo_pet: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z", rodo_rec: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z",
   portocuiaba: " · lembranças, comida e rede na pensão: chega perto e aperta Z. O cais de baixo leva pro Pantanal",
   centrobonito: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda vai pro Rio da Prata",
   mercadocentral: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda sobe pra Serra do Curral",
@@ -803,7 +805,7 @@ const CITY_WAKE = {belem: "Belém · manhã no Ver-o-Peso...", saoluis: "São Lu
 // Petrolina: quem é cada morador da orla do São Francisco e o que eles contam
 const PETROLINA_NAME = {urbano1: "Vendedora de queijo coalho", urbano2: "Artesão de carranca", urbano3: "Vaqueiro"};
 const PETROLINA_TIPS = [
-  "Oxe, chegou do litoral? Aqui é sertão, meu filho: sol de rachar e o Velho Chico pra refrescar. Prova o queijo coalho na brasa.",
+  "Oxe, chegou de Teresina? Aqui é sertão também, meu filho: sol de rachar e o Velho Chico pra refrescar. Prova o queijo coalho na brasa.",
   "A carranca vai na proa do barco pra espantar o Nego d'água. Cara feia de madeira, coração bom.",
   "Na caatinga tudo tem espinho: mandacaru, xique-xique, até o bode tem cara de poucos amigos. Vai de gibão, se puder.",
   "De noite, quem anda na caatinga ouve um assobio fino. É a Comadre Fulozinha. Ela protege a mata e dá surra de cipó em caçador.",
@@ -815,7 +817,7 @@ const PETROLINA_TIPS = [
 // Cuiabá: quem é cada morador do Porto e o que eles contam (o cuiabano fala "tchá", "pai do céu" e "ixi")
 const CUIABA_NAME = {urbano1: "Vendedora de bolo de arroz", urbano2: "Tocador de viola de cocho", urbano3: "Pescador pantaneiro"};
 const CUIABA_TIPS = [
-  "Pai do céu, tu veio do Recife? Senta aí, toma um guaraná ralado e come um bolo de arroz quentinho. Aqui é assim, tchá.",
+  "Pai do céu, tu veio de Teresina? Senta aí, toma um guaraná ralado e come um bolo de arroz quentinho. Aqui é assim, tchá.",
   "Essa viola é de cocho: cavada num tronco só, igual cocho de dar comida pro gado. Sem ela não tem cururu nem siriri.",
   "O Pantanal começa logo ali. Na cheia, vira um mar de água doce; na seca, um campão cheio de bicho. Tuiuiú, jacaré, capivara... tudo junto.",
   "Ixi, tá vendo essa fumaça no horizonte? Todo ano é queimada. Mas esse ano a fumaça tem olho, menino. Juro por Deus.",
@@ -946,7 +948,7 @@ function drawNpc(x, s, cx, cy, now) {
 const skipText = () => padStyle() ? t("Segure {sel} para pular", padVars()) : t("Segure C para pular");
 // setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
 function drawSpotPrompt(x, cx, cy, now) {
-  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `${padStyle() ? padLabel("z") : t("Z / GOLPE")}: ${s.kind === "cliente" ? t("falar com {cliente}", {cliente: FREELAS[freelaHere()].client}) : SPOT_LABEL[s.kind]}` : "";
+  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `${padStyle() ? padLabel("z") : t("Z / GOLPE")}: ${s.kind === "cliente" ? t("falar com {cliente}", {cliente: FREELAS[freelaHere()].client}) : rodoCity(EX.zone) && s.kind === "cabine" ? t("comprar passagem") : rodoCity(EX.zone) && s.kind === "onibus" ? t("embarcar no ônibus") : SPOT_LABEL[s.kind]}` : "";
   if (el.textContent !== txt) { el.textContent = txt; el.classList.toggle("show", !!s); }
   if (!s) return;
   const px = Math.round(s.x - cx), py = Math.round(s.y - cy) - (PEOPLE.includes(s.kind) ? 30 : 10) - Math.floor(now / 250) % 2;
@@ -1136,8 +1138,31 @@ function freelaBugDone() {
 }
 /* ---------- BR-316: cabine do cobrador e o ônibus (fases parada e terminal) ---------- */
 const busDest = () => EX.zone === "parada" ? "belem" : "ananindeua";
-const busSide = () => EX.zone === "parada" ? -1 : 1;   // a estrada sai pela esquerda rumo a Belém e pela direita rumo a Ananindeua
+const busSide = () => rodoCity(EX.zone) ? 1 : EX.zone === "parada" ? -1 : 1;   // o barco sai pela esquerda rumo a Belém e pela direita rumo à aldeia; o ônibus da rodoviária, pela direita
+/* rodoviárias do Nordeste: a bilheteria vende uma passagem por linha da cidade (BUS_LINES, ida e volta) e o ônibus leva
+   para qualquer cidade com passagem na mão */
+function rodoCabin(say, d) {
+  const c = rodoCity(EX.zone);
+  say(t("Bilheteria"), t("Passagem de ônibus, ida e volta. Pra onde tu vai?"));
+  busDests(c).forEach(k => {
+    const ln = busLine(c, k), n = LOC[k].s;
+    if (G[ln.pass]) lh(t("{cidade}: passagem na mão ✓", {cidade: n}), d);
+    else if (!ln.open()) lh(t(ln.lock), d);
+    else btn(t("Passagem para {cidade} · R$ {n}", {cidade: n, n: ln.price}), ask(t("Comprar a passagem para {cidade} por R$ {n}?", {cidade: n, n: ln.price}), () => {
+      if (G[ln.pass] || G.money < ln.price) return;
+      G.money -= ln.price; G[ln.pass] = true; save(); sfx("more"); exHud();
+      exOpenDialog("cabine", t("Passagem comprada! O ônibus tá na plataforma."));
+    }), G.money < ln.price, d);
+  });
+}
+function rodoDoor(say, d) {
+  const c = rodoCity(EX.zone), ok = busDests(c).filter(k => G[busLine(c, k).pass]);
+  if (!ok.length) return say(t("Ônibus"), t("O motorista aponta para a bilheteria: \"Sem passagem não sobe. Compra ali, ó.\""));
+  say(t("Ônibus"), t("O motor já está ligado. Pra onde?"));
+  ok.forEach(k => btn(t("Embarcar para {lugar}", {lugar: LOC[k].s}), () => busLeave(k), false, d));
+}
 function busCabin(say, d) {
+  if (rodoCity(EX.zone)) return rodoCabin(say, d);
   if (EX.zone === "parada" && nbReady() && !G.nb.on) {   // tomada do lado da cabine: o notebook liga aqui
     say(t("Comandante"), t("Tomada? Tem ali do lado da bilheteria, pode usar à vontade."));
     btn(t("Ligar o notebook"), nbTurnOn, false, d);
@@ -1154,22 +1179,23 @@ function busCabin(say, d) {
   }), G.money < BUS.price, d);
 }
 function busDoor(say, d) {
+  if (rodoCity(EX.zone)) return rodoDoor(say, d);
   const dest = busDest(), n = dest === "belem" ? "Belém" : LOC.ananindeua.s;
   if (!G.passagem || !BUS.open) return say(t("Barco de linha"), t("O marinheiro aponta para a bilheteria: \"Sem passagem não sobe, maninho. Compra ali com o comandante.\""));
   say(t("Barco de linha"), t("O motor já está ligado. Destino: {lugar}.", {lugar: n}));
   btn(t("Embarcar para {lugar}", {lugar: n}), busLeave, false, d);
 }
 // sobe no ônibus: ele arranca e sai pela estrada; depois a viagem segue no mapa do Pará e entra na fase da outra cidade
-function busLeave() {
-  exCloseDialog(); EX.locked = true; exKeys.clear(); sfx("apito");   // o barco apita e sai
-  EX.boarding = {t0: performance.now(), vrum: 0};
+function busLeave(dest) {   // dest: cidade (rodoviária com várias linhas); sem ela, o destino do barco
+  exCloseDialog(); EX.locked = true; exKeys.clear(); sfx(rodoCity(EX.zone) ? "onibus" : "apito");   // o barco apita e sai
+  EX.boarding = {t0: performance.now(), vrum: 0, dest: typeof dest === "string" ? dest : null};
 }
 function busPull(now) {
   const b = EX.bus, el = now - EX.boarding.t0;
   if (el > 350) b.dx = busSide() * ((el - 350) / 1000) ** 2 * 260;   // espera a porta fechar e acelera
-  if (now - EX.boarding.vrum > 520) { EX.boarding.vrum = now; sfx("barco"); }
+  if (now - EX.boarding.vrum > 520) { EX.boarding.vrum = now; sfx(rodoCity(EX.zone) ? "onibus" : "barco"); }
   if (el < 2000) return false;
-  const dest = busDest();
+  const dest = EX.boarding.dest || busDest();
   EX.boarding = null; $("explore").hidden = true; $("exDialog").hidden = true; EX = null; exKeys.clear();
   busRide(dest, true);
   return true;
@@ -1177,6 +1203,7 @@ function busPull(now) {
 // barco de linha (recreio) visto de lado: casco azul, dois conveses brancos com redes coloridas, proa virada para o lado
 // em que o rio sai (b.dx = quanto já andou). O bloco U (4x2) fica na água do porto
 function drawBus(x, b, cx, cy, now) {
+  if (rodoCity(EX.zone)) return drawRoadBus(x, b, cx, cy, now);
   const f = busSide(), X = Math.round(b.x + b.dx - cx), Y = Math.round(b.y - cy), W = b.w, run = b.dx !== 0;
   const y = Y + (Math.floor(now / (run ? 160 : 600)) % 2);   // balança na água
   const R = (a, bb, w, h, col) => { x.fillStyle = col; x.fillRect(a, bb, w, h); };
@@ -1196,6 +1223,25 @@ function drawBus(x, b, cx, cy, now) {
   x.fillStyle = "#ffffffc0"; x.fillRect(X + 4, Y + 29, W - 8, 1);
   if (run) for (let k = 0; k < 3; k++) { const ex = f < 0 ? X + W + 2 + k * 5 : X - 6 - k * 5; R(ex, Y + 24 + (Math.floor(now / 90 + k) % 3), 3, 2, "#e8f6ff"); }
   if (run && Math.floor(now / 200) % 2) R(f < 0 ? X + W - 10 : X + 8, y - 6 - (Math.floor(now / 100) % 3), 2, 2, "#c8c4b8");   // fumaça da chaminé
+}
+// ônibus de viagem da rodoviária visto de lado: lataria branca com faixa verde e amarela, janelas, para-brisa na frente
+// (o lado para onde a estrada sai) e as rodas girando quando ele arranca
+function drawRoadBus(x, b, cx, cy, now) {
+  const f = busSide(), X = Math.round(b.x + b.dx - cx), Y = Math.round(b.y - cy), W = b.w, run = b.dx !== 0;
+  const y = Y + (run && Math.floor(now / 120) % 2 ? 1 : 0);   // treme andando
+  const R = (a, bb, w, h, col) => { x.fillStyle = col; x.fillRect(a, bb, w, h); };
+  R(X + 3, Y + 29, W - 6, 3, "rgba(0,0,0,.3)");   // sombra no asfalto
+  R(X + 1, y + 3, W - 2, 23, OUTLINE); R(X + 2, y + 4, W - 4, 21, "#f4f1e8");   // lataria
+  R(X + 4, y + 2, W - 8, 2, OUTLINE); R(X + 20, y, 20, 3, OUTLINE); R(X + 21, y + 1, 18, 2, "#c8c8d0");   // teto e o ar-condicionado
+  R(X + 2, y + 17, W - 4, 4, "#2a8a5a"); R(X + 2, y + 21, W - 4, 2, "#f2c230");   // faixas
+  for (let k = 0; k < 6; k++) { const wx = X + (f > 0 ? 4 : 12) + k * 8; R(wx, y + 7, 6, 7, "#2a4a6a"); R(wx, y + 7, 2, 3, "#bfe8ff"); }   // janelas
+  const fr = f > 0 ? X + W - 9 : X + 2;   // para-brisa
+  R(fr, y + 6, 7, 11, "#2a4a6a"); R(fr + (f > 0 ? 4 : 1), y + 7, 2, 5, "#bfe8ff");
+  R(f > 0 ? X + W - 3 : X + 1, y + 19, 2, 2, "#ffe98a");   // farol
+  const door = f > 0 ? X + W - 17 : X + 10; R(door, y + 8, 6, 13, OUTLINE); R(door + 1, y + 9, 4, 11, "#3a6a8a");   // porta
+  const spin = run ? Math.floor(now / 70) % 2 : 0;
+  for (const wx of [X + 8, X + W - 18]) { R(wx, y + 22, 10, 8, OUTLINE); R(wx + 1, y + 23, 8, 6, "#2a2a30"); R(wx + 4 - spin, y + 25, 2, 2, "#a8a8b0"); }   // rodas
+  if (run && Math.floor(now / 160) % 2) R(f > 0 ? X - 4 - (Math.floor(now / 90) % 3) : X + W + 2, y + 21, 3, 2, "#c8c4b8");   // fumaça do escapamento
 }
 // dormir numa rede ou tenda: passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
 // no motel do Ver-o-Peso, antes da faixa passa a cena do quarto (Rhanon dormindo e a janela escurecendo ou clareando)

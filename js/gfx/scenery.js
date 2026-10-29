@@ -18,6 +18,8 @@ const SCENES = {
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
   ladeiras:    {sky: ["#b8c0d8", "#d0c8d0", "#e8d0b8"], far: "#6a6a8a", trees: "casario", plat: "pedra"},   // Ladeiras de Ouro Preto: tarde de neblina e o casario lá atrás
   serracurral: {sky: ["#9ab8e0", "#c0cce0", "#e8d8c0"], far: "#5a6a8a", trees: "copa", plat: "pedra", water: true},   // Serra do Curral: céu de serra e a cordilheira azulada lá atrás
+  setecidades: {sky: ["#e8a868", "#f0cc98", "#dce4e8"], far: "#a8603a", trees: "caatinga", plat: "pedra"},   // Sete Cidades: fim de tarde no sertão e as pedras ao fundo
+  arrecifes:   {sky: ["#4ab0e8", "#8ad0f0", "#e0f4fa"], far: "#3a8ab8", trees: "campo", plat: "areia", water: true},   // Arrecifes: céu de praia e o mar ao fundo
   parquebsb:   {sky: ["#f0d8a0", "#e8c890", "#b8c8d8"], far: "#7a8a3a", trees: "campo", plat: "grama", water: true},   // Parque Nacional de Brasília: céu de seca e o campo do cerrado
   gruta:       {sky: ["#14141e", "#1c1c2c", "#24243a"], far: "#3a3848", trees: "campo", plat: "pedra", water: true},   // Gruta do Lago Azul: teto de pedra escuro e o lago azul
   rioprata:    {sky: ["#a8e0f0", "#88d0d8", "#6ac0a8"], far: "#2f7a42", trees: "copa", plat: "areia", water: true},   // Rio da Prata: mata verde e água cristalina

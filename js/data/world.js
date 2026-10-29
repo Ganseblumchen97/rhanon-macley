@@ -13,12 +13,12 @@ const MAP_REGIONS = {
     river: "M102 315 Q102 315 128 304 Q154 293 182 296 Q209 299 238 300 Q266 301 287 296 Q308 291 332 288 Q357 284 386 280 Q416 276 438 269 Q459 262 474 255 Q488 248 498 242 L508 237 M361 403 Q361 403 367 382 Q373 362 382 342 Q390 321 396 309 Q402 297 409 286 L416 276",
     route: ["ananindeua", "belem"], pos: {ananindeua: [379, 342], belem: [543, 257]}, path: "M379 342 Q379 342 384 332 Q390 321 396 309 Q402 297 409 286 Q416 276 438 269 Q459 262 474 259 Q488 256 500 261 Q512 266 520 265 Q529 264 536 260 L543 257"},
   // Nordeste: o contorno da região (a partir de longitude/latitude), a ilha de São Luís e o rio São Francisco; a estrada
-  // liga as cidades em ordem (São Luís, Teresina, Recife e Petrolina, que volta para o sertão na beira do São Francisco)
-  nordeste: {n: "Nordeste", aria: "Mapa estilizado do Nordeste, com São Luís, Teresina, Recife e Petrolina",
+  // liga as cidades em ordem (São Luís, Teresina, Petrolina no sertão e Recife no litoral, onde fica o aeroporto do fim)
+  nordeste: {n: "Nordeste", aria: "Mapa estilizado do Nordeste, com São Luís, Teresina, Petrolina e Recife",
     land: ["M150 63 L215 103 L314 116 L439 144 L542 184 L580 249 L576 280 L545 330 L492 370 L439 432 L420 488 L393 596 L367 584 L222 491 L143 500 L154 370 L150 345 L105 286 L97 200 L51 190 L116 169 L135 128Z",
       "M210 100 L222 94 L230 103 L220 110Z"],   // continente e a ilha de São Luís
     river: "M230 494 C250 440 300 360 363 320 S470 320 519 354",   // rio São Francisco
-    route: ["saoluis", "teresina", "recife", "petrolina"], pos: {saoluis: [222, 112], teresina: [276, 188], recife: [564, 280], petrolina: [362, 326]}},
+    route: ["saoluis", "teresina", "petrolina", "recife"], pos: {saoluis: [222, 112], teresina: [276, 188], recife: [564, 280], petrolina: [362, 326]}},
   // Centro-Oeste: Mato Grosso, Mato Grosso do Sul, Goiás e o Distrito Federal (a partir de longitude/latitude) e o rio
   // Paraguai descendo pelo Pantanal; a estrada desce de Cuiabá para Bonito e de lá atravessa o cerrado até Brasília
   centroeste: {n: "Centro-Oeste", aria: "Mapa estilizado do Centro-Oeste, com Cuiabá, Bonito e Brasília",
@@ -89,6 +89,14 @@ const SUB = {
   /* Belém (episódio 2): o ônibus chega no terminal; a trilha passa pelo Ver-o-Peso (feira, sem bichos) e segue
      pela Cidade Velha, pelo Porto e pelas Baixadas, cada vez mais difícil */
   terminal: {city: "belem", n: "Cais da Escadinha", s: "Cais", x: 392, y: 262, txt: "O barco de linha encosta aqui, na escadinha do cais. A passagem vale ida e volta: dá pra voltar pra aldeia quando quiser."},
+  /* rodoviárias do Nordeste (CITY[...].rodo): o ônibus chega e sai daqui; a bilheteria vende as passagens das linhas da
+     cidade (BUS_LINES) e o ônibus sai pela estrada do outro lado. G leva ao centro da cidade */
+  setecidades: {city: "teresina", n: "Sete Cidades", x: 182, y: 270, txt: "Um parque de pedra no norte do Piauí: rochas enormes que parecem ruínas de sete cidades, pintura antiga nas paredes e cerrado no meio. De noite, uma mulher de branco anda pela estrada e não para de crescer."},
+  arrecifes: {city: "recife", n: "Arrecifes", x: 336, y: 66, txt: "A praia do Recife, com a muralha de pedra dos arrecifes segurando o mar: piscina natural, coqueiro, guaiamum na areia e placa de tubarão. De madrugada, dizem, uma perna sozinha anda pela calçada."},
+  rodo_slz: {city: "saoluis", n: "Rodoviária de São Luís", s: "Rodoviária", x: 340, y: 238, txt: "A rodoviária da ilha, na saída para o continente: bilheteria, banco de espera e o ônibus que atravessa o Maranhão."},
+  rodo_the: {city: "teresina", n: "Rodoviária de Teresina", s: "Rodoviária", x: 372, y: 236, txt: "A rodoviária de Teresina, quente até na sombra: daqui saem os ônibus para São Luís e para o sertão de Petrolina."},
+  rodo_pet: {city: "petrolina", n: "Rodoviária de Petrolina", s: "Rodoviária", x: 376, y: 178, txt: "A rodoviária do sertão, de chão batido e banco de cimento: um ônibus volta para Teresina e outro desce para o Recife."},
+  rodo_rec: {city: "recife", n: "Rodoviária do Recife", s: "Rodoviária", x: 76, y: 232, txt: "A rodoviária do Recife, grande e barulhenta: ônibus para o sertão saindo a toda hora."},
   beira: {city: "petrolina", n: "Beira do Velho Chico", s: "Beira", x: 400, y: 228, txt: "Rio abaixo, longe da orla: capim alto, barranco de martim-pescador e o São Francisco largo, verde e manso. De noite, uma gargalhada boia no meio da água."},
   serra: {city: "petrolina", n: "Serra do Araripe", s: "Serra", x: 290, y: 56, txt: "Lá no alto, a chapada: paredão de pedra cheio de fóssil, mata verde na encosta e encruzilhada de estrada de terra. Nas sextas de lua cheia, ninguém sobe."},
   caatinga: {city: "petrolina", n: "Caatinga", x: 120, y: 110, txt: "A mata branca do sertão: galho seco, mandacaru e chão rachado. Bode, preá, tatu-bola... e, de noite, um assobio fino no meio dos espinhos."},
@@ -129,24 +137,24 @@ const CITY = {
     bay: "M0,0 L44,0 C28,40 46,80 28,110 C40,150 22,200 38,240 C28,270 34,300 46,325 L0,325Z",   // baía do Guajará
     river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Tapajós →"], home: "veropeso", gate: "terminal"},
   // São Luís (Nordeste): a ilha, com o rio Anil e a estrada para o aeroporto; a Praia Grande, o manguezal e os Lençóis
-  saoluis: {n: "São Luís", look: "litoral", map: "nordeste", route: ["praiagrande", "mangueilha", "lencois"], cabin: false,
+  saoluis: {n: "São Luís", look: "litoral", map: "nordeste", route: ["rodo_slz", "praiagrande", "mangueilha", "lencois"], rodo: "rodo_slz", cabin: false,
     land: "30,120 80,60 170,30 280,26 370,56 420,120 426,210 390,280 300,312 180,316 80,290 26,220",
     bay: "M0,0 L120,0 C90,30 60,60 34,96 C20,130 12,170 0,190Z",   // baía de São Marcos
-    river: "M260,40 C250,90 236,120 226,150 C214,186 236,230 230,290", road: "M262,200 C320,230 380,250 446,262", sign: [350, 290, "✈ Aeroporto"], home: "praiagrande", gate: "praiagrande"},
+    river: "M260,40 C250,90 236,120 226,150 C214,186 236,230 230,290", road: "M262,200 C320,230 380,250 446,262", sign: [350, 290, "✈ Aeroporto"], home: "praiagrande", gate: "rodo_slz"},
   // Teresina (Nordeste): entre o Parnaíba (oeste) e o Poti (leste), que se encontram ao norte; a estrada vai para São Luís
-  teresina: {n: "Teresina", look: "sertao", map: "nordeste", route: ["trocatroca", "encontro"], cabin: false,
+  teresina: {n: "Teresina", look: "sertao", map: "nordeste", route: ["rodo_the", "trocatroca", "encontro", "setecidades"], rodo: "rodo_the", cabin: false,
     land: "40,40 180,20 320,30 420,90 430,200 400,290 280,316 150,312 50,280 20,170",
-    river: "M60,320 C90,240 70,160 110,100 C130,70 150,40 160,0", road: "M300,200 C350,220 400,250 446,270", sign: [340, 300, "São Luís →"], home: "trocatroca", gate: "trocatroca"},
-  // Recife (Nordeste): o Recife Antigo, numa ilha entre o Capibaribe e o mar; a estrada vai para Teresina. Olinda vem depois
-  recife: {n: "Recife", look: "litoral", map: "nordeste", route: ["recifeantigo", "olinda"], cabin: false,
-    land: "20,40 160,20 330,30 420,80 430,200 400,290 260,316 120,312 30,270 10,160",
-    bay: "M330,0 L440,0 L440,325 L410,325 C400,240 420,160 380,90 C360,50 340,20 330,0Z",   // o mar
-    river: "M0,200 C80,190 160,210 240,180 C300,160 330,170 370,150", road: "M120,200 C80,230 40,250 -6,262", sign: [8, 300, "← Teresina"], home: "recifeantigo", gate: "recifeantigo"},
-  // Petrolina (Nordeste, sertão): a orla do São Francisco, embaixo, e a caatinga subindo para o norte; a estrada vai para Recife
-  petrolina: {n: "Petrolina", look: "sertao", map: "nordeste", route: ["orla", "caatinga", "serra", "beira"], cabin: false,
+    river: "M60,320 C90,240 70,160 110,100 C130,70 150,40 160,0", road: "M300,200 C350,220 400,250 446,270", sign: [340, 300, "São Luís →"], home: "trocatroca", gate: "rodo_the"},
+  // Petrolina (Nordeste, sertão, depois de Teresina): a orla do São Francisco, embaixo, e a caatinga subindo; a estrada vai para Recife
+  petrolina: {n: "Petrolina", look: "sertao", map: "nordeste", route: ["rodo_pet", "orla", "caatinga", "serra", "beira"], rodo: "rodo_pet", cabin: false,
     land: "30,30 170,16 320,26 420,70 432,190 400,250 300,262 160,266 40,250 12,140",
     bay: "M0,250 C80,268 180,272 300,262 C360,256 400,262 440,250 L440,325 L0,325Z",   // o rio São Francisco
-    river: "M0,262 C80,280 180,284 300,274 C360,268 400,274 440,262", road: "M300,210 C350,190 400,170 446,160", sign: [356, 150, "Recife →"], home: "orla", gate: "orla"},
+    river: "M0,262 C80,280 180,284 300,274 C360,268 400,274 440,262", road: "M300,210 C350,190 400,170 446,160", sign: [356, 150, "Recife →"], home: "orla", gate: "rodo_pet"},
+  // Recife (Nordeste, última cidade da estrada): o Recife Antigo, entre o Capibaribe e o mar; a estrada volta para Petrolina
+  recife: {n: "Recife", look: "litoral", map: "nordeste", route: ["rodo_rec", "recifeantigo", "olinda", "arrecifes"], rodo: "rodo_rec", cabin: false,
+    land: "20,40 160,20 330,30 420,80 430,200 400,290 260,316 120,312 30,270 10,160",
+    bay: "M330,0 L440,0 L440,325 L410,325 C400,240 420,160 380,90 C360,50 340,20 330,0Z",   // o mar
+    river: "M0,200 C80,190 160,210 240,180 C300,160 330,170 370,150", road: "M120,200 C80,230 40,250 -6,262", sign: [8, 300, "← Petrolina"], home: "recifeantigo", gate: "rodo_rec"},
   // Cuiabá (Centro-Oeste): o rio Cuiabá descendo pelo meio, com o Porto na margem leste; a estrada atravessa a ponte para
   // Várzea Grande, onde fica o aeroporto. Pantanal e Chapada vêm depois
   cuiaba: {n: "Cuiabá", look: "cerrado", map: "centroeste", route: ["portocuiaba", "pantanal", "chapada"], cabin: false,
@@ -269,13 +277,16 @@ const BUS = {price: 800, open: true};
    (pass = campo em G), vendida no mapa do Nordeste depois de acalmar o chefe de dia da cidade de onde sai (open) */
 const BUS_LINES = {
   teresina: {from: "saoluis", price: 900, pass: "passagemTHE", open: () => !!BS().lencois, lock: "O ônibus para Teresina sai depois que a Suçuarana dos Lençóis for acalmada."},
-  recife:   {from: "teresina", price: 1000, pass: "passagemREC", open: () => !!BS().encontro, lock: "O ônibus para Recife sai depois que o Surubim do Encontro dos rios for acalmado."},
-  petrolina: {from: "recife", price: 1100, pass: "passagemPET", open: () => !!BS().olinda, lock: "O ônibus para Petrolina sai depois que o Teiú-rei de Olinda for acalmado."},
+  petrolina: {from: "teresina", price: 1000, pass: "passagemPET", open: () => !!BS().setecidades, lock: "O ônibus para Petrolina sai depois que o Zabelê-rei de Sete Cidades for acalmado."},
+  recife:   {from: "petrolina", price: 1100, pass: "passagemREC", open: () => !!BS().beira, lock: "O ônibus para Recife sai depois que a Carranca da beira do Velho Chico for acalmada."},
   bonito: {from: "cuiaba", price: 1200, pass: "passagemBON", open: () => !!BS().chapada, lock: "O ônibus para Bonito sai depois que o Lobo-guará-rei da Chapada for acalmado."},
   ouropreto: {from: "bh", price: 1400, pass: "passagemOPR", open: () => !!BS().serracurral, lock: "O ônibus para Ouro Preto sai depois que o Muriqui-rei da Serra do Curral for acalmado."},
   brasilia: {from: "bonito", price: 1300, pass: "passagemBSB", open: () => !!BS().gruta, lock: "O ônibus para Brasília sai depois que a Preguiça-gigante da Gruta do Lago Azul for acalmada."}
 };
 // linha de ônibus entre as cidades a e b (em qualquer sentido), ou nada
+// rodoviária: a cidade dela e as cidades para onde sai ônibus dela
+const rodoCity = z => Object.keys(CITY).find(c => CITY[c].rodo === z);
+const busDests = c => MAP_REGIONS[CITY[c].map].route.filter(k => k !== c && busLine(c, k));
 const busLine = (a, b) => (BUS_LINES[b] && BUS_LINES[b].from === a && BUS_LINES[b]) || (BUS_LINES[a] && BUS_LINES[a].from === b && BUS_LINES[a]) || null;
 /* Notebook do Rhanon (missão do começo, só em jogo novo; ver HISTORIA.md): o Mateiro entrega quebrado depois do tutorial,
    o técnico da feira vende a BATERIA, o macaco-prego larga o TECLADO e a ariranha o CARREGADOR quando são acalmados, e
@@ -310,7 +321,7 @@ const FREELAS = {
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

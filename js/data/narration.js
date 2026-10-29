@@ -22,7 +22,7 @@ const NARRA = {
     "Fez mesmo? Então tu é famoso no Nordeste inteiro. Mas aqui na aldeia continua lavando a panela."
   ],
   petrolina: [
-    "Petrolina, no sertão. Depois de tanto mar e tanto mangue, o menino desceu do ônibus e só viu poeira, sol e mandacaru.",
+    "Petrolina, no sertão. Depois do mar de São Luís e dos rios de Teresina, o menino desceu do ônibus e só viu poeira, sol e mandacaru.",
     "Mas lá passa o São Francisco, o Velho Chico. No meio da seca, um rio que nunca para. O povo de lá chama ele de pai.",
     {r: "E tinha bode pra todo lado, vô. Um deles comeu minha corda do arco."},
     "Bode come tudo, curumim. Até corda de arco. Agora deixa eu contar da caatinga."
@@ -93,6 +93,10 @@ const NARRA_BOSS = {
   fulozinha: ["A Comadre Fulozinha é a dona da mata do sertão, curumim. Menina pequena, cabelo comprido até o pé, e um assobio que se ouve de longe.", "Ela protege os bichos de caçador. A fumaça fez ela achar que todo mundo era caçador, até o menino.", {r: "Eu deixei fumo e mingau pra ela, vô. Do jeito que o povo ensinou."}, "Fez certo. Ela agradeceu com uma trança no teu cabelo, lembra? Tu ficou dias sem conseguir desfazer."],
   teiu_rei: ["O Teiú-rei tomava sol no alto da Sé desde o tempo dos holandeses, diz o povo de Olinda.", "A fumaça não deixava ele dormir. O menino acalmou o bicho e ele voltou pra pedra quentinha."],
   meia_noite: ["O Homem da Meia-Noite é o boneco gigante mais antigo de Olinda. Sai no Carnaval e dança até o sol nascer.", "A fumaça fez ele dançar fora de hora, de cara fechada. O menino acalmou o boneco, e ele voltou a sorrir.", {r: "Ele me ensinou o passo do frevo, vô."}, "Tu? Dançando frevo? Isso eu queria ter visto."],
+  zabele_rei: ["O zabelê é ave do sertão do Piauí, curumim. Dizem que eram dois namorados que viraram passarinho pra ninguém separar.", "A fumaça fez o Zabelê-rei esquecer do canto. Ficou só o grito.", {r: "Quando ele acalmou, vô, assoviou bonito e outro zabelê respondeu de longe."}, "Era a namorada dele. Viu? Tem coisa que fumaça nenhuma separa."],
+  num_se_pode: ["A Num-se-pode é a mulher que cresce, curumim. Quem olha pra cima pra ver o rosto dela fica tonto e cai.", {r: "Eu olhei pros pés dela, vô. Igual o povo de lá ensinou."}, "Fez bem. Ela parou de crescer e voltou pro tamanho de gente. Era só uma moça perdida na estrada."],
+  tubarao_rei: ["Os arrecifes são a muralha de pedra do Recife, curumim. Do lado de dentro a água é mansa; do lado de fora mora o Tubarão-rei.", "A fumaça fez ele pular a muralha e entrar nas piscinas onde as crianças nadam.", {r: "Eu não briguei com ele, vô. Só mostrei o caminho de volta pro mar aberto."}, "Bicho grande também se perde. Tu fez certo."],
+  perna_cabeluda: ["Essa é história de cidade, curumim: uma perna enorme e cabeluda, sem dono, que dava rasteira em quem andava de madrugada no Recife.", {r: "E de quem era a perna, vô?"}, "Ninguém nunca soube. Mas depois que tu acalmou ela, nunca mais deu rasteira em ninguém. Dizem que só dança frevo no Carnaval."],
   surubim: ["O Surubim é o rei do fundo do Parnaíba, curumim. Pintado igual onça, com bigode de velho.", {r: "Ele fez cócegas com o bigode, vô."}, "Era agradecimento. Peixe não sabe abraçar."],
   cabeca_cuia: ["O Cabeça de Cuia foi gente: um pescador que maltratou a mãe e ficou com a cabeça pesada de remorso, assombrando o rio.", "A fumaça deixou ele mais bravo ainda. O menino acalmou o homem, e pela primeira vez em muito tempo ele chorou.", {r: "Ele disse que ia pedir perdão pra mãe dele, vô."}, "Então a maldição já tá ficando mais leve."],
   sucuarana: ["A suçuarana é prima da onça, curumim, só que da cor da areia. Nas dunas ninguém via ela chegar.", "O menino só viu porque ela fez sombra. E lá no Lençóis quase não tem sombra."],
@@ -160,16 +164,19 @@ const NARRA_PYT = {
     {r: "Tu tá deixando Guaraci bravo."},
     {p: "Sol bravo seca rio, seca roça, seca gente. Quanto mais seco, mais eu cresço."}
   ],
-  surubim: [
-    "No encontro dos rios, a fumaça ficou rodando em cima da água, sem conseguir secar nada.",
-    {p: "Dois rios teimosos... Mas o sertão é grande, curumim. Lá tu não acha água pra te esconder."},
+  // Teresina: o último chefe de dia é o de Sete Cidades (antes era o Surubim, do Encontro dos rios)
+  zabele_rei: [
+    "Entre as pedras de Sete Cidades, a fumaça se enrolou nas pinturas antigas das paredes.",
+    {p: "Gente pintou essas pedras faz milhares de anos, curumim. E eu já estava aqui olhando."},
+    {p: "Mas o sertão é grande. Lá tu não acha água pra te esconder."},
     {r: "Então eu levo a minha."}
   ],
-  teiu_rei: [
-    "No alto de Olinda, Pytuna se misturou com a fumaça da cidade, dos carros, das fábricas.",
+  // Recife: o último chefe de dia é o dos Arrecifes, a última fase do Nordeste
+  tubarao_rei: [
+    "Na beira dos arrecifes, com a cidade inteira acesa do outro lado, Pytuna se misturou com a fumaça dos carros e das fábricas.",
     {p: "Tá vendo? Aqui eu nem preciso trabalhar. Eles mesmos fazem fumaça pra mim."},
     {r: "E fazem festa também, frevo, maracatu. Disso tu não entende nada."},
-    "A fumaça não respondeu. Foi embora pro sertão, pro lado do Velho Chico."
+    {p: "Perdi o Nordeste, curumim. Mas o resto do Brasil ainda é meu. Me procura no meio do mapa, onde o céu é maior."}, "E o vento do mar levou a fumaça pro oeste, pro cerrado."
   ],
   // Brasília: o último chefe de dia do Centro-Oeste; a fumaça foge para o Sudeste, das cidades que não dormem
   tamandua_rei: [
@@ -199,8 +206,8 @@ const NARRA_PYT = {
     "Na beira do Velho Chico, quando a carranca voltou pra proa, a fumaça desceu baixinha, sem força.",
     {p: "Carranca, rezadeira, cordel... Esse povo ri de tudo, até do sol rachando o chão."},
     {r: "É assim que eles aguentam. E é assim que tu perde."},
-    {p: "Perdi o sertão. O resto do Brasil ainda é meu. Me procura no meio do mapa, onde o céu é maior."},
-    "E o vento quente levou ela pro oeste, pro cerrado."
+    {p: "Perdi o sertão. Mas no litoral tem cidade grande, e cidade grande faz fumaça sozinha."},
+    "E o vento quente levou ela pro leste, pro lado do mar."
   ],
   centroeste: [
     "E quando o último encantado do Centro-Oeste se acalmou, curumim, o céu do cerrado limpou de uma vez.",

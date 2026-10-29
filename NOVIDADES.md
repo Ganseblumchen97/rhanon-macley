@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.68.0 — o Nordeste em ordem: rodoviárias, Sete Cidades e os Arrecifes
+
+- Duas trilhas novas. Em Teresina, depois do Encontro dos rios, **Sete Cidades**: pedras que parecem ruínas no
+  cerrado, arara-canindé, furão, corre-campo e gralha-cancã; o Zabelê-rei de dia e, de noite, a Num-se-pode, a mulher
+  de branco que não para de crescer. No Recife, depois de Olinda, os **Arrecifes**: praia com coqueiros e piscinas
+  naturais, guaiamum, tartaruga, tesourão, moreia e tubarão; o Tubarão-rei de dia e a Perna Cabeluda de noite.
+- A estrada do Nordeste agora segue São Luís → Teresina → Petrolina → Recife, e o aeroporto para o Centro-Oeste fica na
+  última cidade. Os níveis de Petrolina e de Olinda foram ajustados para a ordem nova.
+- Cada cidade do Nordeste tem uma rodoviária: compre a passagem na bilheteria, suba no ônibus e escolha o destino. Quem
+  chega de ônibus desce na rodoviária da outra cidade.
+- Quem já tinha a passagem de Teresina para o Recife ganha a de Teresina para Petrolina.
+
 ## 0.67.0 — Pytuna não solta fácil e lutas com mais desafio
 
 - O último chefe de dia de cada cidade não volta a si de primeira: quando ele está quase calmo, Pytuna puxa a fumaça

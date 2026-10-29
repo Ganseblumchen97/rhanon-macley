@@ -1159,6 +1159,37 @@ function visagem(C) {
   };
 }
 
+// Perna Cabeluda (Recife, à noite): uma perna enorme e peluda, sem dono, com a barra da bermuda listrada em cima e o pé
+// de chinelo; pula, dá rasteira e chute. Desmaiada, cai deitada no chão com o pé para cima
+function pernaCabeluda(pose, f) {
+  const d = rigGrid(1, 40, 52), sk = "#b07a48", Sk = "#7a4e2a", hr = "#2a1a10", sh = "#e8402a", Sh = "#a82a18", st = "#ffd23a", ch = "#3a8ad8", Ch = "#1a5aa8";
+  const hair = pts => d.dots(pts, hr);
+  if (pose === "ko") {   // deitada, coxa à direita e o pé para cima à esquerda
+    d.part().poly([[30, 40], [38, 40], [38, 49], [30, 49]], sh, Sh).dots([[32, 41], [35, 43], [33, 46]], st);   // bermuda
+    d.part().limb(30, 45, 16, 46, 8, sk, Sk).limb(16, 46, 7, 44, 6, sk, Sk);
+    d.part().ellipse(6, 40, 3, 5, sk, Sk, .6).rect(3, 44, 6, 2, ch);   // pé para cima e o chinelo
+    hair([[27, 43], [24, 42], [21, 43], [18, 44], [26, 48], [22, 48], [13, 43], [10, 42]]);
+    d.dots([[5, 37], [6, 36], [7, 37], [5, 39], [7, 39]], BN);   // tonta (as estrelinhas giram em cima)
+    return {c: d.canvas(), head: [7, 38]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (pose === "idle" ? f * 2 : 0) + (cr ? 4 : 0), bx = at ? -2 : hu ? 3 : 0;
+  const X = v => v + bx, Y = v => v + by;
+  const hip = [X(22), Y(10)], knee = at ? [X(13), Y(22)] : cr ? [X(16), Y(28)] : [X(20), Y(28)], foot = at ? [X(3), Y(26)] : [X(18), 46];   // no chute, o pé vai para a frente
+  d.part().poly([[X(13), Y(2)], [X(31), Y(2)], [X(31), Y(13)], [X(13), Y(13)]], sh, Sh, X(26));   // a barra da bermuda listrada (frevo)
+  d.rect(X(13), Y(6), 18, 2, st).dots([[X(16), Y(10)], [X(22), Y(11)], [X(28), Y(10)]], st);
+  d.part().limb(...hip, ...knee, 10, sk, Sk).limb(...knee, ...foot, 7, sk, Sk);   // coxa grossa e canela
+  d.part().ellipse(knee[0], knee[1], 4.5, 4, sk, Sk, .6);   // joelho
+  const toe = at ? [foot[0] - 2, foot[1] - 2] : [foot[0] - 6, foot[1] + 1];
+  d.part().ellipse(...toe, 5.5, 2.6, sk, Sk, .5).rect(toe[0] - 6, toe[1] + 2, 12, 2, ch).rect(toe[0] - 1, toe[1] - 1, 1, 3, Ch);   // pé de chinelo
+  for (let k = 0; k < 9; k++) {   // os pelos, espalhados pela perna
+    const u = (k + .5) / 9, a = u < .5 ? hip : knee, b = u < .5 ? knee : foot, v = (u % .5) * 2, side = k % 2 ? -1 : 1;
+    const px = a[0] + (b[0] - a[0]) * v + side * 3, py = a[1] + (b[1] - a[1]) * v;
+    hair([[px, py], [px + side, py - 1], [px + side * 2, py - 1]]);
+  }
+  if (hu) d.dots([[X(26), Y(18)], [X(27), Y(17)], [X(28), Y(18)]], "#ffffff");   // tremidinha do golpe
+  return {c: d.canvas(), head: [X(22), Y(4)]};
+}
+
 /* ---------- bugs do freela: caricaturas de erro de programa, com olho grande de desenho animado ---------- */
 function bugPose(pose, f) {
   const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt";
@@ -1420,6 +1451,14 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   boitata: cobra({b: "#e8601c", B: "#a8300c", k: "#ffd23a", eye: "#fff3a0", flame: true, rattle: ["#e8d8a0", "#a89870"]}, false),
   sucuri: cobra({b: "#5a7a3a", B: "#3a5a24", k: "#1e2a14"}, false),
   surucucu: cobra({b: "#b0905a", B: "#806440", k: "#3a2a1a"}, true),
+  caninde: (pose, f) => pombo(pose, f, {b: "#2a7ad8", B: "#1a4a9a", n: "#f0c020", p: "#f0c020", w: "#2a5ab8", y: "#2a2a2a"}),   // arara-canindé: azul de peito amarelo
+  gralha: (pose, f) => pombo(pose, f, {b: "#1a1a2a", B: "#0e0e18", n: "#f4f4f0", p: "#f4f4f0", w: "#2a5ad8", y: "#2a2a2a"}),   // gralha-cancã: preta, peito branco e asa azul
+  zabele_rei: (pose, f) => pombo(pose, f, {b: "#8a7258", B: "#5e4a36", n: "#a89070", p: "#c8b090", w: "#6e5a44", y: "#3a3028"}),   // zabelê: pardo, barriga clara (o tamanho vem do scale do chefe)
+  corre_campo: cobra({b: "#c8a060", B: "#8a6a3a", k: "#5a3a1a"}, false),   // corre-campo: cor de capim seco com a listra escura
+  moreia: cobra({b: "#6a8a3a", B: "#3e5a22", k: "#e8d860", eye: "#ffffff"}, false),   // moreia: verde com pintas amarelas
+  tesourao: (pose, f) => garca(pose, f, {b: "#1e1e24", B: "#0e0e12", n: "#1e1e24", N: "#0e0e12", r: "#e2363d", R: "#a01a28", y: "#3a3a40", Y: "#22222a", k: "#5a5a60"}),   // tesourão: preto de papo vermelho
+  num_se_pode: visagem({w: "#ece4d4", W: "#b0a890", s: "#d8c8b0", h: "#2a1a10", e: "#ffd23a"}),   // Num-se-pode: a mulher de branco das estradas do Piauí
+  perna_cabeluda: pernaCabeluda,
   bug_loop: bugLoop, bug_404: bug404, bug_prazo: bugPrazo, bug_memoria: bugMemoria, bug_acento: bugAcento, bug_mutante: bugMutante,
   bug_falso: bugFalso, bug_coordenada: bugCoordenada, bug_lento: bugLento};
 Object.keys(QUADS).forEach(id => { BEAST_DRAW[id] = (pose, f) => quad(QUADS[id], pose, f); });

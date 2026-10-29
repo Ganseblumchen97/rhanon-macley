@@ -26,7 +26,8 @@ const ART = {queixada_chefe: "queixada", cobra_grande: "sucuri", onca_rei: "onca
   sagui: "macaco", maracaja: "jaguatirica", teiu: "calango", galo_campina: "pombo", teiu_rei: "calango",
   lontra: "ariranha", jacare_papo: "jacare", cagado: "tracaja", surubim: "pirarucu",
   tatupeba: "tatu", raposa: "lobo", traira: "piranha", asa_branca: "pombo", sucuarana: "onca",
-  siri: "caranguejo", carcara: "harpia", mero: "pirarucu"};
+  siri: "caranguejo", carcara: "harpia", mero: "pirarucu",
+  furao: "ariranha", guaiamum: "caranguejo", tartaruga: "tracaja", tubarao: "pirarucu", tubarao_rei: "pirarucu"};
 const FLAME = ["...r....","..rr.r..","..rrrr..",".rroorr.",".rooyor.","rooyyyor","rooyyyor",".rooyor.","..rooor."], PAL_F = {r:"#d62828", o:"#f2740c", y:"#ffd23a"};
 const GL = {"0":"111101101101111","1":"010110010010111","2":"111001111100111","3":"111001111001111","4":"101101111001001","5":"111100111001111","6":"111100111101111","7":"111001001010010","8":"111101111101111","9":"111101111001111","+":"000010111010000","-":"000000111000000"};
 

@@ -30,10 +30,11 @@ function vit() {
   if (SUB[G.sub] && cityOf(G.sub) !== curCity()) G.sub = CITY[curCity()].home;   // o local guardado tem que ser da cidade atual
   // locais que já apareceram no mapa de Ananindeua; save antigo: tudo o que já está liberado (sem repetir animação)
   if (!G.seen) { G.seen = {}; CITY.ananindeua.route.forEach(k => { if (unlocked(k)) G.seen[k] = true; }); }   // Belém aparece aos poucos na primeira chegada
+  Object.values(CITY).forEach(c => { if (c.rodo && G.seen[c.home]) G.seen[c.rodo] = true; });   // a rodoviária aparece junto com o centro da cidade
   G.skills = G.skills || {};   // degraus aprendidos da árvore de habilidades
   // notebook: jogo novo começa sem ele (missão do começo); save antigo já tem tudo ligado
   if (!G.nb) G.nb = G.tutorial ? {} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};
-  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET; G.passagemBON = !!G.passagemBON; G.passagemBSB = !!G.passagemBSB; G.passagemOPR = !!G.passagemOPR;
+  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET || G.passagemREC;   // save de antes da troca (Petrolina antes do Recife): quem pagou Teresina–Recife leva Teresina–Petrolina G.passagemBON = !!G.passagemBON; G.passagemBSB = !!G.passagemBSB; G.passagemOPR = !!G.passagemOPR;
   G.regions = G.regions || {norte: true};   // regiões já visitadas (o aeroporto voa entre elas)
   if (!G.narrated) G.narrated = G.belemVisto ? {belem: true} : {};   // falas do Pajé já contadas (prólogo, Belém, cada chefe)
   G.loseStreak = G.loseStreak || 0;   // lutas perdidas seguidas (2 = o Pajé dá uma dica)   // bugs resolvidos por freela; freelas entregues
@@ -64,9 +65,9 @@ function debugSetup() {
     route.slice(0, upto < 0 ? route.length : upto + (DEBUG.has("chefe") ? 1 : 0)).forEach(z => { if (ZONES[z]) BS()[z] = true; });
     route.slice(0, upto + 1).forEach(z => { if (cityOf(z) === city) G.seen[z] = true; });
     if (city !== "ananindeua") { G.loc = city; G.passagem = true; G.belemVisto = true; }
-    if (city === "teresina" || city === "recife" || city === "petrolina") G.passagemTHE = true;
-    if (city === "recife" || city === "petrolina") G.passagemREC = true;
-    if (city === "petrolina") G.passagemPET = true;
+    if (city === "teresina" || city === "petrolina" || city === "recife") G.passagemTHE = true;
+    if (city === "petrolina" || city === "recife") G.passagemPET = true;   // Petrolina vem antes do Recife
+    if (city === "recife") G.passagemREC = true;
     if (city === "bonito" || city === "brasilia") G.passagemBON = true;
     if (city === "brasilia") G.passagemBSB = true;
     if (city === "ouropreto") G.passagemOPR = true;

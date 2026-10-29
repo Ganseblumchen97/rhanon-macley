@@ -49,6 +49,10 @@ const TILE_PAL = {
   // Pantanal: capim verde-claro de campo alagado, cordilheira de mata baixa e água de baía escura e parada
   pantanal: {g1: "#8ab45a", g2: "#7aa44e", tall: "#5a8a3a", tallHi: "#a8d070", path: "#c8a870", path2: "#a88a54", leaf: "#3a7a3a", leaf2: "#2a5a2a", leafHi: "#5a9a4a", trunk: "#6d4a2a", rock: "#a89a88", rock2: "#7a6a58", water: "#3a7a7a", water2: "#7ab8b0", wood: "#9c6339", wood2: "#6d4329"},
   // Petrolina: a orla do São Francisco, calçada clara e casario baixo de cores quentes
+  // Teresina: Sete Cidades, chão de cerrado avermelhado, árvore torta (cerrado: true) e muita pedra cor de tijolo
+  setecidades: {g1: "#b8985a", g2: "#a8884a", tall: "#a8a04a", tallHi: "#d8c860", path: "#c8845a", path2: "#a8643a", leaf: "#5a8a3a", leaf2: "#3a6a2a", leafHi: "#8ab85a", trunk: "#4a3020", rock: "#c8845a", rock2: "#8a4a2a", water: "#3a8ab8", water2: "#8ad0f0", wood: "#9c6339", wood2: "#6d4329", cerrado: true},
+  // Recife: os Arrecifes, areia clara, coqueiro (palm: true), piscinas de água verde-azulada e pedra escura do arrecife
+  arrecifes: {g1: "#e8d8a8", g2: "#d8c898", tall: "#a8b860", tallHi: "#d8e080", path: "#c8b080", path2: "#a8905a", leaf: "#3a9a3a", leaf2: "#2a7a2a", leafHi: "#6ac85a", trunk: "#8a6a3a", rock: "#5a5a58", rock2: "#3a3a3a", water: "#2aa8c8", water2: "#a8f0f8", wood: "#9c6339", wood2: "#6d4329", palm: true},
   orla: {g1: "#c8b898", g2: "#b8a888", tall: "#8a9a4a", tallHi: "#b8c86a", path: "#8a7a68", path2: "#6e604e", leaf: "#3a7a3a", leaf2: "#2a5a2a", leafHi: "#5a9a4a", trunk: "#6d4329", rock: "#a89a88", rock2: "#7a6a58", water: "#3a7aa0", water2: "#7ab8d0", wood: "#9c6339", wood2: "#6d4329", roof: "#c06a3a", roof2: "#8a4422", walls: ["#e8d090", "#e89a5a", "#f0e6d0", "#d8705a", "#8ac0a0"]},
   olinda: {g1: "#a8a090", g2: "#948c7c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7e786c", path2: "#625c52", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22", walls: ["#e86a8a", "#f0c840", "#4aa8d8", "#8ad86a", "#f08a3a", "#e8e4d8"]},   // Olinda: o casario colonial colorido
   praiagrande: {g1: "#a8a090", g2: "#948c7c", tall: "#6a8a4a", tallHi: "#9ac06a", path: "#7e786c", path2: "#625c52", leaf: "#2f6a2a", leaf2: "#22501e", leafHi: "#4a8a3a", trunk: "#6d4329", rock: "#9a948a", rock2: "#6a645a", water: "#4a7a8a", water2: "#8ab8c0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22", walls: ["#3a6ab8", "#e8e4d8", "#4a8ad8", "#f0d890", "#e8e4d8"]},   // casarões de azulejo (azul, branco e amarelo)
@@ -63,6 +67,8 @@ const TILE_PAL = {
 };
 const OUTLINE = "#1a2418";
 // tipo de terreno desenhado embaixo das letras especiais
+// rodoviárias do Nordeste: as cores do centro da cidade (Petrolina com mandacaru no lugar das árvores)
+Object.assign(TILE_PAL, {rodo_slz: TILE_PAL.praiagrande, rodo_the: TILE_PAL.trocatroca, rodo_pet: {...TILE_PAL.orla, cactus: true}, rodo_rec: TILE_PAL.recifeantigo});
 const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "~", Y: ".", J: "."};   // U: o barco de linha fica na água; Y e J: entrada e baú do segredo (systems/secrets.js)
 
 function fillEllipse(x, cx, cy, rx, ry, col) {
@@ -113,6 +119,18 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
     grass();
     fillEllipse(x, ox + 8, oy + 9, 7, 6, OUTLINE); fillEllipse(x, ox + 8, oy + 9, 6, 5, P.rock2); fillEllipse(x, ox + 7, oy + 8, 5, 4, P.rock);
     x.fillStyle = "#ffffff40"; x.fillRect(ox + 5, oy + 6, 3, 1);
+  } else if (ch === "T" && P.palm) {   // praia: coqueiro de tronco curvo, folhas em leque e cocos (o lado da curva sorteado pelo lugar)
+    grass();
+    const s = r(91) < .5 ? 1 : -1, bx = ox + 8;
+    for (let k = 0; k < 9; k++) { const tx2 = bx + Math.round(s * (k * k) / 24); x.fillStyle = OUTLINE; x.fillRect(tx2 - 2, oy + 15 - k, 4, 1); x.fillStyle = k % 3 ? P.trunk : "#6a4a2a"; x.fillRect(tx2 - 1, oy + 15 - k, 2, 1); }
+    const top = bx + Math.round(s * 64 / 24), ty2 = oy + 6;
+    // folhas finas em arco: [lado, quanto caem, comprimento]; primeiro o contorno de todas, depois o verde por cima
+    const fronds = [[-1, .08, 7], [1, .08, 7], [-1, .22, 5], [1, .22, 5], [-1, -.16, 4], [1, -.16, 4]];
+    const pts = ([d, c, n]) => [...Array(n).keys()].map(k => [top + d * (k + 1), ty2 + Math.round(c * (k + 1) * (k + 1)) - (c < 0 ? 1 : 0)]);
+    x.fillStyle = OUTLINE; fronds.forEach(fr => pts(fr).forEach(([px, py]) => x.fillRect(px, py - 1, 1, 3)));
+    fronds.forEach(fr => pts(fr).forEach(([px, py], k) => { x.fillStyle = k % 2 ? P.leaf : P.leafHi; x.fillRect(px, py, 1, 1); }));
+    x.fillStyle = OUTLINE; x.fillRect(top - 2, ty2 - 1, 5, 4);
+    x.fillStyle = "#6a4a1e"; x.fillRect(top - 1, ty2, 1, 2); x.fillRect(top + 1, ty2, 1, 2);   // cocos
   } else if (ch === "T" && P.cactus) {   // caatinga: mandacaru (cacto de braços) ou árvore seca de galho cinza, sorteado pelo lugar
     grass();
     if (r(90) < .5) {
@@ -231,7 +249,8 @@ function drawStageMap(rows, zone) {
     }
     if (ch === "#") return drawBuilding(x, ox, oy, P, tx, ty, at);
     // chefe de água (Pirarucu, Cobra-Grande...): fica numa poça em vez de na grama
-    drawTile(x, ch === "B" && ZONES[zone] && WATER_BATTLE.has(ZONES[zone].boss) ? "~" : TILE_BASE[ch] || ch, ox, oy, P, tx, ty);
+    // e o ônibus da rodoviária fica no asfalto, não na água como o barco
+    drawTile(x, ch === "B" && ZONES[zone] && WATER_BATTLE.has(ZONES[zone].boss) ? "~" : ch === "U" && STAGES[zone] && rodoCity(zone) ? "r" : TILE_BASE[ch] || ch, ox, oy, P, tx, ty);
     if (ch === "E") {   // seta de saída apontando para a borda mais perto
       const sy = rows.findIndex(r => r.includes("S")), sx = rows[sy].indexOf("S");   // aponta do início (S) para a saída
       const left = tx < sx, down = ty > sy, ax = tx * TILE + 8, ay = ty * TILE + 8;

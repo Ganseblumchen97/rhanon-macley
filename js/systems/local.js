@@ -47,6 +47,10 @@ function selectSub(id, msg) {
     btn(t("Voltar para a aldeia"), () => busRide("ananindeua"), false, i);
     lh(t("A passagem vale ida e volta. Na aldeia tem a fogueira e as matas de sempre."));
   }
+  else if (rodoCity(id)) {   // rodoviária do Nordeste: a bilheteria e o ônibus para as cidades vizinhas
+    btn(t("Entrar na rodoviária"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: a bilheteria vende as passagens de ônibus, ida e volta, e o ônibus sai pela estrada."));
+  }
   else if (id === "orla") {
     btn(t("Entrar na orla"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo do sertão."));
@@ -132,10 +136,10 @@ function busRide(city, toStage) {
   const L0 = at(G.loc), L1 = at(city);
   const veh = $(MAP_REGION === "norte" ? "mkboat" : "mkbus");   // no Norte se viaja de barco pelo rio; no Nordeste, de ônibus
   $("mk").style.display = "none"; veh.style.display = "";
-  const volta = G.loc === "recife" || G.loc === "petrolina";   // voltando para o litoral (Teresina, Recife) pelo sertão
+  const volta = G.loc === "recife" || G.loc === "petrolina";   // voltando pela estrada (São Luís → Teresina → Petrolina → Recife)
   const onRiver = MAP_REGION === "norte";
   const deBSB = G.loc === "brasilia";   // voltando de Brasília para Bonito
-  $("info").innerHTML = `<h2>${t(onRiver ? "No rio…" : "Na estrada…")}</h2><p>${t({belem: "O barco desce o Tapajós e o Amazonas rumo a Belém.", ananindeua: "O barco sobe o Amazonas e o Tapajós de volta para a aldeia.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: volta ? "O ônibus desce do sertão de volta para Recife." : "O ônibus atravessa o sertão rumo a Recife.", petrolina: "O ônibus sobe pelo agreste e pelo sertão rumo a Petrolina.", bonito: deBSB ? "O ônibus volta pelo cerrado até Bonito." : "O ônibus desce pelo Mato Grosso do Sul rumo a Bonito.", brasilia: "O ônibus atravessa o cerrado rumo a Brasília.", ouropreto: "O ônibus desce pela serra rumo a Ouro Preto.", bh: "O ônibus sobe pela serra de volta para Belo Horizonte.", cuiaba: "O ônibus sobe pela estrada de volta para Cuiabá."}[city])}</p>`;
+  $("info").innerHTML = `<h2>${t(onRiver ? "No rio…" : "Na estrada…")}</h2><p>${t({belem: "O barco desce o Tapajós e o Amazonas rumo a Belém.", ananindeua: "O barco sobe o Amazonas e o Tapajós de volta para a aldeia.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: "O ônibus desce do sertão pelo agreste rumo a Recife.", petrolina: volta ? "O ônibus sobe pelo agreste e pelo sertão de volta para Petrolina." : "O ônibus atravessa o sertão rumo a Petrolina.", bonito: deBSB ? "O ônibus volta pelo cerrado até Bonito." : "O ônibus desce pelo Mato Grosso do Sul rumo a Bonito.", brasilia: "O ônibus atravessa o cerrado rumo a Brasília.", ouropreto: "O ônibus desce pela serra rumo a Ouro Preto.", bh: "O ônibus sobe pela serra de volta para Belo Horizonte.", cuiaba: "O ônibus sobe pela estrada de volta para Cuiabá."}[city])}</p>`;
   let t0 = 0, last = null, vrum = 0;
   const f = ts => {
     t0 = t0 || ts;
