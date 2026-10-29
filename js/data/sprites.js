@@ -49,6 +49,13 @@ const VILLAGER_LOOK = {
   peles:   {pal: {g: "#6d4329", G: "#46291a", r: "#ffffff", s: "#a86f40", S: "#7d4f2c"}, feather: "#e5001c", prop: "pelt"},
   comida:  {pal: {g: "#3f9a5c", G: "#25663a", r: "#ffd23a"}, longHair: true, top: "#ffd23a", prop: "basket"},
   artesao: {pal: {g: "#2a2230", G: "#17121c", r: "#19a8d8", t: "#26364a", T: "#18222f"}, feather: "#19a8d8", prop: "cloth"},
+  // vendedores de fora do Norte (lembranças e comida, <tipo>_<região>): roupa da região no lugar da faixa e da pena
+  peles_nordeste: {pal: {r: "#1a1426", s: "#a86f40", S: "#7d4f2c", h: "#2a1a14"}, shirt: ["#8a5a32", "#5e3a1e"], pants: ["#5a4a3a", "#3e3226"], hat: ["#8a5a32", "#5e3a1e", "#3a2414"], noBand: true, prop: "pelt"},   // vaqueiro de gibão e chapéu de couro
+  comida_nordeste: {pal: {r: "#1a1426", s: "#9a6236", S: "#6e4424", h: "#1a1420"}, shirt: ["#f4f0e4", "#d8d0bc"], pants: ["#e85a3a", "#a83a22"], longHair: true, noBand: true, prop: "basket"},   // blusa branca e saia de chita
+  peles_centroeste: {pal: {r: "#1a1426", s: "#b47a48", S: "#8a5a32", h: "#3a2a22"}, shirt: ["#c84a3a", "#8a2a22"], pants: ["#3a5a8a", "#24405a"], hat: ["#e8d080", "#b8a050", "#8a7030"], noBand: true, prop: "pelt"},   // peão pantaneiro de chapéu de palha
+  comida_centroeste: {pal: {r: "#1a1426", s: "#c8905a", S: "#9a6a3e", h: "#5a3a22"}, shirt: ["#f0c020", "#b8900e"], pants: ["#3a8a5a", "#25663a"], longHair: true, noBand: true, prop: "basket"},   // vestido amarelo de ipê
+  peles_sudeste: {pal: {r: "#1a1426", s: "#d8a070", S: "#a87048", h: "#3a2a22"}, shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#3a3a44", "#24242c"], hat: ["#4a4640", "#2a2a30", "#1a1a1e"], noBand: true, prop: "pelt"},   // mineiro de chapéu de feltro
+  comida_sudeste: {pal: {r: "#1a1426", s: "#d8a070", S: "#a87048", h: "#8a8478"}, shirt: ["#6a3a8a", "#4a2a6a"], pants: ["#e8e2cf", "#c8c0a8"], longHair: true, noBand: true, glasses: true, prop: "basket"},   // vovó mineira de óculos e avental
   // gente de Belém: roupa da cidade nas cores de urucum (vermelho), jenipapo (preto), açafrão (amarelo) e folha (verde)
   urbano1: {pal: {g: "#e5401c", G: "#a82a10", r: "#1a1426", s: "#b47a48", S: "#8a5a32"}, shirt: ["#e8c040", "#b8902a"], pants: ["#2a2a30", "#18181c"], longHair: true, prop: "basket"},
   urbano2: {pal: {g: "#3f9a5c", G: "#25663a", r: "#e5401c", h: "#3a2a22"}, shirt: ["#3f9a5c", "#2a6a3e"], pants: ["#c8402a", "#8a2a1a"], longHair: true, prop: "basket"},

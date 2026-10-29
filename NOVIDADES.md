@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.69.0 — cada região com a sua cara
+
+- A barraca de comida vende o prato da região: tapioca, carne de sol, cajuína e baião de dois no Nordeste; pamonha,
+  pacu assado, guaraná ralado e arroz com pequi no Centro-Oeste; pão de queijo, frango com quiabo, café coado e feijão
+  tropeiro em Minas. O que já está na bolsa vale em qualquer lugar.
+- Os vendedores de lembranças e de comida fora do Norte se vestem como o povo de lá: vaqueiro de gibão e chapéu de
+  couro no Nordeste, peão de chapéu de palha no Centro-Oeste, mineiro de chapéu de feltro e a vovó de óculos em Minas.
+- Os mercados das cidades não são mais todos iguais: pensão, barracas e moradores mudaram de lugar, e cada mercado
+  tem o toldo de uma cor.
+
 ## 0.68.0 — o Nordeste em ordem: rodoviárias, Sete Cidades e os Arrecifes
 
 - Duas trilhas novas. Em Teresina, depois do Encontro dos rios, **Sete Cidades**: pedras que parecem ruínas no

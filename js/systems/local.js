@@ -218,7 +218,7 @@ function peltButtons(i) {
   ids.forEach(k => { const u = peltUses(k); btn(t("Vender {pele} ×{n} · R$ {v}", {pele: peltName(k), n: G.pelts[k], v: G.pelts[k] * peltValue(k)}) + (u.length ? " " + USE_TAG() : ""), ask(t("Vender {pele} ×{n} por R$ {v}?", {pele: peltName(k).toLowerCase(), n: G.pelts[k], v: G.pelts[k] * peltValue(k)}) + (u.length ? useWarn(u) : ""), () => sell(k)), false, i); });
   if (!ids.length) lh(t("Nenhuma lembrança pra vender ainda. Acalma uns bichos e volta aqui."), i);
 }
-function foodButtons(i) { Object.entries(ITEMS).forEach(([id, it]) => btn(`${it.n} (${itemEffect(it)}) · R$ ${it.price}`, ask(t("Comprar {item} por R$ {n}?", {item: it.n.toLowerCase(), n: it.price}), () => buy(id)), G.money < it.price, i)); }
+function foodButtons(i) { Object.entries(ITEMS).filter(([, it]) => (it.reg || "norte") === foodRegion()).forEach(([id, it]) => btn(`${it.n} (${itemEffect(it)}) · R$ ${it.price}`, ask(t("Comprar {item} por R$ {n}?", {item: it.n.toLowerCase(), n: it.price}), () => buy(id)), G.money < it.price, i)); }
 function sell(k) {
   const n = G.pelts[k] || 0, v = n * peltValue(k); if (!n) return;
   G.money += v; G.pelts[k] = 0; save(); sfx("more"); localDone("feira", t("Vendeu {pele} ×{n} por R$ {v}.", {pele: peltName(k).toLowerCase(), n, v}));

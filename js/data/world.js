@@ -328,8 +328,27 @@ const ITEMS = {
   mandioca: {n: "Mandioca", price: 10, hp: 15, sp: 0},
   peixe:    {n: "Peixe assado", price: 18, hp: 20, sp: 0},
   acai:     {n: "Açaí", price: 15, hp: 0, sp: 10},
-  manicoba: {n: "Maniçoba", price: 45, hp: 30, sp: 15}
+  manicoba: {n: "Maniçoba", price: 45, hp: 30, sp: 15},
+  // comida de cada região (reg = mapa da cidade): a barraca vende a da região; na bolsa, todas valem em qualquer lugar
+  tapioca:  {n: "Tapioca", price: 10, hp: 15, sp: 0, reg: "nordeste"},
+  carne_sol: {n: "Carne de sol", price: 18, hp: 20, sp: 0, reg: "nordeste"},
+  cajuina:  {n: "Cajuína", price: 15, hp: 0, sp: 10, reg: "nordeste"},
+  baiao:    {n: "Baião de dois", price: 45, hp: 30, sp: 15, reg: "nordeste"},
+  pamonha:  {n: "Pamonha", price: 10, hp: 15, sp: 0, reg: "centroeste"},
+  pacu:     {n: "Pacu assado", price: 18, hp: 20, sp: 0, reg: "centroeste"},
+  guarana:  {n: "Guaraná ralado", price: 15, hp: 0, sp: 10, reg: "centroeste"},
+  pequi:    {n: "Arroz com pequi", price: 45, hp: 30, sp: 15, reg: "centroeste"},
+  pao_queijo: {n: "Pão de queijo", price: 10, hp: 15, sp: 0, reg: "sudeste"},
+  frango_quiabo: {n: "Frango com quiabo", price: 18, hp: 20, sp: 0, reg: "sudeste"},
+  cafe:     {n: "Café coado", price: 15, hp: 0, sp: 10, reg: "sudeste"},
+  tropeiro: {n: "Feijão tropeiro", price: 45, hp: 30, sp: 15, reg: "sudeste"}
 };
+// o que a barraca de comida da região diz (fala de vendedor)
+const FOOD_TALK = {norte: "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!",
+  nordeste: "Tapioca, carne de sol, cajuína gelada e baião de dois. Comida de sertanejo, visse?",
+  centroeste: "Pamonha, pacu assado, guaraná ralado e arroz com pequi. Cuidado pra não morder o espinho do pequi, tchá!",
+  sudeste: "Pão de queijo quentinho, frango com quiabo, café coado e feijão tropeiro. Come mais um, sô!"};
+const foodRegion = () => CITY[curCity()].map;
 /* Pedidos dos aldeões (um por vez). giver = aldeão que pede (aldeao1 Mateiro, aldeao2 Ancião, aldeao3 Aldeã);
    need: {kill: bicho, n} (vencer, conta a partir do aceite) ou {pelt: bicho, n} (entregar peles);
    night = só aparece à noite; reward: dinheiro e itens da bolsa. */

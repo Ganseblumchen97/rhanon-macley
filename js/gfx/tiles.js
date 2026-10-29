@@ -67,6 +67,10 @@ const TILE_PAL = {
 };
 const OUTLINE = "#1a2418";
 // tipo de terreno desenhado embaixo das letras especiais
+// toldo das barracas de cada mercado (sem stall: vermelho e branco, como na feira da aldeia)
+Object.entries({praiagrande: ["#2a6ab8", "#f4ecd8"], trocatroca: ["#e8a020", "#c8402a"], orla: ["#3a8a5a", "#f0d890"], recifeantigo: ["#e86a8a", "#f0c840"],
+  portocuiaba: ["#e8701c", "#f4ecd8"], centrobonito: ["#2aa8b8", "#f4ecd8"], planopiloto: ["#3a5ab8", "#e8e4d8"], mercadocentral: ["#c8a040", "#6a3a8a"], tiradentes: ["#2a5aa8", "#e8d8b0"]})
+  .forEach(([z, c]) => { if (TILE_PAL[z]) TILE_PAL[z].stall = c; });
 // rodoviárias do Nordeste: as cores do centro da cidade (Petrolina com mandacaru no lugar das árvores)
 Object.assign(TILE_PAL, {rodo_slz: TILE_PAL.praiagrande, rodo_the: TILE_PAL.trocatroca, rodo_pet: {...TILE_PAL.orla, cactus: true}, rodo_rec: TILE_PAL.recifeantigo});
 const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "~", Y: ".", J: "."};   // U: o barco de linha fica na água; Y e J: entrada e baú do segredo (systems/secrets.js)
@@ -212,8 +216,8 @@ function hutCanvas() {
   return c;
 }
 // barraca da feira: toldo listrado em cima, balcão com mercadoria embaixo (left/right = pontas)
-function drawStall(x, ox, oy, tx, left, right) {
-  const cols = ["#e5001c", "#f4ecd8"];
+function drawStall(x, ox, oy, tx, left, right, P = {}) {
+  const cols = P.stall || ["#e5001c", "#f4ecd8"];   // listras do toldo: cada mercado tem as suas (stall na paleta)
   for (let k = 0; k < TILE; k += 4) { x.fillStyle = cols[((tx * 4 + k) / 4) % 2]; x.fillRect(ox + k, oy + 1, 4, 6); }
   x.fillStyle = OUTLINE; x.fillRect(ox, oy, TILE, 1); x.fillRect(ox, oy + 7, TILE, 1);
   for (let k = 0; k < TILE; k += 4) { x.fillStyle = cols[((tx * 4 + k) / 4) % 2]; x.fillRect(ox + k, oy + 8, 4, 1); x.fillRect(ox + k + 1, oy + 9, 2, 1); }
@@ -235,7 +239,7 @@ function drawStageMap(rows, zone) {
     if ("HKFNVPCRMXLWQO".includes(ch)) {
       drawTile(x, "KVCRM".includes(ch) ? "-" : ".", ox, oy, P, tx, ty);
       if (ch === "H") x.drawImage(hut, (at(tx - 1, ty) === "H" ? (at(tx - 2, ty) === "H" ? 2 : 1) : 0) * 16, at(tx, ty - 1) === "H" ? 16 : 0, 16, 16, ox, oy, 16, 16);
-      else if (ch === "K") drawStall(x, ox, oy, tx, at(tx - 1, ty) !== "K", at(tx + 1, ty) !== "K");
+      else if (ch === "K") drawStall(x, ox, oy, tx, at(tx - 1, ty) !== "K", at(tx + 1, ty) !== "K", P);
       else if (ch === "F") {   // pedras em volta e lenha (as chamas são animadas por cima)
         fillEllipse(x, ox + 8, oy + 10, 7, 4, "#6a675e"); fillEllipse(x, ox + 8, oy + 10, 5, 2.5, "#2a1a10");
         x.fillStyle = "#6d4329"; x.fillRect(ox + 4, oy + 9, 8, 2); x.fillStyle = "#9c6339"; x.fillRect(ox + 5, oy + 11, 7, 1);

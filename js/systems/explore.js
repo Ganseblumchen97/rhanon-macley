@@ -182,7 +182,7 @@ function startExplore(zone, after, from) {
       else if (ch === "a") { const a = pickFromPool(zone, "terra"); if (a) EX.ents.push(makeAnimalEnt(a, tx, ty)); }
       else if (ch === "B" && !BS()[bossKey(zone)]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === zoneDef(zone).boss), tx, ty));
       else if (ch === "B") EX.spots.push({kind: "lembranca", x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});   // chefe vencido: dá para enfrentar de novo
-      else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "cliente" ? FREELAS[FREELA_AT[zone] || "site_feira"].look : SPOTS[ch] === "aldeao" ? (cityOf(zone) !== "ananindeua" ? "urbano" : "aldeao") + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});
+      else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "cliente" ? FREELAS[FREELA_AT[zone] || "site_feira"].look : SPOTS[ch] === "aldeao" ? (cityOf(zone) !== "ananindeua" ? "urbano" : "aldeao") + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : VILLAGER_LOOK[SPOTS[ch] + "_" + CITY[cityOf(zone)].map] ? SPOTS[ch] + "_" + CITY[cityOf(zone)].map : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});   // vendedor com a roupa da região (peles_nordeste...)
     }));
     if (from === "back") {   // do lado de dentro da passagem, virado para a fase
       const gy = st.rows.findIndex(r => r.includes("G")), gx = st.rows[gy].indexOf("G"), W = st.rows[0].length, H = st.rows.length;
@@ -987,7 +987,7 @@ function exOpenDialog(kind, msg, look) {
   }
   else if (kind === "tenda") { say(t("Tenda"), t("A tenda do Rhanon. Dormir recupera tudo, mas o dia passa.")); btn(t("Dormir"), () => exNap("dormir"), false, d); }
   else if (kind === "peles") { say(t("Comprador de lembranças"), t("Pena, dente, pele que a cobra largou... tudo vira artesanato. Mostra aí o que a mata te deu.")); peltButtons(d); }
-  else if (kind === "comida") { say(t("Barraca de comida"), t("Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!")); foodButtons(d); }
+  else if (kind === "comida") { say(t("Barraca de comida"), t(FOOD_TALK[foodRegion()] || FOOD_TALK.norte)); foodButtons(d); }
   else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão, tocha, cuia d'água e chicote de cipó pra espantar bicho. Me traz faísca de poraquê que eu te faço coisa melhor. Arma e armadura é com o armeiro, ali na barraca do meio.")); gearButtons(d); }
   else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
   else if (kind === "xama") { say(t("Pajé"), t("Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem luar de chefe nenhum pra eu trabalhar. Acalma um chefe e me traz o luar dele."), d);
