@@ -41,7 +41,9 @@ const STATUS_ICON = {
   fedor:    {c: ["#9bd34a", "#5a7a2a"], m: [".x...x.", "x.x.x.x", "...x...", ".xoooo.", "xoooooo", "xoooooo", ".oooo.."]},   // nuvem
   preso:    {c: ["#5d8a3a", "#2a3a1c"], m: ["xxxxxxx", "o.....o", "xxxxxxx", "o.....o", "xxxxxxx", "o.....o", "xxxxxxx"]},   // laço de cobra
   medo:     {c: ["#86d6ff", "#1a1426"], m: ["..xxx..", ".xxxxx.", "xoxxxox", "xxxxxxx", "xxoooxx", ".xoxox.", "..xxx.."]},   // carinha assustada
-  assustada:{c: ["#86d6ff", "#ffffff"], m: ["x.....x", ".x...x.", "..x.x..", "...x...", "..o.o..", ".o...o.", "o.....o"]}    // tremendo
+  assustada:{c: ["#86d6ff", "#ffffff"], m: ["x.....x", ".x...x.", "..x.x..", "...x...", "..o.o..", ".o...o.", "o.....o"]},   // tremendo
+  escudo:   {c: ["#cfe0ff", "#ffffff"], m: ["xxxxxxx", "xx.o.xx", "x.ooo.x", "xoooooo", "x.ooo.x", ".x.o.x.", "..xxx.."]},   // escudo com estrela de luar
+  aliado:   {c: ["#cfe0ff", "#1a1426"], m: ["x.x.x..", "xxxxx..", ".xxx...", "..x.xx.", "...xxxx", "...xxxx", "....xx."]}    // patinha de luar
 };
 const ICON_CACHE = {};
 function statusIconURL(k) {
@@ -64,6 +66,8 @@ function statusList() {
   if (p.weak > 0) out.push(["fedor", t("Fedor: golpes mais fracos"), p.weak]);
   if (p.preso > 0) out.push(["preso", t("Preso: não consegue fugir"), p.preso]);
   if (p.medo > 0) out.push(["medo", t("Medo: sem defesa"), p.medo]);
+  if (p.escudo > 0) out.push(["escudo", t("Escudo de luar: golpe pela metade"), p.escudo]);
+  if (p.fiel > 0) out.push(["aliado", t("Aliado ao lado do Rhanon"), p.fiel]);
   if (e && e.assustada) out.push(["assustada", t("{bicho} {assustado}", {bicho: theName(e, true), assustado: ending(e, "assustado", "assustada")}), ""]);
   return out;
 }

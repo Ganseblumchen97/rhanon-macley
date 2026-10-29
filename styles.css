@@ -691,6 +691,13 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 #beast.submerged.surge canvas.actor{animation:surgeW .5s steps(8)!important}
 @keyframes surgeW{30%{translate:4px -4px;scale:1.03}60%{translate:-10px -8px;scale:1.06}}
 .fx-cipo{position:absolute;display:block;height:6px;transform-origin:0 50%;margin-top:-3px;pointer-events:none;background:repeating-linear-gradient(90deg,#3f9a3a 0 10px,#2a6a2a 10px 13px);box-shadow:0 0 0 2px rgba(10,30,10,.55)}
+/* Chamado do aliado (combat.js): o espírito de luar do chefe acalmado, virado para o bicho, e o escudo de luar no Rhanon */
+.fx-espirito{position:absolute;translate:-50% -100%;pointer-events:none;z-index:4;filter:drop-shadow(0 0 6px rgba(207,224,255,.9))}
+.fx-espirito::before{content:"";position:absolute;inset:-20%;background:radial-gradient(closest-side,rgba(207,224,255,.35),transparent);z-index:-1}
+.fx-espirito canvas{display:block;width:auto;image-rendering:pixelated;transform:scaleX(-1)}
+.hero.escudo::after{content:"";position:absolute;right:-18%;top:10%;width:30%;height:75%;border-radius:40% 40% 50% 50%;border:3px solid rgba(207,224,255,.85);background:rgba(207,224,255,.18);box-shadow:0 0 12px rgba(207,224,255,.7);pointer-events:none;animation:escudoLuar 1.6s ease-in-out infinite}
+@keyframes escudoLuar{50%{opacity:.65}}
+@media (prefers-reduced-motion:reduce){.hero.escudo::after{animation:none}}
 .fx-jato{position:absolute;display:block;box-shadow:0 0 0 2px rgba(10,26,40,.55);image-rendering:pixelated;pointer-events:none}
 #beast.submerged.hit canvas.actor{animation:shakeW .35s,flashf .35s steps(1)!important}
 /* (translate/scale separados: a entrada do bicho deixa o transform do desenho preso) */
@@ -955,7 +962,8 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 
 /* ===== árvore de habilidades (systems/skills.js): três colunas com a cor de cada caminho (--sk); degrau aprendido
    cheio, livre com borda pulsando, sem pontos apagado, trancado (falta o de cima) mais apagado ainda ===== */
-.sk-wrap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:6px 0 10px}
+.sk-wrap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:6px 0 10px;max-height:min(52vh,520px);overflow-y:auto;padding:4px 6px 4px 2px}
+.sk-reg{font:700 11px var(--mono);font-style:normal;text-transform:uppercase;color:var(--brown);text-align:center;border-top:2px dashed var(--wood);padding-top:5px;margin-top:4px;opacity:.85}
 .sk-tree{display:flex;flex-direction:column;gap:8px;align-items:stretch}
 .sk-tree h3{margin:0;font:400 20px var(--display);text-transform:uppercase;color:var(--sk)}
 .sk-tree>small{font:700 11px var(--mono);opacity:.75;margin-top:-6px}
@@ -967,7 +975,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .sk-node.learned{background:var(--sk);border-color:#06120a;color:var(--parch)}
 .sk-node.open{border-color:var(--sk);animation:skPulse 1.2s steps(2) infinite}
 .sk-node.short{opacity:.6}
-.sk-node.locked{opacity:.38}
+.sk-node.locked,.sk-node.far{opacity:.38}
 .sk-node.sel{translate:0 -2px;box-shadow:4px 4px 0 var(--red);outline:3px solid #ffd23a}
 @keyframes skPulse{50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--sk) 40%,transparent)}}
 @media (prefers-reduced-motion:reduce){.sk-node.open{animation:none}}

@@ -3,6 +3,21 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.70.0 — habilidades novas e os chefes como aliados
+
+- **Chamado do aliado:** o último chefe de dia de cada cidade, depois de acalmado, vira aliado de verdade. Aprenda o
+  degrau na árvore do Pajé e, na luta, escolha em Especial quem chamar (12 PE, uma vez por luta). O espírito dele chega
+  na luz de Jaci, ao lado do Rhanon, e dá o golpe próprio: o jacaré faz o Rolo da morte, a Suçuarana joga areia nos
+  olhos do bicho, o Muriqui-rei passa com o bando e cura você, a Mula-madrinha toca o cincerro e a tropa inteira passa.
+- A árvore de habilidades cresceu: cada caminho ganhou 5 degraus novos, que abrem quando você chega no Nordeste, no
+  Centro-Oeste e no Sudeste (custam 3, 4 e 5 pontos). A tela agora rola e separa os degraus por região.
+- Golpes novos para aprender: Estocada dupla, Flecha dupla, Investida (no meio do golpe forte do chefe, dano dobrado e o
+  golpe se desfaz), Laço de cipó (o bicho perde a vez), Brilho das estrelas (os 2 próximos golpes do bicho batem pela
+  metade) e Lança de luar, que fica mais forte a cada chefe que você já acalmou.
+- E vantagens que valem sempre: Fúria guardada (errar o tempo certo tira só um ponto da fúria), Faro do mateiro (a luta
+  começa com crítico e o bicho nunca te pega de surpresa), Revide, Aliado fiel e Luz de Jaci, que levanta o Rhanon uma
+  vez por luta quando ele cai.
+
 ## 0.69.0 — cada região com a sua cara
 
 - A barraca de comida vende o prato da região: tapioca, carne de sol, cajuína e baião de dois no Nordeste; pamonha,

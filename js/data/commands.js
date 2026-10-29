@@ -19,6 +19,13 @@ const SPECIALS = [
   {id:"vento",  n:"Sopro de vento", cost:6, skill:"vento", elem:"vento", d:"Vento: 14 a 18 de dano. Na fraqueza do bicho, dano maior e “Mais uma!”. 6 PE."},
   {id:"raio",   n:"Raio do poraquê", cost:6, price:120, lv:9, craft:{poraque: 2}, elem:"raio", d:"Raio: 14 a 18 de dano. Na fraqueza do bicho, dano maior e “Mais uma!”. 6 PE."},
   {id:"flecha", n:"Flecha", cost:3, d:"Mira com calma: 40% de chance de crítico (dano dobrado). 3 PE. Precisa de arco."},
+  {id:"dupla", n:"Estocada dupla", cost:8, skill:"dupla", d:"Duas estocadas seguidas, cada uma com o seu tempo certo. 8 PE."},
+  {id:"flecha2", n:"Flecha dupla", cost:8, skill:"flecha2", bow:true, d:"Duas flechas, cada uma com 40% de chance de crítico. 8 PE. Precisa de arco."},
+  {id:"investida", n:"Investida", cost:10, skill:"investida", d:"Dano 1,6×. Contra o golpe forte que o chefe está juntando, dano dobrado e o golpe se desfaz. 10 PE."},
+  {id:"laco", n:"Laço de cipó", cost:10, skill:"laco", d:"Pouco dano, mas o bicho perde a próxima vez (chefe: metade das vezes). 10 PE."},
+  {id:"estrelas", n:"Brilho das estrelas", cost:10, skill:"estrelas", d:"Os 2 próximos golpes do bicho batem pela metade. 10 PE."},
+  {id:"aliado", n:"Chamado do aliado", cost:12, skill:"aliado", d:"Um chefe acalmado vem na luz de Jaci e dá o golpe dele. Uma vez por luta. 12 PE."},
+  {id:"luar", n:"Lança de luar", cost:14, skill:"luar", d:"Uma estocada de luar que fica mais forte a cada chefe acalmado. 14 PE."},
   {id:"cura", n:"Reza de cura", cost:6, skill:"cura", d:"O Rhanon reza para a mata e recupera 30% da vida (com Reza forte, 45% e tira veneno e queimadura). 6 PE."}
 ];
 // os cinco elementos dos especiais: nome e cor (etiqueta na placa da batalha e no caderno)

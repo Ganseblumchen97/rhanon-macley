@@ -59,7 +59,7 @@ function openItemMenu() {
   openSubMenu(bagIds().map(k => ({label: ITEMS[k].n, small: "×" + p.items[k], desc: `${ITEMS[k].n}: ${itemEffect(ITEMS[k])}.`, fn: () => useItem(k)})), t("Fecha a bolsa sem gastar o turno."), CMDS.findIndex(c => c.id === "item"));
 }
 // por que um especial ainda não pode ser usado ("" = pode): flecha precisa de arco, os comprados precisam ter sido comprados
-const specialLock = s => s.id === "flecha" && !G.equip.ranged ? t("sem arco") : s.price && !G.owned[s.id] ? t("na feira") : s.skill && !hasSkill(s.skill) ? t("habilidade") : "";
+const specialLock = s => (s.id === "flecha" || s.bow) && !G.equip.ranged ? t("sem arco") : s.price && !G.owned[s.id] ? t("na feira") : s.skill && !hasSkill(s.skill) ? t("habilidade") : "";
 /* especiais já liberados, na ordem em que o Rhanon conseguiu cada um (G.specOrder); o que ainda não tem não aparece.
    Os que liberam juntos (save antigo) entram pela ordem de compra: Object.keys(G.owned) guarda a ordem em que comprou */
 function specialsInOrder() {
@@ -101,7 +101,8 @@ function init(opts = {}) {
   $("beast").style.top = `calc(var(--plat) - ${spr.height / (+spr.dataset.scale || 1) * (animal.boss ? animal.scale || 1.35 : 1)} * var(--px) + 12px)`; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", animal.name); $("hero").style.display = ""; $("intent").style.display = ""; $("ehp").parentElement.style.display = ""; $("spTxt").parentElement.style.display = ""; $("sp").parentElement.style.display = "";
   musicStop();
   vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = t("Lutar de novo"); $("toMap").textContent = fromExplore ? t("Continuar explorando") : t("Voltar ao mapa");
-  p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, items:{...G.items}, furia:0};
+  p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:hasSkill("faro"), items:{...G.items}, furia:0};   // Faro do mateiro: começa atento
+  if (hasSkill("faro")) opts = {...opts, enemyFirst: false};   // ...e o bicho nunca pega de surpresa
   // freela do mapa de queimadas (Brasília): a brigada apaga os focos antes e o bicho tomado chega com 10% menos PV
   const far = !animal.bug && !!ZONES[curZone] && CITY[cityOf(curZone)].map !== "norte";   // chefe de fora do Norte: mais vida e o golpe forte
   const ehp = Math.round(animal.hp * (G.portfolio.mapa_queimadas && !animal.bug && isTomado(animal) ? .9 : 1) * (animal.boss && far ? BOSS_HP_FAR : 1) * beastToughness(animal));
@@ -174,6 +175,7 @@ function say(t) { lines.push(t); if (lines.length > 4) lines.shift(); }
 function avail(id) {
   if (busy) return false;
   const sp = SPECIALS.find(s => s.id === id);
+  if (id === "aliado" && (p.aliadoUsado || !allyList().length)) return false;   // uma vez por luta, e só com chefe final acalmado
   if (sp) return !specialLock(sp) && p.sp >= sp.cost;
   if (id === "especial") return SPECIALS.some(s => avail(s.id));
   if (id === "item") return bagIds().length > 0;
@@ -193,6 +195,7 @@ function render() {
   // estados como ícones (ui/theme.js), com os turnos que faltam; o nome aparece ao passar o mouse e para leitores de tela
   $("status").innerHTML = statusList().map(([k, name, n]) => `<span class="st" title="${name}"><img src="${statusIconURL(k)}" alt="${name}">${n ? `<b>${n}</b>` : ""}</span>`).join("");
   $("furia").className = "furia" + (furyReady() ? " cheia" : "");
+  $("hero").classList.toggle("escudo", p.escudo > 0);   // rabo-bandeira e Brilho das estrelas: escudo de luar na frente do Rhanon
   [...$("furia").children].forEach((d, i) => { d.classList.toggle("on", i < (p ? p.furia || 0 : 0)); d.hidden = i >= furyMax(); });
   if (!subMenu) CMDS.forEach((c, i) => {
     const b = $("cmds").children[i];
@@ -236,7 +239,7 @@ const furyMax = () => hasSkill("furia2") ? FURY_MAX - 1 : FURY_MAX;   // habilid
 const furyReady = () => !!p && p.furia >= furyMax();
 function furyNote(ok) {
   if (!p || furyReady()) return;
-  if (!ok) { p.furia = 0; return; }
+  if (!ok) { p.furia = hasSkill("furia_guarda") ? Math.max(0, p.furia - 1) : 0; return; }   // Fúria guardada: perde só 1
   p.furia++;
   if (furyReady()) setTimeout(() => { pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t(furyMax() === 3 ? "Três no tempo certo! Fúria pronta: usa a lança." : "Quatro no tempo certo! Fúria pronta: usa a lança.")); render(); }, 420);
 }
@@ -244,8 +247,9 @@ function hitBeast() {
   const b = $("beast"); b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit");
   if (BEAST_A.state !== "defeat") BEAST_A.set("hurt");
 }
-function act(id) {
+function act(id, ally) {
   if (!avail(id)) return;
+  if (id === "aliado" && !ally) return openAllyMenu();   // escolhe o aliado; o turno só é gasto ao escolher
   if (id === "defender") HERO_A.set("guard");
   if (id === "item") return openItemMenu();          // submenus: o turno só é gasto ao escolher algo dentro deles
   if (id === "especial") return openSpecialMenu();
@@ -270,6 +274,37 @@ function act(id) {
     if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
     e.hp = Math.max(0, e.hp - d);
     wait = strike(d, crit ? "crit" : "", "throw", miss ? t("Rhanon joga a lança, mas {bicho} desvia!", {bicho: foe()}) : crit ? t("Arremesso certeiro no ponto fraco: −{n}!", {n: d}) : t("Rhanon joga a lança: −{n}.", {n: d}));
+  } else if (id === "dupla") {   // Estocada dupla: duas lançadas, cada uma com o seu anel
+    p.sp -= 8;
+    wait = strikeTwice("spear", () => { let d = Math.round((rnd(6, 10) + G.lv - 1 + weaponAtk()) * .8), crit = p.atento; if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2); return {d, cls: crit ? "crit" : "", msg: t("Estocada: −{n}.", {n: d})}; });
+  } else if (id === "flecha2") {   // Flecha dupla: duas flechas, cada uma com 40% de crítico
+    p.sp -= 8;
+    wait = strikeTwice("arrow", () => { let d = rnd(5, 9) + G.lv - 1 + ((EQUIP.ranged[G.equip.ranged] || {}).atk || 0) + charmStat("atk") + skillStat("atk") + (hasSkill("mira") ? 4 : 0), crit = p.atento || Math.random() < .4; if (crit) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2); return {d, cls: crit ? "crit" : "", msg: crit ? t("Flechada certeira no ponto fraco: −{n}!", {n: d}) : t("Flechada: −{n}.", {n: d})}; });
+  } else if (id === "investida" || id === "luar") {   // Investida do lobo-guará (corta o golpe forte) e Lança de luar (cresce com os chefes acalmados)
+    p.sp -= id === "luar" ? 14 : 10;
+    const forte = id === "investida" && e.intent === "forte";
+    let d = Math.round((rnd(6, 10) + G.lv - 1 + weaponAtk()) * (id === "luar" ? Math.min(2.5, 1 + .02 * bossesCalm()) : forte ? 3.2 : 1.6));
+    if (p.atento) { d *= 2; p.atento = false; } if (p.weak > 0) d = Math.ceil(d / 2);
+    e.hp = Math.max(0, e.hp - d);
+    if (forte) { e.intent = "arranhao"; e.known = true; }   // o golpe forte se desfaz
+    wait = strike(d, "crit", "spear", id === "luar" ? t("Lança de luar: −{n}!", {n: d}) : forte ? t("Investida no meio do golpe forte: −{n}! O golpe se desfaz.", {n: d}) : t("Investida: −{n}!", {n: d}));
+    if (id === "luar") setTimeout(() => { const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height / 2); PFX.burst(16, "star", ["#ffffff", "#cfe0ff"], gx, gy, 20, {life: 1, up: 8}); }, 450);
+  } else if (id === "laco") {   // Laço de cipó: pouco dano e o bicho perde a vez (chefe: metade das vezes)
+    p.sp -= 10;
+    let d = Math.round((rnd(6, 10) + G.lv - 1 + weaponAtk()) * .5); if (p.weak > 0) d = Math.ceil(d / 2);
+    const ok = !e.boss || Math.random() < .5; if (ok) e.perde = 1;
+    e.hp = Math.max(0, e.hp - d);
+    wait = strike(d, "", "cipo", ok ? t("O laço de cipó prende {bicho}: −{n}, e perdeu a vez.", {bicho: foe(), n: d}) : t("O laço pega {bicho} de raspão: −{n}. Ele se soltou.", {bicho: foe(), n: d}));
+  } else if (id === "estrelas") {   // Brilho das estrelas: os 2 próximos golpes do bicho batem pela metade
+    p.sp -= 10; p.escudo = Math.max(p.escudo || 0, 2);
+    HERO_A.set("cast"); sfx("heal");
+    const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .4);
+    PFX.burst(16, "star", ["#ffffff", "#ffd23a", "#cfe0ff"], gx, gy, 22, {life: 1.1, up: 6});
+    say(t("Brilho das estrelas: os 2 próximos golpes batem pela metade."));
+    wait = 900;
+  } else if (id === "aliado") {   // Chamado do aliado: o chefe acalmado vem e dá o golpe dele
+    p.sp -= 12; p.aliadoUsado = true;
+    const r = allyCall(ally); wait = r.wait; extra = r.extra;
   } else if (SPECIALS.find(s => s.id === id && s.elem)) {   // especial de elemento (tocha, cuia, vento, raio): fraqueza 1,5× e "Mais uma!", resistência metade
     const k = SPECIALS.find(s => s.id === id).elem, m = bugMode ? 1 : elemMult(e, k), fresh = !bugMode && !elemKnown(e, k);
     elemLearn(e, k);
@@ -310,7 +345,7 @@ function act(id) {
     if (Math.random() * 100 < chance) { render(); return finish("flee"); }
     say(p.preso > 0 ? t("Rhanon tá preso, não dá pra fugir!") : t("{bicho} cortou o caminho. Não deu pra fugir!", {bicho: foe(1)}));
   }
-  const again = !extra && (["atacar", "arremesso", "flecha"].includes(id) || SPECIALS.some(s => s.id === id && s.elem)) && charmRoll("turno");   // talismã: age de novo
+  const again = !extra && (["atacar", "arremesso", "flecha", "dupla", "flecha2", "investida", "luar", "laco"].includes(id) || SPECIALS.some(s => s.id === id && s.elem)) && charmRoll("turno");   // talismã: age de novo
   const bonus = !extra && !again && p.bonus && id !== "fugir"; if (bonus) p.bonus = false;   // contra-ataque perfeito: esta ação não passa a vez
   render();
   setTimeout(() => {
@@ -323,7 +358,10 @@ function act(id) {
 }
 function enemyTurn() {
   const i = e.intent; foeImpact = 0;
-  if (charmRoll("encanto")) {   // talismã do Boto: o bicho fica parado, encantado
+  if (e.perde > 0) {   // laço de cipó ou abraço do tempo: o bicho fica parado
+    e.perde = 0; say(t("{bicho} não consegue se mexer: perdeu a vez.", {bicho: foe(1)})); pop(t("PRESO!"), $("beast"), "crit"); BEAST_A.set("hurt");
+    foeImpact = 600;
+  } else if (charmRoll("encanto")) {   // talismã do Boto: o bicho fica parado, encantado
     say(t("O talismã encanta {bicho}: perdeu a vez.", {bicho: foe()})); pop(t("ENCANTADO!"), $("beast"), "crit"); sfx("look"); BEAST_A.set("hurt");
     foeImpact = 600;
   } else if (i === "forte") {   // o golpe forte avisado: com a guarda levantada, passa só um pedaço
@@ -348,6 +386,12 @@ function enemyTurn() {
   setTimeout(() => {
     tick(); p.hp = Math.max(0, p.hp);
     if (e.hp <= 0) { render(); return finish("win"); }
+    if (p.hp <= 0 && hasSkill("jaci") && !p.jaciUsada) {   // Luz de Jaci: uma vez por luta, levanta com 30% da vida
+      p.jaciUsada = true; p.hp = Math.ceil(p.max * .3); HERO_A.set("victory"); sfx("heal"); pop(t("LUZ DE JACI!"), $("hero"), "heal");
+      const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .3);
+      PFX.burst(18, "spark", ["#ffffff", "#cfe0ff", "#e8f0ff"], gx, gy, 20, {life: 1.2, up: 12});
+      say(t("A luz de Jaci cai sobre o Rhanon: ele levanta com {n} PV!", {n: p.hp}));
+    }
     if (p.hp <= 0) { render(); return finish("lose"); }
     pick(); busy = false; render();
   }, foeImpact + 150);
@@ -469,10 +513,17 @@ function foeAttack(kind, d, sp0) {
     else { anim($("beast"), "lunge"); sfx("claw"); }
   }, prep);
   setTimeout(() => {
+    if (d > 0 && e.cego > 0) { e.cego = 0; if (Math.random() < .5) { p.hp += d; d = 0; say(t("Com areia nos olhos, {bicho} erra o golpe!", {bicho: foe()})); pop(t("ERROU!"), $("hero"), "heal"); sfx("esquiva"); } }   // Salto da duna
+    if (d > 0 && e.espanto > 0) { const n = Math.ceil(d * .35); p.hp += n; d -= n; }   // Careta que espanta: com medo, bate mais fraco
+    if (d > 0 && p.escudo > 0) { p.escudo--; const n = Math.floor(d / 2); p.hp += n; d -= n; say(t("O escudo de luar segura metade do golpe: evitou {n}.", {n})); pop(t("ESCUDO!"), $("hero"), "heal"); sfx("bloqueio"); }
     if (block && qteTake()) {   // bloqueio na hora certa: metade do dano volta (Bloqueio firme: 2/3; Contra-ataque perfeito: tudo)
       const all = hasSkill("bloqueio2"), back = all ? d : Math.floor(d * (hasSkill("bloqueio") ? 2 / 3 : 1 / 2)); p.hp += back; d -= back;
       if (back) { say(t("Bloqueio! Evitou {n} de dano.", {n: back})); pop(t("BLOQUEIO!"), $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
       if (all && back) { p.bonus = true; say(t("Contra-ataque perfeito: no próximo turno, o Rhanon age duas vezes!")); }
+      if (hasSkill("revide") && back && e.hp > 0) {   // Revide: metade do que evitou volta para o bicho
+        const n = Math.max(1, Math.ceil(back / 2)); e.hp = Math.max(0, e.hp - n);
+        setTimeout(() => { hitBeast(); pop("−" + n, $("beast"), "strong"); say(t("Revide! {bicho} perde {n} PV.", {bicho: foe(), n})); render(); }, 150);
+      }
     }
     if (d > 0 && !e.bug && Math.random() * 100 < (WEATHER[weatherNow()].dodge || 0)) {   // neblina: o bicho erra de vez em quando
       p.hp += d; d = 0; say(t("Na neblina, o golpe passa raspando!")); pop(t("DESVIOU!"), $("hero"), "heal"); sfx("esquiva");
@@ -629,6 +680,159 @@ function cipoWhip(a, b) {
   }, start);
   return start + reach;
 }
+/* ---------- Chamado do aliado (degrau p6, ALLY_MOVES em data/skills.js) ----------
+   Os chefes que o Pytuna segurou (o último chefe de dia de cada cidade), já acalmados, atendem a luz de Jaci: o espírito
+   surge ao lado do Rhanon, de perfil para o bicho, prateado e meio transparente, dá o golpe próprio e se desfaz em luar.
+   Uma vez por luta; com Aliado fiel (p8) ele fica mais 3 turnos e ataca no fim de cada um (allyEcho, em tick). */
+const allyList = () => pytunaBosses().filter(id => ALLY_MOVES[id] && bossBeaten(id));
+const allyBase = () => rnd(14, 18) + G.lv - 1 + charmStat("atk") + skillStat("atk");   // a mesma base dos especiais de elemento
+function openAllyMenu() {
+  openSubMenu(allyList().map(id => {
+    const a = ANIMALS.find(x => x.id === id), mv = ALLY_MOVES[id];
+    return {label: a.name, small: mv.n, desc: `${mv.n}: ${mv.d}`, fn: () => { buildCmds(); act("aliado", id); }};
+  }), t("Volta aos comandos sem gastar o turno."), CMDS.findIndex(c => c.id === "especial"));
+}
+// quadro do espírito: o desenho do chefe tingido de luar, com brilho em volta (guardado por pose)
+const SPIRIT_C = new Map();
+function spiritFrame(id, pose) {
+  const k = id + pose; if (SPIRIT_C.has(k)) return SPIRIT_C.get(k);
+  const a = ANIMALS.find(x => x.id === id) || {}, src = beastFrame(id, pose, 0) || animalSprite(a), pad = 8;
+  const o = document.createElement("canvas"); o.width = src.width; o.height = src.height;
+  const og = o.getContext("2d"); og.filter = a.tint || "none"; og.drawImage(src, 0, 0); og.filter = "none";
+  og.globalCompositeOperation = "source-atop"; og.fillStyle = "rgba(200,220,255,.4)"; og.fillRect(0, 0, o.width, o.height);
+  const c = document.createElement("canvas"); c.width = src.width + pad * 2; c.height = src.height + pad * 2;
+  const g = c.getContext("2d"); g.shadowColor = "#cfe0ff"; g.shadowBlur = 6; g.drawImage(o, pad, pad); g.shadowBlur = 0; g.drawImage(o, pad, pad);
+  SPIRIT_C.set(k, c); return c;
+}
+// espírito no palco: pés na altura dos pés do Rhanon, um pouco à frente dele; size = fração da altura do Rhanon
+function spiritEl(id, size = 1.15, x) {
+  const a = pos($("hero")), hr = $("hero").getBoundingClientRect(), w = document.createElement("div"), cv = document.createElement("canvas");
+  w.className = "fx-espirito"; w.append(cv);
+  const show = pose => { const s = spiritFrame(id, pose); cv.width = s.width; cv.height = s.height; cv.getContext("2d").drawImage(s, 0, 0); cv.style.height = hr.height * size + "px"; };
+  show("idle");
+  w.style.left = (x === undefined ? a.x + hr.width * 1.3 : x) + "px"; w.style.top = a.y + hr.height / 2 + "px";
+  $("fx").appendChild(w);
+  return {el: w, show, x: x === undefined ? a.x + hr.width * 1.3 : x};
+}
+// golpe do aliado: devolve {wait, extra}; o dano entra no impacto (cada mordida do frenesi é um impacto)
+function allyCall(id) {
+  const mv = ALLY_MOVES[id], me = e, k = mv.elem, m = bugMode ? 1 : elemMult(e, k), fresh = !bugMode && !elemKnown(e, k);
+  const at = (ms, fn) => setTimeout(() => { if (e === me && mode === "hunt") fn(); }, REDUCE ? ms / 3 : ms);
+  const name = ANIMALS.find(x => x.id === id).name, dmg = f => Math.max(1, Math.round(allyBase() * mv.pow * f * m * (bugMode ? 1 : weatherBoost(k))));
+  if (!bugMode) elemLearn(e, k);
+  p.aliadoId = id; if (hasSkill("fiel")) p.fiel = 3;
+  const sp = spiritEl(id), b = pos($("beast")), dx = Math.max(0, b.x - sp.x - 70), cols = ["#ffffff", "#cfe0ff", ELEMENTS[k].c];
+  say(t("{aliado} atende a luz de Jaci!", {aliado: name}));
+  HERO_A.set("cast"); sfx("look"); animalCry(id, true); pop(mv.n.toUpperCase(), $("hero"), "heal");   // nome do golpe pequeno, sem cobrir o espírito
+  sp.el.animate([{opacity: 0, transform: "translateY(24px)"}, {opacity: .85, transform: "translateY(0)"}], {duration: 600, easing: "ease-out", fill: "forwards"});
+  const hit = (d, msg) => {   // impacto no bicho: barra desce, número, cor do elemento
+    e.hp = Math.max(0, e.hp - d); hitBeast(); pop(String(d), $("beast"), m > 1 ? "crit" : "strong");
+    burst(b, cols, 14, 80); sfx(m > 1 ? "critico" : "hit"); hitImpact(d >= 20 ? "forte" : "leve"); if (msg) say(msg); render();
+  };
+  const lunge = (t0, dur = 260, hold = 300, extra = []) => {   // agacha, dá o bote até o bicho e volta
+    at(t0 - 250, () => sp.show("crouch"));
+    at(t0, () => { sp.show("attack"); sfx("claw"); sp.el.animate([{transform: "translateX(0)"}, {transform: `translateX(${dx}px)`, offset: dur / (dur + hold + 300)}, ...extra, {transform: `translateX(${dx}px)`, offset: (dur + hold) / (dur + hold + 300)}, {transform: "translateX(0)"}], {duration: dur + hold + 300, easing: "ease-out"}); });
+  };
+  const v = {bicho: foe()}, T = 900;   // T = hora do bote
+  let end = T + 900;
+  if (mv.fx === "frenesi") {   // três mordidas: o espírito cola no bicho e morde três vezes
+    lunge(T, 220, 900);
+    [0, 1, 2].forEach(i => at(T + 220 + i * 280, () => { sp.show(i % 2 ? "crouch" : "attack"); sfx("claw"); hit(dmg(1), i === 2 && t("Três mordidas do recife n{bicho}!", v)); }));
+    end = T + 220 + 3 * 280 + 400;
+  } else if (mv.fx === "tropa") {   // o cincerro toca e uma fila de mulas de luar atravessa o palco
+    at(500, () => { sp.show("attack"); sfx("bloqueio"); setTimeout(() => sfx("bloqueio"), 220); shake("gshake-s"); });   // blém, blém: o cincerro
+    at(800, () => {
+      const W = $("fx").clientWidth;
+      for (let i = 0; i < 5; i++) setTimeout(() => {
+        const c = spiritEl(id, .8, -60); c.show(i % 2 ? "attack" : "idle"); c.el.style.opacity = .7; sfx("claw");
+        c.el.animate([{transform: "translateX(0)"}, {transform: `translateX(${W + 140}px)`}], {duration: 900, easing: "linear"}).onfinish = () => c.el.remove();
+      }, i * 140);
+      shake("gshake");
+    });
+    at(1450, () => { hit(dmg(1), t("A tropa de luar passa por cima d{bicho}!", v)); hitImpact("furia"); });
+    end = 2300;
+  } else if (mv.fx === "bando") {   // muriquis pequenos de luar pulam por cima do bicho; folhas verdes caem no Rhanon
+    at(600, () => {
+      const W = $("fx").clientWidth;
+      for (let i = 0; i < 6; i++) setTimeout(() => {
+        const c = spiritEl(id, .45, -40); c.el.style.opacity = .8;
+        c.el.animate([{transform: "translate(0,0)"}, {transform: `translate(${W * .5}px,-60px)`}, {transform: `translate(${W + 80}px,0)`}], {duration: 1000, easing: "linear"}).onfinish = () => c.el.remove();
+      }, i * 110);
+      animalCry(id, false);
+    });
+    at(1200, () => {
+      hit(dmg(1), null);
+      const n = Math.min(p.max - p.hp, Math.round(p.max * .3)); p.hp += n; pop("+" + n, $("hero"), "heal"); sfx("heal");
+      const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top);
+      PFX.burst(14, "leaf", ["#7ac84a", "#3f9a3a", "#c9f2a8"], gx, gy, 16, {life: 1.2, up: -4});
+      say(t("O bando dourado passa: {bicho} leva o golpe e o Rhanon recupera {n} PV.", {bicho: foe(), n})); render();
+    });
+    end = 2100;
+  } else if (mv.fx === "uivo" || mv.fx === "canto") {   // fica ao lado do Rhanon: uivo (anéis de som) ou canto (notinhas) até o bicho
+    at(T - 200, () => { sp.show("attack"); animalCry(id, true); });
+    for (let i = 0; i < 6; i++) at(T - 100 + i * 90, () => {
+      const [gx, gy] = PFX.toGrid(sp.el.getBoundingClientRect().right, sp.el.getBoundingClientRect().top + 20), [bx] = PFX.toGrid(b.x + $("fx").getBoundingClientRect().left, 0);
+      PFX.emit(mv.fx === "uivo" ? "ring" : "note", mv.fx === "uivo" ? ["#ffd23a", "#ff7a3a"] : ["#ffffff", "#cfe0ff"], gx, gy, (bx - gx) * 1.4, mv.fx === "canto" ? -6 : 0, .7);
+    });
+    at(T + 500, () => {
+      if (mv.fx === "uivo") { hit(dmg(1), null); p.furia = furyMax(); pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t("O uivo do cerrado acerta {bicho} e enche a fúria do Rhanon!", v)); }
+      else { hit(dmg(1), null); const n = Math.min(p.msp - p.sp, Math.round(p.msp * .4)); p.sp += n; pop("+" + n + " " + t("PE"), $("hero"), "heal"); sfx("heal"); say(t("O canto do zabelê devolve {n} PE ao Rhanon.", {n})); }
+      render();
+    });
+    end = T + 1300;
+  } else {   // bote até o bicho, com o jeito de cada um
+    const spin = mv.fx === "rolo" ? [{transform: `translateX(${dx}px) rotate(360deg)`, offset: .55}] : [];   // o jacaré rola com o bicho
+    if (mv.fx === "areia") at(T - 300, () => sp.el.animate([{translate: "0 0"}, {translate: "0 -70px"}, {translate: "0 0"}], {duration: 600, easing: "ease-in-out"}));
+    lunge(T, 260, mv.fx === "abraco" ? 650 : 300, spin);
+    at(T + 260, () => {
+      const d = dmg(1);
+      if (mv.fx === "rolo") { e.dot = {d: 3 + Math.floor(G.lv / 4), t: 2}; sfx("agua"); hit(d, t("Rolo da morte: {bicho} vai sangrar por 2 turnos.", v)); }
+      else if (mv.fx === "areia") {
+        e.cego = 1; hit(d, t("Areia nos olhos d{bicho}: o próximo golpe pode errar.", v));
+        const [gx, gy] = PFX.toGrid(b.x + $("fx").getBoundingClientRect().left, b.y + $("fx").getBoundingClientRect().top); PFX.burst(18, "puff", ["#e8d27a", "#d8b860", "#fff2c0"], gx, gy, 20, {life: 1.1, up: 4});
+      }
+      else if (mv.fx === "careta") { e.espanto = 2; hit(d, t("A careta espanta {bicho}: vai bater mais fraco por 2 turnos.", v)); elemFly("agua", pos($("hero")), b); pop(t("MEDO!"), $("beast"), "crit"); }
+      else if (mv.fx === "abraco") {
+        const ok = !e.boss || Math.random() < .5; if (ok) e.perde = 1; hit(d, ok ? t("Abraço do tempo: {bicho} fica parado e perde a vez.", v) : t("Abraço do tempo: {bicho} se solta a tempo.", v));
+        const [gx, gy] = PFX.toGrid(b.x + $("fx").getBoundingClientRect().left, b.y + $("fx").getBoundingClientRect().top - 30); PFX.burst(8, "star", ["#ffd23a", "#ffffff"], gx, gy, 10, {life: 1.2, up: 6});
+      }
+      else if (mv.fx === "bandeira") { p.escudo = Math.max(p.escudo || 0, 2); hit(d, t("O rabo-bandeira abre na frente do Rhanon: os 2 próximos golpes batem pela metade.", v)); sfx("bloqueio"); }
+      else hit(d, t("{aliado} acerta {bicho} em cheio: −{n}.", {aliado: name, bicho: foe(), n: d}));
+    });
+    end = T + 260 + (mv.fx === "abraco" ? 650 : 300) + 500;
+  }
+  at(end - 300, () => {   // desfaz em luar
+    const r = sp.el.getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height / 2);
+    PFX.burst(16, "spark", ["#ffffff", "#cfe0ff", "#e8f0ff"], gx, gy, 18, {life: 1.1, up: 10});
+    sp.el.animate([{opacity: .85}, {opacity: 0}], {duration: 450, fill: "forwards"}).onfinish = () => sp.el.remove();
+  });
+  setTimeout(() => sp.el.remove(), (REDUCE ? end / 3 : end) + 600);   // garantia, se a luta acabar no meio
+  if (fresh) at(end, () => { plateElem(e); render(); });
+  let extra = false;
+  if (m > 1 && !e.assustada) { extra = true; at(end - 100, () => { if (e.hp <= 0) return; e.assustada = true; say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); pop(t("FRAQUEZA!"), $("beast"), "crit"); sfx("more"); render(); }); }
+  return {wait: REDUCE ? end / 3 : end, extra};
+}
+// Aliado fiel: no fim do turno, o espírito volta rapidinho e dá um bote mais fraco
+function allyEcho() {
+  const id = p.aliadoId, mv = ALLY_MOVES[id]; if (!mv || e.hp <= 0) return;
+  p.fiel--;
+  const m = bugMode ? 1 : elemMult(e, mv.elem), d = Math.max(1, Math.round(allyBase() * .5 * m)), b = pos($("beast"));
+  e.hp = Math.max(0, e.hp - d);
+  const sp = spiritEl(id, .9), dx = Math.max(0, b.x - sp.x - 70);
+  sp.show("attack"); sfx("claw");
+  sp.el.animate([{opacity: 0, transform: "translateX(0)"}, {opacity: .8, transform: `translateX(${dx}px)`, offset: .45}, {opacity: .8, transform: `translateX(${dx}px)`, offset: .6}, {opacity: 0, transform: "translateX(0)"}], {duration: 800, fill: "forwards"}).onfinish = () => sp.el.remove();
+  setTimeout(() => { hitBeast(); pop(String(d), $("beast")); burst(b, ["#ffffff", "#cfe0ff", ELEMENTS[mv.elem].c], 8, 50); sfx("hit"); }, 360);
+  say(t("{aliado} volta e acerta {bicho}: −{n}.", {aliado: ANIMALS.find(x => x.id === id).name, bicho: foe(), n: d}));
+}
+// golpes duplos (Estocada dupla, Flecha dupla): o segundo sai depois do primeiro, cada um com o seu anel do tempo certo
+function strikeTwice(kind, mk) {
+  const one = () => { const r = mk(); e.hp = Math.max(0, e.hp - r.d); return strike(r.d, r.cls, kind, r.msg); };
+  const w1 = one(), me = e;
+  setTimeout(() => { if (e === me && mode === "hunt" && e.hp > 0) { preE = e.hp; one(); } }, w1 + 150);
+  return w1 + 150 + (kind === "arrow" ? 1950 : 850);
+}
+// chefes acalmados até agora (dia e noite): a Lança de luar fica mais forte com cada um
+const bossesCalm = () => [...new Set([...Object.values(ZONES), ...Object.values(NIGHT_ZONES)].map(z => z.boss).filter(Boolean))].filter(bossBeaten).length;
 // fúria: faixa "FÚRIA!", Rhanon corre até o bicho e dá três estocadas (a última mais forte). Devolve quanto dura (ms).
 function furyStrike(ds) {
   holdE = preE; qteClear();
@@ -722,6 +926,8 @@ function tick() {
     if (p.dot.n === "Drenagem") { e.hp = Math.min(e.max, e.hp + p.dot.d); say(t("Drenagem: −{n} PV, e {bicho} recupera {n}.", {n: p.dot.d, bicho: foe()})); }
     else say(`${t(p.dot.n)}: −${p.dot.d} ${t("PV")}.`);
   }
+  if (e.espanto > 0) e.espanto--;
+  if (p.fiel > 0 && e.hp > 0) allyEcho();   // Aliado fiel: o espírito volta e ataca no fim do turno
   if (hasSkill("regen") && p.hp > 0) { p.hp = Math.min(p.max, p.hp + 3); p.sp = Math.min(p.msp, p.sp + 1); }   // Proteção dos encantados
   if (p.medo > 0) p.medo--;
   if (p.weak > 0) p.weak--;
