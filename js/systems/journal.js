@@ -33,7 +33,7 @@ function journalCard(a) {
   const b = G.bestiary[a.id], seen = b && b.seen, src = beastFrame(a.id), c = document.createElement("canvas");
   c.width = src ? src.width : 20; c.height = src ? src.height : 20;
   const x = c.getContext("2d");
-  if (src) { x.drawImage(src, 0, 0); if (!seen) { x.globalCompositeOperation = "source-in"; x.fillStyle = "#2a1a14"; x.fillRect(0, 0, c.width, c.height); } }   // não visto: só a silhueta
+  if (src) { x.drawImage(src, 0, 0); if (!seen) { x.globalCompositeOperation = "source-in"; x.fillStyle = G.nb.on ? "#3a6a9a" : "#2a1a14"; x.fillRect(0, 0, c.width, c.height); } }   // não visto: só a silhueta (azul na tela do notebook)
   if (a.tint && seen) c.style.filter = a.tint;
   const card = document.createElement("div"); card.className = "cad-card" + (seen ? "" : " nao-visto");
   card.append(c);
@@ -45,7 +45,7 @@ function journalCard(a) {
 function openJournal() {
   vit();
   const o = $("caderno"), box = o.querySelector(".info"), seen = ANIMALS.filter(a => G.bestiary[a.id] && G.bestiary[a.id].seen).length;
-  o.classList.toggle("papel", !G.nb.on);   // antes do notebook ligar, o caderno é de papel (desenho à mão); depois, digital
+  o.classList.toggle("papel", !G.nb.on); o.classList.toggle("digital", !!G.nb.on);   // antes do notebook ligar, o caderno é de papel; depois, abre na tela do notebook
   box.innerHTML = `<h2>${t(G.nb.on ? "Caderno de bichos · digital" : "Caderno de bichos")}</h2><p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p>${G.regions?.nordeste ? `<p class="hint">${t("Calma de Guaraci: {n} de {total} chefes do Nordeste acalmados", {n: NORDESTE_BOSSES().filter(k => BS()[k]).length, total: NORDESTE_BOSSES().length})}</p>` : ""}${G.regions?.centroeste ? `<p class="hint">${t("Brilho das estrelas: {n} de {total} chefes do Centro-Oeste acalmados", {n: CENTROESTE_BOSSES().filter(k => BS()[k]).length, total: CENTROESTE_BOSSES().length})}</p>` : ""}<p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><p class="hint"><span class="elem-key">${t("Elementos: {fraco} fraco · {resiste} resiste · {normal} normal · ? use o golpe no bicho pra descobrir", ELEM_KEY_ICONS())}</span></p><div class="cad-grid"></div>`;
   const grid = box.querySelector(".cad-grid");
   ANIMALS.forEach(a => grid.append(journalCard(a)));

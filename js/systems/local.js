@@ -97,7 +97,7 @@ function selectSub(id, msg) {
     else lh(BS()[id] ? t("Chefe vencido ✓ · a passagem no fim da trilha tá aberta.") : t("{chefe} espera no fim da trilha.", {chefe: theName(boss, true)}));
     if (G.hp < maxHP(G.lv) * .35) lh(t("Rhanon tá muito ferido. Melhor descansar na aldeia antes de voltar pra mata."));
   }
-  const fl = flightsFrom(curCity()).find(f => f.a === curCity());   // última trilha da cidade do aeroporto: o próximo passo
+  const fl = FLIGHTS.find(f => f.a === curCity());   // última trilha da cidade do aeroporto: o próximo passo (o voo que abre a região nova)
   if (fl && z && BS()[id] && id === CITY[curCity()].route.slice(-1)[0]) lh(t("Próximo destino: {cidade}. O voo sai do {aero}: volte ao mapa do {mapa} (X) e escolha {aqui}.", {cidade: LOC[fl.b].s, aero: t(AIRPORT[curCity()]), mapa: MAP_REGIONS[MAP_REGION].n, aqui: LOC[curCity()].s}));
   if (msg) lh(msg);
   btn(t("Inventário"), showInv, false, i);

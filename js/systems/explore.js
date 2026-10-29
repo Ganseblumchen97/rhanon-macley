@@ -580,19 +580,15 @@ function drawAnimalEnt(x, en, cx, cy, now) {
   if (en.alive && en.tomado) drawTomado(x, sx, sy - bob, w, hg, now, en.homeX);
   grassOver(x, en, cx, cy);
 }
-/* fumaça de Pytuna num bicho tomado (some quando ele é acalmado): back = halo escuro arroxeado pulsando atrás do
-   corpo; senão, fiapos escuros subindo das costas e sumindo */
+/* fumaça de Pytuna num bicho tomado (some quando ele é acalmado), no mesmo desenho da fumaça dele: back = bolhas
+   girando atrás do corpo (drawSmokeAura); senão, bolhinhas redondas subindo das costas e sumindo */
 function drawTomado(x, sx, sy, w, hg, now, seed, back) {
-  if (back) {
-    const k = .5 + .5 * Math.sin(now / 420 + seed), rx = w * .55 + 2 + k * 2, ry = hg * .5 + 2 + k;
-    x.globalAlpha = .22 + k * .14; x.fillStyle = "#2a1440";
-    x.beginPath(); x.ellipse(sx, sy - hg * .45, rx, ry, 0, 0, Math.PI * 2); x.fill();
-    x.globalAlpha = 1; return;
-  }
-  for (let i = 0; i < 6; i++) {
-    const p = (now / 1300 + i / 6 + seed * .013) % 1, s = p < .35 ? 4 : p < .7 ? 3 : 2;
-    const px = Math.round(sx + Math.sin(p * 4 + i * 1.7) * w * .35), py = Math.round(sy - hg * (.45 + .12 * (i % 3)) - p * 22);
-    x.globalAlpha = .85 * (1 - p); x.fillStyle = PYT_SMOKE[i % PYT_SMOKE.length]; x.fillRect(px - (s >> 1), py - (s >> 1), s, s);
+  if (back) return drawSmokeAura(x, sx, sy - hg * .48, w * .5, hg * .46, now, seed * .01, .75);
+  for (let i = 0; i < 4; i++) {
+    const p = (now / 1600 + i / 4 + seed * .013) % 1, r = 3 - p * 2;
+    const px = Math.round(sx + Math.sin(p * 4 + i * 1.7) * w * .3), py = Math.round(sy - hg * (.7 + .1 * (i % 2)) - p * 20);
+    x.globalAlpha = .8 * (1 - p); x.fillStyle = PYT_SMOKE[i % 3];
+    x.beginPath(); x.arc(px, py, r, 0, Math.PI * 2); x.fill();
   }
   x.globalAlpha = 1;
 }
@@ -912,7 +908,7 @@ const VILLAGER_TIPS = [
   "Etiqueta verde em cima do bicho? Esse aí se acalma com uma lançada só.",
   "Bicho se encolheu tremendo? Vai dar o bote. Aperta Z quando o anel ficar verde que tu bloqueia metade.",
   "Acerta o bicho primeiro, na lança (Z) ou na flecha (X), que o primeiro turno da briga é teu.",
-  "Três tempos certos seguidos na briga, golpe perfeito ou bloqueio, enchem a Fúria: a lança vira três estocadas de uma vez. Pai d'égua!",
+  "Quatro tempos certos seguidos na briga, golpe perfeito ou bloqueio, enchem a Fúria: a lança vira três estocadas de uma vez. Pai d'égua!",
   "Se o bicho te pegar antes, quem bate primeiro é ele. Viu o \"!\"? Moscou, dançou.",
   "Todo bicho tem um elemento que ele não aguenta: fogo, água, vento, raio ou planta. Acerta esse que ele fraqueja e tu bate de novo na hora.",
   "Usou um elemento num bicho? O caderno anota se ele é fraco, se resiste ou se nem liga. A fraqueza que tu descobrir aparece embaixo do nome dele.",
@@ -1458,7 +1454,11 @@ function drawWeather(x, now, w = weatherNow()) {
     x.globalAlpha = 1;
   } else if (w === "mormaco") {
     x.fillStyle = "rgba(255,170,60,.1)"; x.fillRect(0, 0, W, H);
-    x.fillStyle = "rgba(255,230,160,.12)"; x.fillRect(0, 0, W, Math.round(H * .3));
+    // brilho do sol descendo do alto e sumindo aos poucos (antes era uma faixa de borda reta no primeiro terço, que parecia defeito)
+    const g = x.createLinearGradient(0, 0, 0, H * .45); g.addColorStop(0, "rgba(255,230,160,.16)"); g.addColorStop(1, "rgba(255,230,160,0)");
+    x.fillStyle = g; x.fillRect(0, 0, W, Math.round(H * .45));
+    x.fillStyle = "rgba(255,240,200,.18)";   // ondas de calor tremendo
+    for (let i = 0; i < 8; i++) { const py = (i * 89 + 40) % H, px = (i * 151) % W, s = Math.round(Math.sin(now / 240 + i) * 2 * R); x.fillRect(px + s, py, 10, 1); x.fillRect(px + 3 - s, py + 2, 8, 1); }
   } else if (w === "ventania") {
     x.fillStyle = EX.night ? "#ffffff30" : "#ffffff70";
     const n = Math.round(W * H / 2500);

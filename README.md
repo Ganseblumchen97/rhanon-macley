@@ -1,4 +1,4 @@
-# Jaci: The Fading Moon (alfa 0.66.4)
+# Jaci: The Fading Moon (alfa 0.67.0)
 
 *Jaci: A Lua que se Apaga* · uma aventura de Rhanon Macley · RPG de turno no navegador
 
@@ -32,7 +32,7 @@ acalmá-los. Aqui **ninguém morre**: cada bicho vencido volta a si, agradece e 
 - **Exploração livre** vista de cima: ande pela mata, pela beira do rio, pelas ladeiras da cidade. Golpeie com a lança,
   atire flecha, role para desviar e encontre recantos secretos que só abrem com o elemento certo.
 - **Batalha por turno**, no espírito do Pokémon antigo, mas com **tempo certo**: aperte no momento em que o anel fecha
-  para acertar em cheio ou bloquear o golpe do bicho. Três acertos seguidos enchem a **Fúria da mata**.
+  para acertar em cheio ou bloquear o golpe do bicho. Quatro acertos seguidos enchem a **Fúria da mata**.
 - **Cinco elementos** (fogo, água, vento, raio e planta). A fraqueza de cada bicho só aparece depois de você descobrir:
   acertou, ganha "Mais uma!".
 - **Dia e noite, chuva e neblina.** À noite a mata muda: outros bichos, mais fortes, e os chefes viram encantados do

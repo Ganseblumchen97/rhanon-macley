@@ -61,6 +61,19 @@ function drawSmoke(x, cx, cy, k = 1, now = 0, alpha = 1) {
   x.fillStyle = "#ff2a2a"; if (!blink) { x.fillRect(Math.round(cx - 5 * k), Math.round(cy - 2 * k), Math.max(1, Math.round(3 * k)), Math.max(1, Math.round(2 * k))); x.fillRect(Math.round(cx + 2 * k), Math.round(cy - 2 * k), Math.max(1, Math.round(3 * k)), Math.max(1, Math.round(2 * k))); }
   x.restore();
 }
+/* a mesma fumaça presa num bicho tomado, sem os olhos: bolhas girando devagar em volta do corpo (atrás dele);
+   (cx, cy) = meio do bicho, rx/ry = metade da largura e da altura */
+function drawSmokeAura(x, cx, cy, rx, ry, now, seed = 0, alpha = .8) {
+  if (!(rx > 0 && ry > 0)) return;
+  x.save(); x.globalAlpha = alpha;
+  const r0 = Math.max(2, Math.min(rx, ry) * .3);
+  for (let i = 0; i < 10; i++) {
+    const a = i / 10 * Math.PI * 2 + now / 1400 + seed, d = .8 + (i % 2) * .25, r = r0 * (1 + (i % 3) * .35) * (1 + .12 * Math.sin(now / 380 + i * 1.7));
+    x.fillStyle = PYT_SMOKE[i % 3];
+    x.beginPath(); x.arc(Math.round(cx + Math.cos(a) * rx * d), Math.round(cy + Math.sin(a) * ry * d), r, 0, Math.PI * 2); x.fill();
+  }
+  x.restore();
+}
 /* Luz de Jaci: quanto do Norte já foi acalmado (chefes de dia e de noite de Ananindeua e Belém). Clareia as noites e
    descobre a lua da faixa do anoitecer (moonCanvas). */
 // chefes do Norte (zonas de Ananindeua e Belém), de dia e de noite: as zonas de outras regiões ficam de fora

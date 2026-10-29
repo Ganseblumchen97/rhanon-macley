@@ -45,6 +45,7 @@ function quadPose(S, pose, f) {
   if (pose === "idle") cy += f;
   if (pose === "crouch") { cy += L * .4; cx += 1; hdy = 2; o.eye = "angry"; }
   if (pose === "attack") { cx -= 4; cy -= L * .35; rx *= 1.06; hdx = -2; hdy = -1; o.eye = "angry"; o.mouth = true; }
+  if (pose === "roar") { hdx = -1; hdy = -2; o.eye = "angry"; o.mouth = true; }   // rugido: parado no lugar, cabeça erguida e boca aberta
   if (pose === "hurt") { cx += 2; hdx = 2; hdy = -2; o.eye = "shut"; }
   if (pose === "ko") { ry *= .85; cy = G - ry * .8; o.eye = "x"; o.tongue = true; }
   const hip = cy + ry * .5, F = cx - rx * .55, B = cx + rx * .55, sp = S.splay || 0;
@@ -56,6 +57,7 @@ function quadPose(S, pose, f) {
   let hx = cx - rx - (S.neck || 0) + hdx, hy = cy - (S.hu || 0) + hdy;
   if (pose === "ko") { hx = cx - rx - (S.neck || 0) * .6; hy = G - (S.hr || 5) + 1; }
   hy = Math.max(hy, (S.hr || 5) + 4);   // orelhas não saem do quadro no bote
+  hx = Math.max(hx, (S.hr || 5) + 5);   // nem o focinho e a boca aberta (onça e ariranha passavam da borda)
   return {cx, cy, rx, ry, hip, legs, hx, hy, o, G, pose, f, L};
 }
 function quad(S, pose, f) {
@@ -1157,6 +1159,218 @@ function visagem(C) {
   };
 }
 
+/* ---------- bugs do freela: caricaturas de erro de programa, com olho grande de desenho animado ---------- */
+function bugPose(pose, f) {
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt";
+  const o = {eye: pose === "ko" ? "x" : hu || pose === "blink" ? "shut" : at || cr ? "angry" : "open"};
+  const bx = at ? -3 : hu ? 3 : 0, by = (pose === "idle" ? f : 0) + (cr ? 3 : 0);
+  return {at, cr, hu, o, X: v => v + bx, Y: v => v + by};
+}
+// olho branco redondo com a pupila (pu = para onde olha); bravo (ou o.mad) ganha a sobrancelha em diagonal; s = 1 olho
+// da esquerda, -1 da direita
+function bugEye(d, x, y, r, o, s = 1, pu = [-1, .5]) {
+  if (o.eye === "x" || o.eye === "shut") return bEye(d, x, y, o);
+  d.ellipse(x, y, r, r * 1.1, BW); bEye(d, x + pu[0], y + pu[1], {eye: "open"});
+  if (o.eye === "angry" || o.mad) d.limb(x - (r + 1) * s, y - r - 1.5, x + r * .6 * s, y - r + .5, 1.2, BN);
+}
+// letrinhas de pixel (3x5) para o 404 e o "?" do caractere quebrado
+const BUG_GLYPH = {4: ["1.1", "1.1", "111", "..1", "..1"], 0: ["111", "1.1", "1.1", "1.1", "111"]};
+function bugText(d, s, x, y, c) { [...s].forEach((ch, i) => BUG_GLYPH[ch].forEach((r, j) => [...r].forEach((v, k) => { if (v === "1") d.dots([[x + i * 4 + k, y + j]], c); }))); }
+// ponteiro de relógio (braço do Prazo): haste fina com a ponta de flecha
+function bugHand(d, x0, y0, x1, y1, c) {
+  const L = Math.hypot(x1 - x0, y1 - y0) || 1, ux = (x1 - x0) / L, uy = (y1 - y0) / L;
+  d.part().limb(x0, y0, x1, y1, 1.5, c).poly([[x1 + ux * 3, y1 + uy * 3], [x1 - uy * 2.5, y1 + ux * 2.5], [x1 + uy * 2.5, y1 - ux * 2.5]], c);
+}
+// Loop Infinito: o sinal de infinito verde e bravo, mordendo o próprio rabo, com setinhas girando no anel
+function bugLoop(pose, f) {
+  const d = rigGrid(1, 58, 46), c = "#3ae87a", C = "#1a9a4a", l = "#d8ffe4";
+  const ring = (cx, cy, rx, ry, w) => { for (let i = 0; i < 20; i++) { const a = i / 20 * Math.PI * 2, b = (i + 1) / 20 * Math.PI * 2; d.limb(cx + Math.cos(a) * rx, cy + Math.sin(a) * ry, cx + Math.cos(b) * rx, cy + Math.sin(b) * ry, w, c, C); } };
+  if (pose === "ko") {   // o infinito desmanchado no chão
+    d.part(); ring(37, 40, 12, 3.5, 4); d.part(); ring(18, 40, 10, 3.5, 4);
+    d.part().ellipse(7, 38, 5.5, 4.5, c, C, .6); bugEye(d, 5, 37, 2, {eye: "x"}); bugEye(d, 10, 37, 2, {eye: "x"});
+    return {c: d.canvas(), head: [7, 37]};
+  }
+  const {at, cr, o, X: X0, Y} = bugPose(pose, f), X = v => X0(v + 3), sq = cr ? 2 : 0, st = at ? 2 : 0; o.mad = true;   // +3: a cabeça não sai do quadro no bote
+  d.part(); ring(X(37), Y(31), 11 + st, 9 - sq, 5);
+  for (let i = 0; i < 3; i++) { const a = -Math.PI / 2 + i * 2.1 + f * .6, px = X(37) + Math.cos(a) * (11 + st), py = Y(31) + Math.sin(a) * (9 - sq); d.dots([[px - 1, py - 1], [px, py], [px - 1, py + 1]], l); }   // setinhas girando
+  d.part(); ring(X(17), Y(31), 10 + st, 9 - sq, 5);
+  const hx = X(at ? 5 : 7), hy = Y(at ? 21 : 23);
+  d.part().limb(X(9), Y(37), hx - 1, hy + 4, 2, c, C);   // o rabo, que sobe até a boca
+  d.part().ellipse(hx, hy, 6.5, 5.5, c, C, .6);
+  bugEye(d, hx - 2, hy - 1, 2, o, 1); bugEye(d, hx + 2.5, hy - 1, 2, o, -1);
+  if (at) d.part().poly([[hx - 5, hy + 2], [hx + 2, hy + 2], [hx - 2, hy + 7]], "#3a1410").dots([[hx - 4, hy + 2], [hx, hy + 2]], BW);
+  else d.limb(hx - 4, hy + 3, hx + 1, hy + 3, 1, BN).dots([[hx - 3, hy + 4], [hx, hy + 4]], BW);   // dentes cravados no rabo
+  return {c: d.canvas(), head: [hx, hy]};
+}
+// Erro 404: a página em branco de janela de navegador, com olhão, asinhas de morcego e o "404" no lugar da boca
+function bug404(pose, f) {
+  const d = rigGrid(1, 46, 44), pg = "#f4f4f8", Pg = "#c4c4d4", bl = "#3a6ad8", wg = "#8a5ad8", Wg = "#5a2aa8";
+  if (pose === "ko") {   // a página caída e amassada
+    d.part().poly([[4, 34], [40, 33], [42, 42], [6, 43]], pg, Pg, 32).rect(4, 33, 36, 2, bl);
+    bugEye(d, 13, 38, 2.5, {eye: "x"}); bugEye(d, 21, 38, 2.5, {eye: "x"}); bugText(d, "404", 27, 37, BR);
+    return {c: d.canvas(), head: [17, 37]};
+  }
+  const {at, o, X, Y} = bugPose(pose, f), up = at || f;
+  const wing = s => { const x0 = s < 0 ? X(10) : X(34); return [[x0, Y(15)], [x0 + s * 8, Y(up ? 5 : 11)], [x0 + s * 6, Y(up ? 13 : 19)], [x0 + s * 9, Y(up ? 17 : 25)], [x0, Y(26)]]; };
+  d.part().poly(wing(-1), wg, Wg); d.part().poly(wing(1), wg, Wg);
+  d.part().poly([[X(9), Y(8)], [X(35), Y(8)], [X(35), Y(32)], [X(30), Y(37)], [X(9), Y(37)]], pg, Pg, X(31)).rect(X(9), Y(8), 26, 4, bl).rect(X(31), Y(9), 2, 2, BR);   // barra azul e o "x" de fechar
+  d.part().poly([[X(35), Y(32)], [X(30), Y(32)], [X(30), Y(37)]], Pg);   // a pontinha dobrada
+  bugEye(d, X(17), Y(19), 3.5, o, 1); bugEye(d, X(27), Y(19), 3.5, o, -1);
+  if (at) d.part().ellipse(X(22), Y(29), 4, 3, "#3a1410"); else bugText(d, "404", X(16), Y(26), BR);
+  return {c: d.canvas(), head: [X(22), Y(17)]};
+}
+// O Prazo: a folhinha de calendário com os dias riscados de X, o cabeçalho vermelho bravo, dentes trincados e os ponteiros
+// do relógio no lugar dos braços
+function bugPrazo(pose, f) {
+  const d = rigGrid(1, 50, 48), pg = "#f8f4ea", Pg = "#d0c8b4", rd = "#d8282a", hd = "#2a2a34", gr = "#a8b0b8";
+  if (pose === "ko") {
+    d.part().poly([[4, 36], [44, 36], [46, 45], [6, 46]], pg, Pg, 36).rect(4, 36, 40, 3, rd);
+    bugEye(d, 17, 41, 2.5, {eye: "x"}); bugEye(d, 26, 41, 2.5, {eye: "x"});
+    bugHand(d, 40, 43, 46, 41, hd);
+    return {c: d.canvas(), head: [21, 40]};
+  }
+  const {at, cr, o, X, Y} = bugPose(pose, f), run = pose === "idle" && f ? 1 : 0; o.mad = true;
+  d.part().limb(X(19), Y(37), X(17 - run), 46, 2.5, hd).limb(X(31), Y(37), X(33 + run), 46, 2.5, hd);   // perninhas correndo
+  d.part().poly([[X(10), Y(10)], [X(40), Y(10)], [X(40), Y(38)], [X(10), Y(38)]], pg, Pg, X(37)).rect(X(10), Y(10), 30, 8, rd);
+  for (let r = 0; r < 3; r++) for (let k = 0; k < 5; k++) {   // os dias: quase todos já riscados
+    const x = X(12 + k * 6), y = Y(26 + r * 4);
+    if (r * 5 + k < 13) d.dots([[x, y], [x + 2, y], [x + 1, y + 1], [x, y + 2], [x + 2, y + 2]], rd); else d.rect(x, y, 3, 3, Pg);
+  }
+  d.part().limb(X(17), Y(6), X(17), Y(12), 2, gr).limb(X(33), Y(6), X(33), Y(12), 2, gr);   // as argolas
+  bugEye(d, X(20), Y(15), 3, o, 1); bugEye(d, X(30), Y(15), 3, o, -1);
+  if (at) d.part().poly([[X(17), Y(20)], [X(33), Y(20)], [X(30), Y(25)], [X(20), Y(25)]], "#3a1410").dots([[X(19), Y(20)], [X(22), Y(20)], [X(25), Y(20)], [X(28), Y(20)], [X(31), Y(20)]], BW);
+  else { d.part().rect(X(18), Y(21), 14, 3, BN); for (let x = 19; x < 32; x += 2) d.dots([[X(x), Y(21)], [X(x), Y(23)]], BW); }   // dente trincado
+  bugHand(d, X(10), Y(24), ...(at ? [X(2), Y(17)] : cr ? [X(5), Y(31)] : [X(5), Y(18)]), hd);   // o ponteiro grande
+  bugHand(d, X(40), Y(25), X(45), Y(at ? 19 : 21), hd);   // e o pequeno
+  return {c: d.canvas(), head: [X(25), Y(15)]};
+}
+// Vazamento de Memória: o pente de RAM inchado no meio como balão, com os chips nas pontas, os contatos dourados e
+// pingando o que vaza
+function bugMemoria(pose, f) {
+  const d = rigGrid(1, 44, 40), pc = "#2aa84a", Pc = "#1a6a32", au = "#f0c040", ch = "#22222a", gt = "#7ad8ff";
+  if (pose === "ko") {   // murcho no chão, numa poça
+    d.part().ellipse(24, 38, 15, 1.5, gt);
+    d.part().poly([[4, 31], [38, 31], [38, 37], [4, 37]], pc, Pc).ellipse(21, 31, 8, 3, pc).rect(5, 35, 33, 2, au);
+    bugEye(d, 17, 32, 2, {eye: "x"}); bugEye(d, 25, 32, 2, {eye: "x"});
+    return {c: d.canvas(), head: [21, 31]};
+  }
+  const {at, cr, o, X, Y} = bugPose(pose, f), sw = (pose === "idle" ? f : 0) + (at ? 3 : cr ? -1 : 0);
+  d.part().limb(X(10), Y(35), X(9), 39, 2, ch).limb(X(32), Y(35), X(33), 39, 2, ch);
+  d.part().poly([[X(3), Y(24)], [X(39), Y(24)], [X(39), Y(35)], [X(3), Y(35)]], pc, Pc, X(37)).rect(X(6), Y(26), 5, 5, ch).rect(X(31), Y(26), 5, 5, ch).rect(X(4), Y(32), 35, 2, au);
+  for (let x = 6; x < 38; x += 3) d.dots([[X(x), Y(32)], [X(x), Y(33)]], Pc);   // os vãos entre os contatos
+  d.part().ellipse(X(21), Y(23), 10 + sw, 9 + sw, pc, Pc, .55).dots([[X(14), Y(18)], [X(15), Y(17)], [X(27), Y(17)], [X(28), Y(18)]], "#7ae89a");   // o balão (e as estrias de esticar)
+  bugEye(d, X(17), Y(20), 2.5, o, 1); bugEye(d, X(25), Y(20), 2.5, o, -1);
+  if (at) d.part().ellipse(X(21), Y(27), 3, 2.5, "#3a1410");
+  else d.dots([[X(18), Y(26)], [X(19), Y(27)], [X(20), Y(26)], [X(21), Y(27)], [X(22), Y(26)], [X(23), Y(27)], [X(24), Y(26)]], BN);
+  d.part().ellipse(X(40), Y(36) + f, 1.2, 1.6, gt);   // a gota que vaza
+  return {c: d.canvas(), head: [X(21), Y(19)]};
+}
+// Acento Quebrado: o "�" de texto com acento estragado, losango roxo com o "?" branco, e o til solto e torto por cima
+function bugAcento(pose, f) {
+  const d = rigGrid(1, 36, 38), bk = "#8a3ad8", Bk = "#5a1a9a", wt = "#f4f4f8", ti = "#ff9a2a", Ti = "#c86a10";
+  if (pose === "ko") {
+    d.part().poly([[4, 32], [18, 26], [32, 32], [18, 37]], bk, Bk, 22);
+    bugEye(d, 14, 31, 2, {eye: "x"}); bugEye(d, 22, 31, 2, {eye: "x"});
+    d.part().limb(26, 37, 29, 36, 1.5, ti).limb(29, 36, 33, 37, 1.5, ti);   // o til largado
+    return {c: d.canvas(), head: [18, 30]};
+  }
+  const {at, o, X, Y} = bugPose(pose, f), tx = at ? -5 : 0, ty = at ? -1 : f;
+  d.part().limb(X(15), Y(31), X(14), 37, 2, Bk).limb(X(21), Y(31), X(22), 37, 2, Bk);
+  d.part().limb(X(7), Y(21), X(2), Y(at ? 16 : 25), 1.5, bk, Bk).limb(X(29), Y(21), X(34), Y(17 - f), 1.5, bk, Bk);   // bracinhos
+  d.part().poly([[X(18), Y(7)], [X(31), Y(20)], [X(18), Y(33)], [X(5), Y(20)]], bk, Bk, X(23));
+  bugEye(d, X(14), Y(16), 2.5, o, 1); bugEye(d, X(22), Y(16), 2.5, o, -1);
+  if (at) d.part().ellipse(X(18), Y(25), 2.5, 3, "#3a1410");
+  else d.dots([[X(16), Y(21)], [X(17), Y(21)], [X(18), Y(21)], [X(19), Y(22)], [X(19), Y(23)], [X(18), Y(24)], [X(17), Y(25)], [X(17), Y(26)], [X(17), Y(28)]], wt);   // o "?"
+  d.part(); bChain(d, [[X(10) + tx, Y(6) + ty], [X(13) + tx, Y(3) + ty], [X(17) + tx, Y(5) + ty], [X(21) + tx, Y(1) + ty], [X(25) + tx, Y(2) + ty]], 2.5, ti, Ti);   // o til, torto e solto
+  return {c: d.canvas(), head: [X(18), Y(16)]};
+}
+// Requisito Mutante: o post-it amarelo de olho desigual e sorriso largo, com braços brotando e cada um trazendo mais um
+// pedido colorido
+function bugMutante(pose, f) {
+  const d = rigGrid(1, 56, 48), nt = "#f8e050", Nt = "#c8a830", mini = ["#ff7ab8", "#6ac8ff", "#7ae86a", "#ffb04a"];
+  if (pose === "ko") {
+    d.part().poly([[6, 38], [42, 38], [42, 45], [6, 45]], nt, Nt, 36);
+    bugEye(d, 18, 41, 2.5, {eye: "x"}); bugEye(d, 28, 41, 2.5, {eye: "x"});
+    d.part().rect(1, 42, 4, 3, mini[0]); d.part().rect(44, 41, 4, 3, mini[1]);
+    return {c: d.canvas(), head: [23, 40]};
+  }
+  const {at, o, X: X0, Y} = bugPose(pose, f), X = v => X0(v + 4), w = f * 2, reach = at ? -3 : 0;   // +4: os papeizinhos não saem do quadro
+  d.part().limb(X(20), Y(40), X(19), 46, 2.5, Nt).limb(X(31), Y(40), X(32), 46, 2.5, Nt);
+  const arms = [[13, 20, 4 + reach, 12 + w], [13, 30, 3 + reach, 34 - w], [38, 22, 46, 14 + w], [38, 32, 47, 36 - w]];
+  arms.forEach(([x0, y0, x1, y1], i) => { d.part().limb(X(x0), Y(y0), X(x1), Y(y1), 2, nt, Nt); d.part().rect(X(x1) - 2.5, Y(y1) - 2.5, 5, 5, mini[i]); });
+  d.part().poly([[X(13), Y(12)], [X(33), Y(12)], [X(38), Y(17)], [X(38), Y(40)], [X(13), Y(40)]], nt, Nt, X(35)).rect(X(16), Y(32), 18, 1, Nt).rect(X(16), Y(35), 13, 1, Nt);
+  d.part().poly([[X(33), Y(12)], [X(33), Y(17)], [X(38), Y(17)]], Nt);   // a dobrinha do papel
+  bugEye(d, X(20), Y(21), 4, o, 1); bugEye(d, X(31), Y(22), 2.5, o, -1, [0, 1]);   // um olho de cada tamanho
+  if (at) d.part().poly([[X(17), Y(26)], [X(33), Y(26)], [X(30), Y(31)], [X(20), Y(31)]], "#3a1410").dots([[X(19), Y(26)], [X(23), Y(26)], [X(27), Y(26)], [X(31), Y(26)]], BW);
+  else { d.part().rect(X(18), Y(27), 14, 2, BN).dots([[X(17), Y(26)], [X(32), Y(26)]], BN); for (let x = 19; x < 32; x += 2) d.dots([[X(x), Y(27)]], BW); }   // sorrisão
+  return {c: d.canvas(), head: [X(25), Y(20)]};
+}
+// Falso Positivo: a placa amarela de alerta com o "!" no meio da testa, segurando uma chama de papelão num palito
+function bugFalso(pose, f) {
+  const d = rigGrid(1, 38, 40), yl = "#f8d020", Yl = "#c89a10", fl = "#ff6a1a", Fl = "#e83a1a", pp = "#a8784a";
+  if (pose === "ko") {
+    d.part().poly([[3, 38], [30, 38], [10, 24]], yl, Yl, 18);
+    bugEye(d, 11, 33, 2, {eye: "x"}); bugEye(d, 17, 34, 2, {eye: "x"});
+    d.part().limb(26, 36, 34, 36, 1.5, pp).poly([[33, 33], [37, 32], [37, 38], [33, 38]], fl, Fl);
+    return {c: d.canvas(), head: [13, 32]};
+  }
+  const {at, o, X, Y: Y0} = bugPose(pose, f), Y = v => Y0(v + 2), fx = at ? -2 : 0, fy = at ? -1 : f;   // +2: a chama não encosta no topo
+  d.part().limb(X(13), Y(34), X(12), 39, 2, Yl).limb(X(23), Y(34), X(24), 39, 2, Yl);
+  d.part().poly([[X(18), Y(8)], [X(33), Y(34)], [X(3), Y(34)]], yl, Yl, X(25));
+  d.rect(X(17), Y(13), 2, 4, BN).rect(X(17), Y(18), 2, 1, BN);   // o "!"
+  bugEye(d, X(14), Y(24), 2.5, o, 1); bugEye(d, X(22), Y(24), 2.5, o, -1);
+  if (at) d.part().ellipse(X(18), Y(30), 2, 1.8, "#3a1410"); else d.rect(X(16), Y(30), 4, 1, BN);
+  d.part().limb(X(27), Y(25), X(32) + fx, Y(17) + fy, 1.5, yl, Yl);   // o braço
+  d.part().limb(X(32) + fx, Y(19) + fy, X(32) + fx, Y(8) + fy, 1.5, pp)
+    .poly([[X(29) + fx, Y(8) + fy], [X(30) + fx, Y(3) + fy], [X(32) + fx, Y(5) + fy], [X(33) + fx, Y(0) + fy], [X(35) + fx, Y(4) + fy], [X(36) + fx, Y(8) + fy]], fl, Fl, X(33) + fx)
+    .rect(X(31) + fx, Y(6) + fy, 3, 1, "#e8e0c8");   // a chama de papelão, com o durex
+  return {c: d.canvas(), head: [X(18), Y(22)]};
+}
+// Coordenada Trocada: o alfinete de mapa plantado de ponta-cabeça (a bolinha no chão e a ponta para cima), com as linhas
+// do globo e os olhos tontos, cada um para um lado
+function bugCoordenada(pose, f) {
+  const d = rigGrid(1, 40, 42), rd = "#e83a3a", Rd = "#a82020", ln = "#ffa8a8";
+  if (pose === "ko") {   // deitada de lado
+    d.part().poly([[10, 29], [38, 35], [10, 40]], rd, Rd, 30).ellipse(10, 34, 7, 7, rd, Rd, .55);
+    bugEye(d, 8, 33, 2, {eye: "x"}); bugEye(d, 13, 33, 2, {eye: "x"});
+    return {c: d.canvas(), head: [10, 33]};
+  }
+  const {at, o, X, Y} = bugPose(pose, f);
+  d.part().limb(X(12), Y(27), X(4), Y(at ? 20 : 22 - f), 2, rd, Rd).ellipse(X(4), Y(at ? 20 : 22 - f), 1.8, 1.8, BW);   // bracinhos de luva
+  d.part().limb(X(28), Y(27), X(36), Y(32 + f), 2, rd, Rd).ellipse(X(36), Y(32 + f), 1.8, 1.8, BW);
+  d.part().poly([[X(20), Y(3)], [X(29), Y(25)], [X(11), Y(25)]], rd, Rd, X(23)).ellipse(X(20), Y(29), 10, 10, rd, Rd, .55);
+  d.limb(X(20), Y(6), X(20), Y(19), 1, ln).rect(X(17), Y(12), 6, 1, ln).rect(X(15), Y(17), 10, 1, ln);   // meridiano e paralelos
+  bugEye(d, X(16), Y(27), 2.5, o, 1, [-1, 1.5]); bugEye(d, X(24), Y(27), 2.5, o, -1, [.5, -.5]);
+  if (at) d.part().ellipse(X(20), Y(33), 2.5, 2, "#3a1410");
+  else d.dots([[X(17), Y(33)], [X(18), Y(34)], [X(19), Y(33)], [X(20), Y(34)], [X(21), Y(33)], [X(22), Y(34)], [X(23), Y(33)]], BN);
+  return {c: d.canvas(), head: [X(20), Y(27)]};
+}
+// Mapa Lento: a ampulheta de carregamento, de olho caído de sono, bocejando, com a areia quase toda ainda lá em cima
+function bugLento(pose, f) {
+  const d = rigGrid(1, 48, 50), fr = "#a86a3a", Fr = "#6e4220", gl = "#bfe8f8", Gl = "#7ab8d8", sd = "#f0c060", Sd = "#c8902a";
+  if (pose === "ko") {   // a ampulheta tombada
+    d.part().rect(3, 30, 4, 16, fr).rect(41, 30, 4, 16, fr);
+    d.part().poly([[7, 32], [22, 37], [22, 40], [7, 45]], gl, Gl).poly([[7, 41], [22, 39], [7, 45]], sd);
+    d.part().poly([[26, 37], [41, 32], [41, 45], [26, 40]], gl, Gl).poly([[41, 40], [26, 40], [41, 45]], sd);
+    bugEye(d, 12, 37, 2, {eye: "x"}); bugEye(d, 17, 38, 2, {eye: "x"});
+    return {c: d.canvas(), head: [14, 37]};
+  }
+  const {at, o, X, Y} = bugPose(pose, f);
+  d.part().limb(X(13), Y(45), X(12), 49, 2.5, Fr).limb(X(35), Y(45), X(36), 49, 2.5, Fr);
+  d.part().limb(X(10), Y(8), X(10), Y(42), 2.5, fr, Fr).limb(X(38), Y(8), X(38), Y(42), 2.5, fr, Fr);   // as colunas
+  d.part().poly([[X(12), Y(9)], [X(36), Y(9)], [X(34), Y(18)], [X(26), Y(24)], [X(22), Y(24)], [X(14), Y(18)]], gl, Gl, X(30))
+    .poly([[X(19), Y(20)], [X(29), Y(20)], [X(25), Y(24)], [X(23), Y(24)]], sd);
+  d.part().poly([[X(22), Y(25)], [X(26), Y(25)], [X(34), Y(31)], [X(36), Y(41)], [X(12), Y(41)], [X(14), Y(31)]], gl, Gl, X(30))
+    .poly([[X(18), Y(41)], [X(30), Y(41)], [X(24), Y(38)]], sd, Sd).rect(X(23.5), Y(25), 1, 13, sd);   // um fiozinho de areia caindo
+  d.part().rect(X(7), Y(5), 34, 4, fr); d.part().rect(X(7), Y(41), 34, 4, fr);
+  if (o.eye === "open") for (const ex of [19, 29]) {   // olho de sono: pálpebra caída até o meio
+    d.ellipse(X(ex), Y(13), 2.5, 2.5, BW).rect(X(ex) - 2.5, Y(10.5), 5, 2.5, Gl).rect(X(ex) - 2, Y(13), 5, 1, BN).rect(X(ex) - 1, Y(14), 2, 1, BN);
+  } else { bugEye(d, X(19), Y(13), 2.5, o, 1); bugEye(d, X(29), Y(13), 2.5, o, -1); }
+  d.part().ellipse(X(24), Y(17.5), at ? 3 : 2, at ? 2 : 1.5, "#3a1410");   // bocejo (no bote, o grito de acordado)
+  if (pose === "idle") d.part().dots([[X(42), Y(1 + f)], [X(43), Y(1 + f)], [X(44), Y(1 + f)], [X(43), Y(2 + f)], [X(42), Y(3 + f)], [X(43), Y(3 + f)], [X(44), Y(3 + f)]], "#e8f0ff");   // z
+  return {c: d.canvas(), head: [X(24), Y(13)]};
+}
+
 /* ---------- registro e cache ---------- */
 const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, coruja, chupacabra, garca, pirarucu, caranguejo, matinta, curupira, mapinguari, pombo,
   gaivota: (pose, f) => garca(pose, f, {b: "#f4f4f4", B: "#a8b0b8", y: "#e8b030", Y: "#b88a20", k: "#e8b030"}),   // gaivota: a garça em branco e cinza
@@ -1205,7 +1419,9 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   boto: (pose, f) => boto(pose, f, false), boto_encantado: (pose, f) => boto(pose, f, true),
   boitata: cobra({b: "#e8601c", B: "#a8300c", k: "#ffd23a", eye: "#fff3a0", flame: true, rattle: ["#e8d8a0", "#a89870"]}, false),
   sucuri: cobra({b: "#5a7a3a", B: "#3a5a24", k: "#1e2a14"}, false),
-  surucucu: cobra({b: "#b0905a", B: "#806440", k: "#3a2a1a"}, true)};
+  surucucu: cobra({b: "#b0905a", B: "#806440", k: "#3a2a1a"}, true),
+  bug_loop: bugLoop, bug_404: bug404, bug_prazo: bugPrazo, bug_memoria: bugMemoria, bug_acento: bugAcento, bug_mutante: bugMutante,
+  bug_falso: bugFalso, bug_coordenada: bugCoordenada, bug_lento: bugLento};
 Object.keys(QUADS).forEach(id => { BEAST_DRAW[id] = (pose, f) => quad(QUADS[id], pose, f); });
 const BEAST_CACHE = new Map();
 const beastId = id => BEAST_DRAW[id] ? id : BEAST_DRAW[ART[id]] ? ART[id] : null;   // chefes usam o desenho do bicho base

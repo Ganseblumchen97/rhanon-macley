@@ -229,9 +229,11 @@ function makeHeroActor() {
 function makeBeastActor() {
   let cv = null, g = null, base = null, white = null, w = 0, h = 0, f = 1, k = 1, CW = 0, CH = 0, kind = "", motion = "", state = "idle", since = 0, lastFx = 0, nextHop = 0, info = {}, swT = 0, smT = 0, rig = null;
   const whites = new WeakMap(), whiteFrame = c => whites.get(c) || (whites.set(c, whiteOf(c)), whites.get(c));
-  const MX = 6, MT = 8, MB = 2;
+  let MX = 6, MT = 8;
+  const MB = 2;
   const set = (s) => { state = s; since = animNow(); lastFx = 0; };
   function mount(el, src, opts = {}) {
+    MX = opts.smoke ? 16 : 6; MT = opts.smoke ? 16 : 8;   // tomado: margem maior para a fumaça girando em volta não ser cortada
     // w/h em pixels do jogo; k = resolução extra da arte em imagem (data-scale)
     k = +src.dataset.scale || 1; base = src; w = src.width / k; h = src.height / k; f = opts.boss ? opts.scale || 1.35 : 1; kind = opts.id || ""; info = opts;
     // bicho alto demais para o palco (harpia, chefes): diminui um pouco para os pés ficarem na plataforma e a cabeça aparecer
@@ -292,8 +294,8 @@ function makeBeastActor() {
       if (motion === "hop" && t > nextHop) { nextHop = t + 1400 + Math.random() * 1600; set("hop"); }
       if (motion === "curl" && Math.floor(t / 2600) % 3 === 2) o.dy = 2;
       if (motion === "snort" && t - lastFx > 2400) { lastFx = t; const [gx, gy] = grid(MX - 1, MT + h * .45); PFX.emit("puff", ["#e8e4dc"], gx, gy, -8, -2, .5); PFX.emit("puff", ["#e8e4dc"], gx, gy + 1, -10, 0, .45); }
-      if (evilNow() && t - smT > 260) {   // tomado: fumaça escura subindo do corpo
-        smT = t; const [gx, gy] = grid(MX + w * (.2 + Math.random() * .6), MT + h * (.15 + Math.random() * .5));
+      if (evilNow() && t - smT > 420) {   // tomado: um fiapo da fumaça subindo do corpo, de vez em quando
+        smT = t; const [gx, gy] = grid(MX + w * (.25 + Math.random() * .5), MT + h * (.1 + Math.random() * .3));
         PFX.emit("puff", PYT_SMOKE, gx, gy, (Math.random() - .5) * 4, -7 - Math.random() * 5, 1.1);
       }
       if (info.boss && t - lastFx > 140) {
@@ -361,7 +363,7 @@ function makeBeastActor() {
     let rp = null;
     if (rig) {
       sx = sy = scale = 1;
-      rp = state === "prep" ? "crouch" : state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" || state === "bigroar" ? "attack" : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
+      rp = state === "prep" ? "crouch" : state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" || state === "bigroar" ? (QUADS[rig] ? "roar" : "attack") : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
       if (rp === "idle" && t % 3400 < 140) rp = "blink";   // pisca de vez em quando
     }
     g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;
@@ -370,6 +372,11 @@ function makeBeastActor() {
     g.fillStyle = "rgba(0,0,0,.3)";
     const sw = Math.max(6, Math.round(w * .8) - lift * 2);
     g.fillRect(Math.round((CW - sw) / 2), CH - 1, sw, 1);
+    if (evilNow()) {   // a fumaça de Pytuna girando atrás do corpo; possuído (combat.js, pytunaPossess): maior, e o próprio Pytuna em cima
+      const big = !!e.possuido;
+      drawSmokeAura(g, MX + ox + w / 2, MT - lift + h * .52, w * (big ? .58 : .5), h * (big ? .54 : .46), t, 0, big ? .92 : .8);
+      if (big) drawSmoke(g, MX + ox + w / 2, MT - lift + 2, .5, t, .95);
+    }
     const img = flash ? white : base;
     if (shake) ox += Math.floor(t / 40) % 2 ? 1 : -1;
     if (rp) {

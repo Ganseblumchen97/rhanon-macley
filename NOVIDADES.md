@@ -3,6 +3,25 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.67.0 — Pytuna não solta fácil e lutas com mais desafio
+
+- O último chefe de dia de cada cidade não volta a si de primeira: quando ele está quase calmo, Pytuna puxa a fumaça
+  de volta e ele levanta com mais da metade da vida, batendo mais forte, com os olhos vermelhos de Pytuna em cima e a
+  música dele tocando. A luz de Jaci responde e devolve parte do PE ao Rhanon. Só acontece até a primeira vitória.
+- Lutas com mais desafio: a Fúria agora enche com 4 tempos certos seguidos (3 com o Sangue quente) e as estocadas
+  batem um pouco menos. Do Nordeste em diante, os chefes têm mais vida e, a cada 4 turnos, avisam um golpe forte numa
+  faixa vermelha ("junta forças: golpe forte! Defenda."): use Defender e passa só um pedaço. Bicho muito abaixo do
+  seu nível também aguenta um pouco mais.
+- Os bugs dos freelas ganharam desenho próprio: o infinito bravo, a página 404 com asinhas, o calendário com os dias
+  riscados, a memória que incha, o "�" com o til torto, o post-it cheio de braços, a placa de alerta com chama de
+  papelão, o alfinete de mapa de ponta-cabeça e a ampulheta com sono. Eles chegam com um bipe de erro de computador.
+- Os bichos tomados agora ficam envoltos na fumaça de Pytuna, com as mesmas bolhas escuras girando, na trilha e na
+  batalha. Com o notebook ligado, o caderno de bichos abre dentro da tela dele.
+- Mapa do Brasil: cada região pintada com a sua cor (mais forte onde você já esteve) e com um desenho dela. O avião
+  virou um jato de linha, e de qualquer aeroporto dá para voar direto para as cidades com aeroporto onde você já esteve.
+- Correções: a onça e a ariranha-mãe não cortam mais a boca ao rugir (agora rugem paradas no lugar), e o mormaço não
+  deixa mais uma faixa clara de borda reta no alto da tela (aparecia em Brasília).
+
 ## 0.66.4 — o jogo ganhou nome: Jaci
 
 - O jogo agora se chama **Jaci: The Fading Moon** (em português, *Jaci: A Lua que se Apaga*), por causa da lua que o

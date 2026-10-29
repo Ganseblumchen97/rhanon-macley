@@ -32,7 +32,14 @@ const MAP_REGIONS = {
     land: ["M112 273 L238 222 L268 126 L322 84 L398 54 L532 113 L566 205 L587 277 L537 344 L490 415 L440 420 L377 436 L310 462 L238 512 L213 487 L154 420 L70 403 L24 394 L87 331Z"],
     river: "M306 302 C330 250 360 200 365 150 S390 80 398 54",   // rio São Francisco, da Canastra para o norte
     route: ["bh", "ouropreto"], pos: {bh: [409, 290], ouropreto: [446, 336]}},
+  // area = pedaço de cada região (recortado pelo contorno, então pode passar dele); icon = desenho de MAP_ICON no ponto dela
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre a aldeia e Curitiba",
+    area: {norte: "M80 80 H358 V178 L352 230 L340 280 L345 300 L320 305 L300 300 L230 310 L170 362 H80Z",
+      nordeste: "M358 80 H480 V365 L400 362 L345 355 V300 L340 280 L352 230 L358 178Z",
+      centroeste: "M80 362 H170 L230 310 L300 300 L320 305 L345 300 V355 L315 370 L300 400 L285 428 L267 452 H80Z",
+      sudeste: "M345 355 L400 362 L480 365 V452 H352 L300 440 L285 428 L300 400 L315 370Z",
+      sul: "M80 452 H267 L285 428 L300 440 L352 452 H480 V560 H80Z"},
+    icon: {norte: "manguezal", nordeste: "caatinga", centroeste: "pantanal", sudeste: "tiradentes", sul: "curitiba"},
     land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
     route: ["ananindeua", "curitiba"], pos: {ananindeua: [268, 172], curitiba: [315, 478]}}
 };
@@ -235,7 +242,14 @@ const FLIGHTS = [
 }
 ];
 const AIRPORT = {belem: "Aeroporto de Belém", saoluis: "Aeroporto de São Luís", recife: "Aeroporto do Recife", cuiaba: "Aeroporto de Cuiabá", brasilia: "Aeroporto de Brasília", bh: "Aeroporto de Confins"};
-const flightsFrom = c => FLIGHTS.filter(f => f.a === c || f.b === c).map(f => Object.assign({to: f.a === c ? f.b : f.a}, f));
+// voos de um aeroporto: os de FLIGHTS (que abrem a região nova) e, de lá, voo direto para qualquer outro aeroporto de
+// cidade onde o Rhanon já esteve (G.seen da chegada dela); só aeroporto: cidade sem AIRPORT não tem voo
+const flightsFrom = c => {
+  if (!AIRPORT[c]) return [];
+  const own = FLIGHTS.filter(f => f.a === c || f.b === c).map(f => Object.assign({to: f.a === c ? f.b : f.a}, f));
+  const more = Object.keys(AIRPORT).filter(k => k !== c && !own.some(f => f.to === k) && G.seen[CITY[k].home]).map(k => ({to: k, a: c, b: k, open: () => true}));
+  return [...own, ...more];
+};
 const flightOpen = (to = "saoluis") => FLIGHTS.some(f => (f.a === to || f.b === to) && f.open());
 // o que falta na região de onde o voo sai (chefes sem acalmar e o freela dela), para o aviso antes de partir
 function flightMissing(f) {

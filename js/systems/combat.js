@@ -103,8 +103,9 @@ function init(opts = {}) {
   vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = t("Lutar de novo"); $("toMap").textContent = fromExplore ? t("Continuar explorando") : t("Voltar ao mapa");
   p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:false, items:{...G.items}, furia:0};
   // freela do mapa de queimadas (Brasília): a brigada apaga os focos antes e o bicho tomado chega com 10% menos PV
-  const ehp = Math.round(animal.hp * (G.portfolio.mapa_queimadas && !animal.bug && isTomado(animal) ? .9 : 1));
-  e = { ...animal, hp:ehp, max:ehp, intent:null, known:false, assustada:false, rematch: !!opts.rematch };   // rematch: revanche pela lembrança do chefe
+  const far = !animal.bug && !!ZONES[curZone] && CITY[cityOf(curZone)].map !== "norte";   // chefe de fora do Norte: mais vida e o golpe forte
+  const ehp = Math.round(animal.hp * (G.portfolio.mapa_queimadas && !animal.bug && isTomado(animal) ? .9 : 1) * (animal.boss && far ? BOSS_HP_FAR : 1) * beastToughness(animal));
+  e = { ...animal, hp:ehp, max:ehp, intent:null, known:false, assustada:false, rematch: !!opts.rematch, far, turn: 0 };   // rematch: revanche pela lembrança do chefe
   busy = false;
   lines = [animal.intro];
   if (opts.firstHit) { e.hp = Math.max(1, e.hp - opts.firstHit); lines.push(t("Rhanon acertou primeiro: −{n}. Sua vez!", {n: opts.firstHit})); }
@@ -121,7 +122,7 @@ function init(opts = {}) {
   PFX.clear();
   HERO_A.mount($("hero"), {weapon: true, mode: "battle", state: "walk"});
   const boss = !!e.boss;
-  BEAST_A.mount($("beast"), $("beast").querySelector("canvas") || animalSprite(e), {id: e.id, boss, scale: e.scale, state: "enter", fit: true});   // scale: chefe com tamanho próprio (o padrão é 1,35)
+  BEAST_A.mount($("beast"), $("beast").querySelector("canvas") || animalSprite(e), {id: e.id, boss, scale: e.scale, state: "enter", fit: true, smoke: isTomado(animal) && !opts.rematch});   // scale: chefe com tamanho próprio (o padrão é 1,35); smoke: sobra em volta para a fumaça
   busy = true; render();
   HERO_A.slide("-38vw", "0px", 650, () => HERO_A.set("idle"));
   const ready = () => { if (opts.enemyFirst) return enemyTurn(); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus(); };
@@ -154,7 +155,15 @@ function plateElem(a) {
   el.className = "elem"; el.innerHTML = !w ? "" : [[w, false], ...r.map(k => [k, true])].filter(([k]) => elemKnown(a, k))
     .map(([k, res]) => `<i class="${res ? "resiste" : "fraco"}" style="--ec:${ELEMENTS[k].c}" title="${t(res ? "Resiste: {elemento}" : "Fraco: {elemento}", {elemento: ELEMENTS[k].n})}">${elemIcon(res ? "resiste" : "fraco")} ${ELEMENTS[k].n}</i>`).join("");
 }
+/* dificuldade (lote B): chefe de fora do Norte tem BOSS_HP_FAR da vida e, a cada BOSS_HEAVY_EVERY turnos, avisa um golpe
+   forte (BOSS_HEAVY × o dano máximo) que pede guarda (Defender corta para BOSS_HEAVY_GUARD); bicho comum bem abaixo do
+   nível do Rhanon aguenta mais (beastToughness), para a luta não acabar no primeiro golpe */
+const BOSS_HP_FAR = 1.4, BOSS_HEAVY_EVERY = 4, BOSS_HEAVY = 1.8, BOSS_HEAVY_GUARD = .3;
+const beastToughness = a => a.boss || a.bug ? 1 : Math.min(1.5, 1 + .08 * Math.max(0, G.lv - (a.lv || 1) - 2));
+const moveName = () => e.intent === "forte" ? t("Golpe forte") : (e.moves || MOVES)[e.intent];
 function pick() {
+  e.turn = (e.turn || 0) + 1;
+  if (e.boss && e.far && e.turn % BOSS_HEAVY_EVERY === 0) { e.intent = "forte"; e.known = true; return; }   // o golpe forte vem sempre avisado
   const r = Math.random() * 100;
   e.intent = r < 45 ? "arranhao" : r < 80 ? "bote" : "rugido";
   e.known = false;
@@ -179,8 +188,8 @@ function render() {
   $("spTxt").textContent = ps + " / " + p.msp;
   drawXp();
   $("log").innerHTML = lines.map(l => "<p>" + l + "</p>").join("");
-  $("intentTxt").textContent = e.known ? t("Próximo golpe: {golpe}", {golpe: (e.moves || MOVES)[e.intent]}) : t("{bicho} prepara o golpe…", {bicho: foe(1)});
-  $("intent").className = "intent" + (e.known ? " known" : "");
+  $("intentTxt").textContent = e.intent === "forte" ? t("{bicho} junta forças: golpe forte! Defenda.", {bicho: foe(1)}) : e.known ? t("Próximo golpe: {golpe}", {golpe: moveName()}) : t("{bicho} prepara o golpe…", {bicho: foe(1)});
+  $("intent").className = "intent" + (e.known ? " known" : "") + (e.intent === "forte" ? " forte" : "");
   // estados como ícones (ui/theme.js), com os turnos que faltam; o nome aparece ao passar o mouse e para leitores de tela
   $("status").innerHTML = statusList().map(([k, name, n]) => `<span class="st" title="${name}"><img src="${statusIconURL(k)}" alt="${name}">${n ? `<b>${n}</b>` : ""}</span>`).join("");
   $("furia").className = "furia" + (furyReady() ? " cheia" : "");
@@ -220,15 +229,16 @@ function qtePress() {
 // no impacto: devolve se acertou o tempo (e encerra a janela); cada janela conta para a fúria
 function qteTake() { const had = !!qte, ok = !!(qte && qte.ok); qteClear(); if (had) furyNote(ok); return ok; }
 /* fúria: FURY_MAX tempos certos seguidos (golpe perfeito ou bloqueio) enchem a barra; errar ou deixar passar zera.
-   Cheia, o comando da lança vira "Fúria!": três estocadas seguidas e a última mais forte. */
-const FURY_MAX = 3;
-const furyMax = () => hasSkill("furia2") ? 2 : FURY_MAX;   // habilidade Sangue quente: enche com 2
+   Cheia, o comando da lança vira "Fúria!": três estocadas seguidas (FURY_HIT do golpe) e a última mais forte (FURY_LAST).
+   Antes enchia com 3 (2 com Sangue quente) e cada estocada era um golpe inteiro: quem acertava o tempo vencia chefe em 2 turnos */
+const FURY_MAX = 4, FURY_HIT = .8, FURY_LAST = 1.4, FURY_LAST_CRIT = 1.9;
+const furyMax = () => hasSkill("furia2") ? FURY_MAX - 1 : FURY_MAX;   // habilidade Sangue quente: enche com um acerto a menos
 const furyReady = () => !!p && p.furia >= furyMax();
 function furyNote(ok) {
   if (!p || furyReady()) return;
   if (!ok) { p.furia = 0; return; }
   p.furia++;
-  if (furyReady()) setTimeout(() => { pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t(furyMax() === 2 ? "Dois no tempo certo! Fúria pronta: usa a lança." : "Três no tempo certo! Fúria pronta: usa a lança.")); render(); }, 420);
+  if (furyReady()) setTimeout(() => { pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t(furyMax() === 3 ? "Três no tempo certo! Fúria pronta: usa a lança." : "Quatro no tempo certo! Fúria pronta: usa a lança.")); render(); }, 420);
 }
 function hitBeast() {
   const b = $("beast"); b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit");
@@ -245,7 +255,7 @@ function act(id) {
   if (id === "atacar" && furyReady()) {
     p.furia = 0;
     const n = hasSkill("furia4") ? 4 : 3;   // habilidade Fúria da onça: uma estocada a mais
-    const ds = [...Array(n).keys()].map(i => { let d = rnd(6, 10) + G.lv - 1 + weaponAtk(); if (i === n - 1) d = Math.round(d * (p.atento ? 2.2 : 1.6)); if (p.weak > 0) d = Math.ceil(d / 2); return d; });
+    const ds = [...Array(n).keys()].map(i => { let d = rnd(6, 10) + G.lv - 1 + weaponAtk(); d = Math.round(d * (i === n - 1 ? (p.atento ? FURY_LAST_CRIT : FURY_LAST) : FURY_HIT)); if (p.weak > 0) d = Math.ceil(d / 2); return d; });
     p.atento = false; e.hp = Math.max(0, e.hp - ds.reduce((a, b) => a + b, 0));
     wait = furyStrike(ds);
   } else if (id === "atacar") {
@@ -291,7 +301,7 @@ function act(id) {
     wait = 900;
   } else if (id === "observar") {
     e.known = true; p.atento = true; sfx("look");
-    say(t("Rhanon estuda {bicho}. Vem aí: {golpe}.", {bicho: foe(), golpe: (e.moves || MOVES)[e.intent]}));
+    say(t("Rhanon estuda {bicho}. Vem aí: {golpe}.", {bicho: foe(), golpe: moveName()}));
   } else if (id === "defender") {
     p.def = true; p.sp = Math.min(p.msp, p.sp + 3); sfx("guard");
     say(t("Rhanon levanta a guarda."));
@@ -316,6 +326,10 @@ function enemyTurn() {
   if (charmRoll("encanto")) {   // talismã do Boto: o bicho fica parado, encantado
     say(t("O talismã encanta {bicho}: perdeu a vez.", {bicho: foe()})); pop(t("ENCANTADO!"), $("beast"), "crit"); sfx("look"); BEAST_A.set("hurt");
     foeImpact = 600;
+  } else if (i === "forte") {   // o golpe forte avisado: com a guarda levantada, passa só um pedaço
+    let d = Math.round(e.damage[1] * BOSS_HEAVY); if (p.def) d = Math.ceil(d * BOSS_HEAVY_GUARD); d = Math.max(1, d - pdef());
+    p.hp -= d; foeAttack("claw", d); shake("gshake");
+    say(p.def ? t("A guarda segura o golpe forte d{bicho}: −{n} PV.", {bicho: foe(), n: d}) : t("Golpe forte d{bicho}! −{n} PV.", {bicho: foe(), n: d}));
   } else if (i === "arranhao") {
     let d = rnd(e.damage[0], Math.max(e.damage[0], Math.min(e.damage[1], e.damage[0]+3))); if (p.def) d = Math.ceil(d / 2); d = Math.max(1, d - pdef());
     p.hp -= d; foeAttack("claw", d); say(t("{bicho} ataca: −{n} PV.", {bicho: foe(1), n: d}));
@@ -338,7 +352,41 @@ function enemyTurn() {
     pick(); busy = false; render();
   }, foeImpact + 150);
 }
+/* Pytuna não solta fácil o último chefe de dia de cada cidade: até a primeira vitória, quando o chefe quase volta a si,
+   a fumaça entra de volta nele, ele levanta com PYT_HOLD da vida, mais forte e com o tema de Pytuna tocando, e a luz de
+   Jaci devolve PYT_SP do PE ao Rhanon. Ninguém morre: o chefe só não voltou a si ainda */
+const PYT_HOLD = .6, PYT_DMG = 1.15, PYT_SP = .35;
+const pytunaBosses = () => Object.values(CITY).map(c => c.route.filter(z => ZONES[z]).pop()).filter(Boolean).map(z => ZONES[z].boss);   // o último chefe de dia de cada cidade
+const pytunaHolds = () => mode === "hunt" && e.boss && !e.rematch && !e.night && !e.possuido && !bugMode && ZONES[curZone] && !BS()[curZone] && pytunaBosses().includes(e.id);
+function pytunaPossess() {
+  const me = e; e.possuido = true; e.segurando = true; busy = true; render();   // segurando: a vida fica em 0 durante a cena, e nenhuma vitória conta
+  const at = (ms, fn) => setTimeout(() => { if (e === me && mode === "hunt" && p.hp > 0) fn(); }, REDUCE ? ms / 3 : ms);
+  BEAST_A.set("hurt"); musicStop(); say(t("{bicho} quase volta a si...", {bicho: foe(1)})); render();
+  at(1000, () => {   // a fumaça volta de todo lado para dentro do chefe, e Pytuna fala
+    sfx("rugidoChefe"); musicStart("pytuna"); shake("gshake-s"); $("beast").classList.add("possuido");
+    const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .45);
+    for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2, R = 28 + (i % 3) * 8; PFX.emit("puff", PYT_SMOKE, gx + Math.cos(a) * R, gy + Math.sin(a) * R * .7, -Math.cos(a) * R / 1.1, -Math.sin(a) * R * .7 / 1.1, 1.1); }
+    say(t("Pytuna puxa a fumaça de volta: \"Esse aí ainda é meu, curumim.\"")); render();
+  });
+  at(2600, () => {   // levanta mais forte
+    e.hp = Math.round(e.max * PYT_HOLD); e.damage = e.damage.map(d => Math.round(d * PYT_DMG)); e.segurando = false;
+    BEAST_A.set("bigroar"); animalCry(e.id, true, 1.4); hitImpact("forte"); shake("gshake");
+    encounterBanner(e.name, t(ending(e, "possuído por Pytuna!", "possuída por Pytuna!")));
+    say(t("{bicho} levanta com a fumaça de Pytuna, mais forte!", {bicho: foe(1)})); render();
+  });
+  at(4000, () => {   // e a luz de Jaci responde
+    const n = Math.max(0, Math.min(p.msp - p.sp, Math.round(p.msp * PYT_SP)));
+    p.sp += n; jaciJingle(); HERO_A.set("ready");
+    const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .35);
+    PFX.burst(14, "dot", ["#fff8c8", "#ffffff", "#bfe8ff"], gx, gy, 18, {life: 1, up: 14});
+    if (n) pop("+" + n + " " + t("PE"), $("hero"), "heal");
+    say(n ? t("A luz de Jaci aquece Rhanon: +{n} PE.", {n}) : t("A luz de Jaci aquece Rhanon."));
+    pick(); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus();
+  });
+}
 function finish(kind) {
+  if (kind === "win" && e.segurando) return;   // um golpe atrasado no meio da cena do Pytuna
+  if (kind === "win" && pytunaHolds()) return pytunaPossess();
   if (kind === "win") { beastThanks(); setTimeout(() => HERO_A.set("victory"), 250); }
   else if (kind === "lose") HERO_A.set("defeat");
   else if (kind === "flee") { HERO_A.set("flee"); HERO_A.slide("0px", "-60vw", 1000); }
@@ -397,7 +445,7 @@ function beastThanks() {
   BEAST_A.set("idle");
   if (e.bug) return setTimeout(() => $("beast").classList.add("glitch"), 300);   // bug: pisca em pedaços e some
   const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .15);
-  $("beast").classList.remove("tomado");
+  $("beast").classList.remove("tomado", "possuido");
   if (isTomado(e) && !e.rematch) { const [sx, sy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .45); PFX.burst(18, "puff", PYT_SMOKE, sx, sy, 16, {life: 1.2, up: 18}); }   // a fumaça de Pytuna sai do corpo e sobe
   if (!person) setTimeout(() => PFX.burst(g === "heart" ? 6 : 3, g, {heart: ["#ff6b8a", "#ff9fb4"], note: ["#5a6ad8", "#ffffff"], thumb: ["#ffd23a", "#c8902a"]}[g], gx, gy, 14, {life: 1, up: 12}), 200);
   if (e.boss) return;

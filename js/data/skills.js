@@ -10,7 +10,7 @@ const SKILL_TREES = [
     {id: "g1", n: "Braço forte", d: "ATQ +2.", cost: 1, atk: 2},
     {id: "g2", n: "Ponta afiada", d: "Golpe perfeito tira +50% de dano (antes +30%).", cost: 1, fx: "perfeito"},
     {id: "g3", n: "Braço de ferro", d: "ATQ +3.", cost: 1, atk: 3},
-    {id: "g4", n: "Sangue quente", d: "A fúria enche com 2 acertos no tempo certo (antes 3).", cost: 2, fx: "furia2"},
+    {id: "g4", n: "Sangue quente", d: "A fúria enche com 3 acertos no tempo certo (antes 4).", cost: 2, fx: "furia2"},
     {id: "g5", n: "Fúria da onça", d: "A fúria dá quatro estocadas em vez de três.", cost: 2, fx: "furia4"}
   ]},
   {id: "cacador", n: "Rastreador", d: "Defesa e reflexo", color: "#3f9a5c", nodes: [

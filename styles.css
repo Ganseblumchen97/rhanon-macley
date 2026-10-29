@@ -725,6 +725,10 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .plate .lv{background:var(--leafB);color:#fff}
 .intent{background:var(--wood2);color:var(--parch)}
 .intent.known{background:var(--leafB);color:#fff}
+/* golpe forte avisado do chefe (combat.js, pick): faixa vermelha piscando, pede Defender */
+.intent.forte{background:var(--red);color:#fff;animation:forteBlink .5s steps(2) infinite}
+@keyframes forteBlink{50%{background:#8a1a1a}}
+@media (prefers-reduced-motion:reduce){.intent.forte{animation:none}}
 .log{background:rgba(16,36,26,.92);color:var(--parch);clip-path:none;border:18px solid transparent;border-left-width:18px;border-image:var(--moldura) 18 round;image-rendering:pixelated;padding:4px 10px;
   box-shadow:inset 6px 0 0 var(--red)}
 .desc{background:var(--leafBD);color:var(--parch)}
@@ -1003,6 +1007,20 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 /* caderno de papel (antes do notebook ligar): folha pautada, letra à mão; depois vira o caderno digital de sempre */
 #caderno.papel .info{background:repeating-linear-gradient(180deg,#f6ecd2 0 22px,#c8d8e8 22px 23px) center/calc(100% - 16px) calc(100% - 16px) no-repeat border-box}
 #caderno.papel .info h2{font-family:"Comic Sans MS","Segoe Print",cursive;transform:rotate(-1.5deg)}
+/* caderno digital (notebook ligado): aberto dentro da tela do notebook, com a moldura preta, a câmera e o teclado embaixo */
+#caderno.digital{align-content:center;grid-auto-rows:auto}
+#caderno.digital .info{border:14px solid #1e1e26;border-top-width:18px;border-image:none;border-radius:12px 12px 3px 3px;filter:drop-shadow(0 6px 0 rgba(0,0,0,.35));
+  background:radial-gradient(circle,#5a5a68 0 2px,transparent 2.5px) 50% -11px/8px 8px no-repeat border-box,linear-gradient(180deg,#0e2640,#0a1626) padding-box;
+  box-shadow:0 0 0 2px #3a3a46;padding:10px 14px 12px;scrollbar-color:#3aa0e8 #0a1626}
+#caderno.digital .info::before{display:none}
+#caderno.digital::after{content:"";width:min(920px,99vw);height:22px;margin-top:-1px;border-radius:0 0 10px 10px;
+  background:linear-gradient(#24242c,#24242c) 50% 0/120px 5px no-repeat,linear-gradient(180deg,#7a7a8a,#4a4a58 35%,#2a2a34);
+  clip-path:polygon(3% 0,97% 0,100% 65%,100% 100%,0 100%,0 65%)}
+#caderno.digital .info h2{background:linear-gradient(180deg,#3aa0e8,#1a5aa8);color:#fff;rotate:0deg;box-shadow:3px 3px 0 #0a1626,0 0 0 2px #7dd8ff}
+#caderno.digital .info .hint{color:#9fd0f0}
+#caderno.digital .cad-card{background:linear-gradient(180deg,#1a3a5a,#12304a);border:2px solid #2a6aa0;border-top-width:6px;border-radius:3px;color:#d8ecff}
+#caderno.digital .cad-card b{color:#7dd8ff}
+#caderno.digital .cad-card.nao-visto{opacity:.6}
 /* bug do freela resolvido: treme em degraus, perde a cor e some */
 #beast.glitch canvas.actor{animation:glitchOut .9s steps(6) forwards}
 @keyframes glitchOut{30%{translate:6px 0;filter:hue-rotate(90deg)}60%{translate:-8px 2px;opacity:.6;filter:grayscale(1)}100%{translate:0 0;opacity:0;filter:grayscale(1)}}
@@ -1031,18 +1049,35 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .chapter h2{font-size:clamp(40px,8vw,96px);rotate:-4deg;margin:0}
 .chapter p{font:700 16px var(--mono);color:#f6e9c4;background:#06120a;padding:6px 14px}
 /* mapa do Brasil (openBrasil em systems/world-map.js): contorno com um ponto por região e a lista ao lado */
-.br-wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-items:start}
-.br-wrap svg{width:100%;max-height:60vh}
-.br-wrap .land path{fill:#3f6a3a;stroke:#06120a;stroke-width:3}
+/* tamanho fixo: a janela não muda de tamanho quando troca a região escolhida */
+.brasil{width:min(900px,94vw);height:min(640px,90vh);overflow:auto}
+.br-wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,1fr);gap:14px;align-items:start}
+.br-wrap svg{width:100%;height:min(500px,64vh)}
+.br-wrap .land path{fill:#3f6a3a}
+.br-wrap .land-edge path{fill:none;stroke:#06120a;stroke-width:3}
+.br-area{fill:var(--rc);fill-opacity:.25;stroke:rgba(6,18,10,.55);stroke-width:2;stroke-dasharray:5 4}
+.br-area.been{fill-opacity:.6}
+.br-area.shut{fill:#2a2a2a;fill-opacity:.45}
+.br-area.sel{fill-opacity:.8}
 .br-trail{fill:none;stroke:#f6e9c4;stroke-width:3;stroke-dasharray:6 7;opacity:.6}
-.br-dot circle{fill:#5a5a5a;stroke:#06120a;stroke-width:3}
+.br-dot>circle{fill:#5a5a5a;stroke:#06120a;stroke-width:3}
+.br-dot:not(.open) .br-ico{opacity:.55}
 .br-dot text{font:400 15px var(--display);fill:#f6e9c4;paint-order:stroke;stroke:#06120a;stroke-width:4px;text-transform:uppercase}
-.br-dot.open circle{fill:var(--rc);animation:brPulse 1.4s steps(2) infinite}
-.br-dot.sel circle{stroke:#ffd23a;stroke-width:5}
+.br-dot.open>circle{fill:var(--rc);animation:brPulse 1.4s steps(2) infinite}
+.br-dot.sel>circle{stroke:#ffd23a;stroke-width:5}
+.br-card{min-height:200px}
 @keyframes brPulse{50%{r:19px}}
 .br-smoke circle{fill:#2a2a34;stroke:#06120a;stroke-width:2}
 .br-smoke rect{fill:#ff2a2a}
-.br-plane path{fill:none;stroke:#ffffff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 2px 0 #06120a)}   /* avião do voo entre regiões (fly em world-map.js) */
+/* avião do voo entre regiões (fly em world-map.js): jato branco de linha aérea, com a sombra caindo no mapa */
+.br-plane{filter:drop-shadow(3px 6px 0 rgba(6,18,10,.35))}
+.br-plane :is(.jw,.jt,.jb,.je,.jf){stroke:#06120a;stroke-width:1;stroke-linejoin:round}
+.br-plane .jw{fill:#d8dee6}
+.br-plane .je{fill:#8a96a8}
+.br-plane .jt,.br-plane .jf{fill:#e2363d}
+.br-plane .jb{fill:#ffffff}
+.br-plane .jl{fill:none;stroke:#2a6ad8;stroke-width:1.4}
+.br-plane .jc{fill:#1a2a4a}
 .br-card{border-top:2px dashed var(--wood);padding-top:6px;margin-top:6px}
 .br-card h3{margin:0;font:400 22px var(--display);text-transform:uppercase}
 .br-card p{margin:4px 0;font:13px/1.45 var(--mono);color:var(--brown)}
@@ -1134,10 +1169,11 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 .boss-warn.treino{background:radial-gradient(ellipse at center,rgba(40,140,60,.25),rgba(0,0,0,.5));animation:none}
 .boss-warn.treino .bw-tape{background:repeating-linear-gradient(-45deg,#ffd23a 0 22px,#2f7a3a 22px 44px);box-shadow:0 4px 0 #173a22,0 -4px 0 #173a22}
 .boss-warn.treino .bw-sub{background:var(--leafB)}
-/* bicho tomado pela fumaça de Pytuna (batalha): brilho escuro arroxeado pulsando em volta; some quando ele é acalmado */
-#beast.tomado canvas.actor{filter:drop-shadow(0 0 5px rgba(42,20,64,.9)) drop-shadow(0 0 12px rgba(74,30,110,.55));animation:tomadoPulse 1.6s ease-in-out infinite}
-@keyframes tomadoPulse{50%{filter:drop-shadow(0 0 3px rgba(42,20,64,.7)) drop-shadow(0 0 7px rgba(74,30,110,.35))}}
-@media (prefers-reduced-motion:reduce){#beast.tomado canvas.actor{animation:none}}
+/* bicho tomado pela fumaça de Pytuna (batalha): a fumaça é desenhada no canvas do bicho (drawSmokeAura em gfx/actors.js);
+   aqui só uma sombra escura leve em volta; some quando ele é acalmado */
+#beast.tomado canvas.actor{filter:drop-shadow(0 0 3px rgba(26,26,34,.6))}
+/* chefe possuído por Pytuna (pytunaPossess em combat.js): brilho vermelho dos olhos dele em volta */
+#beast.possuido canvas.actor{filter:drop-shadow(0 0 4px rgba(255,42,42,.55)) drop-shadow(0 0 2px rgba(26,26,34,.8))}
 .mk3d{pointer-events:none}
 /* notebook (nbView em explore.js): o desenho grande, em cima de uma esteira de palha */
 .nb-canvas{display:block;width:min(360px,100%);aspect-ratio:3/2;margin:4px auto 6px;image-rendering:pixelated;border-radius:6px;

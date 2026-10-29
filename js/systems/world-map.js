@@ -63,7 +63,7 @@ function select(id) {
     }
   } else if (here && id === "belem") {
     btn(t("Entrar em Belém"), openLocal);
-    flightButton("belem", flightsFrom("belem")[0]);
+    flightsFrom("belem").forEach(f => flightButton("belem", f));
   } else if (id === "belem" || (id === "ananindeua" && G.loc === "belem")) {   // entre as duas cidades só se vai de ônibus
     if (G.passagem && BUS.open) { btn(id === "belem" ? t("Viajar de barco para Belém") : t("Voltar de barco para a aldeia"), () => busRide(id)); i.insertAdjacentHTML("beforeend", `<p class="hint">${t("A passagem do barco vale ida e volta.")}</p>`); }
     else i.insertAdjacentHTML("beforeend", '<p class="hint">Para chegar à capital, compre a passagem do barco no porto do Tapajós, no fim da trilha da aldeia.</p>');
@@ -102,16 +102,22 @@ function flightButton(id, f) {
     btn(t("Partir mesmo assim"), go); btn(t("Ficar mais um pouco"), () => select(id));
     menuSelect(i, 0);
   } : go);
-  if (f.open()) i.insertAdjacentHTML("beforeend", `<p class="hint">${t(f.paid)}</p>`);   // quem paga, só com a região de antes completa
+  if (f.open() && f.paid) i.insertAdjacentHTML("beforeend", `<p class="hint">${t(f.paid)}</p>`);   // quem paga, só com a região de antes completa (voo direto não tem)
 }
 /* ---------- voo entre regiões (FLIGHTS em data/world.js) ----------
    o mapa do Brasil abre com um aviãozinho indo de uma região à outra; ao pousar, troca o mapa grande e a cidade */
 function fly(city) {
   if (moving || !flightsFrom(G.loc).some(f => f.to === city)) return;
   moving = true; sfx("onibus"); musicStop();
-  const from = REGIONS[regionOfCity(G.loc)].pos, to = REGIONS[regionOfCity(city)].pos;
+  let from = REGIONS[regionOfCity(G.loc)].pos, to = REGIONS[regionOfCity(city)].pos;
+  if (from === to) { from = [from[0] - 22, from[1] + 8]; to = [to[0] + 22, to[1] - 8]; }   // voo dentro da mesma região: um pulinho
   openBrasil(); const svg = $("brasil").querySelector("svg");
-  svg.insertAdjacentHTML("beforeend", `<g class="br-plane"><path d="M-9 0 L9 0 M-2 -7 L3 0 L-2 7 M-8 -3 L-6 0 L-8 3" /></g>`);
+  // avião de viagem visto de cima, com o bico para a direita: asas enflechadas com turbina, cauda vermelha, faixa azul e a cabine
+  svg.insertAdjacentHTML("beforeend", `<g class="br-plane"><g transform="scale(1.5)"><path class="jw" d="M3 -2 L-5 -15 L-9 -15 L-5 -2Z M3 2 L-5 15 L-9 15 L-5 2Z"/>` +
+    `<ellipse class="je" cx="-1" cy="-7.5" rx="2.6" ry="1.4"/><ellipse class="je" cx="-1" cy="7.5" rx="2.6" ry="1.4"/>` +
+    `<path class="jt" d="M-11 -1.5 L-16 -7 L-18.5 -7 L-15.5 -1.5Z M-11 1.5 L-16 7 L-18.5 7 L-15.5 1.5Z"/>` +
+    `<path class="jb" d="M14 0 Q13 -3 8.5 -3 H-13 Q-17 -2.5 -18 0 Q-17 2.5 -13 3 H8.5 Q13 3 14 0Z"/><path class="jl" d="M-15 0 H9"/>` +
+    `<path class="jc" d="M10.5 -1.6 Q12.6 0 10.5 1.6Z"/><path class="jf" d="M-14 -1 L-18 0 L-14 1Z"/></g></g>`);
   const pl = svg.querySelector(".br-plane"), ang = Math.atan2(to[1] - from[1], to[0] - from[0]) * 180 / Math.PI, t0 = performance.now(), ms = REDUCE ? 300 : 3200;
   const step = now => {
     const k = Math.min(1, (now - t0) / ms), e = k * k * (3 - 2 * k);
@@ -132,9 +138,13 @@ let BR_SEL = "norte";
 function openBrasil() {
   vit(); audio();
   const o = $("brasil"), box = o.querySelector(".info"), B = MAP_REGIONS.brasil, fled = G.narrated.pyt_jacare_canal || G.narrated.pyt_bufalo_touro;
-  const dots = Object.entries(REGIONS).map(([k, r]) => `<g class="br-dot${r.open ? " open" : ""}${k === BR_SEL ? " sel" : ""}" transform="translate(${r.pos[0]} ${r.pos[1]})" style="--rc:${r.color}"><circle r="${r.open ? 16 : 12}"/><text y="34" text-anchor="middle">${r.n}</text></g>`).join("");
+  // cada região pintada com a cor dela: forte onde o Rhanon já esteve, clarinha onde dá pra ir e cinza onde ainda não abriu
+  const been = k => k === "norte" || !!G.regions?.[k], land = B.land.map(d => `<path d="${d}"/>`).join("");
+  const areas = Object.entries(B.area).map(([k, d]) => `<path class="br-area${been(k) ? " been" : REGIONS[k].open ? "" : " shut"}${k === BR_SEL ? " sel" : ""}" d="${d}" style="--rc:${REGIONS[k].color}"/>`).join("");
+  const dots = Object.entries(REGIONS).map(([k, r]) => `<g class="br-dot${r.open ? " open" : ""}${k === BR_SEL ? " sel" : ""}" transform="translate(${r.pos[0]} ${r.pos[1]})" style="--rc:${r.color}"><circle r="${r.open ? 16 : 13}"/><g class="br-ico" transform="scale(${r.open ? 1.15 : .95})">${MAP_ICON[B.icon[k]][1]}</g><text y="34" text-anchor="middle">${r.n}</text></g>`).join("");
   const smoke = fled ? `<g class="br-smoke" transform="translate(${REGIONS.sul.pos[0] + 30} ${REGIONS.sul.pos[1] - 26})"><circle r="11" cx="-6"/><circle r="13" cx="6" cy="-4"/><circle r="9" cx="2" cy="6"/><rect x="-6" y="-4" width="4" height="3"/><rect x="3" y="-4" width="4" height="3"/></g>` : "";
-  box.innerHTML = `<h2>${t("Mapa do Brasil")}</h2><div class="br-wrap"><svg viewBox="80 80 400 480" aria-hidden="true"><g class="land">${B.land.map(d => `<path d="${d}"/>`).join("")}</g>` +
+  box.innerHTML = `<h2>${t("Mapa do Brasil")}</h2><div class="br-wrap"><svg viewBox="80 80 400 480" aria-hidden="true"><defs><clipPath id="brLand">${land}</clipPath></defs><g class="land">${land}</g>` +
+    `<g clip-path="url(#brLand)">${areas}</g><g class="land-edge">${land}</g>` +
     `<path class="br-trail" d="M${REGIONS.norte.pos} L${REGIONS.nordeste.pos} L${REGIONS.centroeste.pos} L${REGIONS.sudeste.pos} L${REGIONS.sul.pos}"/>${dots}${smoke}</svg><div class="br-side"></div></div>`;
   const side = box.querySelector(".br-side");
   Object.entries(REGIONS).forEach(([k, r]) => btn(r.n + (r.open ? "" : ` <small>${t("em breve")}</small>`), () => { BR_SEL = k; sfx("blip"); openBrasil(); }, false, side));
