@@ -1,4 +1,6 @@
-# Rhanon Macley — RPG (alfa 0.66.3)
+# Jaci: The Fading Moon (alfa 0.66.4)
+
+*Jaci: A Lua que se Apaga* · uma aventura de Rhanon Macley · RPG de turno no navegador
 
 ### ▶ [Jogar no navegador](https://ganseblumchen97.github.io/rhanon-macley/)
 

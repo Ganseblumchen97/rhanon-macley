@@ -91,7 +91,7 @@ document.addEventListener("pointerdown", () => {
 document.addEventListener("visibilitychange", () => { if (AC) document.hidden ? AC.suspend() : AC.resume(); });
 
 /* ----- tela inicial ----- */
-ransom($("titleLogo"), ["MACLEY'S", "ADVENTURE"], 7);
+ransom($("titleLogo"), ["JACI"], 7);   // o nome do jogo; o subtítulo (.title-sub) é traduzido
 TITLE_A.mount($("titleArt"));
 drawMap(); themeReady = true;
 $("titleScreen").hidden = false; drawTitleBg();

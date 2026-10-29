@@ -445,6 +445,11 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .title-screen[hidden]{display:none!important}
 .title{font-family:var(--body);font-size:clamp(34px,6vw,88px);line-height:1.1;margin:0 0 6vh;rotate:-4deg;transform-origin:left}
 .title .line{display:block;white-space:nowrap}.title .line+.line{margin-left:1.2em}
+#titleLogo{font-size:clamp(70px,13vw,190px);margin-bottom:1.6vh}
+/* subtítulo do jogo (traduzido) e o herói em letra menor, inclinados junto com o logo */
+.title-sub{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin:0 0 5vh .5em;rotate:-4deg;transform-origin:left}
+.title-sub b{font:400 clamp(20px,2.8vw,40px)/1.1 Anton,Impact,sans-serif;letter-spacing:.5px;text-transform:uppercase;color:var(--paper);background:var(--red);padding:3px 16px;transform:skewX(-8deg);box-shadow:4px 4px 0 var(--ink)}
+.title-sub small{font:700 clamp(11px,1.1vw,15px) var(--mono);color:var(--paper);text-shadow:2px 2px 0 var(--ink)}
 .l{display:inline-block;padding:.02em .09em;margin:0 .015em;rotate:var(--rot);font-size:var(--fs);animation:rpop .5s var(--pop) backwards;animation-delay:calc(var(--d) * 35ms)}
 .l.a{background:var(--paper);color:var(--ink)}.l.b{background:var(--ink);color:var(--paper)}
 .l.c{background:var(--paper);color:var(--accent-ink);font-family:Anton,Impact,sans-serif}

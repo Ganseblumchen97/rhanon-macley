@@ -1,7 +1,13 @@
-# Novidades — Rhanon Macley RPG
+# Novidades — Jaci: The Fading Moon
 
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
+
+## 0.66.4 — o jogo ganhou nome: Jaci
+
+- O jogo agora se chama **Jaci: The Fading Moon** (em português, *Jaci: A Lua que se Apaga*), por causa da lua que o
+  Rhanon tenta salvar. A tela inicial ganhou o logo novo, com o subtítulo no idioma escolhido e "Uma aventura de
+  Rhanon Macley" embaixo. O endereço do jogo continua o mesmo.
 
 ## 0.66.3 — a trilha sonora para ouvir
 
