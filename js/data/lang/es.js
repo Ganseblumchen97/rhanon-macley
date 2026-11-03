@@ -1362,11 +1362,9 @@ TX.es = {
     "Habilidades": "Habilidades",
     "Habilidades (H)": "Habilidades (H)",
     "Pontos para gastar: {n} · ganha 1 a cada nível": "Puntos para gastar: {n} · ganas 1 por nivel",
-    "aprendida": "aprendida",
     "1 ponto": "1 punto",
     "{n} pontos": "{n} puntos",
     "Já aprendida.": "Ya aprendida.",
-    "Aprenda antes a habilidade de cima.": "Aprende antes la habilidad de arriba.",
     "Faltam pontos: suba de nível.": "Faltan puntos: sube de nivel.",
     "Z aprende.": "Z la aprende.",
     "Setas escolhem · Z aprende · X fecha": "Flechas eligen · Z aprende · X cierra",
@@ -2551,8 +2549,6 @@ TX.es = {
     "O rabo-bandeira abre na frente do Rhanon: os 2 próximos golpes batem pela metade.": "La cola de bandera se abre delante de Rhanon: los 2 próximos golpes pegan a la mitad.",
     "{aliado} acerta {bicho} em cheio: −{n}.": "{aliado} le da de lleno a {bicho}: −{n}.",
     "{aliado} volta e acerta {bicho}: −{n}.": "{aliado} vuelve y golpea a {bicho}: −{n}.",
-    "chegue ao {regiao}": "llega al {regiao}",
-    "Abre quando o Rhanon chegar ao {regiao}.": "Se abre cuando Rhanon llegue al {regiao}.",
     "Vazio": "Vacío",
     "Nv {lv} · {lugar} · dia {dia} · {n} chefes": "Nv {lv} · {lugar} · día {dia} · {n} jefes",
     "Escolher save": "Elegir partida",
@@ -2561,6 +2557,8 @@ TX.es = {
     "Apagar o espaço {n}? Não dá para desfazer.": "¿Borrar el espacio {n}? No se puede deshacer.",
     "Sim, apagar": "Sí, borrar",
     "Apagar": "Borrar",
-    "Começar aqui": "Empezar aquí"
+    "Começar aqui": "Empezar aquí",
+    "Teia de habilidades": "Red de habilidades",
+    "Aprenda antes uma habilidade ligada a esta.": "Primero aprende una habilidad conectada a esta."
   }
 };

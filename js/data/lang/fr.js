@@ -1365,11 +1365,9 @@ TX.fr = {
     "Habilidades": "Compétences",
     "Habilidades (H)": "Compétences (H)",
     "Pontos para gastar: {n} · ganha 1 a cada nível": "Points à dépenser : {n} · 1 de plus par niveau",
-    "aprendida": "apprise",
     "1 ponto": "1 point",
     "{n} pontos": "{n} points",
     "Já aprendida.": "Déjà apprise.",
-    "Aprenda antes a habilidade de cima.": "Apprends d'abord la compétence du dessus.",
     "Faltam pontos: suba de nível.": "Pas assez de points : monte de niveau.",
     "Z aprende.": "Z pour l'apprendre.",
     "Setas escolhem · Z aprende · X fecha": "Flèches pour choisir · Z apprend · X ferme",
@@ -2554,8 +2552,6 @@ TX.fr = {
     "O rabo-bandeira abre na frente do Rhanon: os 2 próximos golpes batem pela metade.": "La queue en drapeau s'ouvre devant Rhanon : les 2 prochains coups font moitié moins mal.",
     "{aliado} acerta {bicho} em cheio: −{n}.": "{aliado} frappe {bicho} de plein fouet : −{n}.",
     "{aliado} volta e acerta {bicho}: −{n}.": "{aliado} revient et frappe {bicho} : −{n}.",
-    "chegue ao {regiao}": "atteins le {regiao}",
-    "Abre quando o Rhanon chegar ao {regiao}.": "S'ouvre quand Rhanon atteindra le {regiao}.",
     "Vazio": "Vide",
     "Nv {lv} · {lugar} · dia {dia} · {n} chefes": "Nv {lv} · {lugar} · jour {dia} · {n} chefs",
     "Escolher save": "Choisir la sauvegarde",
@@ -2564,6 +2560,8 @@ TX.fr = {
     "Apagar o espaço {n}? Não dá para desfazer.": "Effacer l'emplacement {n} ? Impossible d'annuler.",
     "Sim, apagar": "Oui, effacer",
     "Apagar": "Effacer",
-    "Começar aqui": "Commencer ici"
+    "Começar aqui": "Commencer ici",
+    "Teia de habilidades": "Toile de compétences",
+    "Aprenda antes uma habilidade ligada a esta.": "Apprends d'abord une compétence reliée à celle-ci."
   }
 };

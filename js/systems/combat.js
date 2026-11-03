@@ -17,6 +17,7 @@ function setBattleDecor(zone) {
 // chefe: a versão pesada; bug do freela: a roda
 const BATTLE_WATER = new Set(["rio", "igarape", "manguezal", "varzea"]), BATTLE_CITY = new Set(["cidadevelha", "porto", "baixadas"]);
 function getBattleTrackFor(animal) {
+  if (animal.possuido) return "battlePytuna";   // Pytuna segurou o chefe: o tema dele em versão de batalha até o fim da luta
   if (animal.boss) return "battleBoss";
   if (regionOfCity(curCity()) === "nordeste" && !animal.bug) return "battleNordeste";   // Nordeste: o tema da região num forró de batalha
   if (regionOfCity(curCity()) === "centroeste" && !animal.bug) return "battleCentroOeste";   // Centro-Oeste: pagode de viola
@@ -407,7 +408,7 @@ function pytunaPossess() {
   const at = (ms, fn) => setTimeout(() => { if (e === me && mode === "hunt" && p.hp > 0) fn(); }, REDUCE ? ms / 3 : ms);
   BEAST_A.set("hurt"); musicStop(); say(t("{bicho} quase volta a si...", {bicho: foe(1)})); render();
   at(1000, () => {   // a fumaça volta de todo lado para dentro do chefe, e Pytuna fala
-    sfx("rugidoChefe"); musicStart("pytuna"); shake("gshake-s"); $("beast").classList.add("possuido");
+    sfx("rugidoChefe"); musicStart("battlePytuna"); shake("gshake-s"); $("beast").classList.add("possuido");   // o tema de Pytuna em versão de batalha
     const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .45);
     for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2, R = 28 + (i % 3) * 8; PFX.emit("puff", PYT_SMOKE, gx + Math.cos(a) * R, gy + Math.sin(a) * R * .7, -Math.cos(a) * R / 1.1, -Math.sin(a) * R * .7 / 1.1, 1.1); }
     say(t("Pytuna puxa a fumaça de volta: \"Esse aí ainda é meu, curumim.\"")); render();

@@ -1359,11 +1359,9 @@ TX.en = {
     "Habilidades": "Skills",
     "Habilidades (H)": "Skills (H)",
     "Pontos para gastar: {n} · ganha 1 a cada nível": "Points to spend: {n} · you get 1 per level",
-    "aprendida": "learned",
     "1 ponto": "1 point",
     "{n} pontos": "{n} points",
     "Já aprendida.": "Already learned.",
-    "Aprenda antes a habilidade de cima.": "Learn the skill above first.",
     "Faltam pontos: suba de nível.": "Not enough points: level up.",
     "Z aprende.": "Z learns it.",
     "Setas escolhem · Z aprende · X fecha": "Arrows choose · Z learns · X closes",
@@ -2548,8 +2546,6 @@ TX.en = {
     "O rabo-bandeira abre na frente do Rhanon: os 2 próximos golpes batem pela metade.": "The flag tail spreads in front of Rhanon: the next 2 blows hit for half.",
     "{aliado} acerta {bicho} em cheio: −{n}.": "{aliado} hits {bicho} square on: −{n}.",
     "{aliado} volta e acerta {bicho}: −{n}.": "{aliado} comes back and hits {bicho}: −{n}.",
-    "chegue ao {regiao}": "reach the {regiao}",
-    "Abre quando o Rhanon chegar ao {regiao}.": "Opens when Rhanon reaches the {regiao}.",
     "Vazio": "Empty",
     "Nv {lv} · {lugar} · dia {dia} · {n} chefes": "Lv {lv} · {lugar} · day {dia} · {n} bosses",
     "Escolher save": "Choose save",
@@ -2558,6 +2554,8 @@ TX.en = {
     "Apagar o espaço {n}? Não dá para desfazer.": "Delete slot {n}? This can't be undone.",
     "Sim, apagar": "Yes, delete",
     "Apagar": "Delete",
-    "Começar aqui": "Start here"
+    "Começar aqui": "Start here",
+    "Teia de habilidades": "Skill web",
+    "Aprenda antes uma habilidade ligada a esta.": "First learn a skill linked to this one."
   }
 };

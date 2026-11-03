@@ -959,6 +959,56 @@ const MUS = (() => {
         if (m) { lead(mtof(m.note), t, m.len * d, part === "A2" ? .015 : .012); flute(mtof(m.note - 12), t, m.len * d, .018); }
       }
     },
+    /* Pytuna segura o chefe (pytunaPossess em combat.js): o tema de Pytuna (PYTUNA_THEME) em versão de batalha. Os acordes
+       saem das notas do próprio tema (ré menor, mi bemol, lá bemol, dó sustenido diminuto: o trítono no meio) e o riff
+       distorcido martela ré e lá bemol. Abre com o coro e a badalada da cena dele; A = bateria cheia com o tema no metal,
+       uma oitava acima; B = meio-tempo pesado com o tema grave no coro e no baixo; C = a fumaça girando (coração e surdo)
+       crescendo de volta para o A. */
+    battlePytuna: {
+      bpm: 136, wet: .32, level: .3,
+      chords: [{bass: 38, notes: [50, 53, 57, 62]}, {bass: 39, notes: [51, 55, 58, 63]}, {bass: 44, notes: [51, 56, 60, 63]}, {bass: 37, notes: [49, 52, 55, 58]}],
+      form: ["A", "B", "A2", "C"], riff: [0, 0, 12, 0, 6, 0, 12, 0, 0, 0, 13, 0, 6, 0, 1, 0], intro: 32, melody: null,
+      play(i, t, d) {
+        if (i < this.intro) {   // abertura: a fumaça volta para dentro do chefe
+          const s = i % 16, bar = Math.floor(i / 16);
+          if (i === 0) { choir([26, 33, 38], t, d * 32, .022); toll(38, t, .05); sweep(t, d * 32, .035); }
+          if (s === 0 || s === 3) kick(t, s ? .08 : .12);   // o coração da cena dele, agora acelerando
+          if (bar === 1 && s % 2 === 0) snare(t, .015 + s * .003);
+          if (bar === 1 && s === 8) toll(44, t, .04);   // a badalada no trítono
+          return;
+        }
+        const j = i - this.intro, s = j % 16, bar = Math.floor(j / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = this.chords[Math.floor(barIn / 2)], notes = chord.notes;
+        const half = part === "B", brk = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (j % 128 === 0) {   // o tema tem 4 compassos: toca duas vezes, a segunda com enfeite
+          const sh = half ? 0 : part === "A2" ? 24 : 12, a = themeLine(PYTUNA_THEME, sh), b = themeLine(PYTUNA_THEME, sh, part === "A2");
+          this.melody = part === "C" ? null : [...a.slice(0, 64), ...b.slice(0, 64)];
+          hat(t, .03, true);
+        }
+        if (s === 0 && barIn % 2 === 0) { choir(notes.slice(0, 3).map(n => n - 12), t, d * 32, brk ? .024 : .014); toll(notes[0] + (half ? 0 : 12), t, .03); }
+        if (brk || build) {   // ponte: a fumaça girando, coração e surdo; a virada cresce no fim
+          if (s === 0 || s === 3) kick(t, .14); if (s === 8 || s === 14) surdo(t, .12);
+          if (s % 4 === 2) sweep(t, d * 2, .01);
+          if (build && !battleFill(t, d, s, barIn, true) && (s === 4 || s === 12)) snare(t, .04);
+          return;
+        }
+        if (half) { if (s === 0 || s === 10) kick(t, .16); if (s === 8) { snare(t, .08); clap(t); } if (s === 14 || s === 15) surdo(t, .11); }
+        else {
+          if ([0, 3, 6, 8, 11].includes(s)) kick(t, .14);
+          if (!battleFill(t, d, s, barIn, false) && (s === 4 || s === 12)) { snare(t, .07); clap(t); }
+        }
+        if (s % 2 === 0) hat(t, s % 4 === 2 ? .013 : .006, s === 6 && half);
+        const r = this.riff[s];   // riff no trítono: ré, ré agudo, lá bemol
+        if (!half || s % 4 === 0) dist(mtof(chord.bass + 12 + r), t, d * (half ? 3.6 : .9), half ? .032 : .024, half ? 1000 : 1400);
+        if (s === 0 || (s === 10 && !half)) brass(notes.slice(1).map(n => n + 12), t, d * (s === 0 ? 3 : 1.5), .011);
+        if (s === 0) synth("sine", mtof(chord.bass), t, d * 15, .09);
+        const m = this.melody && this.melody[j % 128];
+        if (m) {
+          if (half) { synth("sawtooth", mtof(m.note + 12), t, m.len * d, .02, 700); synth("sine", mtof(m.note), t, m.len * d, .06); }   // a voz de fumaça da cena, grave
+          else { lead(mtof(m.note), t, m.len * d * .9, .014); synth("sawtooth", mtof(m.note - 12), t, m.len * d * .9, .007, 1600); }
+        }
+      }
+    },
     // mapa do Pará de dia: guitarrada/carimbó com cara de cidade. Bateria com caixa e chimbal, baixo andando, curimbó
     // (atabaque) e maracas por baixo, piano elétrico no contratempo e a guitarra solando. Forma A - A' - B - A''
     mapPara: {

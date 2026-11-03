@@ -42,7 +42,7 @@ function vit() {
   if (SUB[G.sub] && cityOf(G.sub) !== curCity()) G.sub = CITY[curCity()].home;   // o local guardado tem que ser da cidade atual
   // locais que já apareceram no mapa de Ananindeua; save antigo: tudo o que já está liberado (sem repetir animação)
   if (!G.seen) { G.seen = {}; CITY.ananindeua.route.forEach(k => { if (unlocked(k)) G.seen[k] = true; }); }   // Belém aparece aos poucos na primeira chegada
-  Object.values(CITY).forEach(c => { if (c.rodo && G.seen[c.home]) G.seen[c.rodo] = true; });   // a rodoviária aparece junto com o centro da cidade
+  Object.values(CITY).forEach(c => { if (c.rodo && G.seen[c.rodo] && !unlocked(c.rodo)) delete G.seen[c.rodo]; });   // a rodoviária agora é a última parada: some do mapa até a última trilha
   G.skills = G.skills || {};   // degraus aprendidos da árvore de habilidades
   // notebook: jogo novo começa sem ele (missão do começo); save antigo já tem tudo ligado
   if (!G.nb) G.nb = G.tutorial ? {} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};

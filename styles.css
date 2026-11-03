@@ -963,30 +963,24 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 @media(min-width:761px){.title-art{position:relative}}
 .t-menu .desc{background:rgba(6,18,10,.85);color:#f6e9c4}
 
-/* ===== árvore de habilidades (systems/skills.js): três colunas com a cor de cada caminho (--sk); degrau aprendido
-   cheio, livre com borda pulsando, sem pontos apagado, trancado (falta o de cima) mais apagado ainda ===== */
-.sk-wrap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:6px 0 10px;max-height:min(52vh,520px);overflow-y:auto;padding:4px 6px 4px 2px}
-.sk-reg{font:700 11px var(--mono);font-style:normal;text-transform:uppercase;color:var(--brown);text-align:center;border-top:2px dashed var(--wood);padding-top:5px;margin-top:4px;opacity:.85}
-.sk-tree{display:flex;flex-direction:column;gap:8px;align-items:stretch}
-.sk-tree h3{margin:0;font:400 20px var(--display);text-transform:uppercase;color:var(--sk)}
-.sk-tree>small{font:700 11px var(--mono);opacity:.75;margin-top:-6px}
-.sk-node{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:flex;flex-direction:column;gap:1px;padding:7px 10px;border:3px solid var(--wood);border-radius:4px;
-  background:rgba(255,255,255,.35);color:var(--brown);font:11px/1.3 var(--mono);transition:translate .15s}
-.sk-node+.sk-node::before{content:"";position:absolute;left:50%;top:-11px;width:3px;height:8px;background:var(--wood)}
-.sk-node b{font:400 clamp(13px,1.5vw,16px) var(--display);text-transform:uppercase}
-.sk-node span{font-weight:700;opacity:.8}
-.sk-node.learned{background:var(--sk);border-color:#06120a;color:var(--parch)}
-.sk-node.open{border-color:var(--sk);animation:skPulse 1.2s steps(2) infinite}
-.sk-node.short{opacity:.6}
-.sk-node.locked,.sk-node.far{opacity:.38}
-.sk-node.sel{translate:0 -2px;box-shadow:4px 4px 0 var(--red);outline:3px solid #ffd23a}
+/* ===== teia de habilidades (systems/skills.js): janela de largura fixa, a teia em SVG (nós e fios de cipó) e a ficha
+   do nó escolhido com altura fixa, para a tela não mudar de tamanho com a descrição ===== */
+.info.habil{width:min(720px,94vw);box-sizing:border-box}
+.sk-cab{display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
+.sk-cab h2{margin:0}
+.sk-teia{display:block;width:100%;height:auto;max-height:min(58vh,580px);margin:2px auto 4px}
+.sk-no{cursor:pointer}
+.sk-pulsa{animation:skPulsa 1.1s steps(2) infinite}
+@keyframes skPulsa{50%{opacity:.3}}
+.sk-fio.aceso{animation:skFio 1.2s linear infinite}
+@keyframes skFio{to{stroke-dashoffset:-16}}
+@media (prefers-reduced-motion:reduce){.sk-pulsa,.sk-fio.aceso{animation:none}}
 @keyframes skPulse{50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--sk) 40%,transparent)}}
-@media (prefers-reduced-motion:reduce){.sk-node.open{animation:none}}
-.sk-card{border-top:2px dashed var(--wood);padding-top:6px}
-.sk-card h3{margin:0;font:400 18px var(--display);text-transform:uppercase;color:var(--brown)}
-.sk-card p{margin:4px 0;font:13px/1.4 var(--mono);color:var(--brown)}
+.sk-card{height:7.6em;overflow:hidden;display:grid;grid-template-columns:1fr auto;align-items:baseline;align-content:start;gap:0 10px;border-top:2px dashed var(--wood);padding-top:6px}
+.sk-card h3{margin:0;font:400 18px var(--display);text-transform:uppercase;color:var(--sk)}
+.sk-card .sk-custo{font:700 12px var(--mono);color:var(--brown)}
+.sk-card p{grid-column:1/-1;margin:3px 0;font:13px/1.4 var(--mono);color:var(--brown)}
 .lvup small+small{display:block;color:#ffd23a}
-@media(max-width:560px){.sk-wrap{grid-template-columns:1fr}}
 #exSkills.pts{background:#ffd23a;color:#3a2414;animation:skPulse 1.2s steps(2) infinite;--sk:#ffd23a}
 /* aviso do controle (ui/gamepad.js) */
 .pad-toast{position:fixed;right:16px;bottom:16px;z-index:2000;padding:8px 14px;background:#06120a;color:#f6e9c4;border:3px solid #ffd23a;font:700 13px var(--mono);box-shadow:4px 4px 0 var(--red);animation:rpop .3s var(--pop) backwards}

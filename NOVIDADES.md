@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.72.0 — a teia de habilidades
+
+- A tela de habilidades virou uma teia. As três primeiras ficam no meio, em volta da lua de Jaci; aprender uma libera
+  todas as ligadas a ela, e na borda alguns fios cruzam de um caminho para o outro. Quanto mais longe do meio, mais forte
+  e mais cara (de 1 a 10 pontos): ninguém pega tudo, então escolha o seu caminho. Nada fica mais trancado por região, e o
+  que você já tinha aprendido continua aprendido.
+- Quando o Pytuna puxa o chefe de volta, agora toca o tema dele em versão de batalha, pesado, até o fim da luta.
+- No Nordeste, a rodoviária virou a última parada de cada cidade: depois de acalmar o chefe de dia da última trilha
+  (Lençóis, Sete Cidades, Beira do Velho Chico e Arrecifes), abre uma passagem no fim dela que leva até a rodoviária.
+  Quem chega de ônibus desce no centro da cidade. Os Arrecifes ganharam um desenho novo de mapa.
+
 ## 0.71.0 — três saves
 
 - Agora dá para ter três aventuras ao mesmo tempo. Em "Iniciar aventura", escolha um dos três espaços: cada um mostra
