@@ -15,6 +15,8 @@ const ART = {queixada_chefe: "queixada", cobra_grande: "sucuri", onca_rei: "onca
   ratazana: "rato", ratao: "rato", rato_dagua: "rato", mucura: "cassaco", jacare_canal: "jacare",
   piau: "piranha",
   gaviao_carijo: "harpia", coruja_orelhuda: "coruja", gato_preto: "jaguatirica",
+  mico_leao: "macaco", quati_corcovado: "quati", morcego_fruteiro: "morcego", sapo_cururu: "sapo", quati_rei: "quati",
+  capivara_pinheiros: "capivara", corujinha: "coruja", gamba: "cassaco", capivara_rainha: "capivara",
   cachorro_mato: "lobo", paca: "cotia", bacurau: "coruja", muriqui_rei: "macaco",
   veado_campeiro: "veado", irara: "ariranha", jaguarundi: "jaguatirica", tamandua_rei: "tamandua",
   morcego_gruta: "morcego", aranha_chicote: "caranguejeira", cateto: "queixada", bagre_cego: "piranha", preguica_gigante: "preguica",

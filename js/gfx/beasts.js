@@ -956,6 +956,67 @@ function saciFrame(pose, f) {
   const S = 1.4, c = rigCanvas("front", P, SACI_LOOK, S);
   return {c, head: pose === "ko" ? [18 * S, 20 * S] : [16 * S, 13 * S]};
 }
+// Cuca (Floresta da Tijuca, à noite): a bruxa velha de cara de jacaré, cabelo amarelo comprido, vestido roxo remendado
+// e mão verde de unha branca; no golpe, a boca abre; desmaiada, senta no chão com o focinho apoiado
+function cuca(pose, f) {
+  const d = rigGrid(1, 44, 50), g = "#5a9a3a", Gd = "#3a6a24", hr = "#f0c830", Hr = "#b8901a", dr = "#6a3a8a", Dr = "#4a2266", bl = "#f0ead0";
+  const o = {eye: pose === "ko" ? "x" : pose === "hurt" || pose === "blink" ? "shut" : pose === "attack" || pose === "crouch" ? "angry" : "open"};
+  if (pose === "ko") {
+    d.part().poly([[10, 48], [16, 32], [32, 32], [38, 48]], dr, Dr, 30);
+    d.part().poly([[16, 26], [32, 26], [34, 40], [14, 40]], hr, Hr, 30);   // o cabelo caído nas costas
+    d.part().ellipse(24, 28, 6, 5, g, Gd, .6).poly([[20, 27], [7, 32], [8, 35], [21, 31]], g, Gd, 14);   // a cabeça tombada, focinho no chão
+    d.dots([[10, 32], [13, 31], [16, 30]], bl); bEye(d, 25, 27, o);
+    return {c: d.canvas(), head: [24, 28]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (pose === "idle" ? f : 0) + (cr ? 3 : 0), bx = at ? -3 : hu ? 3 : 0;
+  const X = v => v + bx, Y = v => v + by;
+  d.part().limb(X(19), Y(40), X(17), Y(48), 2.5, g, Gd); d.limb(X(27), Y(40), X(29), Y(48), 2.5, g, Gd);   // pés de jacaré
+  d.part().poly([[X(17), Y(6)], [X(31), Y(6)], [X(34), Y(28)], [X(29), Y(24)], [X(26), Y(29)], [X(22), Y(23)]], hr, Hr, X(29));   // cabelo amarelo pelas costas
+  d.part().poly([[X(16), Y(18)], [X(30), Y(18)], [X(36), Y(44)], [X(10), Y(44)]], dr, Dr, X(27));   // vestido largo
+  d.dots([[X(14), Y(36)], [X(15), Y(36)], [X(14), Y(37)], [X(29), Y(30)], [X(30), Y(30)], [X(30), Y(31)]], "#e8a020");   // remendos
+  const hand = at ? [X(4), Y(15)] : cr ? [X(9), Y(31)] : [X(10), Y(29)];
+  d.part().limb(X(17), Y(20), ...hand, 2.5, g, Gd);
+  d.dots([[hand[0] - 2, hand[1] - 1], [hand[0] - 2, hand[1] + 1], [hand[0] - 1, hand[1] + 2]], bl);   // unhas
+  d.part().limb(X(29), Y(20), X(33), Y(31), 2.5, g, Gd).dots([[X(34), Y(32)], [X(32), Y(33)]], bl);
+  const hx = X(24), hy = Y(11), jaw = at ? 3 : 0;
+  d.part().ellipse(hx, hy, 6, 5.5, g, Gd, .6);
+  d.part().poly([[hx - 3, hy - 3], [hx - 17, hy], [hx - 17, hy + 2], [hx - 3, hy + 2]], g, Gd, hx - 8);   // focinho comprido
+  d.part().poly([[hx - 3, hy + 2], [hx - 16, hy + 3 + jaw], [hx - 15, hy + 5 + jaw], [hx - 3, hy + 5]], Gd);   // queixo
+  d.dots([[hx - 15, hy + 2], [hx - 12, hy + 2], [hx - 9, hy + 2], [hx - 6, hy + 2]], bl).dots([[hx - 16, hy - 0]], BN);   // dentes e a narina
+  d.dots([[hx + 2, hy + 2], [hx - 10, hy - 1], [hx - 7, hy - 2]], Gd);   // escamas
+  bEye(d, hx - 1, hy - 2, o);
+  d.part().poly([[hx - 4, hy - 6], [hx + 6, hy - 6], [hx + 7, hy + 1], [hx + 3, hy - 3], [hx - 1, hy - 3]], hr, Hr);   // franja
+  return {c: d.canvas(), head: [hx - 4, hy]};
+}
+// Pisadeira (Ibirapuera, à noite): a velha magra dos telhados, de cabelo branco espetado, vestido rasgado, perna fina e
+// unha enorme; no golpe levanta o pé para pisar; desmaiada, senta no chão com o cabelo espalhado
+function pisadeira(pose, f) {
+  const d = rigGrid(1, 40, 50), sk = "#c8c0b8", Sk = "#948a84", hr = "#f0f0f4", Hr = "#b8b8c8", dr = "#4a3a5a", Dr = "#2e2240", un = "#e8d8a0";
+  if (pose === "ko") {
+    d.part().poly([[8, 48], [14, 34], [30, 34], [36, 48]], dr, Dr, 28);
+    d.part().poly([[6, 40], [10, 24], [20, 21], [30, 24], [34, 40]], Hr, "#8a8a9a", 26);   // o cabelo espalhado atrás
+    d.part().ellipse(20, 30, 4.5, 5, sk, Sk, .6);
+    d.dots([[17, 30], [18, 30], [22, 30], [23, 30]], BN).rect(18, 33, 4, 1, BN);   // olhos fechados, tonta
+    return {c: d.canvas(), head: [20, 30]};
+  }
+  const at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt", by = (pose === "idle" ? f : 0) + (cr ? 3 : 0), bx = at ? -2 : hu ? 3 : 0;
+  const X = v => v + bx, Y = v => v + by;
+  d.part().limb(X(18), Y(38), X(17), Y(48), 1.6, sk, Sk);
+  if (at) d.limb(X(22), Y(38), X(12), Y(35), 1.6, sk, Sk).limb(X(12), Y(35), X(7), Y(39), 1.6, sk, Sk);   // o pé que pisa
+  else d.limb(X(22), Y(38), X(23), Y(48), 1.6, sk, Sk);
+  d.part().poly([[X(15), Y(16)], [X(25), Y(16)], [X(29), Y(40)], [X(26), Y(37)], [X(23), Y(41)], [X(20), Y(37)], [X(17), Y(41)], [X(14), Y(37)], [X(11), Y(40)]], dr, Dr, X(23));   // vestido rasgado
+  const hand = at ? [X(6), Y(9)] : cr ? [X(6), Y(30)] : [X(9), Y(32)], up = at ? -1 : 1;
+  d.part().limb(X(15), Y(18), ...hand, 1.6, sk, Sk);
+  d.part().limb(hand[0], hand[1], hand[0] - 4, hand[1] + 3 * up, .8, un).limb(hand[0], hand[1], hand[0] - 2, hand[1] + 5 * up, .8, un).limb(hand[0], hand[1], hand[0] + 1, hand[1] + 5 * up, .8, un);   // unhas compridas
+  d.part().limb(X(25), Y(18), X(31), Y(33), 1.6, sk, Sk).limb(X(31), Y(33), X(33), Y(38), .8, un).limb(X(31), Y(33), X(30), Y(38), .8, un);
+  d.part().poly([[X(10), Y(20)], [X(11), Y(8)], [X(13), Y(2)], [X(17), Y(5)], [X(20), Y(1)], [X(23), Y(5)], [X(27), Y(2)], [X(29), Y(8)], [X(30), Y(20)], [X(26), Y(15)], [X(14), Y(15)]], hr, Hr, X(26));   // cabelo branco espetado
+  d.part().ellipse(X(20), Y(10), 5, 6, sk, Sk, .7);
+  if (hu) d.dots([[X(17), Y(9)], [X(18), Y(9)], [X(22), Y(9)], [X(23), Y(9)]], BN);
+  else d.ellipse(X(17.5), Y(9), 1.3, 1.5, "#ff3a3a").ellipse(X(22.5), Y(9), 1.3, 1.5, "#ff3a3a");
+  d.dots([[X(20), Y(11)], [X(19), Y(12)]], Sk);   // nariz torto
+  if (at) d.ellipse(X(20), Y(14), 2, 1.6, BN); else d.rect(X(17), Y(14), 6, 1, BN);   // a risada sem dente
+  return {c: d.canvas(), head: [X(20), Y(10)]};
+}
 // Cabeça de Cuia (Teresina, à noite): pescador sem camisa, de calção, com a cabeça enorme em forma de cuia, cabelo molhado
 // e olhos acesos; desmaiado, fica deitado na beira com a cabeça no chão
 function cabecaCuia(pose, f) {
@@ -1424,6 +1485,12 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   jacu: (pose, f) => pombo(pose, f, {b: "#2a2a30", B: "#16161a", n: "#d8282a", p: "#3a3a44", w: "#22222a", y: "#9aa0a8"}),   // jacu: preto, papo vermelho
   pepita: pessoa({pal: {s: "#c8905a", S: "#9a6a3e", h: "#3a2a1e"}, shirt: ["#d8c8a0", "#b0a078"], pants: ["#5a4a3a", "#3e3226"], noBand: true, cap: ["#d8b860", "#a88a38"]}),   // vendedor de ouro de tolo: chapéu de palha e camisa de garimpeiro
   saci: saciFrame,   // Saci: pele escura, calção e gorro vermelhos e uma perna só
+  saira: (pose, f) => pombo(pose, f, {b: "#3ab86a", B: "#22804a", n: "#3ad0e0", p: "#e8702a", w: "#1a1a2a", y: "#3a3a3a"}),   // saíra-sete-cores: verde, cabeça turquesa, laranja e asa preta
+  jararacucu: cobra({b: "#2a2a24", B: "#16160f", k: "#e8c840"}, true),   // jararacuçu: preta com os desenhos amarelos, cabeça triangular
+  cuca, pisadeira,
+  maritaca: (pose, f) => pombo(pose, f, {b: "#4ab04a", B: "#2a7a2a", n: "#5ac05a", p: "#e8402a", w: "#3a9a3a", y: "#e8d8c0"}),   // maritaca: verde, testa vermelha e bico claro
+  bem_te_vi: (pose, f) => pombo(pose, f, {b: "#8a6a4a", B: "#5e4630", n: "#f0d020", p: "#f0f0e8", w: "#7a5a3a", y: "#2a2a2a"}),   // bem-te-vi: costas pardas e barriga amarela
+  golpista_pix: pessoa({pal: {s: "#c8905a", S: "#9a6a3e", h: "#1a1420"}, shirt: ["#2a8a3a", "#1a5a24"], pants: ["#2a2a30", "#18181c"], noBand: true, cap: ["#d8282a", "#a01a1a"], glasses: true}),   // golpista do Pix: boné, óculos escuros e camisa de time
   tucano: (pose, f) => pombo(pose, f, {b: "#1e1e22", B: "#0e0e12", n: "#f8f0e0", p: "#1e1e22", w: "#2a2a30", y: "#f08a1a"}),   // tucano-toco: preto, papo branco e o bicão laranja
   quero_quero: (pose, f) => garca(pose, f, {b: "#b8b8b0", B: "#7a7a74", n: "#e8e8e0", N: "#2a2a2a", y: "#d8504a", Y: "#a03a3a", k: "#1a1a1a"}),   // quero-quero: cinza, peito preto, pernas vermelhas
   corpo_seco: pessoa({pal: {s: "#8a8a7a", S: "#5e5e52", h: "#3a3a32"}, shirt: ["#6a5a48", "#4a3e30"], pants: ["#5a4a38", "#3e3226"], noBand: true}),   // Corpo-seco: pele cinza grudada no osso e roupa velha da cor do tronco

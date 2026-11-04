@@ -27,6 +27,18 @@ const NARRA = {
     {r: "E tinha bode pra todo lado, vô. Um deles comeu minha corda do arco."},
     "Bode come tudo, curumim. Até corda de arco. Agora deixa eu contar da caatinga."
   ],
+  riodejaneiro: [
+    "Da serra de Minas o ônibus desceu até o mar, curumim. O Rio de Janeiro: praia de um lado, morro de mata do outro.",
+    "Lá no alto tem uma floresta inteira dentro da cidade. Uma vez cortaram tudo pra plantar café, e depois plantaram de novo, árvore por árvore.",
+    {r: "E o mar, vô! Eu nunca tinha visto o mar daquele tamanho. Entrei de roupa e tudo."},
+    "Tu e o rio, sempre. Até no mar tu procurava a margem. Agora deixa eu contar da mata."
+  ],
+  saopaulo: [
+    "Do Rio, curumim, a estrada foi pela beira do mar e subiu a serra até São Paulo. A maior cidade que tu já viu.",
+    "Prédio até onde o olho alcança, e gente correndo tanto que nem olha pro céu. Jaci passava lá em cima e ninguém via.",
+    {r: "Tinha garoa, vô. Uma chuva tão fininha que nem molha, só esfria."},
+    "Garoa é chuva com vergonha. Mas foi no meio daquele concreto todo que tu achou o parque. Escuta."
+  ],
   ouropreto: [
     "Depois de BH, curumim, o menino pegou o ônibus pra Ouro Preto. Cidade velha, do tempo em que tiravam ouro da terra.",
     "Tiraram tanto que a serra ficou oca por dentro. E nos buracos que sobraram a fumaça achou onde se esconder.",
@@ -71,6 +83,10 @@ const NARRA = {
   ]
 };
 const NARRA_BOSS = {
+  quati_rei: ["O Quati-rei mandava em todos os quatis da Tijuca, curumim. Bicho esperto, que aprendeu a pedir comida pros turistas do morro.", "A fumaça entrou no bando e o pedido virou roubo. Pegavam a sacola de quem passasse, e o rei na frente.", {r: "Ele roubou minha bolsa três vezes, vô. Na quarta eu segurei o rabo dele."}, "E ele te devolveu tudo, até o que não era teu. Quati acalmado é bicho honesto. Voltou pra mata a fuçar fruta no chão, como sempre foi."],
+  cuca: ["A Cuca é velha como as cantigas de ninar, curumim. Mora numa gruta e só pega quem não quer dormir.", "Com a fumaça, ela esqueceu a cantiga e ficou só com o caldeirão. Fervia fumaça em vez de chá.", {r: "Ela quase me fez dormir em pé, vô. A voz dela é pesada que nem rede molhada."}, "E tu cantou pra ela a cantiga que eu cantava pra ti. Ela lembrou, coitada. Voltou pra gruta cantarolando."],
+  capivara_rainha: ["A Capivara-rainha vive no lago desde antes de ter cidade em volta, curumim. É a bicha mais calma que existe: passarinho dorme em cima dela.", "A fumaça veio pelo rio sujo e ela ficou sem sossego. Capivara sem sossego é feito trovão: devagar, mas não para.", {r: "Ela me empurrou pro lago, vô. Com calma. Mas empurrou."}, "Depois sentou do teu lado na grama e ficou olhando a água. Capivara não pede desculpa. Ela só fica perto."],
+  pisadeira: ["A Pisadeira mora nos telhados, curumim. Quando alguém janta demais e dorme de barriga pra cima, ela desce e pisa no peito dele.", "Na cidade grande, com tanta gente cansada e com o peito apertado, a fumaça deu a ela peso de pedra.", {r: "Eu cochilei no banco do parque, vô. Acordei com ela em cima de mim, rindo."}, "E tu levantou mesmo assim, com o peso todo. Ela ficou tão espantada que esqueceu de pisar. Voltou pro telhado e de lá ficou só olhando."],
   mula_madrinha: ["A Mula-madrinha guiou as tropas do ouro, curumim. As outras mulas iam atrás do sino dela, ladeira acima, ladeira abaixo.", "A fumaça entrou nas minas velhas e ela achou que a tropa tinha se perdido lá dentro. Ficou brava de tanto procurar.", {r: "Eu toquei o sino dela de volta, vô. Ela parou na hora pra escutar."}, "Sino de madrinha a gente não esquece. Ela foi pro pasto devagar, balançando o cincerro."],
   saci: ["O Saci é o mais levado dos encantados, curumim. Esconde as coisas, trança a crina dos cavalos, azeda o leite... mas nunca fez mal de verdade.", "A fumaça de Pytuna virou redemoinho de brasa no pito dele. Aí a brincadeira ficou perigosa.", {r: "Eu peguei o gorro dele, vô. Ele ficou sem graça e prometeu se comportar."}, "E tu devolveu o gorro, não foi? Por isso ele ainda te deve um favor. Saci não esquece quem foi justo com ele."],
   muriqui_rei: ["O Muriqui-rei é o macaco mais calmo da mata, curumim. Briga de muriqui se resolve com abraço.", "A fumaça desceu nas grotas da serra e ele esqueceu como se abraça sem apertar.", {r: "Ele me deu um abraço que tirou meus pés do chão, vô."}, "Quando a fumaça saiu, o abraço ficou macio. Era o jeito dele de pedir desculpa."],

@@ -29,7 +29,8 @@ function stepWork(s, t) {
    com o tema do Nordeste), "localCentroOeste" (Cuiabá e o mapa do Centro-Oeste: toada caipira com viola ponteada, sanfona e o
    tema do Centro-Oeste em dueto), "battleCentroOeste" (batalha no Centro-Oeste: pagode de viola com bateria sertaneja), "localSudeste" (Belo Horizonte e o mapa do Sudeste: sertanejo
    universitário com o tema do Sudeste em dupla), "battleMinas" (batalha em Minas: o mesmo, acelerado), "mpbSudeste" e
-   "funkSudeste" (o tema do Sudeste em MPB e em funk carioca, para São Paulo e o Rio; ainda sem uso), "battleBoss" (chefe: abertura
+   "funkSudeste" (o tema do Sudeste em MPB e em funk carioca: exploração em São Paulo e no Rio), "mpbSudesteNight" e
+   "funkSudesteNight" (as duas à noite), "battleSaoPaulo" (samba-rock) e "battleRio" (funk 150), "battleBoss" (chefe: abertura
    sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
@@ -765,7 +766,7 @@ const MUS = (() => {
         else { lead(mtof(m.note - (part === "A2" ? 0 : 12)), t, len, .018); lead(mtof(N.terca(m.note) - 12), t, len, .009); }
       }
     },
-    // (para escolher o estilo de São Paulo) MPB: violão de náilon na batida da bossa, piano elétrico com acordes de
+    // São Paulo (exploração de dia): MPB. Violão de náilon na batida da bossa, piano elétrico com acordes de
     // sétima e nona, escovinha e o tema do Sudeste na flauta; B no piano elétrico, A' com o vibrafone dobrando
     mpbSudeste: {
       bpm: 116, wet: .34, level: .42, swing: .1, form: ["I", "A", "B", "A2"], melody: null,
@@ -791,7 +792,7 @@ const MUS = (() => {
         else { flute(mtof(m.note), t, len, .026); if (part === "A2") bell(mtof(m.note + 12), t, .008, 1.2); }
       }
     },
-    // (para escolher o estilo do Rio) funk carioca: o tamborzão (o grave do 808 e o tambor), palma, chimbal e um
+    // Rio de Janeiro (exploração de dia): funk carioca. O tamborzão (o grave do 808 e o tambor), palma, chimbal e um
     // sintetizador cantando o tema; B com o metal (acordes curtos) respondendo
     funkSudeste: {
       bpm: 130, wet: .16, level: .32, form: ["I", "A", "B", "A2"], melody: null,
@@ -809,6 +810,86 @@ const MUS = (() => {
         if (s === 0 && barIn % 2 === 0) pad(chord.notes.slice(1), t, d * 32, .006);
         const m = this.melody && this.melody[i % 128];
         if (m) { lead(mtof(m.note), t, m.len * d * .85, .016); synth("sawtooth", mtof(m.note - 12), t, m.len * d * .85, .006, 1800); }
+      }
+    },
+    // Rio à noite: funk melody na beira do mar. O tamborzão abafado e lento (só o grave e um tambor), o tema no piano
+    // elétrico com eco e a onda do mar passando a cada dois compassos; na parte B só o pad e o mar
+    funkSudesteNight: {
+      bpm: 96, wet: .48, level: .36, swing: .06, form: ["I", "A", "B", "A2"], melody: null,
+      play(i, t, d) {
+        const N = TRACKS.localSudeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" || part === "B" ? null : themeLine(SUDESTE_THEME.A, part === "A2" ? 0 : -12, part === "A2");
+        if (s === 0 && barIn % 2 === 0) { pad(chord.notes.slice(1), t, d * 32, .009); sweep(t, d * 24, .012); }   // a onda
+        if (part !== "I" && part !== "B") {
+          if (s === 0 || s === 10) bumbo808(mtof(chord.bass - 12), t, d * 4, .04);
+          if (s === 6) atabaque(t, .035, false);
+          if (s === 12) palma(t, .008);
+        }
+        if (s === 8 && barIn % 4 === 3) bell(mtof(chord.notes[3] + 12), t, .008, 2);
+        const m = this.melody && this.melody[i % 128];
+        if (m) ep(mtof(m.note), t, m.len * d * .95, .022);
+      }
+    },
+    // São Paulo à noite: bossa de apartamento. O violão de náilon na batida da bossa, bem devagar e baixinho, escovinha
+    // só no um, o baixo macio e o tema na flauta grave; na parte B o piano elétrico responde. Garoa: um chiado fino
+    mpbSudesteNight: {
+      bpm: 80, wet: .5, level: .4, swing: .1, form: ["I", "A", "B", "A2"], melody: null,
+      play(i, t, d) {
+        const N = TRACKS.mpbSudeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(part === "B" ? SUDESTE_THEME.B : SUDESTE_THEME.A, -12, part === "A2");
+        if (s === 0 || s === 8) violao(mtof(chord.bass + (s && barIn % 2 ? 7 : 0)), t, d * 6, .036);
+        if (N.bossa.includes(s)) chord.notes.forEach((m, k) => violao(mtof(m), t + k * .008, d * 2.6, .011));
+        if (s === 0 && part !== "I") noiseHit(t, .05, .003, "bandpass", 4200, .8);   // escovinha
+        if (s === 0 && barIn % 2 === 0) { synth("sine", mtof(chord.bass - 12), t, d * 14, .055); pad(chord.notes, t, d * 32, .007); }
+        if (s % 4 === 2) noiseHit(t, .2, .0012, "highpass", 6000);   // a garoa
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        if (part === "B") ep(mtof(m.note), t, m.len * d * .95, .024);
+        else flute(mtof(m.note + 12), t, m.len * d * .95, .016);
+      }
+    },
+    // batalha no Rio: funk 150. O tamborzão dobrado e rápido, palma no 2 e no 4, o tema no sintetizador e o metal
+    // respondendo na parte B; C = ponte só de tambor que cresce. Forma A - A' - B - C
+    battleRio: {
+      bpm: 150, wet: .16, level: .4, form: ["A", "A2", "B", "C"], melody: null,
+      tambor: {0: "b", 3: "t", 6: "b", 8: "t", 10: "b", 12: "t", 14: "t", 15: "t"},
+      play(i, t, d) {
+        const N = TRACKS.localSudeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)], h = this.tambor[s], bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "C" ? null : themeLine(part === "B" ? SUDESTE_THEME.B : SUDESTE_THEME.A, part === "A2" ? 12 : 0, part !== "A"); hat(t, .02, true); }
+        if (h === "b") bumbo808(mtof(chord.bass - 12), t, d * 2.5, .055);
+        if (h === "t") { atabaque(t, .08, s >= 14); noiseHit(t, .05, .012, "bandpass", 700, 1.2); }
+        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) palma(t, .024);
+        if (s % 2 === 0) hat(t, s % 4 ? .004 : .008);
+        if (bridge) return;
+        if (part === "B" && [0, 3, 6, 10].includes(s)) chord.notes.slice(1).forEach(m => synth("sawtooth", mtof(m + 12), t, d * 1.1, .006, 2600));   // metal
+        const m = this.melody && this.melody[i % 128];
+        if (m) { lead(mtof(m.note), t, m.len * d * .85, .018); synth("sawtooth", mtof(m.note - 12), t, m.len * d * .85, .007, 1800); }
+      }
+    },
+    // batalha em São Paulo: samba-rock. Bumbo e caixa de rock com o balanço do samba, agogô, o violão batendo na batida
+    // da bossa acelerada e o tema na guitarra (lead); B no piano elétrico. Forma A - A' - B - C (ponte de bateria)
+    battleSaoPaulo: {
+      bpm: 140, wet: .2, level: .42, swing: .06, form: ["A", "A2", "B", "C"], melody: null,
+      play(i, t, d) {
+        const N = TRACKS.mpbSudeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)], bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "C" ? null : themeLine(part === "B" ? SUDESTE_THEME.B : SUDESTE_THEME.A, part === "A2" ? 12 : 0, part !== "A"); hat(t, .02, true); }
+        if (s === 0 || s === 7 || s === 10) kick(t, .1);
+        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) snare(t, .03);
+        hat(t, s % 2 ? .004 : .008);
+        if (s === 2 || s === 6 || s === 11) agogo(t, s !== 6, .012);
+        if (bridge) return;
+        if (N.bossa.includes(s)) strum(chord.notes, t, d * 1.8, .009, s % 2 === 1, false);
+        if (s % 4 === 0) synth("triangle", mtof(chord.bass - 12 + (s === 8 ? 7 : 0)), t, d * 2, .1);
+        if (s === 0 && barIn % 2 === 0) chord.notes.forEach(m => ep(mtof(m + 12), t, d * 16, .005));
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        const len = m.len * d * .9;
+        if (part === "B") ep(mtof(m.note), t, len, .034);
+        else { lead(mtof(m.note - (part === "A2" ? 0 : 12)), t, len, .018); flute(mtof(m.note), t, len, .01); }
       }
     },
     // Pytuna em cena: zumbido grave do coro, vento, coração batendo e a badalada; o tema de Pytuna (PYTUNA_THEME) numa voz
@@ -1350,7 +1431,9 @@ function musicStart(id) {
   // fora do Norte, exploração e mapa tocam a faixa da região (Nordeste: toada do boi; Centro-Oeste: toada caipira;
   // Sudeste: sertanejo universitário), e à noite a versão noturna dela
   const REGION_LOCAL = {nordeste: "localNordeste", centroeste: "localCentroOeste", sudeste: "localSudeste"};
-  const regLocal = id === "local" ? REGION_LOCAL[regionOfCity(curCity())] : id === "map" ? REGION_LOCAL[MAP_REGION] : null;
+  // no Sudeste cada estado tem o seu: o Rio toca funk e São Paulo, MPB (Minas fica com o sertanejo da região)
+  const CITY_LOCAL = {riodejaneiro: "funkSudeste", saopaulo: "mpbSudeste"};
+  const regLocal = id === "local" ? CITY_LOCAL[curCity()] || REGION_LOCAL[regionOfCity(curCity())] : id === "map" ? REGION_LOCAL[MAP_REGION] : null;
   if (regLocal) id = G.night ? regLocal + "Night" : regLocal;
   if (id === "local" && G.night) id = "localNight";   // à noite a música da exploração muda de clima
   if (id === "map" && MAP_REGION === "norte") id = G.night ? "mapParaNight" : "mapPara";   // mapa do Norte: guitarrada de dia e de noite

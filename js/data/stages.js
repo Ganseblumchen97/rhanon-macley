@@ -199,6 +199,114 @@ const STAGES = {
       "########################"
     ]
   },
+  // Rio de Janeiro: Copacabana, os prédios de frente pro mar com a pensão (O), quiosques (K), o calçadão (-), coqueiros
+  // (T) e o mar embaixo; a saída da direita volta pro mapa e o calçadão da esquerda sobe pra Floresta da Tijuca
+  copacabana: {
+    safe: true, next: "tijuca",
+    rows: [
+      "########################",
+      "########################",
+      "#f...OOO.....KKK....T..#",
+      "#....OOO......V...P....#",
+      "#.....-.........-......#",
+      "G---------------------SE",
+      "#.T..P....KKK...-..T...#",
+      "#..........C....-....P.#",
+      "#..f..T.........T...f..#",
+      "~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~"
+    ]
+  },
+  // Rio de Janeiro: a Floresta da Tijuca (gerado por tools/gerar_mapas.py)
+  tijuca: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT,.T",
+      "TTTTTTTTTTTTTTTTTTTT~~TT.......a.,.,.,.TTTTTTTTTTTTTTTTT.S-E",
+      "TTTTTTTTTTTTTTTTTTTT~~T,---------------.TTTTTT~~~~~TTTTT.-,T",
+      "TTTTTTTTTTTTTTTTTTTT~~T,-,,...,,..,.,,-,TTTTT~~~~~~~TTTT.-.T",
+      "TTTTTT~~~~~TTTTTTTTT~~.,-..a.o..,.f..,-,TTTTT~~~~~~~T...,-.T",
+      "TTTTT~~~~~~~TTTTTTTT~~,.-.,,......f...F..TTTT~~~~~~~,...,-.T",
+      "TTTTT~~~~~~~TTTTTTTT~~.a-.o,TTTT,,..,.-..TTTTT~~~~~,....,-,T",
+      "TTTTT~~~~~~~TTTTTTTT~~f.-...TTTTf...,,-...,.,TTTTTT.,,..,-.T",
+      "TTTTTT~~~~~T,.,....T~~,.-,..TTTTT,...,-------.TTTTT.f,,,,-.T",
+      "TTTTTTTTTTTT.....,a,~~,.-.,.TTTTTT..,..,.,,.-,TTTTT,,,.,.-,T",
+      "TTTTTTTTTTT,--------==---,.TTTTTTTTTTTTTTTT,-,TTTTT,,.,,.-,T",
+      "TTTTTTTTTTT.-...,,..~~,...TTTTTTTTTTTTTTTTT.-.TTTTTT,,...-.T",
+      "TTTTTTTTTTT,-..,.,fT~~...TTTTTTTTTTTTTTTTT.,-,.TTTTTT.,.,-,T",
+      "TTTTTTTTTT..-a,TTTTT~~TTTTTTTTTTTTTTTTTTT.,.-,.....,,a.,.-.T",
+      "TTTTTTTTTf..-..,TTTT~~TTTTTTTTTTTTTTTTTTT,..-..a.,,.------,T",
+      "TTTTTTTTT.,.-.o,TTTT~~TT..,..TTTTTTTTTTTT...-..,,...-.....TT",
+      "TTTTTTTTT,a.-,o.,.,f~~.........TTTTTTTTTTT.,-,,.,,,.-..TTTTT",
+      "TTTTTTTTTTo,-.,..,.,~~.,,....,.TTTTTTTTTTTT.-,...,.,-..TTTTT",
+      "TTTTTTTTTTT.--------==---------,TTTTTTTTTTT,-.Tf,,.a-.TTTTTT",
+      "TTTTTTTTTTTT.,......~~,..,,.,,-.TTTTTTTTTTT.-.TT...,-,TTTTTT",
+      "TTTTTTTTTTTT.,...,.f~~,,,...,.-..TTTTTTTTTT.-,.,,,..-.TTTTTT",
+      "TT,,f..TTTTTTTTTTTTT~~TT,..,.,-.,fTTTTTTTT..-,.....,-.TTTTTT",
+      "T.,.,.,.TT....,TTTTT~~.a.TT.,.-,,.TTTTTTTT..---------.TTTTTT",
+      "Ta.f..,...a,,,..a,..~~.......a-..,TTTTTTTT...,.,.a,,.TTTTTTT",
+      "T...----------------==---------,oTTTTTTTTTTT,.,o..,,.TTTTTTT",
+      "T...B........a...,,.~~,.,.a.,..fTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "T.,,....TT,,,f,TTTTT~~.,.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TT,.,o.TTTTTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
+  // São Paulo: a Avenida Paulista, prédios (#) dos dois lados, a pensão (O), a feira de artesanato (K), árvores da
+  // calçada (T) e moradores; a saída da direita volta pro mapa e a da esquerda desce pro Parque do Ibirapuera
+  paulista: {
+    safe: true, next: "ibirapuera",
+    rows: [
+      "########################",
+      "########################",
+      "#..OOO....KKK..KKK...T.#",
+      "#..OOO.....V....C......#",
+      "#.........-.......-....#",
+      "#..P......-.......-.P..#",
+      "G---------------------SE",
+      "#..T....T....T....T..P.#",
+      "#.####.......####......#",
+      "#.####.......####...f..#",
+      "########################"
+    ]
+  },
+  // São Paulo: o Parque do Ibirapuera (gerado por tools/gerar_mapas.py)
+  ibirapuera: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTT.......TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTT......T.T.T..,....,........,....T.TTTTT..~~~~~.TT.T.TT.TT",
+      "TT......,.......--------------B....T.,.oT.~~~~~~~~~.T..,..TT",
+      "TTTT.T.....,....-.....,........ff....TT.T.~~~~~~~~~TT...T.TT",
+      "TT..............-..T...,f,.,.......TTTT.TT~~~~~~~~~T.TT,T.TT",
+      "TTT.-------------....T.......f....TTa......T~~~~~,..T.T.TTTT",
+      "TT..-...........,...T..T,T.T.T....T.T.....T..f.aoT,TTa..TTTT",
+      "TT..-....a......,,..T..TT.TTTT.TT,......o...,...o.,.....T,TT",
+      "TT..-........,T.TTT.T,,TT.TT.T....TT..,..........,...,T...TT",
+      "TT..-..,.TTTT.TTT.aTTTT.T..oTT,T.....,---------------.T.T.TT",
+      "TT..-...T....TT.....,~~~~~~~T.To...TT.-,a......,.,..-,.T.TTT",
+      "T...-.f.T..T.......~~~~~~~~~~~.TT.,.,.-,.,,.ff..foa.-.,T.TTT",
+      "T.,.-...,TTT.,,.,.~~~~~~~~~~~~~....,..-.TT......T,o.-.,...TT",
+      "T..,-.,fT...------=======~~~~~~TTTTTf.-..,.T...T....-....TTT",
+      "T...-.......-.....~~~~~~=~~~~~~...T,..-.a.ToTTTo...,-.a...TT",
+      "T...-.~~~~~.-.,....~~~~~=~~~~~T.TT....-.....TTT.....-...T.TT",
+      "TT..-~~~~~~~-..,f..o.~~~=~~~..T.T....a-...TT.T...f..-..T..TT",
+      "TT..-~~~~~~~-,..T,T.,f..-.....T.......-...TT...,..f.-.TT.,TT",
+      "TTT,-~~~~~~~-...........-....TT.,.T,.,-.,..,........-.....TT",
+      "TT..-.~~~~~.-,...T..o...-...,T,T,a.T..-..,..---------..TTTTT",
+      "TTT.-.TTT,..-.....TT.T,.-...T.,.f.T.,a-.T.T,-......,,..T..TT",
+      "TTT.-...fT..-.,,,TTo....-.F...........-.TTT.-....f.,...TT.TT",
+      "TTT.-.......-..a.TT.....-..........,..-,TT..-....,...,TTTTTT",
+      "TT.,---------.T.TT...T..---------------,T.T.-,TT.T.T.....TTT",
+      "TTT.a,......,T.,T.TT..T...........,...,.,...-.............TT",
+      "TT.......T.TTT....T,TT,.TT..........a..,TTT.-...,.,.....,.,T",
+      "TT,.T....TTT.,T,.,.TT.T.Ta...a...o..T..TTT..-------------S-E",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT......,....,...T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Ouro Preto: as Ladeiras, ruas de pedra e casarão (gerado por tools/gerar_mapas.py)
   ladeiras: {
     next: null,

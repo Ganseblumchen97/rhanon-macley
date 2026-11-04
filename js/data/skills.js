@@ -79,5 +79,7 @@ const ALLY_MOVES = {
   preguica_gigante: {n: "Abraço do tempo", d: "Dano alto e o bicho perde a próxima vez (chefe: metade das vezes).", pow: 1.5, elem: "planta", fx: "abraco"},
   tamandua_rei:     {n: "Rabo-bandeira", d: "Pouco dano, mas os 2 próximos golpes do bicho batem pela metade.", pow: .5, elem: "planta", fx: "bandeira"},
   muriqui_rei:      {n: "Bando dourado", d: "Dano leve e cura 30% da vida do Rhanon.", pow: .7, elem: "planta", fx: "bando"},
-  mula_madrinha:    {n: "Estouro da tropa", d: "O cincerro toca e a tropa de luar passa: o maior dano de todos.", pow: 2.2, elem: "raio", fx: "tropa"}
+  mula_madrinha:    {n: "Estouro da tropa", d: "O cincerro toca e a tropa de luar passa: o maior dano de todos.", pow: 2.2, elem: "raio", fx: "tropa"},
+  quati_rei:        {n: "Bando do Corcovado", d: "Três unhadas rápidas do bando de quatis.", pow: .7, elem: "planta", fx: "frenesi"},
+  capivara_rainha:  {n: "Calma da capivara", d: "Pouco dano, mas os 2 próximos golpes do bicho batem pela metade.", pow: .6, elem: "agua", fx: "bandeira"}
 };

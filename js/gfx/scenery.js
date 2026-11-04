@@ -16,6 +16,8 @@ const SCENES = {
   lencois:     {sky: ["#5ab8f0", "#8ad0f8", "#e0f2fa"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // dunas e lagoas
   seringal:    {sky: ["#8ab86a", "#6a9a4e", "#557f3e"], far: "#2f6a2a", trees: "seringa", plat: "folhas"},
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
+  tijuca:      {sky: ["#7ab8a0", "#5a9a7a", "#3e7a52"], far: "#1e5a2e", trees: "fechada", plat: "musgo", vines: true},   // Floresta da Tijuca: mata atlântica fechada, luz verde
+  ibirapuera:  {sky: ["#b8c4d0", "#c8d0d4", "#d8dcd0"], far: "#7a8a94", trees: "copa", plat: "grama", water: true},   // Ibirapuera: céu de garoa e o lago
   ladeiras:    {sky: ["#b8c0d8", "#d0c8d0", "#e8d0b8"], far: "#6a6a8a", trees: "casario", plat: "pedra"},   // Ladeiras de Ouro Preto: tarde de neblina e o casario lá atrás
   serracurral: {sky: ["#9ab8e0", "#c0cce0", "#e8d8c0"], far: "#5a6a8a", trees: "copa", plat: "pedra", water: true},   // Serra do Curral: céu de serra e a cordilheira azulada lá atrás
   setecidades: {sky: ["#e8a868", "#f0cc98", "#dce4e8"], far: "#a8603a", trees: "caatinga", plat: "pedra"},   // Sete Cidades: fim de tarde no sertão e as pedras ao fundo

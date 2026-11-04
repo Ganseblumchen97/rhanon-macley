@@ -27,11 +27,12 @@ const MAP_REGIONS = {
     river: "M196 280 C172 300 160 330 170 360 C178 390 164 410 170 430 S160 470 163 493",   // rio Paraguai, pelo Pantanal
     route: ["cuiaba", "bonito", "brasilia"], pos: {cuiaba: [217, 298], bonito: [205, 463], brasilia: [463, 304]}},
   // Sudeste: Minas Gerais, Espírito Santo, Rio de Janeiro e São Paulo (a partir de longitude/latitude) e o rio São
-  // Francisco nascendo na serra da Canastra; a estrada desce de Belo Horizonte para Ouro Preto (o Rio e São Paulo vêm depois)
-  sudeste: {n: "Sudeste", aria: "Mapa estilizado do Sudeste, com Belo Horizonte e Ouro Preto",
+  // Francisco nascendo na serra da Canastra; a estrada desce de Belo Horizonte para Ouro Preto, de lá para o Rio, no
+  // litoral, e segue pela beira do mar até São Paulo
+  sudeste: {n: "Sudeste", aria: "Mapa estilizado do Sudeste, com Belo Horizonte, Ouro Preto, Rio de Janeiro e São Paulo",
     land: ["M112 273 L238 222 L268 126 L322 84 L398 54 L532 113 L566 205 L587 277 L537 344 L490 415 L440 420 L377 436 L310 462 L238 512 L213 487 L154 420 L70 403 L24 394 L87 331Z"],
     river: "M306 302 C330 250 360 200 365 150 S390 80 398 54",   // rio São Francisco, da Canastra para o norte
-    route: ["bh", "ouropreto"], pos: {bh: [409, 290], ouropreto: [446, 336]}},
+    route: ["bh", "ouropreto", "riodejaneiro", "saopaulo"], pos: {bh: [409, 290], ouropreto: [446, 336], riodejaneiro: [452, 404], saopaulo: [324, 436]}},
   // area = pedaço de cada região (recortado pelo contorno, então pode passar dele); icon = desenho de MAP_ICON no ponto dela
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre a aldeia e Curitiba",
     area: {norte: "M80 80 H358 V178 L352 230 L340 280 L345 300 L320 305 L300 300 L230 310 L170 362 H80Z",
@@ -69,6 +70,8 @@ const LOC = {
   cuiaba: {n: "Cuiabá (MT)", s: "Cuiabá", txt: "O meio da América do Sul, na beira do rio Cuiabá: calor de quarenta graus, viola de cocho, peixe na brasa e o Pantanal começando logo ali. O Centro-Oeste começa aqui."},
   bh: {n: "Belo Horizonte (MG)", s: "Belo Horizonte", txt: "A capital de Minas, cercada de serra por todo lado: pão de queijo, Mercado Central, ladeira e gente que fala \"uai\". O Sudeste começa aqui."},
   ouropreto: {n: "Ouro Preto (MG)", s: "Ouro Preto", txt: "A cidade do ouro, toda de ladeira, pedra e igreja barroca: sino tocando, casarão de janela azul e mina velha cavada na serra. De noite, dizem, um menino de uma perna só apronta nas ruas."},
+  riodejaneiro: {n: "Rio de Janeiro (RJ)", s: "Rio", txt: "A cidade entre o mar e a montanha: praia, calçadão de onda, morro com bondinho e a maior floresta dentro de cidade do mundo, a da Tijuca. De noite, dizem, uma velha de cara de jacaré anda no meio das árvores."},
+  saopaulo: {n: "São Paulo (SP)", s: "São Paulo", txt: "A maior cidade do Brasil: prédio até onde a vista alcança, avenida que nunca dorme, garoa fina e gente de todo canto do país. No meio do concreto, um parque enorme com lago, capivara e um silêncio que de noite pesa no peito."},
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
@@ -114,6 +117,10 @@ const SUB = {
   pantanal: {city: "cuiaba", n: "Pantanal", x: 140, y: 262, txt: "Rio abaixo, a planície que alaga: capim alto, baías de água parada, corixo cortando o campo e bicho de todo lado. Tuiuiú, arara-azul, jacaré às centenas... e, de noite, o barranco que desaba sozinho."},
   ladeiras: {city: "ouropreto", n: "Ladeiras de Ouro Preto", s: "Ladeiras", x: 120, y: 240, txt: "Ruas de pedra que sobem e descem entre igreja e casarão, com quintal de mata no meio. De dia, bicho e espertalhão vendendo ouro de tolo; de noite, um assobio e um redemoinho no meio da rua."},
   tiradentes: {city: "ouropreto", n: "Praça Tiradentes", s: "Praça", x: 248, y: 150, txt: "O coração de Ouro Preto: a praça no alto do morro, o museu, a igreja, casarão colorido de janela azul, pensão e o povo da cidade, que fala devagar e conta causo."},
+  copacabana: {city: "riodejaneiro", n: "Copacabana", s: "Copacabana", x: 300, y: 214, txt: "O calçadão de ondas pretas e brancas, quiosque de água de coco, prédio de frente pro mar e a praia mais famosa do Brasil. Tem pensão, barraca e muito carioca querendo prosa."},
+  tijuca: {city: "riodejaneiro", n: "Floresta da Tijuca", s: "Tijuca", x: 120, y: 96, txt: "Mata atlântica no meio da cidade, plantada de novo à mão onde antes era fazenda de café: cachoeira, gruta, mico-leão e quati pedindo comida. De noite, um riso rouco sai de uma das grutas."},
+  paulista: {city: "saopaulo", n: "Avenida Paulista", s: "Paulista", x: 290, y: 140, txt: "A avenida mais famosa de São Paulo, no alto do espigão: prédio espelhado, museu de pernas vermelhas, feira de artesanato, pastel e gente correndo pra todo lado. Tem pensão e Wi-Fi em toda esquina."},
+  ibirapuera: {city: "saopaulo", n: "Parque do Ibirapuera", s: "Ibirapuera", x: 150, y: 236, txt: "O parque grande de São Paulo: gramado, lago, ponte de madeira, maritaca gritando e capivara tomando sol. De dia, tem até golpista no meio da corrida; de noite, quem cochila no banco acorda com um peso no peito."},
   serracurral: {city: "bh", n: "Serra do Curral", s: "Serra", x: 150, y: 282, txt: "A serra que fecha Belo Horizonte pelo sul: campo de pedra cor de ferro, mata nas grotas e a cidade inteira lá embaixo. De noite, dizem, uma árvore seca anda pela trilha."},
   mercadocentral: {city: "bh", n: "Mercado Central", s: "Mercado", x: 226, y: 196, txt: "O mercado mais famoso de Minas: queijo da Canastra, doce de leite, pimenta, gaiola de passarinho e cheiro de pão de queijo. Do lado, a pensão e uns mineiros de prosa comprida."},
   portocuiaba: {city: "cuiaba", n: "Porto de Cuiabá", s: "Porto", x: 268, y: 206, txt: "O bairro mais velho de Cuiabá, na beira do rio: o mercado do peixe, casario baixo, rede na pensão e gente que fala \"tchá\" e \"pai do céu\" em toda frase."},
@@ -184,7 +191,19 @@ const CITY = {
   // embaixo; a estrada sobe para Belo Horizonte, ao norte
   ouropreto: {n: "Ouro Preto", look: "minas", map: "sudeste", route: ["tiradentes", "ladeiras"], cabin: false,
     land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
-    river: "M0,290 C100,280 180,300 260,286 C340,272 390,290 440,280", road: "M248,150 C270,110 300,70 330,30 C336,20 340,10 344,-6", sign: [350, 18, "Belo Horizonte ↑"], home: "tiradentes", gate: "tiradentes"}
+    river: "M0,290 C100,280 180,300 260,286 C340,272 390,290 440,280", road: "M248,150 C270,110 300,70 330,30 C336,20 340,10 344,-6", sign: [350, 18, "Belo Horizonte ↑"], home: "tiradentes", gate: "tiradentes"},
+  // Rio de Janeiro (Sudeste): o mar embaixo (Copacabana), o maciço da Tijuca no alto à esquerda e a estrada subindo a
+  // serra para Ouro Preto, ao norte
+  riodejaneiro: {n: "Rio de Janeiro", look: "litoral", map: "sudeste", route: ["copacabana", "tijuca"], cabin: false,
+    land: "20,30 160,12 300,16 380,40 400,130 380,220 330,270 220,280 100,276 30,240 12,140",
+    bay: "M0,325 L0,292 C80,300 160,286 240,298 C300,306 360,290 440,284 L440,325Z",   // o mar de Copacabana
+    river: "M60,0 C80,60 140,110 180,150 C210,180 230,240 250,300",   // o rio Carioca, descendo da Tijuca
+    road: "M300,214 C320,160 340,100 360,40 C364,24 368,10 372,-6", sign: [378, 18, "Ouro Preto ↑"], home: "copacabana", gate: "copacabana"},
+  // São Paulo (Sudeste): o espigão da Paulista no meio, o rio Pinheiros embaixo, o Ibirapuera à esquerda e a estrada
+  // para o Rio saindo pela direita
+  saopaulo: {n: "São Paulo", look: "cidade", map: "sudeste", route: ["paulista", "ibirapuera"], cabin: false,
+    land: "24,40 150,14 300,12 410,40 432,150 410,260 300,312 160,314 40,290 14,170",
+    river: "M0,300 C90,286 170,304 250,290 C330,276 390,296 440,288", road: "M290,140 C330,150 380,150 420,140 C430,138 440,136 450,134", sign: [354, 126, "Rio de Janeiro →"], home: "paulista", gate: "paulista"}
 };
 /* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
    que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
@@ -243,7 +262,11 @@ const SECRETS = {
   serracurral: {elem: "raio", item: "pao_queijo", n: "Pedra de ferro", d: "Uma pedra escura e pesada, cheia de ferro, fecha uma loca na serra. Um raio racha ela.",
     lore: "A Serra do Curral é feita de ferro, e muita gente queria levar ela embora em trem. O povo de BH não deixou. O baú ficou lá, junto com a serra."},
   ladeiras: {elem: "fogo", item: "tropeiro", n: "Porta de madeira podre", d: "Uma porta velha de madeira, inchada de umidade, tranca o porão de uma igreja. O fogo seca e abre ela.",
-    lore: "Ouro Preto tem mais igreja que esquina, e cada igreja tem um porão. Num deles, alguém escondeu um baú no tempo do ouro. O ouro foi embora. O baú ficou."}
+    lore: "Ouro Preto tem mais igreja que esquina, e cada igreja tem um porão. Num deles, alguém escondeu um baú no tempo do ouro. O ouro foi embora. O baú ficou."},
+  tijuca:   {elem: "planta", item: "cafe", n: "Raízes de figueira", d: "As raízes de uma figueira velha desceram pela pedra e fecharam a boca de uma gruta. Puxando com jeito, elas abrem.",
+    lore: "A Floresta da Tijuca já foi fazenda de café, curumim. A mata morreu e a água da cidade secou. Aí plantaram tudo de novo, muda por muda. Num canto, os plantadores deixaram um baú."},
+  ibirapuera: {elem: "raio", item: "pao_queijo", n: "Portão do viveiro", d: "O portão de ferro de um viveiro velho do parque, com a trava elétrica sem força.",
+    lore: "No meio de São Paulo tem um parque onde o povo vai respirar. Nos fundos do viveiro, o jardineiro guardava um baú pra quem chegasse cansado da cidade. O menino chegou."}
 };
 /* Clima do Norte: um por dia, sorteado pelo número do dia (o mesmo dia tem sempre o mesmo tempo, sem campo no save).
    boost = quanto cada elemento pesa na batalha; more = bichos que aparecem mais; dodge = chance (%) do golpe do bicho
@@ -252,13 +275,13 @@ const WEATHER = {
   limpo:    {n: "Tempo bom"},
   chuva:    {n: "Chuva", boost: {agua: 1.2, raio: 1.2, fogo: .8}, fight: "Tá chovendo: água e raio ficam mais fortes, e o fogo mais fraco.",
     more: {norte: ["sapo", "ariranha", "poraque", "jacaretinga"], nordeste: ["siri", "traira", "jacare_papo", "cagado", "lontra"],
-      centroeste: ["jacare_pantanal", "dourado", "piraputanga", "sucuri_amarela"], sudeste: ["paca", "cachorro_mato", "jacu"]}},
+      centroeste: ["jacare_pantanal", "dourado", "piraputanga", "sucuri_amarela"], sudeste: ["paca", "cachorro_mato", "jacu", "sapo_cururu", "capivara_pinheiros"]}},
   neblina:  {n: "Neblina", dodge: 12, fight: "Neblina: às vezes o golpe do bicho passa raspando.",
-    more: {norte: ["coruja", "garca", "soco"], nordeste: ["carao", "bigua", "garca_moura"], centroeste: ["mutum", "bugio", "morcego_gruta"], sudeste: ["jacu", "sabia", "gaviao_carijo"]}},
+    more: {norte: ["coruja", "garca", "soco"], nordeste: ["carao", "bigua", "garca_moura"], centroeste: ["mutum", "bugio", "morcego_gruta"], sudeste: ["jacu", "sabia", "gaviao_carijo", "saira", "corujinha"]}},
   mormaco:  {n: "Mormaço", boost: {fogo: 1.2, agua: .9}, fight: "Mormaço: o fogo fica mais forte.",
-    more: {norte: ["calango", "iguana"], nordeste: ["tatupeba", "prea", "tatu_bola"], centroeste: ["ema", "seriema", "tatu_canastra"], sudeste: ["quero_quero"]}},
+    more: {norte: ["calango", "iguana"], nordeste: ["tatupeba", "prea", "tatu_bola"], centroeste: ["ema", "seriema", "tatu_canastra"], sudeste: ["quero_quero", "jararacucu", "capivara_pinheiros"]}},
   ventania: {n: "Ventania", boost: {vento: 1.2, planta: 1.1}, fight: "Ventania: o vento e as folhas ficam mais fortes.",
-    more: {norte: ["harpia", "urubu", "gaivota"], nordeste: ["asa_branca", "tesourao", "carcara", "periquito"], centroeste: ["arara_azul", "arara_vermelha", "papagaio", "tuiuiu"], sudeste: ["tucano", "gaviao_carijo"]}},
+    more: {norte: ["harpia", "urubu", "gaivota"], nordeste: ["asa_branca", "tesourao", "carcara", "periquito"], centroeste: ["arara_azul", "arara_vermelha", "papagaio", "tuiuiu"], sudeste: ["tucano", "gaviao_carijo", "maritaca", "bem_te_vi"]}},
   // climas de cada região: o sol de rachar do sertão, a fumaça das queimadas do Centro-Oeste (a fumaça do Pytuna de
   // perto: os bichos tomados batem mais forte, foe) e a garoa das serras de Minas
   sol:      {n: "Sol de rachar", boost: {fogo: 1.3, agua: .8, planta: .9}, fight: "Sol de rachar: o fogo fica bem mais forte, e a água e as folhas mais fracas.",
@@ -266,7 +289,7 @@ const WEATHER = {
   fumaca:   {n: "Fumaça de queimada", boost: {vento: 1.2, fogo: 1.1}, foe: 1.1, fight: "Fumaça de queimada: os bichos tomados batem mais forte, e o vento rende mais.",
     more: {centroeste: ["veado_campeiro", "tamandua_mirim", "irara", "cateto", "tatu_canastra"]}},
   garoa:    {n: "Garoa", boost: {agua: 1.1}, dodge: 6, fight: "Garoa: a água rende um pouco mais, e às vezes o golpe do bicho passa raspando.",
-    more: {sudeste: ["sabia", "paca", "cachorro_mato", "jacu"]}}
+    more: {sudeste: ["sabia", "paca", "cachorro_mato", "jacu", "corujinha", "gamba"]}}
 };
 // chance de cada tempo por cidade; Belém tem a chuva da tarde quase todo dia
 const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15], ["mormaco", 12], ["ventania", 8]],
@@ -278,6 +301,8 @@ const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15]
   cuiaba: [["limpo", 30], ["chuva", 20], ["neblina", 5], ["mormaco", 20], ["ventania", 5], ["fumaca", 20]],   // calorão, chuva de verão e queimada na seca
   bonito: [["limpo", 35], ["chuva", 25], ["neblina", 15], ["mormaco", 10], ["ventania", 5], ["fumaca", 10]],   // serra de mata: neblina de manhã cedo
   brasilia: [["limpo", 30], ["chuva", 15], ["neblina", 5], ["mormaco", 15], ["ventania", 15], ["fumaca", 20]],   // planalto: seca comprida, vento e queimada
+  riodejaneiro: [["limpo", 30], ["chuva", 25], ["neblina", 5], ["mormaco", 30], ["ventania", 10]],   // verão carioca: mormaço e pancada de chuva no fim da tarde
+  saopaulo: [["limpo", 25], ["chuva", 20], ["neblina", 10], ["mormaco", 10], ["ventania", 5], ["garoa", 30]],   // a terra da garoa
   ouropreto: [["limpo", 25], ["chuva", 20], ["neblina", 20], ["mormaco", 5], ["ventania", 5], ["garoa", 25]],   // cidade alta: neblina e garoa
   bh: [["limpo", 30], ["chuva", 20], ["neblina", 15], ["mormaco", 10], ["ventania", 10], ["garoa", 15]]};   // serra: neblina de manhã e garoa
 // bichos que o tempo de agora chama em dobro, os da região da cidade (more por região em WEATHER)
@@ -285,7 +310,7 @@ const weatherMore = (w = weatherNow()) => (WEATHER[w].more || {})[regionOfCity(c
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
-  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31, bh: 37, ouropreto: 41}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31, bh: 37, ouropreto: 41, riodejaneiro: 43, saopaulo: 47}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
   for (const [k, w] of odds) if ((r -= w) < 0) return k === "fumaca" && G.portfolio?.mapa_queimadas && seeded(day * 7 + 3) < .66 ? "limpo" : k;   // com o mapa de queimadas, a brigada apaga 2 de cada 3 focos
   return "limpo";
 }
@@ -338,6 +363,8 @@ const BUS_LINES = {
   recife:   {from: "petrolina", price: 1100, pass: "passagemREC", open: () => !!BS().beira, lock: "O ônibus para Recife sai depois que a Carranca da beira do Velho Chico for acalmada."},
   bonito: {from: "cuiaba", price: 1200, pass: "passagemBON", open: () => !!BS().chapada, lock: "O ônibus para Bonito sai depois que o Lobo-guará-rei da Chapada for acalmado."},
   ouropreto: {from: "bh", price: 1400, pass: "passagemOPR", open: () => !!BS().serracurral, lock: "O ônibus para Ouro Preto sai depois que o Muriqui-rei da Serra do Curral for acalmado."},
+  riodejaneiro: {from: "ouropreto", price: 1500, pass: "passagemRIO", open: () => !!BS().ladeiras, lock: "O ônibus para o Rio sai depois que a Mula-madrinha das Ladeiras for acalmada."},
+  saopaulo: {from: "riodejaneiro", price: 1600, pass: "passagemSAO", open: () => !!BS().tijuca, lock: "O ônibus para São Paulo sai depois que o Quati-rei da Floresta da Tijuca for acalmado."},
   brasilia: {from: "bonito", price: 1300, pass: "passagemBSB", open: () => !!BS().gruta, lock: "O ônibus para Brasília sai depois que a Preguiça-gigante da Gruta do Lago Azul for acalmada."}
 };
 // linha de ônibus entre as cidades a e b (em qualquer sentido), ou nada
@@ -378,7 +405,7 @@ const FREELAS = {
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {aero_bel: "baixadas", aero_rec: "arrecifes", aero_bsb: "parquebsb", aero_cnf: "serracurral", rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {tijuca: "copacabana", ibirapuera: "paulista", aero_bel: "baixadas", aero_rec: "arrecifes", aero_bsb: "parquebsb", aero_cnf: "serracurral", rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

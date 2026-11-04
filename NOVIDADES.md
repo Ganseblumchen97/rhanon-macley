@@ -3,6 +3,22 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.75.0 — o Rio de Janeiro e São Paulo
+
+- O Sudeste chega ao litoral. Depois de acalmar a Mula-madrinha em Ouro Preto, compre a passagem para o Rio de Janeiro
+  no mapa do Sudeste (R$ 1.500, ida e volta). Você desce em Copacabana: calçadão de ondas, coqueiros, o mar, uma pensão
+  e cariocas que gostam de prosa.
+- A Floresta da Tijuca (níveis 64 a 66) é mata atlântica no meio da cidade: mico-leão-dourado, saíra-sete-cores,
+  jararacuçu e o quati do Corcovado, que quer a sua bolsa. De dia, o Quati-rei manda no bando; de noite, um riso rouco
+  sai da gruta: é a Cuca, de cara de jacaré, mexendo o caldeirão.
+- Do Rio, o ônibus segue para São Paulo (R$ 1.600) depois do Quati-rei. A Avenida Paulista tem pensão e o povo da
+  cidade, e o Parque do Ibirapuera (níveis 66 a 68) tem maritaca, bem-te-vi, capivara e até um golpista do Pix. De dia,
+  a Capivara-rainha sai do lago; de noite, cuidado com o banco do parque: a Pisadeira desce do telhado.
+- Cada cidade tem a sua música: funk no Rio e MPB em São Paulo, com versões de noite e de batalha (um funk acelerado e
+  um samba-rock).
+- O Quati-rei e a Capivara-rainha também viram aliados no Chamado do aliado, e as duas trilhas novas têm um canto
+  secreto com baú. No Rio faz mormaço de verão; em São Paulo, garoa.
+
 ## 0.74.0 — cada região com o seu tempo e os seus segredos
 
 - O tempo agora tem a cara de cada lugar. No sertão de Petrolina e Teresina vem o "Sol de rachar": o fogo fica bem mais

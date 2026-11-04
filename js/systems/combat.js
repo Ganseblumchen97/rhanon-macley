@@ -22,6 +22,8 @@ function getBattleTrackFor(animal) {
   if (animal.boss) return "battleBoss";
   if (regionOfCity(curCity()) === "nordeste" && !animal.bug) return "battleNordeste";   // Nordeste: o tema da região num forró de batalha
   if (regionOfCity(curCity()) === "centroeste" && !animal.bug) return "battleCentroOeste";   // Centro-Oeste: pagode de viola
+  if (curCity() === "riodejaneiro") return "battleRio";   // Rio: funk carioca acelerado
+  if (curCity() === "saopaulo") return "battleSaoPaulo";   // São Paulo: samba-rock com o tema em MPB
   if (regionOfCity(curCity()) === "sudeste" && !animal.bug) return "battleMinas";   // Minas: sertanejo universitário
   return BATTLE_CITY.has(curZone) ? "battleGuitarrada" : BATTLE_WATER.has(curZone) ? "battleCarimbo" : "battleCapo";
 }
@@ -482,7 +484,7 @@ function finish(kind) {
   const xp0 = {lv: G.lv, xp: G.xp};   // para a barra de XP do cartão encher do ponto em que estava
   musicStop(); keepVitals(kind); const rw = kind === "win" ? reward(e, e.rematch ? REMATCH_XP : 1, false, true) : []; if (kind === "win") $("beast").classList.add("dead"); fanfare(kind);
   // cartão: título, uma frase curta e, embaixo, o que ganhou ou perdeu (um item por linha)
-  const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = t({belem: "Acordou no Ver-o-Peso, com metade das forças", saoluis: "Acordou na Praia Grande, com metade das forças", teresina: "Acordou no Troca-Troca, com metade das forças", recife: "Acordou no Recife Antigo, com metade das forças", petrolina: "Acordou na orla do Velho Chico, com metade das forças", cuiaba: "Acordou no Porto de Cuiabá, com metade das forças", bh: "Acordou no Mercado Central, com metade das forças", ouropreto: "Acordou na Praça Tiradentes, com metade das forças", bonito: "Acordou no centro de Bonito, com metade das forças", brasilia: "Acordou no Plano Piloto, com metade das forças"}[curCity()] || "Acordou na aldeia, com metade das forças");
+  const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = t({belem: "Acordou no Ver-o-Peso, com metade das forças", saoluis: "Acordou na Praia Grande, com metade das forças", teresina: "Acordou no Troca-Troca, com metade das forças", recife: "Acordou no Recife Antigo, com metade das forças", petrolina: "Acordou na orla do Velho Chico, com metade das forças", cuiaba: "Acordou no Porto de Cuiabá, com metade das forças", bh: "Acordou no Mercado Central, com metade das forças", ouropreto: "Acordou na Praça Tiradentes, com metade das forças", riodejaneiro: "Acordou em Copacabana, com metade das forças", saopaulo: "Acordou na Paulista, com metade das forças", bonito: "Acordou no centro de Bonito, com metade das forças", brasilia: "Acordou no Plano Piloto, com metade das forças"}[curCity()] || "Acordou na aldeia, com metade das forças");
   const T = {
     win:  e.bug ? [t("Bug resolvido!"), t("{bicho} sumiu do código.", {bicho: O})] : e.rematch ? [t("Treino concluído!"), t("{bicho} gostou do treino.", {bicho: O})]
       : e.boss ? [t(ending(e, "Chefe acalmado!", "Chefe acalmada!")), t("{bicho} voltou a si. A trilha está livre.", {bicho: O})]
@@ -495,7 +497,7 @@ function finish(kind) {
   setTimeout(() => {
     $("overTitle").textContent = T[0]; $("overTxt").textContent = [T[1], ...rw].filter(Boolean).join("\n");
     const again = kind !== "lose" && !fromExplore;
-    if (fromExplore && kind === "lose") $("toMap").textContent = t({belem: "Voltar ao Ver-o-Peso", saoluis: "Voltar à Praia Grande", teresina: "Voltar ao Troca-Troca", recife: "Voltar ao Recife Antigo", petrolina: "Voltar à orla", cuiaba: "Voltar ao Porto", bh: "Voltar ao Mercado", ouropreto: "Voltar à Praça", bonito: "Voltar ao centro de Bonito", brasilia: "Voltar ao Plano Piloto"}[curCity()] || "Voltar à aldeia");
+    if (fromExplore && kind === "lose") $("toMap").textContent = t({belem: "Voltar ao Ver-o-Peso", saoluis: "Voltar à Praia Grande", teresina: "Voltar ao Troca-Troca", recife: "Voltar ao Recife Antigo", petrolina: "Voltar à orla", cuiaba: "Voltar ao Porto", bh: "Voltar ao Mercado", ouropreto: "Voltar à Praça", riodejaneiro: "Voltar a Copacabana", saopaulo: "Voltar à Paulista", bonito: "Voltar ao centro de Bonito", brasilia: "Voltar ao Plano Piloto"}[curCity()] || "Voltar à aldeia");
     $("again").style.display = again ? "" : "none"; $("over").hidden = false; (again ? $("again") : $("toMap")).focus();
     overXp(kind === "win" ? xp0 : null);
   }, kind === "win" ? 1700 : kind === "lose" ? 1900 : 1150);
@@ -780,7 +782,7 @@ function allyCall(id) {
   let end = T + 900;
   if (mv.fx === "frenesi") {   // três mordidas: o espírito cola no bicho e morde três vezes
     lunge(T, 220, 900);
-    [0, 1, 2].forEach(i => at(T + 220 + i * 280, () => { sp.show(i % 2 ? "crouch" : "attack"); sfx("claw"); hit(dmg(1), i === 2 && t("Três mordidas do recife n{bicho}!", v)); }));
+    [0, 1, 2].forEach(i => at(T + 220 + i * 280, () => { sp.show(i % 2 ? "crouch" : "attack"); sfx("claw"); hit(dmg(1), i === 2 && (id === "quati_rei" ? t("O bando do Corcovado passa unhando {bicho}!", v) : t("Três mordidas do recife n{bicho}!", v))); }));
     end = T + 220 + 3 * 280 + 400;
   } else if (mv.fx === "tropa") {   // o cincerro toca e uma fila de mulas de luar atravessa o palco
     at(500, () => { sp.show("attack"); sfx("bloqueio"); setTimeout(() => sfx("bloqueio"), 220); shake("gshake-s"); });   // blém, blém: o cincerro
@@ -840,7 +842,7 @@ function allyCall(id) {
         const ok = !e.boss || Math.random() < .5; if (ok) e.perde = 1; hit(d, ok ? t("Abraço do tempo: {bicho} fica parado e perde a vez.", v) : t("Abraço do tempo: {bicho} se solta a tempo.", v));
         const [gx, gy] = PFX.toGrid(b.x + $("fx").getBoundingClientRect().left, b.y + $("fx").getBoundingClientRect().top - 30); PFX.burst(8, "star", ["#ffd23a", "#ffffff"], gx, gy, 10, {life: 1.2, up: 6});
       }
-      else if (mv.fx === "bandeira") { p.escudo = Math.max(p.escudo || 0, 2); hit(d, t("O rabo-bandeira abre na frente do Rhanon: os 2 próximos golpes batem pela metade.", v)); sfx("bloqueio"); }
+      else if (mv.fx === "bandeira") { p.escudo = Math.max(p.escudo || 0, 2); hit(d, id === "capivara_rainha" ? t("A calma da capivara cobre o Rhanon: os 2 próximos golpes batem pela metade.", v) : t("O rabo-bandeira abre na frente do Rhanon: os 2 próximos golpes batem pela metade.", v)); sfx("bloqueio"); }
       else hit(d, t("{aliado} acerta {bicho} em cheio: −{n}.", {aliado: name, bicho: foe(), n: d}));
     });
     end = T + 260 + (mv.fx === "abraco" ? 650 : 300) + 500;

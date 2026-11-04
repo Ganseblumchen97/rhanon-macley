@@ -35,6 +35,14 @@ const TILE_PAL = {
   // Belo Horizonte: a Serra do Curral, campo de pedra (capim ralo sobre a canga cor de ferro), trilha de terra vermelha,
   // mata verde-escura nas grotas e pedra escura de minério
   serracurral: {g1: "#8a8a5a", g2: "#7a7a4e", tall: "#9a9a4a", tallHi: "#c8c070", path: "#a8644a", path2: "#88503a", leaf: "#3a6a3a", leaf2: "#2a5228", leafHi: "#5a8a4a", trunk: "#4a3020", rock: "#6a5a58", rock2: "#4a3e3c", water: "#3a7ab0", water2: "#8ac0e0", wood: "#9c6339", wood2: "#6d4329"},
+  // Rio: Copacabana, areia clara, calçadão de onda preta e branca, coqueiro (palm), o mar azul e os prédios de frente pra praia
+  copacabana: {g1: "#ecdcac", g2: "#e0d09c", tall: "#a8b860", tallHi: "#d8e080", path: "#f0ece4", path2: "#2a2a2e", leaf: "#3a9a3a", leaf2: "#2a7a2a", leafHi: "#6ac85a", trunk: "#8a6a3a", rock: "#8a8a80", rock2: "#5a5a54", water: "#2a98c8", water2: "#a8e8f8", wood: "#9c6339", wood2: "#6d4329", roof: "#c8c4b8", roof2: "#9a968a", walls: ["#f0ece0", "#e8d0a8", "#d8e8f0", "#f0d8c8", "#e8e4d8"], palm: true},
+  // Rio: a Floresta da Tijuca, mata atlântica fechada, chão de folha, pedra de granito cinza e riacho de água escura
+  tijuca: {g1: "#3e7a34", g2: "#36702e", tall: "#2e6a2a", tallHi: "#5a9a44", path: "#8a6a44", path2: "#6e5234", leaf: "#1e6a2a", leaf2: "#145020", leafHi: "#3a8a3a", trunk: "#5a3a22", rock: "#9a9a94", rock2: "#6a6a64", water: "#2e7a8a", water2: "#7ac0c8", wood: "#9c6339", wood2: "#6d4329"},
+  // São Paulo: a Avenida Paulista, calçada de concreto cinza, prédio espelhado e de pastilha, árvore da calçada
+  paulista: {g1: "#b8b8b2", g2: "#aaaaa4", tall: "#6a8a4a", tallHi: "#9ab86a", path: "#6a6a6e", path2: "#56565a", leaf: "#3a7a3a", leaf2: "#2a5e2a", leafHi: "#5a9a4a", trunk: "#5a3a22", rock: "#9a9a94", rock2: "#6a6a64", water: "#4a7a9a", water2: "#8ab8d0", wood: "#9c6339", wood2: "#6d4329", roof: "#7a7a82", roof2: "#5a5a62", walls: ["#8ab0d0", "#c8d0d8", "#6a8aa8", "#e8e4d8", "#a8b8c8"]},
+  // São Paulo: o Parque do Ibirapuera, gramado verde-claro, pista de cooper cinza, o lago e as árvores grandes
+  ibirapuera: {g1: "#6aa84a", g2: "#5e9c40", tall: "#4a8a38", tallHi: "#8ac860", path: "#a8a49a", path2: "#8a867c", leaf: "#2f7a3a", leaf2: "#22602a", leafHi: "#4a9a48", trunk: "#5a3a22", rock: "#a8a49a", rock2: "#7a766e", water: "#3a7a9a", water2: "#8ac0d8", wood: "#a8703f", wood2: "#6d4329"},
   // Belo Horizonte: a rua do Mercado Central, pedra portuguesa clara, casario mineiro branco de janela colorida, telhado
   // colonial e quaresmeira roxa nas calçadas (o símbolo das serras de Minas)
   mercadocentral: {g1: "#c8c0b0", g2: "#b8b0a0", tall: "#6a9a4a", tallHi: "#9ac86a", path: "#7e7468", path2: "#625a50", leaf: "#8a4ab8", leaf2: "#6a2a98", leafHi: "#c890e8", trunk: "#5a3a22", rock: "#a89a88", rock2: "#7a6a58", water: "#4a7a9a", water2: "#8ab8d0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22", walls: ["#f0ece0", "#3a6ab8", "#f0ece0", "#e8c048", "#2a8a6a"]},
@@ -69,7 +77,8 @@ const OUTLINE = "#1a2418";
 // tipo de terreno desenhado embaixo das letras especiais
 // toldo das barracas de cada mercado (sem stall: vermelho e branco, como na feira da aldeia)
 Object.entries({praiagrande: ["#2a6ab8", "#f4ecd8"], trocatroca: ["#e8a020", "#c8402a"], orla: ["#3a8a5a", "#f0d890"], recifeantigo: ["#e86a8a", "#f0c840"],
-  portocuiaba: ["#e8701c", "#f4ecd8"], centrobonito: ["#2aa8b8", "#f4ecd8"], planopiloto: ["#3a5ab8", "#e8e4d8"], mercadocentral: ["#c8a040", "#6a3a8a"], tiradentes: ["#2a5aa8", "#e8d8b0"]})
+  portocuiaba: ["#e8701c", "#f4ecd8"], centrobonito: ["#2aa8b8", "#f4ecd8"], planopiloto: ["#3a5ab8", "#e8e4d8"], mercadocentral: ["#c8a040", "#6a3a8a"], tiradentes: ["#2a5aa8", "#e8d8b0"],
+  copacabana: ["#e8402a", "#f4ecd8"], paulista: ["#2a2a2e", "#e8c040"]})
   .forEach(([z, c]) => { if (TILE_PAL[z]) TILE_PAL[z].stall = c; });
 // rodoviárias do Nordeste: as cores do centro da cidade (Petrolina com mandacaru no lugar das árvores)
 Object.assign(TILE_PAL, {aero_bel: TILE_PAL.veropeso, aero_rec: TILE_PAL.recifeantigo, aero_bsb: TILE_PAL.planopiloto, aero_cnf: TILE_PAL.mercadocentral, rodo_slz: TILE_PAL.praiagrande, rodo_the: TILE_PAL.trocatroca, rodo_pet: {...TILE_PAL.orla, cactus: true}, rodo_rec: TILE_PAL.recifeantigo});
