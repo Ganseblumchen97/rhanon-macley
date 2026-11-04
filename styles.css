@@ -670,6 +670,12 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .stage.w-neblina .weather-fx{display:block;background:linear-gradient(0deg,rgba(220,228,240,.55),rgba(220,228,240,.15) 60%,rgba(220,228,240,.3))}
 .stage.w-mormaco .weather-fx{display:block;background:linear-gradient(180deg,rgba(255,220,150,.22),rgba(255,160,60,.1) 50%,transparent)}
 .stage.w-ventania .weather-fx{display:block;background:repeating-linear-gradient(0deg,transparent 0 37px,rgba(255,255,255,.28) 37px 38px,transparent 38px 61px);background-size:240px 100%;animation:ventania .6s steps(8) infinite}
+/* climas das outras regiões: sol de rachar (clarão seco), fumaça de queimada (véu marrom subindo) e garoa (chuva fina) */
+.stage.w-sol .weather-fx{display:block;background:linear-gradient(180deg,rgba(255,250,220,.32),rgba(255,220,150,.14) 45%,rgba(214,184,130,.12))}
+.stage.w-fumaca .weather-fx{display:block;background:radial-gradient(ellipse 40% 30% at 20% 40%,rgba(130,118,110,.35),transparent 70%),radial-gradient(ellipse 45% 30% at 75% 60%,rgba(120,108,100,.3),transparent 70%),rgba(110,82,62,.2);background-size:200% 100%,200% 100%,auto;animation:fumaca 9s linear infinite}
+.stage.w-garoa .weather-fx{display:block;background:repeating-linear-gradient(100deg,transparent 0 14px,rgba(225,235,248,.28) 14px 15px,transparent 15px 31px),rgba(200,212,228,.16);background-size:90px 90px,auto;animation:garoa .7s steps(6) infinite}
+@keyframes fumaca{to{background-position:-100% 0,100% 0,0 0}}
+@keyframes garoa{to{background-position:-16px 90px,0 0}}
 @keyframes chuva{to{background-position:-38px 140px,0 0}}
 @keyframes ventania{to{background-position:240px 0}}
 @media (prefers-reduced-motion:reduce){.stage .weather-fx{animation:none}}

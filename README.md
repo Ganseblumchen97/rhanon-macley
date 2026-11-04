@@ -1,4 +1,6 @@
-# Jaci: The Fading Moon (alfa 0.73.0)
+**Português** · [English](README.en.md)
+
+# Jaci: The Fading Moon (alfa 0.74.0)
 
 *Jaci: A Lua que se Apaga* · uma aventura de Rhanon Macley · RPG de turno no navegador
 
@@ -32,15 +34,16 @@ acalmá-los. Aqui **ninguém morre**: cada bicho vencido volta a si, agradece e 
 - **Exploração livre** vista de cima: ande pela mata, pela beira do rio, pelas ladeiras da cidade. Golpeie com a lança,
   atire flecha, role para desviar e encontre recantos secretos que só abrem com o elemento certo.
 - **Batalha por turno**, no espírito do Pokémon antigo, mas com **tempo certo**: aperte no momento em que o anel fecha
-  para acertar em cheio ou bloquear o golpe do bicho. Quatro acertos seguidos enchem a **Fúria da mata**.
+  para acertar em cheio ou bloquear o golpe do bicho. Aprenda a **Fúria da mata** e quatro acertos seguidos viram
+  um combo de três estocadas.
 - **Cinco elementos** (fogo, água, vento, raio e planta). A fraqueza de cada bicho só aparece depois de você descobrir:
   acertou, ganha "Mais uma!".
 - **Dia e noite, chuva e neblina.** À noite a mata muda: outros bichos, mais fortes, e os chefes viram encantados do
   folclore (Curupira, Boitatá, Mula sem cabeça, Saci...).
 - **Chefes que viram aliados**, talismãs feitos pelo Pajé com o luar deles e três caminhos de habilidade (Guerreiro,
   Rastreador e Pajé).
-- **Programação de verdade na história:** conserte o notebook do Rhanon e pegue freelas pelo caminho. Os bugs viram
-  lutas dentro do código, e cada programa entregue muda alguma coisa no jogo.
+- **Programação de verdade na história:** conserte o notebook do Rhanon e pegue freelas pelo caminho. Os pedidos
+  chegam por e-mail, os bugs viram lutas dentro do código e cada programa entregue muda alguma coisa no jogo.
 
 ![A Fúria da mata](midia/furia.gif)
 
@@ -79,7 +82,7 @@ Luís, a toada caipira de Cuiabá, o sertanejo de Minas e a música dos chefes.
 | Golpe, conversar, confirmar | Z ou Espaço | A |
 | Flecha, voltar | X | B |
 | Esquiva | Shift ou C | X |
-| Bolsa · Equipamento · Habilidades | I · E · H | |
+| Bolsa · Equipamento · Habilidades · Notebook | I · E · H · N | |
 
 No mouse, a mira segue o cursor: botão esquerdo golpeia e o direito atira.
 

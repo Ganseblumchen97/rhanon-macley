@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.74.0 — cada região com o seu tempo e os seus segredos
+
+- O tempo agora tem a cara de cada lugar. No sertão de Petrolina e Teresina vem o "Sol de rachar": o fogo fica bem mais
+  forte, a água e as folhas mais fracas, e aparecem mais cascavel, preá e bode. No Centro-Oeste, a "Fumaça de queimada"
+  deixa os bichos tomados mais fortes; entregue o mapa de queimadas da Iara e a brigada apaga a maior parte dos focos.
+  Em Minas, cai uma "Garoa" fina, e às vezes o golpe do bicho passa raspando.
+- Chuva, neblina, mormaço e ventania agora trazem os bichos da região em que você está, não só os do Norte.
+- As 16 trilhas do Nordeste, do Centro-Oeste e de Minas ganharam um canto secreto, como as do Norte: um garrancho de
+  jurema na caatinga, uma duna nos Lençóis, uma pedra rachada em Sete Cidades, o porão de uma igreja em Ouro Preto...
+  Abra com o elemento certo (fora da batalha, gastando PE) e encontre um baú com dinheiro, comida da região e uma
+  história que o Pajé conta sobre o lugar.
+- A página do jogo agora também tem o texto em inglês, para quem não fala português conhecer o jogo.
+
 ## 0.73.0 — o notebook ganha vida e o avião voa por região
 
 - O notebook consertado agora serve para alguma coisa: aperte N (ou o botão no alto da tela) e ele abre quase em tela

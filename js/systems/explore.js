@@ -100,7 +100,7 @@ const AQUATIC = new Set(["tubarao", "bagre_cego", "piraputanga", "dourado", "pia
 function pickFromPool(zone, where) {
   const z = zoneDef(zone), pool = where ? z.pool.filter(([id]) => (where === "agua") === AQUATIC.has(id)) : z.pool;
   if (!pool.length) return null;
-  const more = WEATHER[weatherNow()].more || [], wt = ([id, w]) => more.includes(id) ? w * 2 : w;   // clima: os bichos dele aparecem o dobro
+  const more = weatherMore(), wt = ([id, w]) => more.includes(id) ? w * 2 : w;   // clima: os bichos dele aparecem o dobro
   let r = Math.random() * pool.reduce((s, q) => s + wt(q), 0);
   for (const q of pool) if ((r -= wt(q)) < 0) return ANIMALS.find(a => a.id === q[0]);
   return ANIMALS.find(a => a.id === pool[0][0]);
@@ -1536,7 +1536,8 @@ function drawWeather(x, now, w = weatherNow()) {
     x.fillStyle = g; x.fillRect(0, 0, W, Math.round(H * .45));
     x.fillStyle = "rgba(255,240,200,.18)";   // ondas de calor tremendo
     for (let i = 0; i < 8; i++) { const py = (i * 89 + 40) % H, px = (i * 151) % W, s = Math.round(Math.sin(now / 240 + i) * 2 * R); x.fillRect(px + s, py, 10, 1); x.fillRect(px + 3 - s, py + 2, 8, 1); }
-  } else if (w === "ventania") {
+  } else if (w !== "ventania") drawWeatherMore(x, now, w, dim, R);
+  else {
     x.fillStyle = EX.night ? "#ffffff30" : "#ffffff70";
     const n = Math.round(W * H / 2500);
     for (let i = 0; i < n; i++) x.fillRect(Math.round(((i * 211 + now * (.35 + (i % 3) * .1) * R) % (W + 30)) - 30), (i * 71) % H, 6 + i % 6, 1);
@@ -1546,11 +1547,45 @@ function drawWeather(x, now, w = weatherNow()) {
     }
   }
 }
-let FOG_PUFF = null;
-function fogPuff() {   // tufo de neblina: elipse clara que some nas bordas
+let FOG_PUFF = null, SMOKE_PUFF = null;
+// climas das outras regiões (data/world.js): sol de rachar (clarão branco, chão tremendo e poeira rolando), fumaça de
+// queimada (véu marrom, tufos cinzentos e fagulhas subindo) e garoa (gotinha fina e curta com um véu claro)
+function drawWeatherMore(x, now, w, dim, R) {
+  const W = VIEW_W, H = VIEW_H;
+  if (w === "sol") {
+    x.fillStyle = "rgba(255,236,190,.16)"; x.fillRect(0, 0, W, H);
+    const g = x.createLinearGradient(0, 0, 0, H * .5); g.addColorStop(0, "rgba(255,250,225,.24)"); g.addColorStop(1, "rgba(255,250,225,0)");
+    x.fillStyle = g; x.fillRect(0, 0, W, Math.round(H * .5));
+    x.fillStyle = "rgba(255,248,220,.22)";   // o chão tremendo de calor
+    for (let i = 0; i < 12; i++) { const py = (i * 67 + 30) % H, px = (i * 131) % W, s = Math.round(Math.sin(now / 200 + i) * 2 * R); x.fillRect(px + s, py, 12, 1); x.fillRect(px + 4 - s, py + 2, 9, 1); }
+    for (let i = 0; i < 5; i++) {   // poeira rolando rente ao chão
+      const px = ((i * 197 + now * .05 * R) % (W + 30)) - 15, py = (i * 113 + 50) % H;
+      x.fillStyle = "rgba(214,184,130,.45)"; x.fillRect(Math.round(px), py, 3, 1); x.fillRect(Math.round(px) + 1, py - 1, 2, 1);
+    }
+  } else if (w === "fumaca") {
+    x.fillStyle = `rgba(110,82,62,${.2 * dim})`; x.fillRect(0, 0, W, H);
+    const puff = SMOKE_PUFF || (SMOKE_PUFF = fogPuff("120,110,104"));
+    x.globalAlpha = .55 * dim;
+    for (let i = 0; i < 9; i++) x.drawImage(puff, Math.round(((i * 173 + now * .012 * R * (1 + i % 3)) % (W + 120)) - 100), Math.round(((i * 61 + 14) - now * .004 * R * (1 + i % 2)) % H + H) % H, 100, 44);
+    x.globalAlpha = 1;
+    for (let i = 0; i < 7; i++) {   // fagulhas subindo
+      const py = H - ((i * 89 + now * (.03 + (i % 3) * .01) * R) % (H + 10)), px = (i * 151 + Math.sin(now / 400 + i) * 6 + W) % W;
+      x.fillStyle = i % 2 ? "#ffb04a" : "#ff7a3a"; x.fillRect(Math.round(px), Math.round(py), 1, 1);
+    }
+  } else if (w === "garoa") {
+    x.fillStyle = `rgba(200,212,228,${.18 * dim})`; x.fillRect(0, 0, W, H);
+    x.fillStyle = EX.night ? "#a8bcd860" : "#e2ecf8a0";
+    const n = Math.round(W * H / 520);
+    for (let i = 0; i < n; i++) {
+      const py = ((i * 509 + now * (.16 + (i % 3) * .02) * R) % (H + 8)) - 4, px = (((i * 887 - py * .15) % W) + W) % W;
+      x.fillRect(Math.round(px), Math.round(py), 1, 2);
+    }
+  }
+}
+function fogPuff(rgb = "205,215,245") {   // tufo de neblina: elipse clara que some nas bordas
   const c = document.createElement("canvas"); c.width = 40; c.height = 18;
   const g = c.getContext("2d"); g.scale(2.2, 1);
-  const gr = g.createRadialGradient(9, 9, 1, 9, 9, 9); gr.addColorStop(0, "rgba(205,215,245,.95)"); gr.addColorStop(1, "rgba(205,215,245,0)");
+  const gr = g.createRadialGradient(9, 9, 1, 9, 9, 9); gr.addColorStop(0, `rgba(${rgb},.95)`); gr.addColorStop(1, `rgba(${rgb},0)`);
   g.fillStyle = gr; g.fillRect(0, 0, 18, 18);
   return c;
 }

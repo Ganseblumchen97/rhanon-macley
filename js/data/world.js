@@ -208,38 +208,88 @@ const SECRETS = {
   porto:    {elem: "raio", item: "peixe", n: "Grade do depósito", d: "A grade de um depósito velho do porto, com uma trava elétrica sem força.",
     lore: "No porto tudo chega e tudo sai. Num depósito esquecido o menino achou o que um barco deixou e ninguém veio buscar."},
   baixadas: {elem: "agua", item: "manicoba", n: "Lama seca", d: "Um monte de lama seca tapa o vão entre duas casas. Com água, ela amolece.",
-    lore: "Nas Baixadas o povo vive com a maré: ela sobe, ela desce, ela leva e traz. Naquele canto ela trouxe um presente."}
+    lore: "Nas Baixadas o povo vive com a maré: ela sobe, ela desce, ela leva e traz. Naquele canto ela trouxe um presente."},
+  // Nordeste
+  mangueilha: {elem: "planta", item: "tapioca", n: "Raízes de mangue", d: "As raízes do mangue-vermelho se enroscaram e fecharam um vão na lama. Dá pra puxar, com jeito.",
+    lore: "No mangue da ilha, as catadoras de caranguejo sabem cada buraco de cor. Uma delas escondeu ali um baú pra quem precisasse. O menino precisou."},
+  lencois:  {elem: "vento", item: "cajuina", n: "Duna de areia fina", d: "Uma duna pequena de areia fina cobriu a entrada de um buraco. O vento leva ela embora num instante.",
+    lore: "Nos Lençóis o vento muda as dunas de lugar todo dia. O que ele cobre hoje, ele descobre amanhã. O menino só apressou o vento."},
+  encontro: {elem: "agua", item: "carne_sol", n: "Barranco de barro rachado", d: "O barranco do rio secou e rachou que nem casco de jabuti. Molhado, ele desmancha.",
+    lore: "Onde o Parnaíba encontra o Poti, os pescadores guardam a rede no barranco. Um deles guardou mais que rede. O Cabeça de Cuia ficou só olhando."},
+  setecidades: {elem: "raio", item: "baiao", n: "Pedra rachada", d: "Uma laje de pedra com uma rachadura funda no meio fecha uma fenda. Um raio bem dado parte ela.",
+    lore: "As pedras de Sete Cidades parecem ruína de cidade antiga. Os desenhos nelas são mais velhos que a minha avó, curumim. Atrás de uma, alguém deixou um baú."},
+  caatinga: {elem: "fogo", item: "carne_sol", n: "Garrancho seco", d: "Um emaranhado de galho seco e espinho de jurema tapa um vão. Pega fogo num piscar.",
+    lore: "Na caatinga, quando chove, tudo fica verde em três dias. Quando seca, sobra o garrancho. O vaqueiro que deixou esse baú sabia disso."},
+  serra:    {elem: "planta", item: "cajuina", n: "Cipó de pequi", d: "Um cipoal grosso desce da encosta e fecha uma gruta pequena. Puxando os cipós, ela abre.",
+    lore: "Na Serra do Araripe a pedra guarda bicho de antes do tempo, peixe que virou pedra. Guarda baú também, pelo jeito."},
+  beira:    {elem: "agua", item: "tapioca", n: "Areia batida da vazante", d: "A vazante do rio deixou uma parede de areia batida e seca. Com água, ela desmancha.",
+    lore: "O Velho Chico enche e esvazia e cada vazante deixa coisa na beira. Os barqueiros dizem que a carranca na proa espanta assombração. Esse baú nem ela espantou."},
+  olinda:   {elem: "raio", item: "baiao", n: "Portão de ferro da ladeira", d: "Um portão de ferro antigo, com uma trava elétrica quebrada, fecha um quintal na ladeira.",
+    lore: "Em Olinda, cada casa da ladeira tem um quintal escondido e um boneco de carnaval guardado. Naquele quintal tinha um baú. O boneco ficou de guarda."},
+  arrecifes: {elem: "vento", item: "cajuina", n: "Monte de areia da praia", d: "A maré deixou um monte de areia e alga seca na frente de uma toca nas pedras. Um vento forte espalha tudo.",
+    lore: "Os arrecifes seguram o mar do Recife faz muito tempo. Nas tocas das pedras, guaiamum mora junto com o que o mar esquece."},
+  // Centro-Oeste
+  pantanal: {elem: "fogo", item: "pacu", n: "Capim seco do campo", d: "Um capinzal seco e alto fecha a entrada de um capão de mato. Pega fogo rapidinho.",
+    lore: "No Pantanal o fogo bom é o que o peão faz com cuidado. O ruim é o da fumaça do Pytuna. O menino usou o bom, pouquinho, e achou o baú do peão."},
+  chapada:  {elem: "agua", item: "pequi", n: "Arenito seco", d: "Uma camada de arenito seco e esfarelado fecha uma fenda no paredão. Molhada, ela desmancha.",
+    lore: "Na Chapada a água desce do alto em véu de noiva. Por trás do paredão tem fenda que só a água conhece. E agora o menino."},
+  rioprata: {elem: "planta", item: "guarana", n: "Galhada na margem", d: "Galhos e raízes se trançaram na margem do rio e fecharam um vão na mata.",
+    lore: "No Rio da Prata a água é tão limpa que dá pra ver o peixe piscar. O baú do guia ficou escondido nas raízes, longe de quem não sabe olhar."},
+  gruta:    {elem: "raio", item: "pacu", n: "Estalactite caída", d: "Uma estalactite grande caiu e fechou uma passagem na pedra. Um raio parte ela no meio.",
+    lore: "A Gruta do Lago Azul guarda osso de bicho gigante do tempo antigo. A Preguiça-gigante dormia ali perto. O baú, mais perto ainda."},
+  parquebsb: {elem: "vento", item: "pamonha", n: "Folha seca de buriti", d: "Um monte de folha seca de buriti cobre um buraco perto da vereda. Uma ventania espalha tudo.",
+    lore: "A vereda é onde o cerrado guarda água, curumim, e o buriti marca o lugar. Quem conhece o cerrado sabe: onde tem buriti, tem vida. E às vezes um baú."},
+  // Sudeste
+  serracurral: {elem: "raio", item: "pao_queijo", n: "Pedra de ferro", d: "Uma pedra escura e pesada, cheia de ferro, fecha uma loca na serra. Um raio racha ela.",
+    lore: "A Serra do Curral é feita de ferro, e muita gente queria levar ela embora em trem. O povo de BH não deixou. O baú ficou lá, junto com a serra."},
+  ladeiras: {elem: "fogo", item: "tropeiro", n: "Porta de madeira podre", d: "Uma porta velha de madeira, inchada de umidade, tranca o porão de uma igreja. O fogo seca e abre ela.",
+    lore: "Ouro Preto tem mais igreja que esquina, e cada igreja tem um porão. Num deles, alguém escondeu um baú no tempo do ouro. O ouro foi embora. O baú ficou."}
 };
 /* Clima do Norte: um por dia, sorteado pelo número do dia (o mesmo dia tem sempre o mesmo tempo, sem campo no save).
    boost = quanto cada elemento pesa na batalha; more = bichos que aparecem mais; dodge = chance (%) do golpe do bicho
    passar raspando. fight = aviso no começo da luta. Cada região nova terá o próprio clima (WEATHER_ODDS por cidade). */
 const WEATHER = {
   limpo:    {n: "Tempo bom"},
-  chuva:    {n: "Chuva", boost: {agua: 1.2, raio: 1.2, fogo: .8}, more: ["sapo", "ariranha", "poraque", "jacaretinga"], fight: "Tá chovendo: água e raio ficam mais fortes, e o fogo mais fraco."},
-  neblina:  {n: "Neblina", dodge: 12, more: ["coruja", "garca", "soco"], fight: "Neblina: às vezes o golpe do bicho passa raspando."},
-  mormaco:  {n: "Mormaço", boost: {fogo: 1.2, agua: .9}, more: ["calango", "iguana"], fight: "Mormaço: o fogo fica mais forte."},
-  ventania: {n: "Ventania", boost: {vento: 1.2, planta: 1.1}, more: ["harpia", "urubu", "gaivota"], fight: "Ventania: o vento e as folhas ficam mais fortes."}
+  chuva:    {n: "Chuva", boost: {agua: 1.2, raio: 1.2, fogo: .8}, fight: "Tá chovendo: água e raio ficam mais fortes, e o fogo mais fraco.",
+    more: {norte: ["sapo", "ariranha", "poraque", "jacaretinga"], nordeste: ["siri", "traira", "jacare_papo", "cagado", "lontra"],
+      centroeste: ["jacare_pantanal", "dourado", "piraputanga", "sucuri_amarela"], sudeste: ["paca", "cachorro_mato", "jacu"]}},
+  neblina:  {n: "Neblina", dodge: 12, fight: "Neblina: às vezes o golpe do bicho passa raspando.",
+    more: {norte: ["coruja", "garca", "soco"], nordeste: ["carao", "bigua", "garca_moura"], centroeste: ["mutum", "bugio", "morcego_gruta"], sudeste: ["jacu", "sabia", "gaviao_carijo"]}},
+  mormaco:  {n: "Mormaço", boost: {fogo: 1.2, agua: .9}, fight: "Mormaço: o fogo fica mais forte.",
+    more: {norte: ["calango", "iguana"], nordeste: ["tatupeba", "prea", "tatu_bola"], centroeste: ["ema", "seriema", "tatu_canastra"], sudeste: ["quero_quero"]}},
+  ventania: {n: "Ventania", boost: {vento: 1.2, planta: 1.1}, fight: "Ventania: o vento e as folhas ficam mais fortes.",
+    more: {norte: ["harpia", "urubu", "gaivota"], nordeste: ["asa_branca", "tesourao", "carcara", "periquito"], centroeste: ["arara_azul", "arara_vermelha", "papagaio", "tuiuiu"], sudeste: ["tucano", "gaviao_carijo"]}},
+  // climas de cada região: o sol de rachar do sertão, a fumaça das queimadas do Centro-Oeste (a fumaça do Pytuna de
+  // perto: os bichos tomados batem mais forte, foe) e a garoa das serras de Minas
+  sol:      {n: "Sol de rachar", boost: {fogo: 1.3, agua: .8, planta: .9}, fight: "Sol de rachar: o fogo fica bem mais forte, e a água e as folhas mais fracas.",
+    more: {nordeste: ["cascavel", "prea", "tatu_bola", "bode", "raposa", "moco"]}},
+  fumaca:   {n: "Fumaça de queimada", boost: {vento: 1.2, fogo: 1.1}, foe: 1.1, fight: "Fumaça de queimada: os bichos tomados batem mais forte, e o vento rende mais.",
+    more: {centroeste: ["veado_campeiro", "tamandua_mirim", "irara", "cateto", "tatu_canastra"]}},
+  garoa:    {n: "Garoa", boost: {agua: 1.1}, dodge: 6, fight: "Garoa: a água rende um pouco mais, e às vezes o golpe do bicho passa raspando.",
+    more: {sudeste: ["sabia", "paca", "cachorro_mato", "jacu"]}}
 };
 // chance de cada tempo por cidade; Belém tem a chuva da tarde quase todo dia
 const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15], ["mormaco", 12], ["ventania", 8]],
   belem: [["limpo", 25], ["chuva", 45], ["neblina", 8], ["mormaco", 14], ["ventania", 8]],
-  saoluis: [["limpo", 30], ["chuva", 25], ["neblina", 5], ["mormaco", 25], ["ventania", 15]],   // ilha de muito sol e vento
-  petrolina: [["limpo", 45], ["chuva", 5], ["neblina", 5], ["mormaco", 40], ["ventania", 5]],   // sertão: sol e calor quase todo dia
+  saoluis: [["limpo", 30], ["chuva", 25], ["neblina", 5], ["mormaco", 15], ["ventania", 20], ["sol", 5]],   // ilha de muito sol e vento
+  petrolina: [["limpo", 30], ["chuva", 5], ["neblina", 5], ["mormaco", 20], ["ventania", 5], ["sol", 35]],   // sertão: sol de rachar quase todo dia
   recife: [["limpo", 30], ["chuva", 35], ["neblina", 5], ["mormaco", 20], ["ventania", 10]],   // litoral: chuva de verão e brisa do mar
-  teresina: [["limpo", 35], ["chuva", 10], ["neblina", 5], ["mormaco", 45], ["ventania", 5]],   // a capital mais quente do Brasil
-  cuiaba: [["limpo", 35], ["chuva", 20], ["neblina", 5], ["mormaco", 30], ["ventania", 10]],   // calorão do meio do Brasil e chuva de verão
-  bonito: [["limpo", 40], ["chuva", 25], ["neblina", 15], ["mormaco", 15], ["ventania", 5]],   // serra de mata: neblina de manhã cedo
-  brasilia: [["limpo", 40], ["chuva", 15], ["neblina", 5], ["mormaco", 25], ["ventania", 15]],   // planalto: seca comprida e vento
-  ouropreto: [["limpo", 30], ["chuva", 30], ["neblina", 25], ["mormaco", 5], ["ventania", 10]],   // cidade alta: neblina e chuva fina
-  bh: [["limpo", 35], ["chuva", 25], ["neblina", 20], ["mormaco", 10], ["ventania", 10]]};   // serra: neblina de manhã e chuva de verão
+  teresina: [["limpo", 25], ["chuva", 10], ["neblina", 5], ["mormaco", 25], ["ventania", 5], ["sol", 30]],   // a capital mais quente do Brasil
+  cuiaba: [["limpo", 30], ["chuva", 20], ["neblina", 5], ["mormaco", 20], ["ventania", 5], ["fumaca", 20]],   // calorão, chuva de verão e queimada na seca
+  bonito: [["limpo", 35], ["chuva", 25], ["neblina", 15], ["mormaco", 10], ["ventania", 5], ["fumaca", 10]],   // serra de mata: neblina de manhã cedo
+  brasilia: [["limpo", 30], ["chuva", 15], ["neblina", 5], ["mormaco", 15], ["ventania", 15], ["fumaca", 20]],   // planalto: seca comprida, vento e queimada
+  ouropreto: [["limpo", 25], ["chuva", 20], ["neblina", 20], ["mormaco", 5], ["ventania", 5], ["garoa", 25]],   // cidade alta: neblina e garoa
+  bh: [["limpo", 30], ["chuva", 20], ["neblina", 15], ["mormaco", 10], ["ventania", 10], ["garoa", 15]]};   // serra: neblina de manhã e garoa
+// bichos que o tempo de agora chama em dobro, os da região da cidade (more por região em WEATHER)
+const weatherMore = (w = weatherNow()) => (WEATHER[w].more || {})[regionOfCity(curCity())] || [];
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
   let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31, bh: 37, ouropreto: 41}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
-  for (const [k, w] of odds) if ((r -= w) < 0) return k;
+  for (const [k, w] of odds) if ((r -= w) < 0) return k === "fumaca" && G.portfolio?.mapa_queimadas && seeded(day * 7 + 3) < .66 ? "limpo" : k;   // com o mapa de queimadas, a brigada apaga 2 de cada 3 focos
   return "limpo";
 }
-const weatherNow = () => { const w = weatherOn(G.day); return G.night && w === "mormaco" ? "limpo" : w; };   // mormaço some de noite
+const weatherNow = () => { const w = weatherOn(G.day); return G.night && (w === "mormaco" || w === "sol") ? "limpo" : w; };   // mormaço e sol somem de noite
 const weatherBoost = k => (WEATHER[weatherNow()].boost || {})[k] || 1;
 const curCity = () => CITY[G.loc] ? G.loc : "ananindeua";
 /* voos: um aeroporto por região, onde ela termina (AERO: a fase do aeroporto, última parada da cidade). Voa-se de região

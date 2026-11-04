@@ -110,6 +110,7 @@ function init(opts = {}) {
   const far = !animal.bug && !!ZONES[curZone] && CITY[cityOf(curZone)].map !== "norte";   // chefe de fora do Norte: mais vida e o golpe forte
   const ehp = Math.round(animal.hp * (G.portfolio.mapa_queimadas && !animal.bug && isTomado(animal) ? .9 : 1) * (animal.boss && far ? BOSS_HP_FAR : 1) * beastToughness(animal));
   e = { ...animal, hp:ehp, max:ehp, intent:null, known:false, assustada:false, rematch: !!opts.rematch, far, turn: 0 };   // rematch: revanche pela lembrança do chefe
+  const wf = WEATHER[weatherNow()].foe; if (wf && isTomado(animal) && !opts.rematch) e.damage = e.damage.map(d => Math.round(d * wf));   // fumaça de queimada: o bicho tomado bate mais forte
   busy = false;
   lines = [animal.intro];
   if (opts.firstHit) { e.hp = Math.max(1, e.hp - opts.firstHit); lines.push(t("Rhanon acertou primeiro: −{n}. Sua vez!", {n: opts.firstHit})); }
