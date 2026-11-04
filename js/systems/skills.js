@@ -29,7 +29,7 @@ function skillState(id) {
   return skillPoints() >= w.nd.cost ? "open" : "short";
 }
 // ícone do nó (traço em 16x16 em volta do centro): status pela cor do caminho, efeito pelo tipo
-const SK_ICON_OF = n => n.atk ? "lanca" : n.def ? "escudo" : n.hp ? "coracao" : n.sp ? "gota" : {aliado: "pata", fiel: "pata", jaci: "lua", luar: "lua", estrelas: "estrela", cura: "folha", cura2: "folha", regen: "folha", vento: "folha", mira: "olho", faro: "olho", laco: "cipo", dupla: "lanca2", investida: "lanca2", flecha2: "flecha", furia2: "fogo", furia4: "fogo", furia_guarda: "fogo", perfeito: "lanca", bloqueio: "escudo", bloqueio2: "escudo", revide: "escudo"}[n.fx] || "estrela";
+const SK_ICON_OF = n => n.atk ? "lanca" : n.def ? "escudo" : n.hp ? "coracao" : n.sp ? "gota" : {aliado: "pata", fiel: "pata", jaci: "lua", luar: "lua", estrelas: "estrela", cura: "folha", cura2: "folha", regen: "folha", vento: "folha", mira: "olho", faro: "olho", laco: "cipo", dupla: "lanca2", investida: "lanca2", flecha2: "flecha", furia: "fogo", furia2: "fogo", furia4: "fogo", furia_guarda: "fogo", perfeito: "lanca", bloqueio: "escudo", bloqueio2: "escudo", revide: "escudo"}[n.fx] || "estrela";
 const SK_ICON = {
   lanca: "M-7 7 L5 -5 M2 -7 L7 -7 L7 -2", lanca2: "M-8 4 L4 -8 M-4 8 L8 -4", escudo: "M0 -8 L7 -5 L6 3 L0 8 L-6 3 L-7 -5Z",
   coracao: "M0 7 L-7 0 A4 4 0 0 1 0 -5 A4 4 0 0 1 7 0Z", gota: "M0 -8 L5 1 A5 5 0 1 1 -5 1Z", estrela: "M0 -8 L2 -2 L8 -2 L3 2 L5 8 L0 4 L-5 8 L-3 2 L-8 -2 L-2 -2Z",

@@ -47,6 +47,10 @@ function selectSub(id, msg) {
     btn(t("Voltar para a aldeia"), () => busRide("ananindeua"), false, i);
     lh(t("A passagem vale ida e volta. Na aldeia tem a fogueira e as matas de sempre."));
   }
+  else if (AERO[id]) {   // aeroporto da região: o guichê escolhe o destino no mapa do Brasil
+    btn(t("Entrar no aeroporto"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: no guichê tu escolhe a região no mapa do Brasil, e o avião espera na pista."));
+  }
   else if (rodoCity(id)) {   // rodoviária do Nordeste: a bilheteria e o ônibus para as cidades vizinhas
     btn(t("Entrar na rodoviária"), () => startExplore(id), false, i);
     lh(t("Lá dentro: a bilheteria vende as passagens de ônibus, ida e volta, e o ônibus sai pela estrada."));
@@ -101,8 +105,8 @@ function selectSub(id, msg) {
     else lh(BS()[id] ? t("Chefe vencido ✓ · a passagem no fim da trilha tá aberta.") : t("{chefe} espera no fim da trilha.", {chefe: theName(boss, true)}));
     if (G.hp < maxHP(G.lv) * .35) lh(t("Rhanon tá muito ferido. Melhor descansar na aldeia antes de voltar pra mata."));
   }
-  const fl = FLIGHTS.find(f => f.a === curCity());   // última trilha da cidade do aeroporto: o próximo passo (o voo que abre a região nova)
-  if (fl && z && BS()[id] && id === CITY[curCity()].route.slice(-1)[0]) lh(t("Próximo destino: {cidade}. O voo sai do {aero}: volte ao mapa do {mapa} (X) e escolha {aqui}.", {cidade: LOC[fl.b].s, aero: t(AIRPORT[curCity()]), mapa: MAP_REGIONS[MAP_REGION].n, aqui: LOC[curCity()].s}));
+  const ap = Object.keys(AERO).find(k => STAGES[id] && STAGES[id].next === k), fl = ap && flightNext(AERO[ap].reg);   // trilha antes do aeroporto: o próximo passo (o voo que abre a região nova)
+  if (fl && z && BS()[id] && !G.regions?.[fl.b]) lh(t("Próximo destino: {regiao}. O voo sai do {aero}, a passagem no fim desta trilha.", {regiao: t(REGIONS[fl.b].n), aero: t(SUB[ap].n)}));
   if (msg) lh(msg);
   btn(t("Inventário"), showInv, false, i);
   btn(t("Voltar ao mapa do {mapa}", {mapa: MAP_REGIONS[MAP_REGION].n}), closeLocal, false, i);
@@ -370,8 +374,11 @@ function invButtons(i) {
   i.appendChild(list);
   btn(t("Equipamento"), () => openEquip(), false, i);   // trocar arma e roupa (systems/equip.js)
   btn(t("Habilidades") + (skillPoints() ? ` <small>${t("{n} pontos", {n: skillPoints()})}</small>` : ""), () => openSkills(), false, i);   // systems/skills.js
-  btn(t("Caderno de bichos"), openJournal, false, i);
-  if (G.nb.tem) btn(t("Notebook"), () => EX && !$("explore").hidden ? exOpenDialog("notebook") : showNbLocal(), false, i);   // a tela com as peças
+  if (G.nb.on) btn(t("Notebook") + (nbUnread() ? ` <small>${t("{n} e-mail novo", {n: nbUnread()})}</small>` : ""), () => openNotebook(), false, i);   // ligado: caderno, e-mail e programas (systems/notebook.js)
+  else {
+    btn(t("Caderno de bichos"), openJournal, false, i);   // o de papel
+    if (G.nb.tem) btn(t("Notebook"), () => EX && !$("explore").hidden ? exOpenDialog("notebook") : showNbLocal(), false, i);   // a tela com as peças
+  }
 }
 // notebook pelo mapa da cidade (fora da exploração): no painel do lado, com "Voltar" para a bolsa
 function showNbLocal() {

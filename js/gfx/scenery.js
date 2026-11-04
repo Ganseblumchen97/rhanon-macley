@@ -289,10 +289,25 @@ function drawTitleBg() {
   if (cv.width === W && cv.height === H && cv.dataset.region === reg) return;
   cv.width = W; cv.height = H; cv.dataset.region = reg; $("titleScreen").dataset.region = reg;
   $("titleArt").style.setProperty("--titlePlat", sceneryPlat(bg.plat));   // montinho de chão debaixo do Rhanon
-  const x = cv.getContext("2d");
+  paintRegionArt(cv, bg);
+}
+function paintRegionArt(cv, bg) {
+  const x = cv.getContext("2d"), W = cv.width, H = cv.height;
   const rect = (c, a, b, w, h) => { x.fillStyle = c; x.fillRect(Math.round(a), Math.round(b), Math.round(w), Math.round(h)); };
   const blob = (cx, cy, rr, c) => { x.fillStyle = c; x.beginPath(); x.arc(Math.round(cx), Math.round(cy), Math.max(1, rr), 0, Math.PI * 2); x.fill(); };
   bg.draw(W, H, rect, blob);
+}
+/* fundo dos mapas (mapa grande, mapa da cidade, mapa do Brasil): o mesmo desenho da tela inicial, da região do mapa
+   aberto, atrás de tudo (#regionBg dentro do .bg), no lugar da estrela girando; o CSS escurece um pouco para o mapa e os
+   painéis continuarem legíveis. Chamado ao abrir os mapas, ao trocar de região (syncRegion) e ao mudar o tamanho */
+function drawRegionBg() {
+  const cv = $("regionBg");
+  if (!cv) return;
+  const reg = TITLE_BG[MAP_REGION] ? MAP_REGION : "norte";
+  const k = Math.max(3, Math.round(Math.min(innerWidth / 260, innerHeight / 170))), W = Math.ceil(innerWidth / k), H = Math.ceil(innerHeight / k);
+  if (cv.width === W && cv.height === H && cv.dataset.region === reg) return;
+  cv.width = W; cv.height = H; cv.dataset.region = reg; document.body.dataset.mapRegion = reg;
+  paintRegionArt(cv, TITLE_BG[reg]);
 }
 // Norte: a mata ao entardecer. Lua grande, três fileiras de copas (a de trás clara, a da frente quase preta), troncos nas
 // bordas e cipós caindo do alto
@@ -446,4 +461,4 @@ function titleMinas(W, H, rect, blob) {
   }
   rect(ink, 0, H * .92, W, H);
 }
-addEventListener("resize", () => drawTitleBg());
+addEventListener("resize", () => { drawTitleBg(); drawRegionBg(); });

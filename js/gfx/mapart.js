@@ -50,6 +50,8 @@ const MAP_ICON = {
 MAP_ICON.terminal = MAP_ICON.parada;   // o cais de Belém também é o barco de linha
 // rodoviárias do Nordeste: o ônibus de viagem de lado, com as janelas e as rodas
 MAP_ICON.rodo_slz = MAP_ICON.rodo_the = MAP_ICON.rodo_pet = MAP_ICON.rodo_rec = ["#3a6a4a", `<rect x="-9" y="-6" width="18" height="11" rx="2" fill="${MI.c}" ${MI.s}/><path d="M-8 1 H8" stroke="#2a8a5a" stroke-width="2"/><path d="M-7 -4 h3 m1 0 h3 m1 0 h3" stroke="#2a4a6a" stroke-width="2.4"/><rect x="5" y="-4" width="3" height="4" fill="#2a4a6a"/><circle cx="-5" cy="6" r="2" fill="${MI.k}"/><circle cx="5" cy="6" r="2" fill="${MI.k}"/>`];
+// aeroportos (última parada da cidade): o avião de linha visto de cima, com as asas abertas e a cauda
+MAP_ICON.aero_bel = MAP_ICON.aero_rec = MAP_ICON.aero_bsb = MAP_ICON.aero_cnf = ["#3a5a8a", `<path d="M0 -10 Q2 -9 2 -5 V-1 L10 3 V5 L2 3 V7 L5 9 V10 L0 9 L-5 10 V9 L-2 7 V3 L-10 5 V3 L-2 -1 V-5 Q-2 -9 0 -10Z" fill="${MI.c}" ${MI.s}/><path d="M-1 -6 H1" stroke="#2a4a6a" stroke-width="2"/>`];
 // no mapa grande, cada cidade aparece com o desenho do lugar dela
 const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", brasilia: "planopiloto", bh: "mercadocentral", ouropreto: "tiradentes", curitiba: "curitiba"};
 // disco do ponto do mapa (r = raio): cor da área, aro claro e o desenho; sem desenho, a bolinha de antes

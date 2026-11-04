@@ -3,6 +3,27 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.73.0 — o notebook ganha vida e o avião voa por região
+
+- O notebook consertado agora serve para alguma coisa: aperte N (ou o botão no alto da tela) e ele abre quase em tela
+  cheia, com o papel de parede da região, ícones e uma barra com o dia. Lá ficam o Caderno de bichos (depois de ligar o
+  notebook, ele só abre por aqui), o E-mail, os Programas que você já entregou e as Peças.
+- Os freelas chegam por e-mail quando você entra na cidade do cliente. Depurar e entregar o trabalho é pelo notebook, e
+  só onde tem Wi-Fi: nas pensões, mercados e praças das cidades. Os três bugs vêm um atrás do outro, sem descanso, com
+  uma música eletrônica própria que toca o tema do Rhanon. Perdeu no meio? Recomeça do primeiro bug.
+- Cada região tem um aeroporto só, no fim dela: Belém, Recife (do lado da rodoviária), Brasília e Confins, em BH. É a
+  última parada da cidade, aberta pelo último chefe de dia. No guichê, escolha o destino clicando na região do mapa do
+  Brasil, e o avião decola da pista. A primeira viagem para uma região nova sai sempre do guichê; depois, dá para voar
+  também pelo mapa grande. Não tem mais voo dentro da mesma região.
+- A Fúria da mata virou uma habilidade da teia (no caminho do Guerreiro, 2 pontos). Antes ela vinha de graça e bastava
+  acertar o tempo do Z para passar por tudo. Em troca, os golpes de elemento ficaram mais fortes, e acertar a fraqueza do
+  bicho também enche a fúria. O golpe perfeito de +50% foi para a Lança de mandacaru. Quem já tinha o degrau da Ponta
+  afiada ganha a Fúria no lugar dela.
+- Nordeste, Centro-Oeste e Sudeste ganharam música de noite, como o Norte já tinha. E o fundo dos mapas agora é o
+  desenho da região (a mata, o sertão, o Pantanal, as serras de Minas) no lugar da estrela girando.
+- Ajustes na luta: a fumaça do Pytuna só sai do chefe quando o último golpe acerta, e o bicho que pega de surpresa espera
+  o nome dele sair da tela antes de atacar, para dar tempo de ver o anel do bloqueio.
+
 ## 0.72.0 — a teia de habilidades
 
 - A tela de habilidades virou uma teia. As três primeiras ficam no meio, em volta da lua de Jaci; aprender uma libera

@@ -673,6 +673,77 @@ const MUS = (() => {
         else { lead(mtof(m.note - 12), t, len, .016); lead(mtof(this.terca(m.note) - 12), t, len, .009); if (part === "A2") sanfona(mtof(m.note), t, len, .012); }   // a dupla
       }
     },
+    // à noite, cada região tem a sua faixa de exploração e de mapa (musicStart troca sozinho, como no Norte): o tema da
+    // região mais lento, com pouca gente tocando, grilos e coruja. Nordeste: o forró vira seresta de sanfona no sertão,
+    // a zabumba só marca o um e o triângulo aberto responde de longe. Forma: sanfona sozinha - A (meia frase do tema,
+    // grave) - B (só o pad e os grilos) - A' (a frase inteira, oitava abaixo, com a flauta)
+    localNordesteNight: {
+      bpm: 76, wet: .5, level: .4, swing: .1, form: ["I", "A", "B", "A2"], melody: null,
+      chords: [{bass: 43, notes: [55, 59, 62, 65]}, {bass: 41, notes: [53, 57, 60, 64]}, {bass: 36, notes: [52, 55, 60, 62]}, {bass: 38, notes: [54, 57, 60, 62]}],
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4], chord = this.chords[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "A" ? themeLine(NORDESTE_THEME.A, -12, false, 4) : part === "A2" ? themeLine(NORDESTE_THEME.A, -12) : null;
+        if (s === 0 && barIn % 2 === 0) { pad(chord.notes, t, d * 32, .011); synth("sine", mtof(chord.bass - 12), t, d * 30, .06); }
+        if (s === 0 && barIn % 2 === 0) chord.notes.forEach(m => sanfona(mtof(m + 12), t, d * 30, .0028));   // sanfona segurando o acorde
+        if (part !== "I" && part !== "B") {
+          if (s === 0) kick(t, .05);   // zabumba só no um
+          if (s === 10 && bar % 2) tapa(t, .015);
+          if (s === 8) triangulo(t, .004, true);
+        }
+        if (s === 0 && barIn % 4 === 0) bell(mtof(chord.notes[3] + 12), t, .012, 2.6);
+        if (s % 8 === 4 && Math.random() < .55) cricket(t);
+        if (Math.random() < .0018) owl(t);
+        const m = this.melody && this.melody[i % 128];
+        if (m) { sanfona(mtof(m.note + 12), t, m.len * d * .95, .013); if (part === "A2") flute(mtof(m.note + 24), t, m.len * d * .9, .012); }
+      }
+    },
+    // Centro-Oeste à noite: moda de viola na beira do fogo. A viola ponteia devagar, uma corda por semínima, o baixo só
+    // no um, e o tema vem em dueto de terças, sem bateria; na parte B só a sanfona respira a resposta, bem baixinho
+    localCentroOesteNight: {
+      bpm: 70, wet: .5, level: .42, swing: .1, form: ["I", "A", "B", "A"], melody: null,
+      chords: [{bass: 45, notes: [57, 61, 64, 69]}, {bass: 50, notes: [57, 62, 66, 69]}, {bass: 40, notes: [56, 59, 62, 64]}, {bass: 45, notes: [57, 61, 64, 69]}],
+      chordsB: [{bass: 42, notes: [54, 57, 61, 66]}, {bass: 38, notes: [54, 57, 62, 66]}, {bass: 40, notes: [56, 59, 64, 68]}, {bass: 45, notes: [57, 61, 64, 69]}],
+      pontea: [0, 2, 1, 3],
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? this.chordsB : this.chords)[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(part === "B" ? CENTROESTE_THEME.B : CENTROESTE_THEME.A, -12);
+        if (s % 4 === 0) viola(mtof(chord.notes[this.pontea[s / 4]] + 12), t, d * 6, .009);   // ponteado devagar
+        if (s === 0) { viola(mtof(chord.bass), t, d * 10, .03); synth("sine", mtof(chord.bass - 12), t, d * 14, .05); }
+        if (s === 0 && barIn % 2 === 0) { pad(chord.notes, t, d * 32, .009); chord.notes.forEach(m => sanfona(mtof(m + 12), t, d * 30, .0022)); }
+        if (s % 8 === 4 && Math.random() < .55) cricket(t);
+        if (Math.random() < .002) owl(t);
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        const len = m.len * d * .95, terca = TRACKS.localCentroOeste.terca;
+        if (part === "B") sanfona(mtof(m.note + 12), t, len, .011);
+        else { viola(mtof(m.note + 12), t, len, .022); viola(mtof(terca(m.note) + 12), t, len, .014); }   // o dueto, baixinho
+      }
+    },
+    // Minas à noite: seresta. O violão de náilon dedilhado (não mais o de aço batido), um baixo macio e o tema do
+    // Sudeste na flauta, como serenata debaixo da janela; na parte B a sanfona responde. Sem bateria
+    localSudesteNight: {
+      bpm: 72, wet: .5, level: .38, swing: .1, form: ["I", "A", "B", "A2"], melody: null,
+      chords: [{bass: 38, notes: [50, 54, 57, 62, 66]}, {bass: 47, notes: [47, 51, 54, 57, 59]}, {bass: 40, notes: [52, 55, 59, 62, 64]}, {bass: 45, notes: [52, 55, 57, 61, 64]}],
+      chordsB: [{bass: 43, notes: [50, 55, 59, 62, 67]}, {bass: 43, notes: [50, 55, 58, 62, 67]}, {bass: 42, notes: [49, 54, 57, 61, 64]}, {bass: 45, notes: [52, 55, 57, 61, 64]}],
+      dedilha: [0, 2, 3, 4, 2, 3, 1, 3],   // uma corda por colcheia
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? this.chordsB : this.chords)[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(part === "B" ? SUDESTE_THEME.B : SUDESTE_THEME.A, part === "A2" ? 0 : -12, part === "A2");
+        if (s % 2 === 0) violao(mtof(chord.notes[this.dedilha[s / 2]]), t, d * 4, .016);   // náilon dedilhado
+        if (s === 0) synth("sine", mtof(chord.bass - 12), t, d * 14, .07);
+        if (s === 8 && barIn % 2) synth("sine", mtof(chord.bass - 5), t, d * 6, .05);
+        if (s === 0 && barIn % 2 === 0) pad(chord.notes, t, d * 32, .008);
+        if (s % 8 === 4 && Math.random() < .5) cricket(t);
+        if (Math.random() < .0018) owl(t);
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        const len = m.len * d * .95;
+        if (part === "B") sanfona(mtof(m.note), t, len, .012);
+        else flute(mtof(m.note), t, len, .018);
+      }
+    },
     // batalha em Minas: o mesmo sertanejo universitário acelerado, bumbo dobrado, violão batendo em colcheia e a
     // guitarra (lead) com o tema. Forma A - A' - B - C (ponte de bateria que cresce)
     battleMinas: {
@@ -824,6 +895,31 @@ const MUS = (() => {
         const len = m.len * d * .9;
         if (part === "B") { sanfona(mtof(m.note), t, len, .02); viola(mtof(N.terca(m.note)), t, len, .014); }
         else { viola(mtof(m.note), t, len, .034); viola(mtof(N.terca(m.note)), t, len, .022); if (part === "A2") sanfona(mtof(m.note), t, len, .014); }
+      }
+    },
+    // luta contra bug do freela: o trabalho do Rhanon, não a trama, então toca o tema DELE (RHANON_THEME.abertura) e não
+    // o da região. Synthwave de 8 bits nos acordes da tela inicial (P5_CHORDS, um por compasso): bumbo reto, chimbal
+    // aberto no contratempo, baixo pulsando em oitavas, arpejo de semicolcheia e o tema num lead quadrado dobrado.
+    // Forma: A (tema) - A' (tema oitava acima, com floreios) - B (arpejo e acordes picados, com "falhas" de ruído) -
+    // C (meia frase do tema e a caixa enchendo até a volta)
+    battleBug: {
+      bpm: 140, wet: .16, level: .44, swing: 0, form: ["A", "A2", "B", "C"], chords: P5_CHORDS, melody: null,
+      arp: [0, 1, 2, 3, 2, 1, 3, 2],
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4], chord = this.chords[bar % 4];
+        if (i % 128 === 0) this.melody = part === "B" ? null : themeLine(RHANON_THEME.abertura, part === "A2" ? 12 : 0, part === "A2", part === "C" ? 4 : 8);
+        if (s % 4 === 0) kick(t, .12);
+        if (s === 4 || s === 12) { snare(t, .045); clap(t); }
+        if (part === "C" && barIn >= 6 && s % 2 === 1) snare(t, .012 + (barIn - 6) * .01);   // a caixa enche até a volta
+        if (s % 4 === 2) hat(t, .014, true); else if (s % 2 === 0) hat(t, .005);
+        if (s % 2 === 0) synth("sawtooth", mtof(chord.bass - 12 + (s % 4 === 2 ? 12 : 0)), t, d * 1.6, .045, 900);   // baixo pulsando
+        const n = chord.notes[this.arp[s % 8]] + 12 + (part === "A2" && s >= 8 ? 12 : 0);
+        synth("square", mtof(n), t, d * .8, part === "B" ? .014 : .009, 3200);   // arpejo
+        if (s === 0 && barIn % 2 === 0) pad(chord.notes, t, d * 32, .008);
+        if (part === "B" && [0, 6, 10].includes(s)) chord.notes.forEach(m => synth("sawtooth", mtof(m), t, d * 1.5, .01, 2400));   // acordes picados
+        if (part === "B" && s === 14 && Math.random() < .6) for (let k = 0; k < 4; k++) noiseHit(t + k * d * .25, .02, .02, "bandpass", 1500 + Math.random() * 4000, 6);   // falha no código
+        const m = this.melody && this.melody[i % 128];
+        if (m) { synth("square", mtof(m.note), t, m.len * d * .9, .024, 2600); synth("sawtooth", mtof(m.note + 12) * 1.003, t, m.len * d * .9, .007, 3000); }
       }
     },
     // batalha: a roda de capoeira acelerada (toque de São Bento Grande), com atabaque, pandeiro, baixo marcado
@@ -1251,9 +1347,11 @@ function legacyStop() { if (legacyTimer) clearInterval(legacyTimer); legacyTimer
 /* ----- o que o resto do jogo usa ----- */
 function musicStart(id) {
   id = id || "battleCapo";
-  if ((id === "local" && regionOfCity(curCity()) === "nordeste") || (id === "map" && MAP_REGION === "nordeste")) id = "localNordeste";   // Nordeste: a toada do boi
-  if ((id === "local" && regionOfCity(curCity()) === "centroeste") || (id === "map" && MAP_REGION === "centroeste")) id = "localCentroOeste";   // Centro-Oeste: a toada caipira
-  if ((id === "local" && regionOfCity(curCity()) === "sudeste") || (id === "map" && MAP_REGION === "sudeste")) id = "localSudeste";   // Sudeste: sertanejo universitário (Minas)
+  // fora do Norte, exploração e mapa tocam a faixa da região (Nordeste: toada do boi; Centro-Oeste: toada caipira;
+  // Sudeste: sertanejo universitário), e à noite a versão noturna dela
+  const REGION_LOCAL = {nordeste: "localNordeste", centroeste: "localCentroOeste", sudeste: "localSudeste"};
+  const regLocal = id === "local" ? REGION_LOCAL[regionOfCity(curCity())] : id === "map" ? REGION_LOCAL[MAP_REGION] : null;
+  if (regLocal) id = G.night ? regLocal + "Night" : regLocal;
   if (id === "local" && G.night) id = "localNight";   // à noite a música da exploração muda de clima
   if (id === "map" && MAP_REGION === "norte") id = G.night ? "mapParaNight" : "mapPara";   // mapa do Norte: guitarrada de dia e de noite
   if (MUS.has(id)) { legacyStop(); MUS.play(id); }

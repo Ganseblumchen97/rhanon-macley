@@ -194,7 +194,7 @@ function startExplore(zone, after, from) {
     curZone = zone; fromLocal = false; exKeys.clear();
     $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
     $("titleScreen").hidden = true; $("map").hidden = true; $("local").hidden = true; $("over").hidden = true; $("homeButton").hidden = true; $("explore").hidden = false; exFit();
-    musicStart("local"); exHud();
+    musicStart("local"); exHud(); nbMailArrive();   // e-mail de freela da cidade (systems/notebook.js)
     exToast((st.safe ? SUB[zone].n + (SAFE_TIP[zone] || t(" · lembranças, comida, artesão e armeiro: chega perto de uma barraca e aperta Z")) : zoneDef(zone).n + (BS()[bossKey(zone)] ? "" : G.night ? t(" · dizem que algo do folclore ronda o fim da trilha...") : t(" · o chefe espera no fim da trilha"))) + (weatherNow() === "limpo" ? "" : " · " + WEATHER[weatherNow()].n));
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
@@ -218,7 +218,9 @@ const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta 
   trocatroca: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   orla: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   rodo_slz: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z", rodo_the: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z",
-  rodo_pet: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z", rodo_rec: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z",
+  rodo_pet: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z", rodo_rec: " · passagem na bilheteria e o ônibus na pista: chega perto e aperta Z. A porta da direita vai pro aeroporto",
+  aero_bel: " · o guichê escolhe o destino e o avião espera na pista: chega perto e aperta Z", aero_rec: " · o guichê escolhe o destino e o avião espera na pista: chega perto e aperta Z",
+  aero_bsb: " · o guichê escolhe o destino e o avião espera na pista: chega perto e aperta Z", aero_cnf: " · o guichê escolhe o destino e o avião espera na pista: chega perto e aperta Z",
   portocuiaba: " · lembranças, comida e rede na pensão: chega perto e aperta Z. O cais de baixo leva pro Pantanal",
   centrobonito: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda vai pro Rio da Prata",
   mercadocentral: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda sobe pra Serra do Curral",
@@ -426,7 +428,7 @@ function exUpdate(dt, now) {
   }
   let ix = (exKeys.has("right") ? 1 : 0) - (exKeys.has("left") ? 1 : 0), iy = (exKeys.has("down") ? 1 : 0) - (exKeys.has("up") ? 1 : 0);
   if (EX.dodge) ix = iy = 0;
-  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden || !$("habil").hidden || !$("narra").hidden || !$("revela").hidden) ix = iy = 0;
+  if (EX.locked || EX.dialog || EX.draw || EX.camp || !$("opcoes").hidden || !$("caderno").hidden || !$("equipar").hidden || !$("habil").hidden || !$("nbos").hidden || !$("narra").hidden || !$("revela").hidden) ix = iy = 0;
   if (ix || iy) {
     const n = Math.hypot(ix, iy), sp = HERO_SPEED * dt;
     if (!(EX.jab > 0)) {   // durante a estocada a lança e o corpo ficam virados para onde ela foi (a mira do mouse), mesmo andando
@@ -704,6 +706,7 @@ function exHud(show) {
     + row(t("PV"), hp, maxHP(G.lv), "pv") + row(t("PE"), sp, maxSP(G.lv), "pe") + row("XP", G.xp, need(G.lv), "xp")
     + `</span><span class="gmoney">R$ ${G.money}</span>`;
   $("exSkills").classList.toggle("pts", skillPoints() > 0);   // ponto de habilidade para gastar: o botão chama atenção
+  $("exNb").hidden = !G.nb.on; $("exNb").classList.toggle("pts", G.nb.on && nbUnread() > 0);   // notebook: e-mail novo chama atenção
 }
 function exToast(msg) {
   const el = $("exMsg"); el.textContent = msg; el.classList.add("show");
@@ -714,7 +717,7 @@ function exToast(msg) {
 function setupExploreInput() {
   const DIRS = {ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down", ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right"};
   document.addEventListener("keydown", ev => {
-    if (!EX || $("explore").hidden || !$("opcoes").hidden || !$("caderno").hidden || !$("narra").hidden) return;   // com opções, caderno ou narração abertos, o teclado é deles
+    if (!EX || $("explore").hidden || !$("opcoes").hidden || !$("caderno").hidden || !$("nbos").hidden || !$("narra").hidden) return;   // com opções, caderno ou narração abertos, o teclado é deles
     if (EX.dialog) { dialogKey(ev); return; }
     if (EX.camp) {   // cena (abertura, fogueira): só segurar C pula
       ev.preventDefault();
@@ -731,6 +734,7 @@ function setupExploreInput() {
     else if ((ev.key === "i" || ev.key === "I") && !EX.locked) exOpenDialog("inventario");
     else if ((ev.key === "e" || ev.key === "E") && !EX.locked) openEquip();
     else if ((ev.key === "h" || ev.key === "H") && !EX.locked) openSkills();
+    else if ((ev.key === "n" || ev.key === "N") && !EX.locked && G.nb.on) openNotebook();   // notebook ligado (systems/notebook.js)
   });
   document.addEventListener("keyup", ev => { const k = DIRS[ev.key]; if (k) exKeys.delete(k); if ((ev.key === "c" || ev.key === "C") && EX) EX.skipHold = 0; });
   // no celular: segurar o próprio aviso "segure C para pular"
@@ -910,7 +914,7 @@ const VILLAGER_TIPS = [
   "Etiqueta verde em cima do bicho? Esse aí se acalma com uma lançada só.",
   "Bicho se encolheu tremendo? Vai dar o bote. Aperta Z quando o anel ficar verde que tu bloqueia metade.",
   "Acerta o bicho primeiro, na lança (Z) ou na flecha (X), que o primeiro turno da briga é teu.",
-  "Quatro tempos certos seguidos na briga, golpe perfeito ou bloqueio, enchem a Fúria: a lança vira três estocadas de uma vez. Pai d'égua!",
+  "Aprendeu a Fúria da mata? Quatro tempos certos seguidos na briga, golpe perfeito ou bloqueio, e a lança vira três estocadas de uma vez. Acertar a fraqueza do bicho também conta. Pai d'égua!",
   "Se o bicho te pegar antes, quem bate primeiro é ele. Viu o \"!\"? Moscou, dançou.",
   "Todo bicho tem um elemento que ele não aguenta: fogo, água, vento, raio ou planta. Acerta esse que ele fraqueja e tu bate de novo na hora.",
   "Usou um elemento num bicho? O caderno anota se ele é fraco, se resiste ou se nem liga. A fraqueza que tu descobrir aparece embaixo do nome dele.",
@@ -1104,41 +1108,41 @@ function nbShowNew() {
   if (G.nbNew && G.nbNew.length && EX && !$("explore").hidden && !EX.locked && !EX.dialog && !EX.camp) exOpenDialog("notebook");
 }
 // liga o notebook na tomada da rodoviária: a tela acende, chega o e-mail do primeiro freela e o caderno vira digital
+// (systems/notebook.js: o caderno de papel passa para o app Caderno com a barrinha enchendo)
 function nbTurnOn() {
-  G.nb.on = true; save(); sfx("more"); exCloseDialog();
-  exToast(t("A tela acende! Chegou um e-mail: \"Freela no Ver-o-Peso: um site para a feira. Procura a Dona Graça, perto da banca do açaí.\" O caderno de bichos agora é digital."));
+  G.nb.on = true; G.mail.site_feira = G.mail.site_feira || 1; save(); sfx("more"); exCloseDialog();
+  NB_SEL = 0; openNotebook("caderno", {migrate: true});
 }
 // próximo bug do freela em andamento (ou nada)
 const freelaNext = id => FREELAS[id].bugs[G.freela[id] || 0];
-const freelaHere = () => FREELA_AT[EX.zone] || "site_feira";   // o freela do cliente desta fase
-// cliente do freela (Dona Graça no Ver-o-Peso, Seu Dedé no Recife Antigo): pede o trabalho, solta os bugs um por vez e paga na entrega
+const freelaHere = () => EX.freela || FREELA_AT[EX.zone] || "site_feira";   // o freela que o notebook abriu (nbDebug) ou o do cliente desta fase
+// cliente do freela (Dona Graça no Ver-o-Peso, Seu Dedé no Recife Antigo, Iara no Plano Piloto): o trabalho é pelo
+// e-mail do notebook (systems/notebook.js); em pessoa o cliente só conversa e manda abrir o e-mail
 function freelaClient(say, d) {
-  const id = freelaHere(), f = FREELAS[id], done = G.freela[id] || 0;
+  const id = FREELA_AT[EX.zone] || "site_feira", f = FREELAS[id];
   if (G.portfolio[id]) return say(f.client, f.after);
   if (!G.nb.on) return say(f.client, t("Tu que é o menino que mexe com computador? Arruma um notebook que eu tenho trabalho pra ti."));
-  if (done >= f.bugs.length) {
-    say(f.client, f.thanks);
-    btn(t("Entregar o trabalho · R$ {n}", {n: f.pay}), () => {
-      G.portfolio[id] = true; G.money += f.pay; save(); sfx("more"); exHud();
-      exOpenDialog("cliente", t("Freela entregue! +R$ {n}. Programa novo no notebook: {prog}", {n: f.pay, prog: t(f.prog)}));
-    }, false, d);
-    return;
-  }
-  say(f.client, t(f.ask, {n: f.pay}) + " " + t("Bugs resolvidos: {n} de {total}.", {n: done, total: f.bugs.length}));
-  btn(t("Depurar o próximo bug"), () => {
-    exCloseDialog();
-    const b = BUGS.find(x => x.id === freelaNext(id)), en = makeAnimalEnt(b, Math.floor(EX.hero.x / TILE), Math.floor(EX.hero.y / TILE));
-    exStartBattle(en, {});
-  }, false, d);
+  if (!G.mail[id]) { G.mail[id] = 1; save(); }
+  say(f.client, t((G.freela[id] || 0) >= f.bugs.length ? "Já tá pronto? Manda pelo e-mail que eu pago na hora!" : "Te mandei um e-mail com o trabalho! Abre o notebook que tá tudo lá."));
+  btn(t("Abrir o notebook"), () => { NB_MAIL = id; openNotebook("mail"); }, false, d);
 }
+// freela em sequência (bugChain em combat.js): conta o bug resolvido e devolve o próximo; no último devolve nada
+// (quem conta o último é o freelaBugDone, na volta para a fase)
+function freelaChain() {
+  const id = freelaHere(), f = FREELAS[id], done = (G.freela[id] || 0) + 1;
+  if (done >= f.bugs.length) return null;
+  G.freela[id] = done; save();
+  return BUGS.find(x => x.id === f.bugs[done]);
+}
+function freelaReset() { G.freela[freelaHere()] = 0; save(); }
 function freelaBugDone() {
   const id = freelaHere(), f = FREELAS[id];
   G.freela[id] = Math.min(f.bugs.length, (G.freela[id] || 0) + 1); save();
-  exToast(G.freela[id] >= f.bugs.length ? t("Último bug resolvido! Fala com {cliente} pra entregar o trabalho.", {cliente: f.client}) : t("Bug resolvido! Faltam {n}.", {n: f.bugs.length - G.freela[id]}));
+  exToast(G.freela[id] >= f.bugs.length ? t("Último bug resolvido! Manda o trabalho pelo e-mail do notebook (N).") : t("Bug resolvido! Faltam {n}.", {n: f.bugs.length - G.freela[id]}));
 }
 /* ---------- BR-316: cabine do cobrador e o ônibus (fases parada e terminal) ---------- */
 const busDest = () => EX.zone === "parada" ? "belem" : "ananindeua";
-const busSide = () => rodoCity(EX.zone) ? 1 : EX.zone === "parada" ? -1 : 1;   // o barco sai pela esquerda rumo a Belém e pela direita rumo à aldeia; o ônibus da rodoviária, pela direita
+const busSide = () => rodoCity(EX.zone) || AERO[EX.zone] ? 1 : EX.zone === "parada" ? -1 : 1;   // o barco sai pela esquerda rumo a Belém e pela direita rumo à aldeia; o ônibus da rodoviária, pela direita
 /* rodoviárias do Nordeste: a bilheteria vende uma passagem por linha da cidade (BUS_LINES, ida e volta) e o ônibus leva
    para qualquer cidade com passagem na mão */
 function rodoCabin(say, d) {
@@ -1161,7 +1165,14 @@ function rodoDoor(say, d) {
   say(t("Ônibus"), t("O motor já está ligado. Pra onde?"));
   ok.forEach(k => btn(t("Embarcar para {lugar}", {lugar: LOC[k].s}), () => busLeave(k), false, d));
 }
+/* aeroporto (AERO em data/world.js): o guichê abre o mapa do Brasil para escolher o destino (openBrasil "aero",
+   world-map.js); escolhido, o avião da pista decola (busLeave -> busPull -> fly) */
+function aeroCabin(say, d) {
+  say(t("Guichê de embarque"), t("Bom dia! Pra qual região do Brasil tu vai voar? O mapa tá aqui."));
+  btn(t("Escolher o destino no mapa"), () => { exCloseDialog(); openBrasil("aero"); }, false, d);
+}
 function busCabin(say, d) {
+  if (AERO[EX.zone]) return aeroCabin(say, d);
   if (rodoCity(EX.zone)) return rodoCabin(say, d);
   if (EX.zone === "parada" && nbReady() && !G.nb.on) {   // tomada do lado da cabine: o notebook liga aqui
     say(t("Comandante"), t("Tomada? Tem ali do lado da bilheteria, pode usar à vontade."));
@@ -1179,6 +1190,7 @@ function busCabin(say, d) {
   }), G.money < BUS.price, d);
 }
 function busDoor(say, d) {
+  if (AERO[EX.zone]) { say(t("Avião"), t("A comissária sorri na escada: \"O destino se escolhe no guichê, viu? Depois é só embarcar.\"")); btn(t("Escolher o destino no mapa"), () => { exCloseDialog(); openBrasil("aero"); }, false, d); return; }
   if (rodoCity(EX.zone)) return rodoDoor(say, d);
   const dest = busDest(), n = dest === "belem" ? "Belém" : LOC.ananindeua.s;
   if (!G.passagem || !BUS.open) return say(t("Barco de linha"), t("O marinheiro aponta para a bilheteria: \"Sem passagem não sobe, maninho. Compra ali com o comandante.\""));
@@ -1196,13 +1208,16 @@ function busPull(now) {
   if (now - EX.boarding.vrum > 520) { EX.boarding.vrum = now; sfx(rodoCity(EX.zone) ? "onibus" : "barco"); }
   if (el < 2000) return false;
   const dest = EX.boarding.dest || busDest();
+  const aero = !!AERO[EX.zone];
   EX.boarding = null; $("explore").hidden = true; $("exDialog").hidden = true; EX = null; exKeys.clear();
+  if (aero) return fly(dest), true;   // o avião sumiu no céu: a viagem segue no mapa do Brasil
   busRide(dest, true);
   return true;
 }
 // barco de linha (recreio) visto de lado: casco azul, dois conveses brancos com redes coloridas, proa virada para o lado
 // em que o rio sai (b.dx = quanto já andou). O bloco U (4x2) fica na água do porto
 function drawBus(x, b, cx, cy, now) {
+  if (AERO[EX.zone]) return drawPlane(x, b, cx, cy, now);
   if (rodoCity(EX.zone)) return drawRoadBus(x, b, cx, cy, now);
   const f = busSide(), X = Math.round(b.x + b.dx - cx), Y = Math.round(b.y - cy), W = b.w, run = b.dx !== 0;
   const y = Y + (Math.floor(now / (run ? 160 : 600)) % 2);   // balança na água
@@ -1242,6 +1257,22 @@ function drawRoadBus(x, b, cx, cy, now) {
   const spin = run ? Math.floor(now / 70) % 2 : 0;
   for (const wx of [X + 8, X + W - 18]) { R(wx, y + 22, 10, 8, OUTLINE); R(wx + 1, y + 23, 8, 6, "#2a2a30"); R(wx + 4 - spin, y + 25, 2, 2, "#a8a8b0"); }   // rodas
   if (run && Math.floor(now / 160) % 2) R(f > 0 ? X - 4 - (Math.floor(now / 90) % 3) : X + W + 2, y + 21, 3, 2, "#c8c4b8");   // fumaça do escapamento
+}
+// avião de linha da fase do aeroporto, visto de lado na pista (bloco U 6x2): fuselagem branca com faixa azul, janelinhas,
+// cauda vermelha, asa e turbina; decolando (b.dx = quanto já andou), corre pela pista e sobe inclinado
+function drawPlane(x, b, cx, cy, now) {
+  const W = b.w, lift = Math.max(0, b.dx - 70) * .45, X = Math.round(b.x + b.dx - cx), Y = Math.round(b.y - cy - lift), run = b.dx !== 0;
+  const R = (a, bb, w, h, col) => { x.fillStyle = col; x.fillRect(a, bb, w, h); };
+  if (!lift) R(X + 6, Y + 29, W - 12, 3, "rgba(0,0,0,.3)");   // sombra na pista
+  R(X + 2, Y + 4, 10, 14, OUTLINE); R(X + 3, Y + 5, 8, 12, "#d62828"); R(X + 3, Y + 5, 3, 3, "#f2c230");   // cauda
+  R(X + 2, Y + 13, W - 8, 13, OUTLINE); R(X + 3, Y + 14, W - 10, 11, "#f4f1e8");   // fuselagem
+  R(X + W - 7, Y + 15, 5, 9, OUTLINE); R(X + W - 6, Y + 16, 3, 7, "#f4f1e8"); R(X + W - 6, Y + 16, 3, 3, "#2a4a6a");   // bico e o para-brisa
+  R(X + 3, Y + 21, W - 8, 2, "#1a5aa8");   // faixa
+  for (let k = 0; k < 9; k++) R(X + 16 + k * 7, Y + 16, 3, 3, "#2a4a6a");   // janelinhas
+  R(X + 36, Y + 22, 26, 4, OUTLINE); R(X + 37, Y + 23, 24, 2, "#c8c8d0");   // asa
+  R(X + 44, Y + 25, 12, 6, OUTLINE); R(X + 45, Y + 26, 10, 4, "#8a8a96"); R(X + 45, Y + 27, 2, 2, "#2a2a30");   // turbina
+  if (!lift) for (const wx of [X + 22, X + W - 18]) { R(wx, Y + 26, 4, 4, OUTLINE); R(wx + 1, Y + 27, 2, 2, "#2a2a30"); }   // trem de pouso
+  if (run && Math.floor(now / 90) % 2) R(X + 40 - (Math.floor(now / 60) % 3) * 3, Y + 27, 3, 2, "#e8e8f0");   // ar quente da turbina
 }
 // dormir numa rede ou tenda: passa a faixa do anoitecer (lua e lobo) ou do amanhecer (galo e sol), como na fogueira da aldeia
 // no motel do Ver-o-Peso, antes da faixa passa a cena do quarto (Rhanon dormindo e a janela escurecendo ou clareando)

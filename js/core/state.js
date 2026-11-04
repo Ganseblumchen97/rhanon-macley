@@ -46,7 +46,7 @@ function vit() {
   G.skills = G.skills || {};   // degraus aprendidos da árvore de habilidades
   // notebook: jogo novo começa sem ele (missão do começo); save antigo já tem tudo ligado
   if (!G.nb) G.nb = G.tutorial ? {} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};
-  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET || G.passagemREC;   // save de antes da troca (Petrolina antes do Recife): quem pagou Teresina–Recife leva Teresina–Petrolina G.passagemBON = !!G.passagemBON; G.passagemBSB = !!G.passagemBSB; G.passagemOPR = !!G.passagemOPR;
+  G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.mail = G.mail || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET || G.passagemREC;   // save de antes da troca (Petrolina antes do Recife): quem pagou Teresina–Recife leva Teresina–Petrolina G.passagemBON = !!G.passagemBON; G.passagemBSB = !!G.passagemBSB; G.passagemOPR = !!G.passagemOPR;
   G.regions = G.regions || {norte: true};   // regiões já visitadas (o aeroporto voa entre elas)
   if (!G.narrated) G.narrated = G.belemVisto ? {belem: true} : {};   // falas do Pajé já contadas (prólogo, Belém, cada chefe)
   G.loseStreak = G.loseStreak || 0;   // lutas perdidas seguidas (2 = o Pajé dá uma dica)   // bugs resolvidos por freela; freelas entregues

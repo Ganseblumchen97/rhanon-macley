@@ -1,4 +1,4 @@
-# Jaci: The Fading Moon (alfa 0.72.0)
+# Jaci: The Fading Moon (alfa 0.73.0)
 
 *Jaci: A Lua que se Apaga* · uma aventura de Rhanon Macley · RPG de turno no navegador
 

@@ -14,15 +14,16 @@ function setBattleDecor(zone) {
 }
 
 // batalha comum: o tema do Norte num arranjo do lugar (mata: roda de capoeira; água: carimbó; Belém: guitarrada);
-// chefe: a versão pesada; bug do freela: a roda
+// chefe: a versão pesada; bug do freela: o synthwave com o tema do Rhanon (battleBug)
 const BATTLE_WATER = new Set(["rio", "igarape", "manguezal", "varzea"]), BATTLE_CITY = new Set(["cidadevelha", "porto", "baixadas"]);
 function getBattleTrackFor(animal) {
+  if (animal.bug) return "battleBug";   // o freela é coisa do Rhanon: tema dele, em versão eletrônica
   if (animal.possuido) return "battlePytuna";   // Pytuna segurou o chefe: o tema dele em versão de batalha até o fim da luta
   if (animal.boss) return "battleBoss";
   if (regionOfCity(curCity()) === "nordeste" && !animal.bug) return "battleNordeste";   // Nordeste: o tema da região num forró de batalha
   if (regionOfCity(curCity()) === "centroeste" && !animal.bug) return "battleCentroOeste";   // Centro-Oeste: pagode de viola
   if (regionOfCity(curCity()) === "sudeste" && !animal.bug) return "battleMinas";   // Minas: sertanejo universitário
-  return animal.bug ? "battleCapo" : BATTLE_CITY.has(curZone) ? "battleGuitarrada" : BATTLE_WATER.has(curZone) ? "battleCarimbo" : "battleCapo";
+  return BATTLE_CITY.has(curZone) ? "battleGuitarrada" : BATTLE_WATER.has(curZone) ? "battleCarimbo" : "battleCapo";
 }
 
 /* ---------- comandos: lista principal e submenus (Especial e Itens) ---------- */
@@ -100,9 +101,10 @@ function init(opts = {}) {
   $("beast").innerHTML = ""; $("beast").appendChild(animalSprite(animal)); refreshHero();
   const spr = $("beast").firstChild;
   $("beast").style.top = `calc(var(--plat) - ${spr.height / (+spr.dataset.scale || 1) * (animal.boss ? animal.scale || 1.35 : 1)} * var(--px) + 12px)`; $("beast").style.right = "12%"; $("beast").setAttribute("aria-label", animal.name); $("hero").style.display = ""; $("intent").style.display = ""; $("ehp").parentElement.style.display = ""; $("spTxt").parentElement.style.display = ""; $("sp").parentElement.style.display = "";
-  musicStop();
+  if (!opts.chain) musicStop();   // no freela em sequência a música segue de um bug para o outro
   vit(); const mh = maxHP(G.lv), ms = maxSP(G.lv); $("again").style.display = fromExplore ? "none" : ""; $("again").textContent = t("Lutar de novo"); $("toMap").textContent = fromExplore ? t("Continuar explorando") : t("Voltar ao mapa");
   p = {hp:Math.max(1, G.hp), max:mh, sp:G.sp, msp:ms, def:false, atento:hasSkill("faro"), items:{...G.items}, furia:0};   // Faro do mateiro: começa atento
+  if (opts.chain) Object.assign(p, opts.chain);   // freela em sequência: PV, PE, itens e fúria vêm do bug anterior
   if (hasSkill("faro")) opts = {...opts, enemyFirst: false};   // ...e o bicho nunca pega de surpresa
   // freela do mapa de queimadas (Brasília): a brigada apaga os focos antes e o bicho tomado chega com 10% menos PV
   const far = !animal.bug && !!ZONES[curZone] && CITY[cityOf(curZone)].map !== "norte";   // chefe de fora do Norte: mais vida e o golpe forte
@@ -119,7 +121,8 @@ function init(opts = {}) {
   $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : "") + (isTomado(animal) && !opts.rematch ? " tomado" : "");   // tomado: brilho escuro da fumaça
   $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("meMedal").style.backgroundImage = `url(${heroMedal()})`; $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
   pick(); render();
-  $("cmds").firstChild.focus(); musicStart(getBattleTrackFor(animal));
+  $("cmds").firstChild.focus(); if (!opts.chain) musicStart(getBattleTrackFor(animal));
+  if (opts.chain) return bugChainEnter();
   // abertura: o Rhanon entra pela esquerda, o bicho chega pela direita e o nome dele aparece numa faixa
   PFX.clear();
   HERO_A.mount($("hero"), {weapon: true, mode: "battle", state: "walk"});
@@ -127,11 +130,42 @@ function init(opts = {}) {
   BEAST_A.mount($("beast"), $("beast").querySelector("canvas") || animalSprite(e), {id: e.id, boss, scale: e.scale, state: "enter", fit: true, smoke: isTomado(animal) && !opts.rematch});   // scale: chefe com tamanho próprio (o padrão é 1,35); smoke: sobra em volta para a fumaça
   busy = true; render();
   HERO_A.slide("-38vw", "0px", 650, () => HERO_A.set("idle"));
-  const ready = () => { if (opts.enemyFirst) return enemyTurn(); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus(); };
+  const ready = () => { if (opts.enemyFirst) return afterBanner(enemyTurn); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus(); };
   if (boss && !REDUCE) return bossIntro(ready);
   BEAST_A.slide("42vw", "0px", 600, () => { BEAST_A.set("idle"); BEAST_A.dust(); BEAST_A.bang(); animalCry(e.id, boss); });
   setTimeout(() => encounterBanner(e.name), 380);
   setTimeout(ready, REDUCE ? 300 : 1350);
+}
+/* freela em sequência: os bugs vêm um atrás do outro, sem descanso. Resolvido um, ele some em pedaços e o próximo
+   entra piscando no lugar (BUG_SWAP), sem cartão nem abertura; o XP de cada um entra na hora. Perder ou fechar o
+   notebook no meio recomeça do primeiro bug (freelaChain e freelaReset em explore.js) */
+const BUG_SWAP = 1100;
+function bugChain() {
+  const next = fromExplore && EX ? freelaChain() : null; if (!next) return false;
+  const me = e, rw = reward(e, 1, false, false), keep = {hp: p.hp, sp: p.sp, items: p.items, furia: p.furia, atento: p.atento};
+  busy = true; qteClear(); beastThanks(); sfx("more");
+  say([t("Bug resolvido! Compilando o próximo..."), ...rw].filter(Boolean).join(" · ")); render();
+  setTimeout(() => { if (e === me && mode === "hunt") init({animal: next, chain: keep}); }, REDUCE ? 300 : BUG_SWAP);
+  return true;
+}
+function bugChainEnter() {
+  PFX.clear();
+  HERO_A.mount($("hero"), {weapon: true, mode: "battle", state: "ready"});
+  BEAST_A.mount($("beast"), $("beast").querySelector("canvas") || animalSprite(e), {id: e.id, state: "idle", fit: true});
+  $("beast").classList.add("glitch-in"); animalCry(e.id, false);
+  say(t("{bicho} apareceu no código!", {bicho: theName(e, true)}));
+  busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus();
+}
+/* o bicho que pega de surpresa só ataca depois que a faixa com o nome dele sai da tela (e mais um respiro):
+   antes, o anel do bloqueio aparecia por baixo da faixa e quase não dava tempo de ver */
+const AMBUSH_BREATH = 350;
+function afterBanner(fn) {
+  const me = e, wait = () => {
+    if (e !== me || mode !== "hunt" || p.hp <= 0) return;
+    if ($("stage").querySelector(".encounter")) return setTimeout(wait, 100);
+    setTimeout(() => { if (e === me && mode === "hunt") fn(); }, REDUCE ? 0 : AMBUSH_BREATH);
+  };
+  wait();
 }
 /* apresentação do chefe (a música do chefe abre junto, com tambores e badalada): o chefe chega, "CUIDADO!" bate na
    tela, ele solta um rugido longo que faz tudo tremer, o Rhanon gira a lança e firma a guarda, e só então o nome aparece */
@@ -195,7 +229,7 @@ function render() {
   $("intent").className = "intent" + (e.known ? " known" : "") + (e.intent === "forte" ? " forte" : "");
   // estados como ícones (ui/theme.js), com os turnos que faltam; o nome aparece ao passar o mouse e para leitores de tela
   $("status").innerHTML = statusList().map(([k, name, n]) => `<span class="st" title="${name}"><img src="${statusIconURL(k)}" alt="${name}">${n ? `<b>${n}</b>` : ""}</span>`).join("");
-  $("furia").className = "furia" + (furyReady() ? " cheia" : "");
+  $("furia").className = "furia" + (furyReady() ? " cheia" : ""); $("furia").closest(".furia-row").style.display = furyOn() ? "" : "none";   // sem a Fúria da mata, sem barra
   $("hero").classList.toggle("escudo", p.escudo > 0);   // rabo-bandeira e Brilho das estrelas: escudo de luar na frente do Rhanon
   [...$("furia").children].forEach((d, i) => { d.classList.toggle("on", i < (p ? p.furia || 0 : 0)); d.hidden = i >= furyMax(); });
   if (!subMenu) CMDS.forEach((c, i) => {
@@ -234,12 +268,15 @@ function qtePress() {
 function qteTake() { const had = !!qte, ok = !!(qte && qte.ok); qteClear(); if (had) furyNote(ok); return ok; }
 /* fúria: FURY_MAX tempos certos seguidos (golpe perfeito ou bloqueio) enchem a barra; errar ou deixar passar zera.
    Cheia, o comando da lança vira "Fúria!": três estocadas seguidas (FURY_HIT do golpe) e a última mais forte (FURY_LAST).
-   Antes enchia com 3 (2 com Sangue quente) e cada estocada era um golpe inteiro: quem acertava o tempo vencia chefe em 2 turnos */
+   Antes enchia com 3 (2 com Sangue quente) e cada estocada era um golpe inteiro: quem acertava o tempo vencia chefe em 2 turnos.
+   A fúria é um degrau da teia (Fúria da mata, fx "furia"): vinha de graça e quem acertava o tempo só apertava Z, sem
+   motivo para usar especiais. Acertar a fraqueza com um especial de elemento também conta um ponto */
 const FURY_MAX = 4, FURY_HIT = .8, FURY_LAST = 1.4, FURY_LAST_CRIT = 1.9;
+const furyOn = () => hasSkill("furia");
 const furyMax = () => hasSkill("furia2") ? FURY_MAX - 1 : FURY_MAX;   // habilidade Sangue quente: enche com um acerto a menos
-const furyReady = () => !!p && p.furia >= furyMax();
+const furyReady = () => !!p && furyOn() && p.furia >= furyMax();
 function furyNote(ok) {
-  if (!p || furyReady()) return;
+  if (!p || !furyOn() || furyReady()) return;
   if (!ok) { p.furia = hasSkill("furia_guarda") ? Math.max(0, p.furia - 1) : 0; return; }   // Fúria guardada: perde só 1
   p.furia++;
   if (furyReady()) setTimeout(() => { pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t(furyMax() === 3 ? "Três no tempo certo! Fúria pronta: usa a lança." : "Quatro no tempo certo! Fúria pronta: usa a lança.")); render(); }, 420);
@@ -310,7 +347,7 @@ function act(id, ally) {
     const k = SPECIALS.find(s => s.id === id).elem, m = bugMode ? 1 : elemMult(e, k), fresh = !bugMode && !elemKnown(e, k);
     elemLearn(e, k);
     p.sp -= 6;
-    let d = Math.round((rnd(14, 18) + G.lv - 1 + charmStat("atk") + skillStat("atk")) * m * (bugMode ? 1 : weatherBoost(k))); if (p.weak > 0) d = Math.ceil(d / 2);   // clima: chuva fortalece água e raio...
+    let d = Math.round((rnd(14, 18) + G.lv - 1 + weaponAtk()) * m * (bugMode ? 1 : weatherBoost(k))); if (p.weak > 0) d = Math.ceil(d / 2);   // clima: chuva fortalece água e raio...
     e.hp = Math.max(0, e.hp - d);
     const v = {bicho: foe(), n: d}, msg = {fogo: t("A tocha cospe fogo n{bicho}: −{n}.", v), agua: t("A cuia joga um jato d'água n{bicho}: −{n}.", v), vento: t("Um sopro de vento acerta {bicho}: −{n}.", v), raio: t("Um raio cai n{bicho}: −{n}.", v),
       cipo: t("Um chicote de cipó estala n{bicho}: −{n}.", v), folhas: t("Folhas afiadas cortam {bicho}: −{n}.", v)};
@@ -318,6 +355,7 @@ function act(id, ally) {
     wait = strike(d, m > 1 ? "crit" : "", kind, msg[kind === "fire" ? "fogo" : kind]);
     if (m < 1) setTimeout(() => { say(t("{bicho} resistiu ao golpe.", {bicho: foe(1)})); pop(t("RESISTIU!"), $("beast")); render(); }, wait + 200);
     if (fresh) setTimeout(() => { plateElem(e); if (m === 1) say(t("{elemento} não faz nada de especial n{bicho}. Anotado no caderno.", {elemento: ELEMENTS[k].n, bicho: foe()})); render(); }, wait + 250);   // descobriu: a placa mostra (e o caderno anota)
+    if (m > 1) setTimeout(() => { if (e.hp > 0 && !furyReady()) { furyNote(true); render(); } }, wait + 150);   // fraqueza conta um ponto da fúria
     if (m > 1 && !e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); render(); sfx("more"); pop(t("FRAQUEZA!"), $("beast"), "crit"); }, wait + 200); }
   } else if (id === "flecha") {   // tiro com o arco: menos dano que a lança, mas 40% de chance de crítico
     p.sp -= 3;
@@ -432,6 +470,8 @@ function pytunaPossess() {
 function finish(kind) {
   if (kind === "win" && e.segurando) return;   // um golpe atrasado no meio da cena do Pytuna
   if (kind === "win" && pytunaHolds()) return pytunaPossess();
+  if (kind === "win" && e.bug && bugChain()) return;   // freela: o próximo bug já entra
+  if (kind !== "win" && e.bug && fromExplore && EX) freelaReset();   // perdeu ou fechou o notebook: recomeça do primeiro bug
   if (kind === "win") { beastThanks(); setTimeout(() => HERO_A.set("victory"), 250); }
   else if (kind === "lose") HERO_A.set("defeat");
   else if (kind === "flee") { HERO_A.set("flee"); HERO_A.slide("0px", "-60vw", 1000); }
@@ -450,6 +490,7 @@ function finish(kind) {
     lose: e.rematch ? [t("Fim do treino"), t("{bicho} venceu dessa vez. Bora de novo?", {bicho: O})] : [t("Desmaiou..."), t("{bicho} levou a melhor.", {bicho: O})]
   }[kind];
   if (kind === "lose") rw.push(home, G.lastLoss && t("R$ {n} a menos", {n: G.lastLoss}));
+  if (kind !== "win" && e.bug && fromExplore) rw.push(t("O freela recomeça do primeiro bug"));
   setTimeout(() => {
     $("overTitle").textContent = T[0]; $("overTxt").textContent = [T[1], ...rw].filter(Boolean).join("\n");
     const again = kind !== "lose" && !fromExplore;
@@ -776,7 +817,8 @@ function allyCall(id) {
       PFX.emit(mv.fx === "uivo" ? "ring" : "note", mv.fx === "uivo" ? ["#ffd23a", "#ff7a3a"] : ["#ffffff", "#cfe0ff"], gx, gy, (bx - gx) * 1.4, mv.fx === "canto" ? -6 : 0, .7);
     });
     at(T + 500, () => {
-      if (mv.fx === "uivo") { hit(dmg(1), null); p.furia = furyMax(); pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t("O uivo do cerrado acerta {bicho} e enche a fúria do Rhanon!", v)); }
+      if (mv.fx === "uivo" && furyOn()) { hit(dmg(1), null); p.furia = furyMax(); pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t("O uivo do cerrado acerta {bicho} e enche a fúria do Rhanon!", v)); }
+      else if (mv.fx === "uivo") { hit(dmg(1), null); p.atento = true; pop(t("CERTEIRO!"), $("hero"), "crit"); sfx("furia"); say(t("O uivo do cerrado acerta {bicho}: o próximo golpe do Rhanon sai certeiro!", v)); }   // sem a Fúria da mata
       else { hit(dmg(1), null); const n = Math.min(p.msp - p.sp, Math.round(p.msp * .4)); p.sp += n; pop("+" + n + " " + t("PE"), $("hero"), "heal"); sfx("heal"); say(t("O canto do zabelê devolve {n} PE ao Rhanon.", {n})); }
       render();
     });

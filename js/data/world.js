@@ -45,13 +45,13 @@ const MAP_REGIONS = {
 };
 /* Regiões do Brasil (mapa do Brasil, systems/world-map.js; ver HISTORIA.md): a viagem vai do Norte ao Sul. pos = ponto no
    contorno de MAP_REGIONS.brasil (viewBox 600x620); map = mapa grande da região (por enquanto só o Pará, no Norte);
-   airport = aeroporto que abre os voos de ida e volta para as regiões já visitadas (G.regions). open: false = em breve. */
+   airport = o aeroporto da região (um só, onde ela termina: AERO), de onde se voa para as outras (G.regions). open: false = em breve. */
 const REGIONS = {
   norte:       {n: "Norte", pos: [215, 200], color: "#3f9a5c", open: true, map: "norte", airport: "Aeroporto de Belém",
     txt: "Onde tudo começou: a aldeia Jasytatá, na beira do Tapajós, e Belém. Os bichos e encantados da floresta ficaram bravos com a fumaça de Pytuna."},
-  nordeste:    {n: "Nordeste", pos: [385, 245], color: "#e8a020", open: true, map: "nordeste", airport: "Aeroporto de São Luís",
+  nordeste:    {n: "Nordeste", pos: [385, 245], color: "#e8a020", open: true, map: "nordeste", airport: "Aeroporto do Recife",
     txt: "Sertão, dunas e mangue. Dizem que lá a fumaça secou tudo, e a Comadre Fulozinha anda perdida na mata."},
-  centroeste:  {n: "Centro-Oeste", pos: [262, 335], color: "#c8603a", open: true, map: "centroeste", airport: "Aeroporto de Cuiabá",
+  centroeste:  {n: "Centro-Oeste", pos: [262, 335], color: "#c8603a", open: true, map: "centroeste", airport: "Aeroporto de Brasília",
     txt: "O Pantanal, o cerrado e Brasília. Um céu tão grande que a lua devia brilhar mais."},
   sudeste:     {n: "Sudeste", pos: [352, 410], color: "#3a7ab8", open: true, map: "sudeste", airport: "Aeroporto de Confins",
     txt: "Cidades que não dormem e mata atlântica nas serras. Mais luz de poste que de lua."},
@@ -96,6 +96,10 @@ const SUB = {
   rodo_slz: {city: "saoluis", n: "Rodoviária de São Luís", s: "Rodoviária", x: 340, y: 238, txt: "A rodoviária da ilha, na saída para o continente: bilheteria, banco de espera e o ônibus que atravessa o Maranhão."},
   rodo_the: {city: "teresina", n: "Rodoviária de Teresina", s: "Rodoviária", x: 372, y: 236, txt: "A rodoviária de Teresina, quente até na sombra: daqui saem os ônibus para São Luís e para o sertão de Petrolina."},
   rodo_pet: {city: "petrolina", n: "Rodoviária de Petrolina", s: "Rodoviária", x: 376, y: 178, txt: "A rodoviária do sertão, de chão batido e banco de cimento: um ônibus volta para Teresina e outro desce para o Recife."},
+  aero_bel: {city: "belem", n: "Aeroporto de Belém", s: "Aeroporto", x: 372, y: 104, txt: "O aeroporto de Belém, no fim da cidade: ar-condicionado gelado, açaí caro no saguão e avião saindo pra todo canto do Brasil."},
+  aero_rec: {city: "recife", n: "Aeroporto do Recife", s: "Aeroporto", x: 150, y: 290, txt: "O aeroporto dos Guararapes, do lado da rodoviária: frevo no alto-falante e avião pro Centro-Oeste."},
+  aero_bsb: {city: "brasilia", n: "Aeroporto de Brasília", s: "Aeroporto", x: 300, y: 256, txt: "O aeroporto do meio do Brasil: dali sai voo pra todo lado. Saguão de concreto e ipê na entrada."},
+  aero_cnf: {city: "bh", n: "Aeroporto de Confins", s: "Confins", x: 316, y: 54, txt: "Lá em cima, depois da estrada: o aeroporto de Belo Horizonte, com pão de queijo no saguão."},
   rodo_rec: {city: "recife", n: "Rodoviária do Recife", s: "Rodoviária", x: 76, y: 232, txt: "A rodoviária do Recife, grande e barulhenta: ônibus para o sertão saindo a toda hora."},
   beira: {city: "petrolina", n: "Beira do Velho Chico", s: "Beira", x: 400, y: 228, txt: "Rio abaixo, longe da orla: capim alto, barranco de martim-pescador e o São Francisco largo, verde e manso. De noite, uma gargalhada boia no meio da água."},
   serra: {city: "petrolina", n: "Serra do Araripe", s: "Serra", x: 290, y: 56, txt: "Lá no alto, a chapada: paredão de pedra cheio de fóssil, mata verde na encosta e encruzilhada de estrada de terra. Nas sextas de lua cheia, ninguém sobe."},
@@ -132,7 +136,7 @@ const CITY = {
   ananindeua: {n: "Jasytatá", map: "norte", cabin: false, route: ["aldeia", "feira", "mata", "fechada", "rio", "igarape", "manguezal", "seringal", "varzea", "parada"],
     land: "10,70 60,20 190,8 305,18 395,55 430,140 428,235 398,300 300,316 170,314 60,304 12,255 5,160",
     river: "M318,24 C305,70 358,96 346,140 C334,190 300,222 316,318", road: "M52,62 C34,44 18,32 -4,26", sign: [6, 18, "← Belém"], home: "aldeia", gate: "parada"},
-  belem: {n: "Belém", look: "cidade", map: "norte", cabin: false, route: ["terminal", "veropeso", "cidadevelha", "porto", "baixadas"],
+  belem: {n: "Belém", look: "cidade", map: "norte", cabin: false, route: ["terminal", "veropeso", "cidadevelha", "porto", "baixadas", "aero_bel"],
     land: "40,40 150,14 300,10 400,40 432,130 430,240 400,300 300,316 160,316 40,300 22,230 36,150 20,90",
     bay: "M0,0 L44,0 C28,40 46,80 28,110 C40,150 22,200 38,240 C28,270 34,300 46,325 L0,325Z",   // baía do Guajará
     river: "M206,20 C190,70 214,116 186,160 C170,190 160,204 150,214", road: "M392,262 C410,276 424,286 446,292", sign: [366, 320, "Tapajós →"], home: "veropeso", gate: "terminal"},
@@ -151,7 +155,7 @@ const CITY = {
     bay: "M0,250 C80,268 180,272 300,262 C360,256 400,262 440,250 L440,325 L0,325Z",   // o rio São Francisco
     river: "M0,262 C80,280 180,284 300,274 C360,268 400,274 440,262", road: "M300,210 C350,190 400,170 446,160", sign: [356, 150, "Recife →"], home: "orla", gate: "orla"},
   // Recife (Nordeste, última cidade da estrada): o Recife Antigo, entre o Capibaribe e o mar; a estrada volta para Petrolina
-  recife: {n: "Recife", look: "litoral", map: "nordeste", route: ["recifeantigo", "olinda", "arrecifes", "rodo_rec"], rodo: "rodo_rec", cabin: false,
+  recife: {n: "Recife", look: "litoral", map: "nordeste", route: ["recifeantigo", "olinda", "arrecifes", "rodo_rec", "aero_rec"], rodo: "rodo_rec", cabin: false,
     land: "20,40 160,20 330,30 420,80 430,200 400,290 260,316 120,312 30,270 10,160",
     bay: "M330,0 L440,0 L440,325 L410,325 C400,240 420,160 380,90 C360,50 340,20 330,0Z",   // o mar
     river: "M0,200 C80,190 160,210 240,180 C300,160 330,170 370,150", road: "M120,200 C80,230 40,250 -6,262", sign: [8, 300, "← Petrolina"], home: "recifeantigo", gate: "recifeantigo"},
@@ -167,13 +171,13 @@ const CITY = {
     river: "M60,0 C90,80 200,110 230,180 C250,230 220,280 240,325", road: "M300,150 C340,110 390,70 446,40", sign: [360, 30, "Cuiabá →"], home: "centrobonito", gate: "centrobonito"},
   // Brasília (Centro-Oeste): o Plano Piloto no meio, o Lago Paranoá à direita e um córrego do cerrado; a estrada sai para
   // Bonito pelo oeste. O Plano Piloto e o Parque Nacional, lá em cima
-  brasilia: {n: "Brasília", look: "cerrado", map: "centroeste", route: ["planopiloto", "parquebsb"], cabin: false,
+  brasilia: {n: "Brasília", look: "cerrado", map: "centroeste", route: ["planopiloto", "parquebsb", "aero_bsb"], cabin: false,
     land: "24,40 170,16 330,22 420,80 432,200 396,292 270,316 140,312 40,278 12,160",
     bay: "M330,0 L440,0 L440,325 L360,325 C330,280 350,240 320,200 C300,170 330,120 310,80 C300,50 320,20 330,0Z",   // Lago Paranoá
     river: "M110,0 C120,80 96,160 124,325", road: "M214,172 C160,190 90,200 -6,214", sign: [8, 236, "← Bonito"], home: "planopiloto", gate: "planopiloto"},
   // Belo Horizonte (Sudeste): o centro no meio das serras, o ribeirão Arrudas cortando a cidade e a estrada subindo para
   // o norte, até o Aeroporto de Confins. O Mercado Central e a Serra do Curral, lá embaixo, depois do ribeirão
-  bh: {n: "Belo Horizonte", look: "minas", map: "sudeste", route: ["mercadocentral", "serracurral"], cabin: false,
+  bh: {n: "Belo Horizonte", look: "minas", map: "sudeste", route: ["mercadocentral", "serracurral", "aero_cnf"], cabin: false,
     land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
     river: "M0,236 C90,226 160,250 240,236 C320,222 380,240 440,226", road: "M226,196 C240,140 270,90 300,40 C310,24 316,10 320,-6", sign: [326, 18, "✈ Confins ↑"], home: "mercadocentral", gate: "mercadocentral"},
   // Ouro Preto (Sudeste): a Praça Tiradentes no alto, as ladeiras descendo para o sudoeste e o ribeirão do Funil lá
@@ -238,30 +242,33 @@ function weatherOn(day, city = curCity()) {
 const weatherNow = () => { const w = weatherOn(G.day); return G.night && w === "mormaco" ? "limpo" : w; };   // mormaço some de noite
 const weatherBoost = k => (WEATHER[weatherNow()].boost || {})[k] || 1;
 const curCity = () => CITY[G.loc] ? G.loc : "ananindeua";
-/* voos entre regiões, de ida e volta e de graça (pagos pelo freela da região de onde se sai), sempre liberados. open =
-   a região de antes está completa (chefes acalmados e o freela entregue); sem isso, voar para a região nova (de a para b)
-   avisa o que falta (flightMissing) e pergunta antes, mas dá para voltar depois. paid = quem paga */
+/* voos: um aeroporto por região, onde ela termina (AERO: a fase do aeroporto, última parada da cidade). Voa-se de região
+   para região, de graça, escolhendo o destino no mapa do Brasil (openBrasil com pick, world-map.js): para as regiões já
+   visitadas (G.regions) e para a próxima da história (FLIGHTS: a -> b). open = a região de onde sai está completa
+   (chefes e freela); sem isso, o guichê avisa o que falta (flightMissing) e pergunta antes. A primeira viagem para uma
+   região nova sai sempre do guichê do aeroporto; depois, o ponto do aeroporto no mapa grande também embarca.
+   Pousa no aeroporto da região de destino; se ele ainda não foi visto (primeira chegada), na cidade de começo dela (start). */
 const FLIGHTS = [
-  {a: "belem", b: "saoluis", open: () => !!G.portfolio.site_feira && NORTE_BOSSES().every(k => BS()[k]), paid: "O voo de ida e volta é pago pela empresa do site da feira.",
-},
-  {a: "recife", b: "cuiaba", open: () => !!G.portfolio.app_cordel && NORDESTE_BOSSES().every(k => BS()[k]), paid: "O voo de ida e volta é pago com o dinheiro do app de cordel.",
-},
-  {a: "brasilia", b: "bh", open: () => !!G.portfolio.mapa_queimadas && CENTROESTE_BOSSES().every(k => BS()[k]), paid: "O voo de ida e volta é pago com o dinheiro do mapa de queimadas.",
-}
+  {a: "norte", b: "nordeste", open: () => !!G.portfolio.site_feira && NORTE_BOSSES().every(k => BS()[k]), paid: "O voo é pago pela empresa do site da feira."},
+  {a: "nordeste", b: "centroeste", open: () => !!G.portfolio.app_cordel && NORDESTE_BOSSES().every(k => BS()[k]), paid: "O voo é pago com o dinheiro do app de cordel."},
+  {a: "centroeste", b: "sudeste", open: () => !!G.portfolio.mapa_queimadas && CENTROESTE_BOSSES().every(k => BS()[k]), paid: "O voo é pago com o dinheiro do mapa de queimadas."}
 ];
-const AIRPORT = {belem: "Aeroporto de Belém", saoluis: "Aeroporto de São Luís", recife: "Aeroporto do Recife", cuiaba: "Aeroporto de Cuiabá", brasilia: "Aeroporto de Brasília", bh: "Aeroporto de Confins"};
-// voos de um aeroporto: os de FLIGHTS (que abrem a região nova) e, de lá, voo direto para qualquer outro aeroporto de
-// cidade onde o Rhanon já esteve (G.seen da chegada dela); só aeroporto: cidade sem AIRPORT não tem voo
-const flightsFrom = c => {
-  if (!AIRPORT[c]) return [];
-  const own = FLIGHTS.filter(f => f.a === c || f.b === c).map(f => Object.assign({to: f.a === c ? f.b : f.a}, f));
-  const more = Object.keys(AIRPORT).filter(k => k !== c && !own.some(f => f.to === k) && G.seen[CITY[k].home]).map(k => ({to: k, a: c, b: k, open: () => true}));
-  return [...own, ...more];
-};
-const flightOpen = (to = "saoluis") => FLIGHTS.some(f => (f.a === to || f.b === to) && f.open());
+const AERO = {aero_bel: {city: "belem", reg: "norte"}, aero_rec: {city: "recife", reg: "nordeste"}, aero_bsb: {city: "brasilia", reg: "centroeste"}, aero_cnf: {city: "bh", reg: "sudeste"}};
+const REGION_START = {norte: "belem", nordeste: "saoluis", centroeste: "cuiaba", sudeste: "bh"};   // primeira chegada de avião
+const regionAero = reg => Object.keys(AERO).find(k => AERO[k].reg === reg);
+const AIRPORT = Object.fromEntries(Object.values(AERO).map(a => [a.city, REGIONS[a.reg].airport]));   // nome do aeroporto da cidade
+// voo da história que sai desta região (para a próxima) e se ele está liberado (a região de onde sai está completa)
+const flightNext = reg => FLIGHTS.find(f => f.a === reg);
+const flightOpen = (to = "nordeste") => FLIGHTS.some(f => f.b === to && f.open());
+// onde o avião pousa numa região: na volta, no aeroporto dela (se o Rhanon já esteve lá); na primeira chegada (região
+// ainda não visitada), sempre na cidade de começo
+function flightLanding(reg) {
+  const ap = regionAero(reg);
+  return ap && G.regions?.[reg] && G.seen[ap] ? {city: AERO[ap].city, sub: ap} : {city: REGION_START[reg], sub: CITY[REGION_START[reg]].home};
+}
 // o que falta na região de onde o voo sai (chefes sem acalmar e o freela dela), para o aviso antes de partir
 function flightMissing(f) {
-  const reg = regionOfCity(f.a), all = {norte: NORTE_BOSSES, nordeste: NORDESTE_BOSSES, centroeste: CENTROESTE_BOSSES}[reg]();
+  const reg = f.a, all = {norte: NORTE_BOSSES, nordeste: NORDESTE_BOSSES, centroeste: CENTROESTE_BOSSES}[reg]();
   const left = all.filter(k => !BS()[k]).length, out = [];
   if (left) out.push(t(left === 1 ? "1 chefe sem acalmar" : "{n} chefes sem acalmar", {n: left}));
   Object.entries(FREELA_AT).filter(([ph, id]) => regionOfCity(cityOf(ph)) === reg && !G.portfolio[id]).forEach(([, id]) => out.push(t("o freela de {cliente}", {cliente: FREELAS[id].client})));
@@ -321,7 +328,7 @@ const FREELAS = {
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {aero_bel: "baixadas", aero_rec: "arrecifes", aero_bsb: "parquebsb", aero_cnf: "serracurral", rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

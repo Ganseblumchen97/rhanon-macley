@@ -348,6 +348,10 @@ body{background:var(--bg);transition:background .5s;font-family:var(--body);colo
 :root[data-theme="p4"] .bg::before{display:none}
 .layer{position:absolute;inset:0;display:none}
 :root:not([data-theme="p4"]) .layer.a,:root[data-theme="p4"] .layer.p4{display:block}
+/* fundo dos mapas: o desenho da região do mapa aberto (drawRegionBg em gfx/scenery.js), escurecido, no lugar da estrela */
+.bg>.region-bg{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;filter:brightness(.55) saturate(.9)}
+:root:not([data-theme="p4"]) .bg:has(.region-bg[data-region]) .layer.a{display:none}
+:root[data-theme="p4"] .bg>.region-bg{display:none}
 .star{position:absolute;right:-12vmin;top:-14vmin;width:70vmin;aspect-ratio:1;background:var(--bg-2);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:spin 60s linear infinite}
 .band{position:absolute;left:-30vw;width:160vw;background:var(--ink);rotate:-12deg}
 .band.b1{top:50vh;height:48vh;clip-path:polygon(0 12%,40% 0,100% 18%,100% 88%,62% 100%,0 80%);animation:drift 14s ease-in-out infinite alternate}
@@ -981,7 +985,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .sk-card .sk-custo{font:700 12px var(--mono);color:var(--brown)}
 .sk-card p{grid-column:1/-1;margin:3px 0;font:13px/1.4 var(--mono);color:var(--brown)}
 .lvup small+small{display:block;color:#ffd23a}
-#exSkills.pts{background:#ffd23a;color:#3a2414;animation:skPulse 1.2s steps(2) infinite;--sk:#ffd23a}
+#exSkills.pts,#exNb.pts{background:#ffd23a;color:#3a2414;animation:skPulse 1.2s steps(2) infinite;--sk:#ffd23a}
 /* aviso do controle (ui/gamepad.js) */
 .pad-toast{position:fixed;right:16px;bottom:16px;z-index:2000;padding:8px 14px;background:#06120a;color:#f6e9c4;border:3px solid #ffd23a;font:700 13px var(--mono);box-shadow:4px 4px 0 var(--red);animation:rpop .3s var(--pop) backwards}
 /* ícones do controle (ui/gamepad.js): com o controle em uso, os números de atalho somem e os botões aparecem com a
@@ -1035,6 +1039,9 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 /* bug do freela resolvido: treme em degraus, perde a cor e some */
 #beast.glitch canvas.actor{animation:glitchOut .9s steps(6) forwards}
 @keyframes glitchOut{30%{translate:6px 0;filter:hue-rotate(90deg)}60%{translate:-8px 2px;opacity:.6;filter:grayscale(1)}100%{translate:0 0;opacity:0;filter:grayscale(1)}}
+/* freela em sequência: o próximo bug entra piscando no lugar do que sumiu */
+#beast.glitch-in canvas.actor{animation:glitchIn .6s steps(6)}
+@keyframes glitchIn{0%{opacity:0;translate:8px 0;filter:hue-rotate(90deg)}50%{opacity:.6;translate:-6px 2px;filter:grayscale(1)}100%{opacity:1;translate:0 0}}
 /* narração do Pajé (ui/narration.js): faixa de pergaminho embaixo, retrato com luz de fogueira à esquerda; quando é o
    Rhanon falando, o retrato vai para a direita e o nome fica verde */
 .narra{position:fixed;left:50%;bottom:4vh;translate:-50% 0;z-index:1500;width:min(760px,calc(100vw - 32px));display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;
@@ -1228,3 +1235,59 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 .rio>.lroad{stroke:#2a7ab8;stroke-width:12}
 .rio>.lroad-faixa{stroke:#cfeeff;stroke-width:2;stroke-dasharray:3 7}
 .map-patterns{position:absolute;width:0;height:0;overflow:hidden}
+
+/* notebook ligado, o "Rhanon OS" (systems/notebook.js): moldura do notebook, papel de parede da região, ícones, janelas e a barra */
+.nbos{width:min(1100px,96vw);height:min(700px,90vh);display:flex;flex-direction:column;align-items:center}
+.nbos-lid{flex:1;width:100%;box-sizing:border-box;background:#1e1e26;border-radius:14px 14px 3px 3px;padding:18px 16px 14px;box-shadow:0 0 0 2px #3a3a46;position:relative}
+.nbos-lid::before{content:"";position:absolute;left:50%;top:6px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#5a5a68}
+.nbos-base{width:calc(100% + 30px);max-width:99vw;height:22px;margin-top:-1px;border-radius:0 0 10px 10px;background:linear-gradient(#24242c,#24242c) 50% 0/120px 5px no-repeat,linear-gradient(180deg,#7a7a8a,#4a4a58 35%,#2a2a34);clip-path:polygon(3% 0,97% 0,100% 65%,100% 100%,0 100%,0 65%)}
+.nbos-scr{position:relative;width:100%;height:100%;overflow:hidden;background:#0a1626;border:2px solid #000;font:13px/1.45 var(--mono);color:#d8ecff}
+.nbos-wall{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.nbos-icons{position:absolute;left:14px;top:14px;display:grid;grid-template-columns:repeat(2,104px);gap:10px}
+.nbos-ic{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;background:none;border:0;color:#fff;font:12px var(--mono);cursor:pointer}
+.nbos-ic svg{width:56px;height:56px;filter:drop-shadow(3px 3px 0 #000)}
+.nbos-ic span{background:rgba(0,0,0,.65);padding:1px 6px}
+.nbos-ic.sel,.nbos-ic:focus-visible{outline:3px solid #ffd23a;outline-offset:-2px;background:rgba(255,210,58,.15)}
+.nbos-badge{position:absolute;top:2px;right:18px;min-width:20px;height:20px;border-radius:10px;background:#e5001c;color:#fff;border:2px solid #000;font:700 12px/16px var(--mono);font-style:normal}
+.nbos-bar{position:absolute;left:0;right:0;bottom:0;height:30px;background:#0e0f14;display:flex;align-items:center;gap:14px;padding:0 10px;font:12px var(--mono);color:#d8ecff}
+.nbos-sp{flex:1}
+.nbos-wifi.off{color:#e57a7a;text-decoration:line-through}
+.nbos-bat{display:inline-block;width:22px;height:10px;border:2px solid #d8ecff;position:relative}
+.nbos-bat::after{content:"";position:absolute;right:-5px;top:2px;width:3px;height:4px;background:#d8ecff}
+.nbos-bat i{position:absolute;inset:1px;right:30%;background:#5ad87a}
+.nbos-win{position:absolute;left:4%;right:4%;top:4%;bottom:42px;display:flex;flex-direction:column;background:linear-gradient(180deg,#0e2640,#0a1626);border:2px solid #000;box-shadow:0 0 0 2px #2a6aa0,6px 6px 0 rgba(0,0,0,.4)}
+.nbos-win[hidden]{display:none}
+.nbos-tt{display:flex;justify-content:space-between;align-items:center;padding:3px 6px 3px 12px;background:linear-gradient(180deg,#3aa0e8,#1a5aa8);color:#fff;font:400 18px var(--display);text-transform:uppercase}
+.nbos-x{background:#e5001c;color:#fff;border:2px solid #000;font:700 13px var(--mono);width:28px;height:24px;cursor:pointer}
+.nbos-body{flex:1;overflow:auto;padding:10px 14px;scrollbar-color:#3aa0e8 #0a1626}
+.nbos-body .hint{color:#9fd0f0}
+.nbos .cad-card{background:linear-gradient(180deg,#1a3a5a,#12304a);border:2px solid #2a6aa0;border-top-width:6px;border-radius:3px;color:#d8ecff}
+.nbos .cad-card b{color:#7dd8ff}
+.nbos .cad-card.nao-visto{opacity:.6}
+.nbos-mail{display:grid;grid-template-columns:minmax(170px,34%) minmax(0,1fr);gap:14px;min-height:100%}
+.nbos-lista{display:flex;flex-direction:column;gap:6px;border-right:2px solid #2a6aa0;padding-right:12px}
+.nbos-lista .cmd{text-align:left}
+.nbos-lista .cmd small{display:block;font-size:11px;opacity:.85}
+.nbos-lista .cmd.aberto{box-shadow:0 0 0 3px #7dd8ff}
+.nbos-ler .cmd{margin-top:8px}
+.nbos-de{color:#7dd8ff;margin:0 0 8px}
+.nbos-msg{background:rgba(255,255,255,.06);border-left:4px solid #3aa0e8;padding:8px 10px;margin:0 0 8px}
+.nbos-msg.resp{border-left-color:#5ad87a}
+.nbos-ok{color:#ffd23a;margin:6px 0}
+.nbos-semwifi{color:#e57a7a;margin:6px 0}
+.nbos-vazio{color:#9fd0f0;text-align:center;margin-top:30px}
+.nbos-prog-it{border:2px solid #2a6aa0;background:rgba(26,58,90,.6);padding:8px 12px;margin:0 0 8px}
+.nbos-prog-it b{color:#7dd8ff;font:400 16px var(--display);text-transform:uppercase}
+.nbos-prog-it p{margin:4px 0 0}
+.nbos-copia{display:grid;place-items:center;gap:10px;margin-top:60px}
+.nbos-prog{display:block;width:min(360px,80%);height:16px;border:2px solid #7dd8ff;background:#0a1626}
+.nbos-prog i{display:block;height:100%;width:0;background:#3aa0e8}
+/* botões dentro do notebook: menores, sem a entrada animada, e o escolhido só desliza um pouco (não invade o e-mail) */
+.nbos-body .cmd{font-size:18px;animation:none}
+.nbos-lista .cmd{width:auto;white-space:normal;rotate:0deg;--x:0px}
+.nbos-body .cmd:hover,.nbos-body .cmd:focus-visible,.nbos-body .cmd.sel{scale:1;translate:6px 0}
+.nbos-body .cmd:hover::after,.nbos-body .cmd:focus-visible::after,.nbos-body .cmd.sel::after{translate:5px 4px}
+
+/* mapa do Brasil: as regiões e os pontos também escolhem (clicando); no voo, o motivo de não dar pra ir */
+#brasil svg [data-k]{cursor:pointer}
+.br-why{color:#c8402a;font-weight:700}

@@ -72,7 +72,7 @@ Object.entries({praiagrande: ["#2a6ab8", "#f4ecd8"], trocatroca: ["#e8a020", "#c
   portocuiaba: ["#e8701c", "#f4ecd8"], centrobonito: ["#2aa8b8", "#f4ecd8"], planopiloto: ["#3a5ab8", "#e8e4d8"], mercadocentral: ["#c8a040", "#6a3a8a"], tiradentes: ["#2a5aa8", "#e8d8b0"]})
   .forEach(([z, c]) => { if (TILE_PAL[z]) TILE_PAL[z].stall = c; });
 // rodoviárias do Nordeste: as cores do centro da cidade (Petrolina com mandacaru no lugar das árvores)
-Object.assign(TILE_PAL, {rodo_slz: TILE_PAL.praiagrande, rodo_the: TILE_PAL.trocatroca, rodo_pet: {...TILE_PAL.orla, cactus: true}, rodo_rec: TILE_PAL.recifeantigo});
+Object.assign(TILE_PAL, {aero_bel: TILE_PAL.veropeso, aero_rec: TILE_PAL.recifeantigo, aero_bsb: TILE_PAL.planopiloto, aero_cnf: TILE_PAL.mercadocentral, rodo_slz: TILE_PAL.praiagrande, rodo_the: TILE_PAL.trocatroca, rodo_pet: {...TILE_PAL.orla, cactus: true}, rodo_rec: TILE_PAL.recifeantigo});
 const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "~", Y: ".", J: "."};   // U: o barco de linha fica na água; Y e J: entrada e baú do segredo (systems/secrets.js)
 
 function fillEllipse(x, cx, cy, rx, ry, col) {
@@ -254,7 +254,7 @@ function drawStageMap(rows, zone) {
     if (ch === "#") return drawBuilding(x, ox, oy, P, tx, ty, at);
     // chefe de água (Pirarucu, Cobra-Grande...): fica numa poça em vez de na grama
     // e o ônibus da rodoviária fica no asfalto, não na água como o barco
-    drawTile(x, ch === "B" && ZONES[zone] && WATER_BATTLE.has(ZONES[zone].boss) ? "~" : ch === "U" && STAGES[zone] && rodoCity(zone) ? "r" : TILE_BASE[ch] || ch, ox, oy, P, tx, ty);
+    drawTile(x, ch === "B" && ZONES[zone] && WATER_BATTLE.has(ZONES[zone].boss) ? "~" : ch === "U" && STAGES[zone] && (rodoCity(zone) || AERO[zone]) ? "r" : TILE_BASE[ch] || ch, ox, oy, P, tx, ty);
     if (ch === "E") {   // seta de saída apontando para a borda mais perto
       const sy = rows.findIndex(r => r.includes("S")), sx = rows[sy].indexOf("S");   // aponta do início (S) para a saída
       const left = tx < sx, down = ty > sy, ax = tx * TILE + 8, ay = ty * TILE + 8;

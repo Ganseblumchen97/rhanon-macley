@@ -42,15 +42,22 @@ function journalCard(a) {
     : `<b>???</b><small>${habitat(a.id)}</small>`);
   return card;
 }
+// notebook ligado: o caderno só abre pelo app Caderno do notebook (systems/notebook.js); antes, é o de papel
 function openJournal() {
   vit();
-  const o = $("caderno"), box = o.querySelector(".info"), seen = ANIMALS.filter(a => G.bestiary[a.id] && G.bestiary[a.id].seen).length;
-  o.classList.toggle("papel", !G.nb.on); o.classList.toggle("digital", !!G.nb.on);   // antes do notebook ligar, o caderno é de papel; depois, abre na tela do notebook
-  box.innerHTML = `<h2>${t(G.nb.on ? "Caderno de bichos · digital" : "Caderno de bichos")}</h2><p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p>${G.regions?.nordeste ? `<p class="hint">${t("Calma de Guaraci: {n} de {total} chefes do Nordeste acalmados", {n: NORDESTE_BOSSES().filter(k => BS()[k]).length, total: NORDESTE_BOSSES().length})}</p>` : ""}${G.regions?.centroeste ? `<p class="hint">${t("Brilho das estrelas: {n} de {total} chefes do Centro-Oeste acalmados", {n: CENTROESTE_BOSSES().filter(k => BS()[k]).length, total: CENTROESTE_BOSSES().length})}</p>` : ""}<p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><p class="hint"><span class="elem-key">${t("Elementos: {fraco} fraco · {resiste} resiste · {normal} normal · ? use o golpe no bicho pra descobrir", ELEM_KEY_ICONS())}</span></p><div class="cad-grid"></div>`;
-  const grid = box.querySelector(".cad-grid");
-  ANIMALS.forEach(a => grid.append(journalCard(a)));
+  if (G.nb.on) return openNotebook("caderno");
+  const o = $("caderno"), box = o.querySelector(".info");
+  o.classList.add("papel"); o.classList.remove("digital");
+  journalFill(box, true);
   btn("Fechar", closeJournal, false, box);
   o.hidden = false; sfx("blip"); box.querySelector(".cmd").focus({preventScroll: true}); box.scrollTop = 0;
+}
+// monta o caderno dentro de box (o de papel ou a janela do app Caderno); title = com o título no alto
+function journalFill(box, title) {
+  const seen = ANIMALS.filter(a => G.bestiary[a.id] && G.bestiary[a.id].seen).length;
+  box.innerHTML = `${title ? `<h2>${t("Caderno de bichos")}</h2>` : ""}<p class="hint">${t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length})}</p>${G.regions?.nordeste ? `<p class="hint">${t("Calma de Guaraci: {n} de {total} chefes do Nordeste acalmados", {n: NORDESTE_BOSSES().filter(k => BS()[k]).length, total: NORDESTE_BOSSES().length})}</p>` : ""}${G.regions?.centroeste ? `<p class="hint">${t("Brilho das estrelas: {n} de {total} chefes do Centro-Oeste acalmados", {n: CENTROESTE_BOSSES().filter(k => BS()[k]).length, total: CENTROESTE_BOSSES().length})}</p>` : ""}<p class="hint">${t("{n} de {total} bichos encontrados. Os que faltam aparecem só como silhueta.", {n: seen, total: ANIMALS.length})}</p><p class="hint"><span class="elem-key">${t("Elementos: {fraco} fraco · {resiste} resiste · {normal} normal · ? use o golpe no bicho pra descobrir", ELEM_KEY_ICONS())}</span></p><div class="cad-grid"></div>`;
+  const grid = box.querySelector(".cad-grid");
+  ANIMALS.forEach(a => grid.append(journalCard(a)));
 }
 function closeJournal() { $("caderno").hidden = true; sfx("blip"); }
 

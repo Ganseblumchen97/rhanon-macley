@@ -2,7 +2,8 @@
    aprender um degrau libera todos os vizinhos ligados a ele. O custo vem do anel: 1, 2, 3, 4, 7 e 10 do meio para a borda,
    então ninguém pega tudo (a teia inteira custa 132). O Rhanon ganha 1 ponto por nível (skillPoints em systems/skills.js).
    atk/def/hp/sp somam ao status (skillStat em core/state.js); fx é um efeito que o código procura com hasSkill(fx):
-   perfeito (golpe perfeito +50%), furia2 (fúria com 2 acertos), furia4 (quatro estocadas), bloqueio (bloqueio evita 2/3),
+   furia (Fúria da mata: tempos certos seguidos enchem a fúria; sem ela não tem fúria), perfeito (golpe perfeito +50%),
+   furia2 (fúria com 3 acertos), furia4 (quatro estocadas), bloqueio (bloqueio evita 2/3),
    mira (flecha +4 e esquiva da exploração em 1 s), bloqueio2 (bloqueio perfeito anula o golpe e dá um turno a mais),
    cura (especial Reza de cura), vento (especial Sopro de vento), cura2 (reza mais forte e que limpa veneno/queimadura), regen (+3 PV e +1 PE por turno).
    Degraus das regiões: dupla, investida, luar, flecha2, laco, aliado, estrelas = especiais com skill em SPECIALS;
@@ -12,11 +13,11 @@
 const SKILL_TREES = [
   {id: "guerreiro", n: "Guerreiro", d: "Lança e fúria", color: "#e2363d", nodes: [
     {id: "g1", n: "Braço forte", d: "ATQ +2.", cost: 1, atk: 2},
-    {id: "g2", n: "Ponta afiada", d: "Golpe perfeito tira +50% de dano (antes +30%).", cost: 2, fx: "perfeito"},
+    {id: "g2", n: "Fúria da mata", d: "Quatro tempos certos seguidos (golpe perfeito ou bloqueio) enchem a fúria: a lança vira três estocadas de uma vez. Acertar a fraqueza de um bicho também conta.", cost: 2, fx: "furia"},
     {id: "g3", n: "Braço de ferro", d: "ATQ +3.", cost: 2, atk: 3},
     {id: "g4", n: "Sangue quente", d: "A fúria enche com 3 acertos no tempo certo (antes 4).", cost: 3, fx: "furia2"},
     {id: "g5", n: "Fúria da onça", d: "A fúria dá quatro estocadas em vez de três.", cost: 4, fx: "furia4"},
-    {id: "g6", n: "Lança de mandacaru", d: "ATQ +4.", cost: 3, atk: 4},
+    {id: "g6", n: "Lança de mandacaru", d: "ATQ +4 e o golpe perfeito tira +50% de dano (antes +30%).", cost: 3, atk: 4, fx: "perfeito"},
     {id: "g7", n: "Estocada dupla", d: "Libera o especial Estocada dupla: duas estocadas seguidas, cada uma com o seu tempo certo (as duas contam para a fúria). 8 PE.", cost: 4, fx: "dupla"},
     {id: "g8", n: "Fúria guardada", d: "Errar o tempo certo tira só 1 ponto da fúria, em vez de zerar.", cost: 7, fx: "furia_guarda"},
     {id: "g9", n: "Investida do lobo-guará", d: "Libera o especial Investida: dano 1,6×. Se o chefe estiver juntando forças, dano dobrado e o golpe forte dele se desfaz. 10 PE.", cost: 7, fx: "investida"},
@@ -74,7 +75,7 @@ const ALLY_MOVES = {
   zabele_rei:       {n: "Canto do zabelê", d: "Dano leve e devolve 40% do PE do Rhanon.", pow: .6, elem: "vento", fx: "canto"},
   carranca:         {n: "Careta que espanta", d: "Onda d'água; com medo, o bicho bate 35% mais fraco por 2 turnos.", pow: 1, elem: "agua", fx: "careta"},
   tubarao_rei:      {n: "Frenesi do recife", d: "Três mordidas rápidas seguidas.", pow: .6, elem: "agua", fx: "frenesi"},
-  guara_rei:        {n: "Uivo do cerrado", d: "Dano médio e a fúria do Rhanon enche na hora.", pow: 1, elem: "fogo", fx: "uivo"},
+  guara_rei:        {n: "Uivo do cerrado", d: "Dano médio e enche a fúria do Rhanon (sem a Fúria da mata, o próximo golpe sai certeiro).", pow: 1, elem: "fogo", fx: "uivo"},
   preguica_gigante: {n: "Abraço do tempo", d: "Dano alto e o bicho perde a próxima vez (chefe: metade das vezes).", pow: 1.5, elem: "planta", fx: "abraco"},
   tamandua_rei:     {n: "Rabo-bandeira", d: "Pouco dano, mas os 2 próximos golpes do bicho batem pela metade.", pow: .5, elem: "planta", fx: "bandeira"},
   muriqui_rei:      {n: "Bando dourado", d: "Dano leve e cura 30% da vida do Rhanon.", pow: .7, elem: "planta", fx: "bando"},

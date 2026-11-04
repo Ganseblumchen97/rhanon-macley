@@ -264,8 +264,11 @@ function makeBeastActor() {
     const r = cv.getBoundingClientRect(), u = r.width / CW;
     return PFX.toGrid(r.left + lx * u, r.top + ly * u);
   }
-  // bicho da luta ainda tomado pela fumaça (olho vermelho, fumaça subindo); acalmado ou no treino, volta ao normal
-  const evilNow = () => mode === "hunt" && !!e && e.hp > 0 && !e.rematch && isTomado(e) && state !== "defeat";
+  // bicho da luta ainda tomado pela fumaça (olho vermelho, fumaça subindo); acalmado ou no treino, volta ao normal.
+  // Olha a vida mostrada na barra (holdE), não a de verdade: a fumaça só sai quando o último golpe chega.
+  // Na cena do Pytuna (e.segurando) a vida fica em 0, e a fumaça volta quando ele puxa (#beast.possuido)
+  const evilNow = () => mode === "hunt" && !!e && !e.rematch && isTomado(e) && state !== "defeat"
+    && (e.segurando ? $("beast").classList.contains("possuido") : (holdE !== null ? holdE : e.hp) > 0);
   // desenha o sprite com a parte de cima "respirando" e, nas cobras, ondulando
   function body(img, x, y, t, o) {
     const split = Math.round(h * .55), wave = motion === "sway" || motion === "swim";
