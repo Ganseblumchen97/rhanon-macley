@@ -87,6 +87,10 @@ const guaraciCalm = () => { const all = NORDESTE_BOSSES(); return all.filter(k =
    lá (Cuiabá, Bonito e Brasília, de dia e de noite) acalmados, as estrelas voltam e o capítulo fecha */
 const CENTROESTE_BOSSES = () => Object.keys(ZONES).filter(z => CITY[cityOf(z)].map === "centroeste").flatMap(z => [z, NIGHT_ZONES[z] ? z + ":noite" : null]).filter(Boolean);
 const estrelaCalm = () => { const all = CENTROESTE_BOSSES(); return all.filter(k => BS()[k]).length / all.length; };
+/* Lua sobre as cidades: no Sudeste a fumaça se escondeu na luz dos postes e ninguém olha pro céu; com os chefes de lá
+   (BH, Ouro Preto, Rio e São Paulo, de dia e de noite) acalmados, falta luz na cidade, todo mundo vê Jaci e o capítulo fecha */
+const SUDESTE_BOSSES = () => Object.keys(ZONES).filter(z => CITY[cityOf(z)].map === "sudeste").flatMap(z => [z, NIGHT_ZONES[z] ? z + ":noite" : null]).filter(Boolean);
+const luaCidade = () => { const all = SUDESTE_BOSSES(); return all.filter(k => BS()[k]).length / all.length; };
 // Pytuna aparece na exploração: a fumaça chega perto do Rhanon, fala (narra) e o vento leva ela embora
 function pytunaScene(lines, done) {
   if (!EX) return narrate(lines, done);
@@ -114,8 +118,8 @@ function chapterBanner(title, sub) {
   ransom(b.querySelector("h2"), [title.toUpperCase()], 11); levelUpJingle();
   setTimeout(() => b.classList.add("out"), 4200); setTimeout(() => b.remove(), 5000);
 }
-// depois do comentário do Pajé sobre um chefe: Pytuna (se for o último de uma cidade) e o fim do Norte, do Nordeste ou do
-// Centro-Oeste, nessa ordem
+// depois do comentário do Pajé sobre um chefe: Pytuna (se for o último de uma cidade) e o fim do Norte, do Nordeste, do
+// Centro-Oeste ou do Sudeste, nessa ordem
 function bossStory(id, done) {
   const steps = [];
   // ainda não viu o Pytuna (nenhuma noite na mata): ele se apresenta aqui, e a cena da primeira noite não repete
@@ -134,6 +138,10 @@ function bossStory(id, done) {
   if (estrelaCalm() >= 1 && !G.narrated.centroeste_fim) steps.push(next => {
     G.narrated.centroeste_fim = true; save(); musicStart("jaci");   // as estrelas voltam ao céu do cerrado: o tema da esperança
     narrate(NARRA_PYT.centroeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Centro-Oeste"), t("A história continua no Sudeste: o voo sai do Aeroporto de Brasília.")); setTimeout(next, 1500); });
+  });
+  if (luaCidade() >= 1 && !G.narrated.sudeste_fim) steps.push(next => {
+    G.narrated.sudeste_fim = true; save(); musicStart("jaci");   // apagão na cidade grande: todo mundo vê a lua
+    narrate(NARRA_PYT.sudeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Sudeste"), t("A história continua no Sul, onde a viagem termina. Em breve!")); setTimeout(next, 1500); });
   });
   const run = () => steps.length ? steps.shift()(run) : done && done();
   run();

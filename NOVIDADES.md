@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.78.0 — fim do Sudeste
+
+- O Sudeste agora tem fim de capítulo. Acalme os 10 chefes da região, de dia e de noite, em Belo Horizonte, Ouro
+  Preto, Rio e São Paulo, e o Pajé conta o que aconteceu: falta luz em São Paulo, e no escuro a cidade inteira vê Jaci
+  em cima dos prédios. No fim aparece a faixa "Fim do Sudeste".
+- No mapa do Brasil, o Sudeste mostra quantos chefes faltam: "Lua sobre as cidades: 4 de 10 chefes do Sudeste
+  acalmados".
+- O próximo capítulo é o Sul, onde a viagem termina.
+
 ## 0.77.0 — a mina de Ouro Preto e o freela da startup
 
 - Ouro Preto ganhou a última fase: a Mina abandonada (níveis 64 a 66). Desça pela passagem no largo de baixo das

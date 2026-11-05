@@ -199,7 +199,7 @@ function startExplore(zone, after, from) {
     if (zone === "aldeia" && !after) announceOffer();   // pedido do dia (na abertura, só depois de acordar)
     if (after) after();
     else if (G.night && !G.tutorial && !G.narrated.pyt_noite) { G.narrated.pyt_noite = true; save(); setTimeout(() => pytunaScene(NARRA_PYT.noite), 700); }   // primeira noite: Pytuna aparece
-    else if (jaciLight() >= 1 && !G.narrated.norte_fim || guaraciCalm() >= 1 && !G.narrated.nordeste_fim || estrelaCalm() >= 1 && !G.narrated.centroeste_fim) { EX.locked = true; setTimeout(() => bossStory("", () => { if (EX) EX.locked = false; }), 700); }   // save que já acalmou a região toda
+    else if (jaciLight() >= 1 && !G.narrated.norte_fim || guaraciCalm() >= 1 && !G.narrated.nordeste_fim || estrelaCalm() >= 1 && !G.narrated.centroeste_fim || luaCidade() >= 1 && !G.narrated.sudeste_fim) { EX.locked = true; setTimeout(() => bossStory("", () => { if (EX) EX.locked = false; }), 700); }   // save que já acalmou a região toda
     else if (cityOf(zone) === "belem" && !G.narrated.belem) { G.narrated.belem = true; save(); setTimeout(() => narrate(NARRA.belem), 600); }   // primeira vez na capital
     else if (cityOf(zone) === "saoluis" && !G.narrated.saoluis) { G.narrated.saoluis = true; save(); setTimeout(() => narrate(NARRA.saoluis), 600); }   // chegou no Nordeste
     else if (cityOf(zone) === "riodejaneiro" && !G.narrated.riodejaneiro) { G.narrated.riodejaneiro = true; save(); setTimeout(() => narrate(NARRA.riodejaneiro), 600); }

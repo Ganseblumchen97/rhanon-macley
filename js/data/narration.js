@@ -263,6 +263,13 @@ const NARRA_PYT = {
     "Jasytatá, curumim: estrela. O nome da nossa aldeia. Lá no meio do Brasil o menino entendeu por quê.",
     "Mas a fumaça seguiu pro Sudeste, pras cidades que não dormem. Essa parte fica pra amanhã."
   ],
+  sudeste: [
+    "E quando o último encantado do Sudeste se acalmou, curumim, faltou luz em São Paulo. Apagão de verdade, da Paulista até o Ibirapuera.",
+    "No escuro, o povo foi pra janela reclamar... e viu a lua. Jaci, inteira, redonda, em cima dos prédios.",
+    {r: "Teve gente que nunca tinha reparado nela, vô. Ficaram tirando foto até a luz voltar."},
+    "Os encantados também viram. Saci, Cuca, Pisadeira... Dizem que naquela noite eles perderam o medo de aparecer.",
+    "E o menino juntou o dinheiro da startup e olhou pro sul. Curitiba estava perto. E a fumaça também."
+  ],
   nordeste: [
     "E quando o último encantado do Nordeste se acalmou, curumim, Guaraci baixou a cabeça.",
     "Choveu no sertão naquela noite. Chuva grossa, de molhar o mandacaru e encher o açude.",

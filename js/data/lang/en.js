@@ -2939,6 +2939,14 @@ TX.en = {
     "A maior cidade do Brasil, curumim. Aqui eu me escondo atrás de qualquer chaminé. Ninguém repara numa fumaça a mais.": "The biggest city in Brazil, kiddo. Here I hide behind any chimney. Nobody notices one more puff of smoke.",
     "A capivara reparou. O passarinho que dorme em cima dela reparou. Eu reparei.": "The capybara noticed. The little bird that sleeps on her back noticed. I noticed.",
     "Tu é teimoso... Tá bom. Vou pra onde a mata de pinheiro acaba. Lá no frio, lá eu sou maior que tu.": "You're stubborn... Fine. I'm going where the pine forest ends. Up in the cold, there I'm bigger than you.",
-    "E o vento frio levou a fumaça pro sul. Fazia tempo que o menino não sentia frio.": "And the cold wind carried the smoke south. It had been a long time since the boy had felt cold."
+    "E o vento frio levou a fumaça pro sul. Fazia tempo que o menino não sentia frio.": "And the cold wind carried the smoke south. It had been a long time since the boy had felt cold.",
+    "E quando o último encantado do Sudeste se acalmou, curumim, faltou luz em São Paulo. Apagão de verdade, da Paulista até o Ibirapuera.": "And when the last enchanted creature of the Sudeste calmed down, kiddo, the power went out in São Paulo. A real blackout, from Paulista all the way to Ibirapuera.",
+    "No escuro, o povo foi pra janela reclamar... e viu a lua. Jaci, inteira, redonda, em cima dos prédios.": "In the dark, people went to their windows to complain... and saw the moon. Jaci, whole and round, above the buildings.",
+    "Teve gente que nunca tinha reparado nela, vô. Ficaram tirando foto até a luz voltar.": "Some people had never even noticed her, grandpa. They kept taking pictures until the power came back.",
+    "Os encantados também viram. Saci, Cuca, Pisadeira... Dizem que naquela noite eles perderam o medo de aparecer.": "The enchanted ones saw her too. Saci, Cuca, Pisadeira... They say that night they lost their fear of showing up.",
+    "E o menino juntou o dinheiro da startup e olhou pro sul. Curitiba estava perto. E a fumaça também.": "And the boy gathered his startup money and looked south. Curitiba was close. And so was the smoke.",
+    "Fim do Sudeste": "End of the Sudeste",
+    "A história continua no Sul, onde a viagem termina. Em breve!": "The story continues in the South, where the journey ends. Coming soon!",
+    "Lua sobre as cidades: {n} de {total} chefes do Sudeste acalmados": "Moon over the cities: {n} of {total} Sudeste bosses calmed"
   }
 };

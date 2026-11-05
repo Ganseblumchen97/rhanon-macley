@@ -2942,6 +2942,14 @@ TX.es = {
     "A maior cidade do Brasil, curumim. Aqui eu me escondo atrás de qualquer chaminé. Ninguém repara numa fumaça a mais.": "La ciudad más grande de Brasil, chiquillo. Aquí me escondo detrás de cualquier chimenea. Nadie se fija en un humo más.",
     "A capivara reparou. O passarinho que dorme em cima dela reparou. Eu reparei.": "La capibara se fijó. El pajarito que duerme encima de ella se fijó. Yo me fijé.",
     "Tu é teimoso... Tá bom. Vou pra onde a mata de pinheiro acaba. Lá no frio, lá eu sou maior que tu.": "Qué terco eres... Está bien. Me voy a donde termina el bosque de pinos. Allá en el frío, allá soy más grande que tú.",
-    "E o vento frio levou a fumaça pro sul. Fazia tempo que o menino não sentia frio.": "Y el viento frío se llevó el humo al sur. Hacía tiempo que el muchacho no sentía frío."
+    "E o vento frio levou a fumaça pro sul. Fazia tempo que o menino não sentia frio.": "Y el viento frío se llevó el humo al sur. Hacía tiempo que el muchacho no sentía frío.",
+    "E quando o último encantado do Sudeste se acalmou, curumim, faltou luz em São Paulo. Apagão de verdade, da Paulista até o Ibirapuera.": "Y cuando el último encantado del Sudeste se calmó, chiquillo, se fue la luz en São Paulo. Apagón de verdad, desde la Paulista hasta el Ibirapuera.",
+    "No escuro, o povo foi pra janela reclamar... e viu a lua. Jaci, inteira, redonda, em cima dos prédios.": "En la oscuridad, la gente se asomó a la ventana a quejarse... y vio la luna. Jaci, entera, redonda, encima de los edificios.",
+    "Teve gente que nunca tinha reparado nela, vô. Ficaram tirando foto até a luz voltar.": "Había gente que nunca se había fijado en ella, abuelo. Se quedaron sacando fotos hasta que volvió la luz.",
+    "Os encantados também viram. Saci, Cuca, Pisadeira... Dizem que naquela noite eles perderam o medo de aparecer.": "Los encantados también la vieron. Saci, Cuca, Pisadeira... Dicen que esa noche perdieron el miedo de aparecer.",
+    "E o menino juntou o dinheiro da startup e olhou pro sul. Curitiba estava perto. E a fumaça também.": "Y el muchacho juntó el dinero de la startup y miró al sur. Curitiba estaba cerca. Y el humo también.",
+    "Fim do Sudeste": "Fin del Sudeste",
+    "A história continua no Sul, onde a viagem termina. Em breve!": "La historia sigue en el Sur, donde termina el viaje. ¡Muy pronto!",
+    "Lua sobre as cidades: {n} de {total} chefes do Sudeste acalmados": "Luna sobre las ciudades: {n} de {total} jefes del Sudeste calmados"
   }
 };

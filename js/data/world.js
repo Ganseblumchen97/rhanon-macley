@@ -346,7 +346,7 @@ function flightLanding(reg) {
 }
 // o que falta na região de onde o voo sai (chefes sem acalmar e o freela dela), para o aviso antes de partir
 function flightMissing(f) {
-  const reg = f.a, all = {norte: NORTE_BOSSES, nordeste: NORDESTE_BOSSES, centroeste: CENTROESTE_BOSSES}[reg]();
+  const reg = f.a, all = {norte: NORTE_BOSSES, nordeste: NORDESTE_BOSSES, centroeste: CENTROESTE_BOSSES, sudeste: SUDESTE_BOSSES}[reg]();
   const left = all.filter(k => !BS()[k]).length, out = [];
   if (left) out.push(t(left === 1 ? "1 chefe sem acalmar" : "{n} chefes sem acalmar", {n: left}));
   Object.entries(FREELA_AT).filter(([ph, id]) => regionOfCity(cityOf(ph)) === reg && !G.portfolio[id]).forEach(([, id]) => out.push(t("o freela de {cliente}", {cliente: FREELAS[id].client})));

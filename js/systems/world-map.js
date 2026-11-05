@@ -166,7 +166,8 @@ function openBrasil(pick) {
   const beenSel = BR_SEL === "norte" || !!G.regions?.[BR_SEL], fromF = FLIGHTS.find(f => f.b === BR_SEL);
   const calm = {norte: () => t("Luz de Jaci: {n} de {total} chefes do Norte acalmados", {n: NORTE_BOSSES().filter(k => BS()[k]).length, total: NORTE_BOSSES().length}),
     nordeste: () => t("Calma de Guaraci: {n} de {total} chefes do Nordeste acalmados", {n: NORDESTE_BOSSES().filter(k => BS()[k]).length, total: NORDESTE_BOSSES().length}),
-    centroeste: () => t("Brilho das estrelas: {n} de {total} chefes do Centro-Oeste acalmados", {n: CENTROESTE_BOSSES().filter(k => BS()[k]).length, total: CENTROESTE_BOSSES().length})}[BR_SEL];
+    centroeste: () => t("Brilho das estrelas: {n} de {total} chefes do Centro-Oeste acalmados", {n: CENTROESTE_BOSSES().filter(k => BS()[k]).length, total: CENTROESTE_BOSSES().length}),
+    sudeste: () => t("Lua sobre as cidades: {n} de {total} chefes do Sudeste acalmados", {n: SUDESTE_BOSSES().filter(k => BS()[k]).length, total: SUDESTE_BOSSES().length})}[BR_SEL];
   const hints = !r.open ? [t("Ainda não dá pra ir. A história chega lá em breve.")]
     : !beenSel ? [t("O voo para {cidade} sai do {aero}.", {cidade: LOC[REGION_START[BR_SEL]].s, aero: t(REGIONS[fromF.a].airport)})]
     : [calm && calm(), BR_SEL === "norte" && t("Entre a aldeia e Belém, vai de barco de linha pelo rio."),

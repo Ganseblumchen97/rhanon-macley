@@ -2945,6 +2945,14 @@ TX.fr = {
     "A maior cidade do Brasil, curumim. Aqui eu me escondo atrás de qualquer chaminé. Ninguém repara numa fumaça a mais.": "La plus grande ville du Brésil, petit. Ici, je me cache derrière n'importe quelle cheminée. Personne ne remarque une fumée de plus.",
     "A capivara reparou. O passarinho que dorme em cima dela reparou. Eu reparei.": "Le capybara l'a remarquée. Le petit oiseau qui dort sur son dos l'a remarquée. Moi, je l'ai remarquée.",
     "Tu é teimoso... Tá bom. Vou pra onde a mata de pinheiro acaba. Lá no frio, lá eu sou maior que tu.": "Tu es têtu... D'accord. Je vais là où la forêt de pins s'arrête. Là-bas, dans le froid, je suis plus grande que toi.",
-    "E o vento frio levou a fumaça pro sul. Fazia tempo que o menino não sentia frio.": "Et le vent froid a emporté la fumée vers le sud. Cela faisait longtemps que le garçon n'avait pas eu froid."
+    "E o vento frio levou a fumaça pro sul. Fazia tempo que o menino não sentia frio.": "Et le vent froid a emporté la fumée vers le sud. Cela faisait longtemps que le garçon n'avait pas eu froid.",
+    "E quando o último encantado do Sudeste se acalmou, curumim, faltou luz em São Paulo. Apagão de verdade, da Paulista até o Ibirapuera.": "Et quand le dernier enchanté du Sudeste s'est apaisé, petit, il y a eu une coupure de courant à São Paulo. Une vraie panne, de la Paulista jusqu'à Ibirapuera.",
+    "No escuro, o povo foi pra janela reclamar... e viu a lua. Jaci, inteira, redonda, em cima dos prédios.": "Dans le noir, les gens sont allés à la fenêtre pour se plaindre... et ils ont vu la lune. Jaci, entière, ronde, au-dessus des immeubles.",
+    "Teve gente que nunca tinha reparado nela, vô. Ficaram tirando foto até a luz voltar.": "Il y avait des gens qui ne l'avaient jamais remarquée, grand-père. Ils ont pris des photos jusqu'au retour du courant.",
+    "Os encantados também viram. Saci, Cuca, Pisadeira... Dizem que naquela noite eles perderam o medo de aparecer.": "Les enchantés l'ont vue aussi. Saci, Cuca, Pisadeira... On dit que cette nuit-là, ils ont perdu la peur de se montrer.",
+    "E o menino juntou o dinheiro da startup e olhou pro sul. Curitiba estava perto. E a fumaça também.": "Et le garçon a rassemblé l'argent de la startup et a regardé vers le sud. Curitiba était proche. Et la fumée aussi.",
+    "Fim do Sudeste": "Fin du Sudeste",
+    "A história continua no Sul, onde a viagem termina. Em breve!": "L'histoire continue dans le Sud, là où le voyage se termine. Bientôt !",
+    "Lua sobre as cidades: {n} de {total} chefes do Sudeste acalmados": "Lune sur les villes : {n} sur {total} chefs du Sudeste apaisés"
   }
 };
