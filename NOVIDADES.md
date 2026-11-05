@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.82.0 — as Dunas da Joaquina
+
+- Florianópolis ganhou a sua trilha: as Dunas da Joaquina (níveis 72 a 74), pela passagem da esquerda da Lagoa da
+  Conceição. São dunas brancas com lagoinhas de água doce, maria-farinha, gaivotão (que rouba da bolsa),
+  lagartixa-da-praia e tiê-sangue.
+- De dia, um Leão-marinho que subiu do frio do sul descansa numa poça entre as pedras. Ao ser acalmado, vira aliado
+  no Chamado do aliado ("Barrigada do mar") e libera o ônibus para Foz do Iguaçu. De noite, o vento para e uma das
+  Bruxas da Ilha ri no alto da duna.
+- O Pytuna aparece rasteiro em cima do mar, e o canto secreto conta do artista que guardou as histórias das bruxas.
+
 ## 0.81.0 — as Coxilhas do Pampa
 
 - A primeira trilha do Sul: as Coxilhas do Pampa (níveis 70 a 72), pela passagem da esquerda da estância. É campo

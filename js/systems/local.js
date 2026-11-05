@@ -71,7 +71,7 @@ function selectSub(id, msg) {
   else if (id === "lagoa") {
     btn(t("Entrar na Lagoa"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo da Ilha."));
-    lh(t("As trilhas da Ilha vêm em breve. O ônibus atravessa Santa Catarina até Foz do Iguaçu."));
+    lh(t("A passagem da esquerda leva às Dunas da Joaquina. O ônibus para Foz do Iguaçu sai depois do Leão-marinho."));
   }
   else if (id === "centrofoz") {
     btn(t("Entrar no centro de Foz"), () => startExplore(id), false, i);

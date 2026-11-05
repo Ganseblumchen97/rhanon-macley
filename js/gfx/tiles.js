@@ -91,6 +91,8 @@ Object.entries({praiagrande: ["#2a6ab8", "#f4ecd8"], trocatroca: ["#e8a020", "#c
 // rodoviárias do Nordeste: as cores do centro da cidade (Petrolina com mandacaru no lugar das árvores)
 Object.assign(TILE_PAL, {aero_bel: TILE_PAL.veropeso, aero_rec: TILE_PAL.recifeantigo, aero_bsb: TILE_PAL.planopiloto, aero_cnf: TILE_PAL.mercadocentral, aero_gru: TILE_PAL.paulista, aero_igu: TILE_PAL.centrofoz, rodo_slz: TILE_PAL.praiagrande, rodo_the: TILE_PAL.trocatroca, rodo_pet: {...TILE_PAL.orla, cactus: true}, rodo_rec: TILE_PAL.recifeantigo});
 // Florianópolis: a Lagoa da Conceição, areia clara como Copacabana, mas com casario açoriano colorido e árvore comum (sem coqueiro)
+// Florianópolis: as Dunas da Joaquina, a areia e as dunas dos Lençóis com o mar mais verde do Sul
+TILE_PAL.dunas = Object.assign({}, TILE_PAL.lencois, {water: "#2a8aa8", water2: "#9ad8e0"});
 TILE_PAL.lagoa = Object.assign({}, TILE_PAL.copacabana, {palm: false, path: "#d8c8a0", path2: "#c4b28a", water: "#2a7ab8", water2: "#9ad0f0", roof: "#c8583a", roof2: "#8a3a24", walls: ["#f0e8d0", "#2a7ab8", "#e8c048", "#f0e8d0", "#d8586a", "#f0e8d0"]});
 const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "~", Y: ".", J: "."};   // U: o barco de linha fica na água; Y e J: entrada e baú do segredo (systems/secrets.js)
 

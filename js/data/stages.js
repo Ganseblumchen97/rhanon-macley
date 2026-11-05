@@ -1044,6 +1044,42 @@ const STAGES = {
   // moradores; a saída da direita volta pro mapa e a rua da esquerda sobe pro aeroporto
   // Pampa gaúcho (Rio Grande do Sul): a estância, campo aberto com coxilha (mato alto), o galpão (O), barracas (K), umbus
   // (T) e a gente da estância; a saída da direita volta pro mapa e a passagem da esquerda leva às Coxilhas
+  // Florianópolis: as Dunas da Joaquina (gerado por tools/gerar_mapas.py)
+  dunas: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TT...f.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "T......,TT..,,.T....,,...,,TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "T...B.....a.......,...,.........TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "To,.---------------------------..TTTTTTTTTTT.....T.TTTTTTTTT",
+      "T,.,.......,..............a...-...TTTTTTTT.a,........TTTTTTT",
+      "T......,TT.,,..T.a..~~~~~.....-...TTTTTTTT..=====----.TTTTTT",
+      "TT...,fTTTTTTTTTTTT~~~~~~~.,.,-..aTTTTTTTT.~=~~~~~..-.TTTTTT",
+      "TTTTTTTTTTTTTTTT...~~~~~~~.,,.-..TTTTTTTTTT~=~~~~~..-..TTTTT",
+      "TTTTTTTTTTTT......,~~~~~~~....-,TTTTTTTTTTT~=~~~~~..-,.TTTTT",
+      "TTTTTTTTTTT.--------=====------.TTTTTTTTTTTa=~~~~a..-,,TTTTT",
+      "TTTTTTTTTT..-....a......,......TTTTTTTTTTTT.-.,f....-..TTTTT",
+      "TTTTTTTTT...-,.....,.TT....a..TTTTTTTTTTTT,.-..,...a-..TTTTT",
+      "TTTTTTTTT...-.,.TTTTTTTT.....TTTTTTTTTTTTa..-..,....-.....TT",
+      "TTTTTTTTT...-...TTTTTTTTTTTTTTTTTTTTTTTTT...-...,...------.T",
+      "TTTTTTTTTT..-.fTTTTTTTTTTTTTTTTTTTTTTTTTT...-.fo.,.,....a-.T",
+      "TTTTTTTTTT..-......,.,.TTTTTTTTTTTTTTTTTTT..-..T~~~~~....-.T",
+      "TTTTTTTTTT.a-........,....TTTTTTTTTTTTTTTTT.-.T~~~~~~~o..-.T",
+      "TTTTTTTTTTT.-------------..TTTTTTTTTTTTTTTT.-.T~~~~~~~.f.-.T",
+      "TTTTTTTTTTTT...........,-..,TTTTTTTTTT......-.T~~~~~~~f.a-.T",
+      "TTTTTTTT~~~~~.....,ao...-..,TTTT~~~~~.-------.TT~~~~~,...-.T",
+      "TTTTTT~~~~~~~~~TTTTTTf..-...TT~~~~~~~~=......TTTTTT.,,...-.T",
+      "TTTTTT~~~~~~~~~TTTTTT,..-...TT~~~~~~~~=......TTTTTT.,..,.-.T",
+      "TTTTTT~~~~~~~~~TTTTTT,.,-.....~~~~~~~~F......TTTTTTT.....-.T",
+      "TTTTTTTT~~~~~TTTTTTTTT..-.......~~~~~.-..,a.TTTTTTTTT...,-.T",
+      "TTTTTTTTTTTTTTTTTTTTTT..-........,.a,.-...,TTTTTTTTTTTTT.-.T",
+      "TTTTTTTTTTTTTTTTTTTTTT..---------------,.TTTTTTTTTTTTTT..-.T",
+      "TTTTTTTTTTTTTTTTTTTTTTTT..........,....TTTTTTTTTTTTTTTT..S-E",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT..T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Pampa gaúcho: as Coxilhas (gerado por tools/gerar_mapas.py)
   coxilhas: {
     next: null,
@@ -1081,16 +1117,17 @@ const STAGES = {
     ]
   },
   // Florianópolis (Santa Catarina): a vila da Lagoa da Conceição, casario açoriano (#) com a pensão (O), barracas de renda
-  // e de peixe (K), árvores (T), moradores e a lagoa (~) embaixo; a saída da direita volta pro mapa
+  // e de peixe (K), árvores (T), moradores e a lagoa (~) embaixo; a saída da direita volta pro mapa e a passagem da
+  // esquerda leva às Dunas da Joaquina
   lagoa: {
-    safe: true, next: null,
+    safe: true, next: "dunas",
     rows: [
       "########################",
       "########################",
       "#f...OOO.....KKK....T..#",
       "#....OOO......V...P....#",
       "#.....-.........-......#",
-      "#.--------------------SE",
+      "G.--------------------SE",
       "#.T..P....KKK...-..T...#",
       "#..........C....-....P.#",
       "#..f..T.........T...f..#",

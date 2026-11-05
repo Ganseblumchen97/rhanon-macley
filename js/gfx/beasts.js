@@ -1556,6 +1556,9 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   jacu: (pose, f) => pombo(pose, f, {b: "#2a2a30", B: "#16161a", n: "#d8282a", p: "#3a3a44", w: "#22222a", y: "#9aa0a8"}),   // jacu: preto, papo vermelho
   pepita: pessoa({pal: {s: "#c8905a", S: "#9a6a3e", h: "#3a2a1e"}, shirt: ["#d8c8a0", "#b0a078"], pants: ["#5a4a3a", "#3e3226"], noBand: true, cap: ["#d8b860", "#a88a38"]}),   // vendedor de ouro de tolo: chapéu de palha e camisa de garimpeiro
   saci: saciFrame,
+  gaivotao: (pose, f) => garca(pose, f, {b: "#f0f0ec", B: "#2a2a32", y: "#e8c030", Y: "#b88a20", k: "#e8c030"}),   // gaivotão: branco de costas pretas, bico amarelo
+  tie_sangue: (pose, f) => pombo(pose, f, {b: "#d8202a", B: "#9a1418", n: "#d8202a", p: "#e8303a", w: "#2a2a2a", y: "#3a3a3a"}),   // tiê-sangue: vermelho-vivo, asa preta
+  bruxa_ilha: visagem({w: "#3a2a4a", W: "#22182e", s: "#c8c0b0", h: "#e8e8e0", e: "#9aff6a"}),   // Bruxa da Ilha: vestido escuro, cabelo branco e olho verde
   tacha: (pose, f) => garca(pose, f, {b: "#8a8a90", B: "#5e5e66", n: "#2a2a30", N: "#e8e8e0", y: "#e85a3a", Y: "#a83a24", k: "#2a2a2a"}),   // tachã: cinza, colar preto e branco e pernas vermelhas
   joao_barro: (pose, f) => pombo(pose, f, {b: "#b8784a", B: "#8a5430", n: "#d8a070", p: "#e8c8a0", w: "#9a6438", y: "#5a4a3a"}),   // joão-de-barro: cor de terra, peito claro
   boitata_sul: cobra({b: "#3a8ae8", B: "#1a4aa8", k: "#a8f0ff", eye: "#e8ffff", flame: true, rattle: ["#c8e8ff", "#7aa8d8"]}, false),   // Boitatá do Sul: a cobra de fogo em fogo azul e frio

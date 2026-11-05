@@ -81,6 +81,7 @@ const ALLY_MOVES = {
   muriqui_rei:      {n: "Bando dourado", d: "Dano leve e cura 30% da vida do Rhanon.", pow: .7, elem: "planta", fx: "bando"},
   tatu_rei:         {n: "Túnel do tatu", d: "Cava por baixo do bicho e o chão cede: o maior dano de todos.", pow: 2.2, elem: "planta", fx: "tunel"},
   quati_rei:        {n: "Bando do Corcovado", d: "Três unhadas rápidas do bando de quatis.", pow: .7, elem: "planta", fx: "frenesi"},
+  leao_marinho:     {n: "Barrigada do mar", d: "O leão-marinho de luar pula da onda e cai em cima do bicho: golpe forte de água.", pow: 1.7, elem: "agua", fx: "padrao"},
   touro_xucro:      {n: "Tropel do pampa", d: "O touro de luar desce a coxilha e passa por cima: golpe forte de vento.", pow: 1.7, elem: "vento", fx: "padrao"},
   capivara_rainha:  {n: "Calma da capivara", d: "Pouco dano, mas os 2 próximos golpes do bicho batem pela metade.", pow: .6, elem: "agua", fx: "bandeira"}
 };

@@ -105,6 +105,8 @@ const NARRA_BOSS = {
   cuca: ["A Cuca é velha como as cantigas de ninar, curumim. Mora numa gruta e só pega quem não quer dormir.", "Com a fumaça, ela esqueceu a cantiga e ficou só com o caldeirão. Fervia fumaça em vez de chá.", {r: "Ela quase me fez dormir em pé, vô. A voz dela é pesada que nem rede molhada."}, "E tu cantou pra ela a cantiga que eu cantava pra ti. Ela lembrou, coitada. Voltou pra gruta cantarolando."],
   capivara_rainha: ["A Capivara-rainha vive no lago desde antes de ter cidade em volta, curumim. É a bicha mais calma que existe: passarinho dorme em cima dela.", "A fumaça veio pelo rio sujo e ela ficou sem sossego. Capivara sem sossego é feito trovão: devagar, mas não para.", {r: "Ela me empurrou pro lago, vô. Com calma. Mas empurrou."}, "Depois sentou do teu lado na grama e ficou olhando a água. Capivara não pede desculpa. Ela só fica perto."],
   pisadeira: ["A Pisadeira mora nos telhados, curumim. Quando alguém janta demais e dorme de barriga pra cima, ela desce e pisa no peito dele.", "Na cidade grande, com tanta gente cansada e com o peito apertado, a fumaça deu a ela peso de pedra.", {r: "Eu cochilei no banco do parque, vô. Acordei com ela em cima de mim, rindo."}, "E tu levantou mesmo assim, com o peso todo. Ela ficou tão espantada que esqueceu de pisar. Voltou pro telhado e de lá ficou só olhando."],
+  leao_marinho: ["O Leão-marinho subiu do frio lá do sul, curumim, pra descansar nas pedras da Ilha. Bicho do mar não briga à toa.", "A fumaça veio rasteira em cima da água e entrou no fôlego dele. Aí ele não deixava ninguém chegar nem na areia.", {r: "Eu sentei longe e esperei, vô. Quando o vento mudou, ele dormiu de novo na pedra."}, "Às vezes acalmar é só deixar o outro descansar. Ele voltou pro mar quando quis."],
+  bruxa_ilha: ["As Bruxas da Ilha são das histórias dos pescadores, curumim. Trançam a crina dos cavalos, dão nó nas redes, levam a canoa pro mar sozinha.", "Mas são brincadeira de pescador velho. A fumaça é que deixou a brincadeira brava: o nó virou laço e a gargalhada virou ventania.", {r: "Eu desatei os nós das redes um por um, vô. Ela ficou olhando e acabou rindo de mim."}, "Bruxa que ri não faz mal. Agora ela voltou pras histórias, que é o lugar dela."],
   touro_xucro: ["O Touro Xucro nunca foi laçado, curumim. Os peões contam que ele é o dono das coxilhas, e que o gado todo seguia ele.", "A fumaça entrou nas narinas dele e ele começou a correr sem parar, derrubando cerca, espantando a boiada inteira.", {r: "Eu fiquei parado na frente dele, vô, sem lança levantada. Ele parou bem pertinho e cheirou minha mão."}, "Bicho xucro não aceita laço, mas aceita respeito. Agora ele pasta de novo no alto da coxilha."],
   boitata_sul: ["O Boitatá do Sul é primo do lá de cima, curumim. Os dois são cobra de fogo e os dois cuidam do campo contra quem bota fogo à toa.", "Só que a fumaça confundiu ele: pensou que o fogo era culpa de quem andava no campo, e começou a correr atrás de todo mundo.", {r: "Eu mostrei pra ele que a fumaça vinha de longe, vô. Não era de ninguém dali."}, "E ele foi atrás dela, correndo baixinho pelo campo, pro norte. O fogo dele é pra proteger, não pra queimar."],
   tatu_rei: ["O Tatu-rei cavou a primeira mina daqui, curumim, muito antes dos homens chegarem com a picareta. Os túneis dele iam até debaixo das igrejas.", "A fumaça desceu pelos poços e ficou presa lá embaixo. Ele começou a cavar sem parar, procurando ar, e a serra inteira tremia.", {r: "Eu abri uma galeria pro vento entrar, vô. Ele respirou e parou de cavar."}, "Bicho que cava sabe ouvir a terra. Agora ele dorme de novo, enroladinho na couraça, debaixo de Ouro Preto."],
@@ -239,6 +241,14 @@ const NARRA_PYT = {
     {r: "Tem gente que planta fogo de propósito. Não é descuido."},
     {p: "Então tu já entendeu. Quem manda no fogo não mora no mato. Mora na cidade do meio, a de concreto."},
     "E a fumaça foi pro leste, na direção de Brasília."
+  ],
+  // Sul: na Ilha a fumaça vem rasteira em cima do mar; aparece depois do Leão-marinho, o último chefe de dia de Florianópolis
+  leao_marinho: [
+    "Nas dunas da Joaquina, quando o Leão-marinho voltou a dormir na pedra, a fumaça apareceu rasteira em cima do mar.",
+    {p: "Ilha, curumim... Água pra todo lado. Eu só passei por aqui. Não gosto de sal."},
+    {r: "Tu tá ficando fraca. Do Norte até aqui, cada lugar te tirou um pedaço."},
+    {p: "Fraca? Lá no oeste tem um rio que ronca de tanta água caindo. E depois dele, a última mata de pinheiro. Lá eu junto tudo de volta."},
+    "E a fumaça cruzou o continente, pro oeste, pro lado das Cataratas."
   ],
   // Sul: no pampa a fumaça não tem onde se esconder; aparece depois do Touro Xucro, o último chefe de dia do Pampa
   touro_xucro: [
