@@ -383,6 +383,20 @@ const MUS = (() => {
         [4, 0, 73, 3], [4, 3, 76, 3], [4, 6, 81, 2], [4, 8, 78, 4], [4, 12, 76, 4], [5, 0, 73, 8], [5, 8, 69, 4], [5, 12, 71, 4],
         [6, 0, 73, 3], [6, 3, 76, 3], [6, 6, 79, 2], [6, 8, 78, 4], [6, 12, 76, 4], [7, 0, 73, 4], [7, 4, 71, 2], [7, 6, 73, 2], [7, 8, 74, 8]]
   };
+  /* Tema do Sul (leitmotif): em mi menor, no jeito da milonga e do chamamé. O motivo "si–sol–lá–si" gira em volta da
+     quinta e sobe, no 4-2-2 de quem canta de pé no galpão. A: mi menor–dó–ré–si com sétima (a cadência da milonga), um
+     acorde a cada dois compassos, terminando no si que pede a volta. B (a resposta, que sobe e esquenta): sol–ré–lá
+     menor–si com sétima, cantada pelo violão e com a gaita (a sanfona do Sul) fazendo a terça. */
+  const SUL_THEME = {
+    A: [[0, 0, 71, 4], [0, 4, 67, 2], [0, 6, 69, 2], [0, 8, 71, 4], [0, 12, 74, 4], [1, 0, 72, 6], [1, 6, 71, 2], [1, 8, 67, 8],
+        [2, 0, 72, 4], [2, 4, 67, 2], [2, 6, 69, 2], [2, 8, 72, 4], [2, 12, 76, 4], [3, 0, 74, 6], [3, 6, 72, 2], [3, 8, 71, 8],
+        [4, 0, 74, 4], [4, 4, 69, 2], [4, 6, 71, 2], [4, 8, 72, 4], [4, 12, 74, 4], [5, 0, 76, 8], [5, 8, 74, 4], [5, 12, 72, 4],
+        [6, 0, 71, 4], [6, 4, 75, 2], [6, 6, 78, 2], [6, 8, 76, 4], [6, 12, 75, 4], [7, 0, 71, 12]],
+    B: [[0, 0, 79, 6], [0, 6, 78, 2], [0, 8, 76, 4], [0, 12, 74, 4], [1, 0, 71, 8], [1, 8, 74, 4], [1, 12, 79, 4],
+        [2, 0, 78, 6], [2, 6, 76, 2], [2, 8, 74, 4], [2, 12, 72, 4], [3, 0, 69, 8], [3, 8, 71, 4], [3, 12, 74, 4],
+        [4, 0, 72, 4], [4, 4, 76, 4], [4, 8, 81, 4], [4, 12, 79, 4], [5, 0, 76, 8], [5, 8, 72, 4], [5, 12, 69, 4],
+        [6, 0, 71, 4], [6, 4, 75, 4], [6, 8, 78, 4], [6, 12, 81, 4], [7, 0, 75, 12]]
+  };
   /* Tema de Pytuna (leitmotif do vilão, igual em todas as regiões): "ré – mi bemol – lá bemol – dó sustenido", grave e
      lento. Sobe meio tom, salta o trítono (ré a lá bemol, o intervalo mais instável que existe) e cai num dó sustenido
      que não resolve: a fumaça que nunca assenta. Na segunda frase o salto escorrega meio tom e volta para o ré. */
@@ -672,6 +686,57 @@ const MUS = (() => {
         const len = m.len * d * .92;
         if (part === "B") { sanfona(mtof(m.note), t, len, .018); violao(mtof(this.terca(m.note)), t, len, .012, true); }
         else { lead(mtof(m.note - 12), t, len, .016); lead(mtof(this.terca(m.note) - 12), t, len, .009); if (part === "A2") sanfona(mtof(m.note), t, len, .012); }   // a dupla
+      }
+    },
+    // Foz do Iguaçu e o mapa do Sul: chamamé. O violão faz o rasguido no 3-3-2 (para baixo, para cima, para baixo), o
+    // baixo e o bombo leguero marcam o um, e a gaita (a sanfona do Sul) segura os acordes e canta o tema. Forma:
+    // introdução só de violão - A (a gaita canta) - B (o violão canta a resposta, a gaita faz a terça) - A' (oitava
+    // acima, a gaita com a flauta)
+    localSul: {
+      bpm: 96, wet: .3, level: .4, swing: .14, form: ["I", "A", "B", "A2"], melody: null,
+      chords: [{bass: 40, notes: [52, 55, 59, 64]}, {bass: 48, notes: [52, 55, 60, 64]}, {bass: 38, notes: [50, 54, 57, 62]}, {bass: 47, notes: [51, 54, 57, 59]}],
+      chordsB: [{bass: 43, notes: [50, 55, 59, 62]}, {bass: 38, notes: [50, 54, 57, 62]}, {bass: 45, notes: [52, 57, 60, 64]}, {bass: 47, notes: [51, 54, 57, 59]}],
+      batida: {0: 0, 6: 1, 12: 0},   // o rasguido: 3-3-2 (0 = para baixo, 1 = para cima)
+      // segunda voz: a nota da escala de mi menor duas casas abaixo
+      terca(m) { const sc = [4, 6, 7, 9, 11, 0, 2], k = sc.indexOf(((m % 12) + 12) % 12); if (k < 0) return m - 3; const pc = sc[(k + 5) % 7]; const d = ((m % 12) - pc + 12) % 12; return m - (d || 12); },
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? this.chordsB : this.chords)[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(part === "B" ? SUL_THEME.B : SUL_THEME.A, part === "A2" ? 12 : 0, part === "A2");
+        if (s in this.batida) strum(chord.notes.slice(this.batida[s] ? 1 : 0), t, d * 3, this.batida[s] ? .014 : .022, this.batida[s]);
+        if (s === 0) { violao(mtof(chord.bass), t, d * 6, .03); synth("triangle", mtof(chord.bass - 12), t, d * 7, .07); }
+        if (s === 8) { violao(mtof(chord.bass + 7), t, d * 5, .024); synth("triangle", mtof(chord.bass - 5), t, d * 5, .05); }
+        if (part !== "I") {
+          if (s === 0) kick(t, .07); else if (s === 6) kick(t, .03);   // bombo leguero
+          if (s === 0 && barIn % 2 === 0) chord.notes.forEach(m => sanfona(mtof(m + 12), t, d * 31, .003));   // a gaita segurando
+        }
+        if (Math.random() < .002) bird(t);
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        const len = m.len * d * .95;
+        if (part === "B") { violao(mtof(m.note - 12), t, len, .03); sanfona(mtof(this.terca(m.note)), t, len, .012); }   // o violão canta, a gaita faz a terça
+        else { sanfona(mtof(m.note), t, len, .02); if (part === "A2") flute(mtof(m.note), t, len * .9, .01); }
+      }
+    },
+    // Sul à noite: milonga. O violão sozinho no balanço 3-3-2 do bordão, os acordes dedilhados por cima, e o tema na
+    // corda grave, devagar; na parte B a gaita responde de longe, baixinho. Grilos e a coruja do frio
+    localSulNight: {
+      bpm: 66, wet: .5, level: .4, swing: .1, form: ["I", "A", "B", "A"], melody: null,
+      dedilha: {2: 1, 4: 2, 8: 3, 10: 2, 14: 1},
+      play(i, t, d) {
+        const N = TRACKS.localSul, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
+        const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)];
+        if (i % 128 === 0) this.melody = part === "I" ? null : themeLine(part === "B" ? SUL_THEME.B : SUL_THEME.A, -12);
+        if (s === 0 || s === 6 || s === 12) violao(mtof(chord.bass + (s === 6 ? 7 : 0)), t, d * 5, .03);   // o bordão da milonga
+        if (s in this.dedilha) violao(mtof(chord.notes[this.dedilha[s]] + 12), t, d * 4, .009);
+        if (s === 0 && barIn % 2 === 0) { pad(chord.notes, t, d * 32, .008); synth("sine", mtof(chord.bass - 12), t, d * 30, .05); }
+        if (s % 8 === 4 && Math.random() < .5) cricket(t);
+        if (Math.random() < .002) owl(t);
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        const len = m.len * d * .95;
+        if (part === "B") sanfona(mtof(m.note + 12), t, len, .009);
+        else violao(mtof(m.note), t, len, .026);
       }
     },
     // à noite, cada região tem a sua faixa de exploração e de mapa (musicStart troca sozinho, como no Norte): o tema da
@@ -976,6 +1041,36 @@ const MUS = (() => {
         const len = m.len * d * .9;
         if (part === "B") { sanfona(mtof(m.note), t, len, .02); viola(mtof(N.terca(m.note)), t, len, .014); }
         else { viola(mtof(m.note), t, len, .034); viola(mtof(N.terca(m.note)), t, len, .022); if (part === "A2") sanfona(mtof(m.note), t, len, .014); }
+      }
+    },
+    // batalha no Sul: vanerão (a vaneira gaúcha). Bumbo no um e no três, caixa no contratempo, a gaita batendo os acordes
+    // nos contratempos (o pulo da vaneira), o baixo indo e vindo entre a fundamental e a quinta e o violão no 2 e no 4.
+    // Forma: introdução de gaita - A (a gaita canta o tema, com a terça) - B (o violão canta a resposta) - A' (oitava
+    // acima, com floreios) - C (ponte de bateria que cresce)
+    battleSul: {
+      bpm: 152, wet: .2, level: .44, swing: .02, form: ["I", "A", "B", "A2", "C"], melody: null,
+      play(i, t, d) {
+        const N = TRACKS.localSul, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 5];
+        const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)];
+        const bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
+        if (i % 128 === 0) { this.melody = part === "I" || part === "C" ? null : themeLine(part === "B" ? SUL_THEME.B : SUL_THEME.A, part === "A2" ? 12 : 0, part !== "A"); hat(t, .02, true); }
+        if (part !== "I") {
+          if (s === 0 || s === 8) kick(t, s ? .09 : .11);
+          if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) snare(t, .028);
+          if (s % 2 === 0) hat(t, s % 4 === 2 ? .01 : .006);
+        }
+        if (bridge) { if (s % 4 === 2) reco(t, .008); return; }
+        if (s % 4 === 2) chord.notes.forEach(m => sanfona(mtof(m + 12), t, d * 1.2, part === "I" ? .006 : .0045));   // o pulo da vaneira
+        if (part !== "I") {
+          if (s === 0 || s === 8) synth("triangle", mtof(chord.bass - 12 + (s ? 7 : 0)), t, d * 3, .1);
+          if (s === 6 || s === 14) synth("triangle", mtof(chord.bass - 12 + (s === 6 ? 4 : 9)), t, d * 1.5, .06);
+          if (s === 4 || s === 12) strum(chord.notes.slice(1), t, d * 2, .012, s === 12);
+        }
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        const len = m.len * d * .9;
+        if (part === "B") { lead(mtof(m.note - 12), t, len, .016); sanfona(mtof(N.terca(m.note)), t, len, .012); }
+        else { sanfona(mtof(m.note), t, len, .022); sanfona(mtof(N.terca(m.note)), t, len, .012); if (part === "A2") lead(mtof(m.note - 12), t, len, .01); }
       }
     },
     // luta contra bug do freela: o trabalho do Rhanon, não a trama, então toca o tema DELE (RHANON_THEME.abertura) e não
@@ -1430,7 +1525,7 @@ function musicStart(id) {
   id = id || "battleCapo";
   // fora do Norte, exploração e mapa tocam a faixa da região (Nordeste: toada do boi; Centro-Oeste: toada caipira;
   // Sudeste: sertanejo universitário), e à noite a versão noturna dela
-  const REGION_LOCAL = {nordeste: "localNordeste", centroeste: "localCentroOeste", sudeste: "localSudeste"};
+  const REGION_LOCAL = {nordeste: "localNordeste", centroeste: "localCentroOeste", sudeste: "localSudeste", sul: "localSul"};
   // no Sudeste cada estado tem o seu: o Rio toca funk e São Paulo, MPB (Minas fica com o sertanejo da região)
   const CITY_LOCAL = {riodejaneiro: "funkSudeste", saopaulo: "mpbSudeste"};
   const regLocal = id === "local" ? CITY_LOCAL[curCity()] || REGION_LOCAL[regionOfCity(curCity())] : id === "map" ? REGION_LOCAL[MAP_REGION] : null;

@@ -50,15 +50,17 @@ const MAP_ICON = {
   portocuiaba: ["#c8603a", MI_TREE(-3, 1, 5, "#f0c020") + `<path d="M2 8 V-1 H9 V8Z" fill="${MI.c}" ${MI.s}/><path d="M1 -1 L5.5 -5 L10 -1Z" fill="${MI.r}" ${MI.s}/>`],   // ipê-amarelo e casario
   setecidades: ["#a8603a", `<path d="M-9 8 V0 Q-9 -5 -5 -5 Q-2 -5 -2 0 V8Z M0 8 V-3 Q0 -9 5 -9 Q9 -9 9 -3 V8Z" fill="#c8845a" ${MI.s}/><path d="M3 -4 l2 2 l2 -2 M-7 1 h3" stroke="#e8402a" stroke-width="1.1" fill="none"/>`],   // as pedras de Sete Cidades com pintura antiga
   arrecifes: ["#2a8ac8", `<path d="M-2 8 Q-1 0 2 -5" stroke="${MI.t}" stroke-width="2" fill="none"/><path d="M2 -5 Q-6 -8 -8 -3 M2 -5 Q8 -9 9 -2 M2 -5 Q0 -11 -4 -10 M2 -5 Q6 -11 8 -9" stroke="#3a9a3a" stroke-width="2.2" stroke-linecap="round" fill="none"/>` + MI_WAVE(8, "#cfeeff", 1.4)],   // coqueiro na praia
+  estancia: ["#6a8a3a", `<path d="M-6 -2 Q-7 8 0 9 Q7 8 6 -2Z" fill="#8a5a2a" ${MI.s}/><ellipse cy="-2" rx="6" ry="2" fill="#3a8a3a" ${MI.s}/><path d="M2 -2 L6 -10" stroke="#c8c8d0" stroke-width="1.8"/>`],   // a cuia de chimarrão com a bomba
+  centrofoz: ["#7a4ac8", `<path d="M-2 9 L-1 -8 L1 -8 L2 9Z" fill="${MI.c}" ${MI.s}/><rect x="-2" y="-2" width="4" height="3" fill="#3a9a4a"/><rect x="-2" y="1" width="4" height="3" fill="#e8402a"/><rect x="-2" y="4" width="4" height="3" fill="#4a8ad8"/>` + MI_WAVE(8)],   // o Marco das Três Fronteiras, com as cores dos três países
   curitiba: ["#4a3a8a", `<rect x="-1.2" y="-1" width="2.4" height="9" fill="${MI.t}"/><path d="M-8 -1 Q0 -6 8 -1 M-6 -5 Q0 -9 6 -5" fill="none" stroke="#3a7a3a" stroke-width="2.6" stroke-linecap="round"/>`]
 };
 MAP_ICON.terminal = MAP_ICON.parada;   // o cais de Belém também é o barco de linha
 // rodoviárias do Nordeste: o ônibus de viagem de lado, com as janelas e as rodas
 MAP_ICON.rodo_slz = MAP_ICON.rodo_the = MAP_ICON.rodo_pet = MAP_ICON.rodo_rec = ["#3a6a4a", `<rect x="-9" y="-6" width="18" height="11" rx="2" fill="${MI.c}" ${MI.s}/><path d="M-8 1 H8" stroke="#2a8a5a" stroke-width="2"/><path d="M-7 -4 h3 m1 0 h3 m1 0 h3" stroke="#2a4a6a" stroke-width="2.4"/><rect x="5" y="-4" width="3" height="4" fill="#2a4a6a"/><circle cx="-5" cy="6" r="2" fill="${MI.k}"/><circle cx="5" cy="6" r="2" fill="${MI.k}"/>`];
 // aeroportos (última parada da cidade): o avião de linha visto de cima, com as asas abertas e a cauda
-MAP_ICON.aero_bel = MAP_ICON.aero_rec = MAP_ICON.aero_bsb = MAP_ICON.aero_cnf = ["#3a5a8a", `<path d="M0 -10 Q2 -9 2 -5 V-1 L10 3 V5 L2 3 V7 L5 9 V10 L0 9 L-5 10 V9 L-2 7 V3 L-10 5 V3 L-2 -1 V-5 Q-2 -9 0 -10Z" fill="${MI.c}" ${MI.s}/><path d="M-1 -6 H1" stroke="#2a4a6a" stroke-width="2"/>`];
+MAP_ICON.aero_bel = MAP_ICON.aero_rec = MAP_ICON.aero_bsb = MAP_ICON.aero_cnf = MAP_ICON.aero_gru = MAP_ICON.aero_igu = ["#3a5a8a", `<path d="M0 -10 Q2 -9 2 -5 V-1 L10 3 V5 L2 3 V7 L5 9 V10 L0 9 L-5 10 V9 L-2 7 V3 L-10 5 V3 L-2 -1 V-5 Q-2 -9 0 -10Z" fill="${MI.c}" ${MI.s}/><path d="M-1 -6 H1" stroke="#2a4a6a" stroke-width="2"/>`];
 // no mapa grande, cada cidade aparece com o desenho do lugar dela
-const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", brasilia: "planopiloto", bh: "mercadocentral", ouropreto: "tiradentes", riodejaneiro: "copacabana", saopaulo: "paulista", curitiba: "curitiba"};
+const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", brasilia: "planopiloto", bh: "mercadocentral", ouropreto: "tiradentes", riodejaneiro: "copacabana", saopaulo: "paulista", foz: "centrofoz", pampa: "estancia", curitiba: "curitiba"};
 // disco do ponto do mapa (r = raio): cor da área, aro claro e o desenho; sem desenho, a bolinha de antes
 function mapIcon(k, r = 15) {
   const a = MAP_ICON[k]; if (!a) return `<circle r="10"/>`;

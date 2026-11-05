@@ -33,6 +33,12 @@ const MAP_REGIONS = {
     land: ["M112 273 L238 222 L268 126 L322 84 L398 54 L532 113 L566 205 L587 277 L537 344 L490 415 L440 420 L377 436 L310 462 L238 512 L213 487 L154 420 L70 403 L24 394 L87 331Z"],
     river: "M306 302 C330 250 360 200 365 150 S390 80 398 54",   // rio São Francisco, da Canastra para o norte
     route: ["bh", "ouropreto", "riodejaneiro", "saopaulo"], pos: {bh: [409, 290], ouropreto: [446, 336], riodejaneiro: [452, 404], saopaulo: [324, 436]}},
+  // Sul: Paraná, Santa Catarina e Rio Grande do Sul (contorno estilizado) e o rio Iguaçu descendo até as Cataratas, na
+  // ponta oeste do Paraná; a estrada desce de Foz pelo oeste de Santa Catarina até o Pampa gaúcho, no Rio Grande do Sul
+  sul: {n: "Sul", aria: "Mapa estilizado do Sul, com Foz do Iguaçu e o Pampa gaúcho",
+    land: ["M90 120 L150 40 L330 30 L420 70 L470 130 L462 200 L440 300 L380 400 L300 500 L262 522 L180 440 L60 380 L20 330 L80 262 L140 222 L110 180 L70 140Z"],
+    river: "M420 74 C360 90 300 92 240 104 C190 114 140 112 98 122",   // rio Iguaçu, de Curitiba até as Cataratas
+    route: ["foz", "pampa"], pos: {foz: [104, 126], pampa: [176, 412]}},
   // area = pedaço de cada região (recortado pelo contorno, então pode passar dele); icon = desenho de MAP_ICON no ponto dela
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre a aldeia e Curitiba",
     area: {norte: "M80 80 H358 V178 L352 230 L340 280 L345 300 L320 305 L300 300 L230 310 L170 362 H80Z",
@@ -54,9 +60,9 @@ const REGIONS = {
     txt: "Sertão, dunas e mangue. Dizem que lá a fumaça secou tudo, e a Comadre Fulozinha anda perdida na mata."},
   centroeste:  {n: "Centro-Oeste", pos: [262, 335], color: "#c8603a", open: true, map: "centroeste", airport: "Aeroporto de Brasília",
     txt: "O Pantanal, o cerrado e Brasília. Um céu tão grande que a lua devia brilhar mais."},
-  sudeste:     {n: "Sudeste", pos: [352, 410], color: "#3a7ab8", open: true, map: "sudeste", airport: "Aeroporto de Confins",
+  sudeste:     {n: "Sudeste", pos: [352, 410], color: "#3a7ab8", open: true, map: "sudeste", airport: "Aeroporto de Guarulhos",
     txt: "Cidades que não dormem e mata atlântica nas serras. Mais luz de poste que de lua."},
-  sul:         {n: "Sul", pos: [300, 490], color: "#7a4ac8", open: false,
+  sul:         {n: "Sul", pos: [300, 490], color: "#7a4ac8", open: true, map: "sul", airport: "Aeroporto das Cataratas",
     txt: "Onde a mata de pinheiro acaba. Foi pra lá que a fumaça fugiu. E é lá que fica Curitiba."}
 };
 const LOC = {
@@ -71,6 +77,8 @@ const LOC = {
   bh: {n: "Belo Horizonte (MG)", s: "Belo Horizonte", txt: "A capital de Minas, cercada de serra por todo lado: pão de queijo, Mercado Central, ladeira e gente que fala \"uai\". O Sudeste começa aqui."},
   ouropreto: {n: "Ouro Preto (MG)", s: "Ouro Preto", txt: "A cidade do ouro, toda de ladeira, pedra e igreja barroca: sino tocando, casarão de janela azul e mina velha cavada na serra. De noite, dizem, um menino de uma perna só apronta nas ruas."},
   riodejaneiro: {n: "Rio de Janeiro (RJ)", s: "Rio", txt: "A cidade entre o mar e a montanha: praia, calçadão de onda, morro com bondinho e a maior floresta dentro de cidade do mundo, a da Tijuca. De noite, dizem, uma velha de cara de jacaré anda no meio das árvores."},
+  pampa: {n: "Pampa gaúcho (RS)", s: "Pampa", txt: "No Rio Grande do Sul, campo aberto até onde a vista alcança: coxilha atrás de coxilha, gado, cavalo, estância com galpão e o vento minuano cortando. Quase não tem árvore, então a fumaça não tem onde se esconder."},
+  foz: {n: "Foz do Iguaçu (PR)", s: "Foz do Iguaçu", txt: "Na ponta do Paraná, onde o Brasil encontra o Paraguai e a Argentina: as Cataratas roncando, mata de araucária, chipa na esquina e três países numa ponte só. O Sul começa aqui."},
   saopaulo: {n: "São Paulo (SP)", s: "São Paulo", txt: "A maior cidade do Brasil: prédio até onde a vista alcança, avenida que nunca dorme, garoa fina e gente de todo canto do país. No meio do concreto, um parque enorme com lago, capivara e um silêncio que de noite pesa no peito."},
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
@@ -120,6 +128,10 @@ const SUB = {
   copacabana: {city: "riodejaneiro", n: "Copacabana", s: "Copacabana", x: 300, y: 214, txt: "O calçadão de ondas pretas e brancas, quiosque de água de coco, prédio de frente pro mar e a praia mais famosa do Brasil. Tem pensão, barraca e muito carioca querendo prosa."},
   mina: {city: "ouropreto", n: "Mina abandonada", s: "Mina", x: 60, y: 286, txt: "A boca de uma mina de ouro fechada há mais de cem anos, depois das ladeiras: galeria escura, trilho de vagonete e pedra que ainda brilha. De dia, um bicho enorme cava lá dentro; de noite, uma lamparina anda sozinha."},
   tijuca: {city: "riodejaneiro", n: "Floresta da Tijuca", s: "Tijuca", x: 120, y: 96, txt: "Mata atlântica no meio da cidade, plantada de novo à mão onde antes era fazenda de café: cachoeira, gruta, mico-leão e quati pedindo comida. De noite, um riso rouco sai de uma das grutas."},
+  aero_gru: {city: "saopaulo", n: "Aeroporto de Guarulhos", s: "Guarulhos", x: 396, y: 54, txt: "Depois do parque, a estrada leva ao aeroporto grande de São Paulo: avião saindo a cada minuto, inclusive pro Sul."},
+  estancia: {city: "pampa", n: "Estância do Pampa", s: "Estância", x: 250, y: 170, txt: "Uma estância no meio do pampa: galpão de madeira com fogo de chão, mate passando de mão em mão, peão, prenda e um tropeiro que já viu de tudo."},
+  centrofoz: {city: "foz", n: "Centro de Foz", s: "Centro", x: 250, y: 170, txt: "O centro de Foz do Iguaçu: avenida larga com araucária na calçada, barraca de chipa, gente falando português, espanhol e guarani, e uma pensão do lado."},
+  aero_igu: {city: "foz", n: "Aeroporto das Cataratas", s: "Aeroporto", x: 380, y: 60, txt: "O aeroporto de Foz, no caminho das Cataratas: dá pra ouvir o ronco da água lá da pista."},
   paulista: {city: "saopaulo", n: "Avenida Paulista", s: "Paulista", x: 290, y: 140, txt: "A avenida mais famosa de São Paulo, no alto do espigão: prédio espelhado, museu de pernas vermelhas, feira de artesanato, pastel e gente correndo pra todo lado. Tem pensão e Wi-Fi em toda esquina."},
   ibirapuera: {city: "saopaulo", n: "Parque do Ibirapuera", s: "Ibirapuera", x: 150, y: 236, txt: "O parque grande de São Paulo: gramado, lago, ponte de madeira, maritaca gritando e capivara tomando sol. De dia, tem até golpista no meio da corrida; de noite, quem cochila no banco acorda com um peso no peito."},
   serracurral: {city: "bh", n: "Serra do Curral", s: "Serra", x: 150, y: 282, txt: "A serra que fecha Belo Horizonte pelo sul: campo de pedra cor de ferro, mata nas grotas e a cidade inteira lá embaixo. De noite, dizem, uma árvore seca anda pela trilha."},
@@ -202,9 +214,18 @@ const CITY = {
     road: "M300,214 C320,160 340,100 360,40 C364,24 368,10 372,-6", sign: [378, 18, "Ouro Preto ↑"], home: "copacabana", gate: "copacabana"},
   // São Paulo (Sudeste): o espigão da Paulista no meio, o rio Pinheiros embaixo, o Ibirapuera à esquerda e a estrada
   // para o Rio saindo pela direita
-  saopaulo: {n: "São Paulo", look: "cidade", map: "sudeste", route: ["paulista", "ibirapuera"], cabin: false,
+  saopaulo: {n: "São Paulo", look: "cidade", map: "sudeste", route: ["paulista", "ibirapuera", "aero_gru"], cabin: false,
     land: "24,40 150,14 300,12 410,40 432,150 410,260 300,312 160,314 40,290 14,170",
-    river: "M0,300 C90,286 170,304 250,290 C330,276 390,296 440,288", road: "M290,140 C330,150 380,150 420,140 C430,138 440,136 450,134", sign: [354, 126, "Rio de Janeiro →"], home: "paulista", gate: "paulista"}
+    river: "M0,300 C90,286 170,304 250,290 C330,276 390,296 440,288", road: "M290,140 C330,150 380,150 420,140 C430,138 440,136 450,134", sign: [354, 126, "Rio de Janeiro →"], home: "paulista", gate: "paulista"},
+  // Foz do Iguaçu (Sul): o centro no meio, o rio Iguaçu lá embaixo e a estrada subindo para o aeroporto; as
+  // Cataratas e as trilhas vêm depois
+  foz: {n: "Foz do Iguaçu", look: "sul", map: "sul", route: ["centrofoz", "aero_igu"], cabin: false,
+    land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
+    river: "M0,280 C100,270 180,290 260,276 C340,262 390,280 440,270", road: "M250,170 C290,140 330,110 360,80 C370,70 376,64 380,60", sign: [300, 40, "✈ Cataratas ↑"], home: "centrofoz", gate: "centrofoz"},
+  // Pampa gaúcho (Sul, Rio Grande do Sul): a estância no meio do campo, um arroio lá embaixo e a estrada subindo para Foz
+  pampa: {n: "Pampa gaúcho", look: "sul", map: "sul", route: ["estancia"], cabin: false,
+    land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
+    river: "M0,286 C100,276 180,296 260,282 C340,268 390,286 440,276", road: "M250,170 C200,130 150,90 100,50 C90,40 80,30 70,20", sign: [24, 30, "↑ Foz do Iguaçu"], home: "estancia", gate: "estancia"}
 };
 /* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
    que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
@@ -306,6 +327,8 @@ const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15]
   brasilia: [["limpo", 30], ["chuva", 15], ["neblina", 5], ["mormaco", 15], ["ventania", 15], ["fumaca", 20]],   // planalto: seca comprida, vento e queimada
   riodejaneiro: [["limpo", 30], ["chuva", 25], ["neblina", 5], ["mormaco", 30], ["ventania", 10]],   // verão carioca: mormaço e pancada de chuva no fim da tarde
   saopaulo: [["limpo", 25], ["chuva", 20], ["neblina", 10], ["mormaco", 10], ["ventania", 5], ["garoa", 30]],   // a terra da garoa
+  foz: [["limpo", 35], ["chuva", 30], ["neblina", 20], ["mormaco", 10], ["ventania", 5]],   // a névoa das Cataratas e chuva de mata
+  pampa: [["limpo", 35], ["chuva", 20], ["neblina", 15], ["mormaco", 5], ["ventania", 25]],   // o minuano varrendo o campo
   ouropreto: [["limpo", 25], ["chuva", 20], ["neblina", 20], ["mormaco", 5], ["ventania", 5], ["garoa", 25]],   // cidade alta: neblina e garoa
   bh: [["limpo", 30], ["chuva", 20], ["neblina", 15], ["mormaco", 10], ["ventania", 10], ["garoa", 15]]};   // serra: neblina de manhã e garoa
 // bichos que o tempo de agora chama em dobro, os da região da cidade (more por região em WEATHER)
@@ -313,7 +336,7 @@ const weatherMore = (w = weatherNow()) => (WEATHER[w].more || {})[regionOfCity(c
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
-  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31, bh: 37, ouropreto: 41, riodejaneiro: 43, saopaulo: 47}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31, bh: 37, ouropreto: 41, riodejaneiro: 43, saopaulo: 47, foz: 53, pampa: 59}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
   for (const [k, w] of odds) if ((r -= w) < 0) return k === "fumaca" && G.portfolio?.mapa_queimadas && seeded(day * 7 + 3) < .66 ? "limpo" : k;   // com o mapa de queimadas, a brigada apaga 2 de cada 3 focos
   return "limpo";
 }
@@ -329,12 +352,14 @@ const curCity = () => CITY[G.loc] ? G.loc : "ananindeua";
 const FLIGHTS = [
   {a: "norte", b: "nordeste", open: () => !!G.portfolio.site_feira && NORTE_BOSSES().every(k => BS()[k]), paid: "O voo é pago pela empresa do site da feira."},
   {a: "nordeste", b: "centroeste", open: () => !!G.portfolio.app_cordel && NORDESTE_BOSSES().every(k => BS()[k]), paid: "O voo é pago com o dinheiro do app de cordel."},
-  {a: "centroeste", b: "sudeste", open: () => !!G.portfolio.mapa_queimadas && CENTROESTE_BOSSES().every(k => BS()[k]), paid: "O voo é pago com o dinheiro do mapa de queimadas."}
+  {a: "centroeste", b: "sudeste", open: () => !!G.portfolio.mapa_queimadas && CENTROESTE_BOSSES().every(k => BS()[k]), paid: "O voo é pago com o dinheiro do mapa de queimadas."},
+  {a: "sudeste", b: "sul", open: () => !!G.portfolio.app_trilha && SUDESTE_BOSSES().every(k => BS()[k]), paid: "O voo é pago com o dinheiro do app de trilhas."}
 ];
-const AERO = {aero_bel: {city: "belem", reg: "norte"}, aero_rec: {city: "recife", reg: "nordeste"}, aero_bsb: {city: "brasilia", reg: "centroeste"}, aero_cnf: {city: "bh", reg: "sudeste"}};
-const REGION_START = {norte: "belem", nordeste: "saoluis", centroeste: "cuiaba", sudeste: "bh"};   // primeira chegada de avião
+const AERO = {aero_bel: {city: "belem", reg: "norte"}, aero_rec: {city: "recife", reg: "nordeste"}, aero_bsb: {city: "brasilia", reg: "centroeste"}, aero_cnf: {city: "bh", reg: "sudeste", n: "Aeroporto de Confins"},
+  aero_gru: {city: "saopaulo", reg: "sudeste"}, aero_igu: {city: "foz", reg: "sul"}};   // n = nome, quando a região tem mais de um
+const REGION_START = {norte: "belem", nordeste: "saoluis", centroeste: "cuiaba", sudeste: "bh", sul: "foz"};   // primeira chegada de avião
 const regionAero = reg => Object.keys(AERO).find(k => AERO[k].reg === reg);
-const AIRPORT = Object.fromEntries(Object.values(AERO).map(a => [a.city, REGIONS[a.reg].airport]));   // nome do aeroporto da cidade
+const AIRPORT = Object.fromEntries(Object.values(AERO).map(a => [a.city, a.n || REGIONS[a.reg].airport]));   // nome do aeroporto da cidade
 // voo da história que sai desta região (para a próxima) e se ele está liberado (a região de onde sai está completa)
 const flightNext = reg => FLIGHTS.find(f => f.a === reg);
 const flightOpen = (to = "nordeste") => FLIGHTS.some(f => f.b === to && f.open());
@@ -368,6 +393,7 @@ const BUS_LINES = {
   ouropreto: {from: "bh", price: 1400, pass: "passagemOPR", open: () => !!BS().serracurral, lock: "O ônibus para Ouro Preto sai depois que o Muriqui-rei da Serra do Curral for acalmado."},
   riodejaneiro: {from: "ouropreto", price: 1500, pass: "passagemRIO", open: () => !!BS().mina, lock: "O ônibus para o Rio sai depois que o Tatu-rei da Mina abandonada for acalmado."},
   saopaulo: {from: "riodejaneiro", price: 1600, pass: "passagemSAO", open: () => !!BS().tijuca, lock: "O ônibus para São Paulo sai depois que o Quati-rei da Floresta da Tijuca for acalmado."},
+  pampa: {from: "foz", price: 1700, pass: "passagemPAM", open: () => !!G.seen.centrofoz, lock: "O ônibus para o Pampa sai depois que você conhecer o centro de Foz."},
   brasilia: {from: "bonito", price: 1300, pass: "passagemBSB", open: () => !!BS().gruta, lock: "O ônibus para Brasília sai depois que a Preguiça-gigante da Gruta do Lago Azul for acalmada."}
 };
 // linha de ônibus entre as cidades a e b (em qualquer sentido), ou nada
@@ -415,7 +441,7 @@ const FREELAS = {
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {mina: "ladeiras", tijuca: "copacabana", ibirapuera: "paulista", aero_bel: "baixadas", aero_rec: "arrecifes", aero_bsb: "parquebsb", aero_cnf: "serracurral", rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {aero_gru: "ibirapuera", aero_igu: "centrofoz", mina: "ladeiras", tijuca: "copacabana", ibirapuera: "paulista", aero_bel: "baixadas", aero_rec: "arrecifes", aero_bsb: "parquebsb", aero_cnf: "serracurral", rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {
@@ -435,13 +461,18 @@ const ITEMS = {
   pao_queijo: {n: "Pão de queijo", price: 10, hp: 15, sp: 0, reg: "sudeste"},
   frango_quiabo: {n: "Frango com quiabo", price: 18, hp: 20, sp: 0, reg: "sudeste"},
   cafe:     {n: "Café coado", price: 15, hp: 0, sp: 10, reg: "sudeste"},
-  tropeiro: {n: "Feijão tropeiro", price: 45, hp: 30, sp: 15, reg: "sudeste"}
+  tropeiro: {n: "Feijão tropeiro", price: 45, hp: 30, sp: 15, reg: "sudeste"},
+  chipa:    {n: "Chipa", price: 10, hp: 15, sp: 0, reg: "sul"},
+  pinhao:   {n: "Pinhão cozido", price: 18, hp: 20, sp: 0, reg: "sul"},
+  chimarrao: {n: "Chimarrão", price: 15, hp: 0, sp: 10, reg: "sul"},
+  barreado: {n: "Barreado", price: 45, hp: 30, sp: 15, reg: "sul"}
 };
 // o que a barraca de comida da região diz (fala de vendedor)
 const FOOD_TALK = {norte: "Mandioca, peixe assado, açaí e maniçoba. Barriga cheia, lança firme!",
   nordeste: "Tapioca, carne de sol, cajuína gelada e baião de dois. Comida de sertanejo, visse?",
   centroeste: "Pamonha, pacu assado, guaraná ralado e arroz com pequi. Cuidado pra não morder o espinho do pequi, tchá!",
-  sudeste: "Pão de queijo quentinho, frango com quiabo, café coado e feijão tropeiro. Come mais um, sô!"};
+  sudeste: "Pão de queijo quentinho, frango com quiabo, café coado e feijão tropeiro. Come mais um, sô!",
+  sul: "Chipa quentinha, pinhão cozido, chimarrão e barreado. Bah, aqui ninguém passa fome, tchê!"};
 const foodRegion = () => CITY[curCity()].map;
 /* Pedidos dos aldeões (um por vez). giver = aldeão que pede (aldeao1 Mateiro, aldeao2 Ancião, aldeao3 Aldeã);
    need: {kill: bicho, n} (vencer, conta a partir do aceite) ou {pelt: bicho, n} (entregar peles);

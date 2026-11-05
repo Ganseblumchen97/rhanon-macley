@@ -45,6 +45,10 @@ const TILE_PAL = {
   ibirapuera: {g1: "#6aa84a", g2: "#5e9c40", tall: "#4a8a38", tallHi: "#8ac860", path: "#a8a49a", path2: "#8a867c", leaf: "#2f7a3a", leaf2: "#22602a", leafHi: "#4a9a48", trunk: "#5a3a22", rock: "#a8a49a", rock2: "#7a766e", water: "#3a7a9a", water2: "#8ac0d8", wood: "#a8703f", wood2: "#6d4329"},
   // Belo Horizonte: a rua do Mercado Central, pedra portuguesa clara, casario mineiro branco de janela colorida, telhado
   // colonial e quaresmeira roxa nas calçadas (o símbolo das serras de Minas)
+  // Pampa gaúcho: a estância, capim verde-amarelado do campo, chão de terra batida, umbu de copa larga e galpão de madeira
+  estancia: {g1: "#8aa85a", g2: "#7c9a4e", tall: "#a8b860", tallHi: "#d0d880", path: "#9a7a52", path2: "#7a5e3e", leaf: "#3a6a2a", leaf2: "#2a5020", leafHi: "#6a9a4a", trunk: "#5a3a22", rock: "#a89a88", rock2: "#7a6a58", water: "#4a7a9a", water2: "#8ab8d0", wood: "#9c6339", wood2: "#6d4329", roof: "#6a4a2a", roof2: "#4a3018", walls: ["#a8744a", "#e8dcc8", "#a8744a", "#e8dcc8", "#a8744a", "#e8dcc8"]},
+  // Foz do Iguaçu: o centro, calçada de pedra clara, prédio baixo de tijolo e araucária na calçada (araucaria: true)
+  centrofoz: {g1: "#b8b8a8", g2: "#a8a898", tall: "#5a8a4a", tallHi: "#8ab86a", path: "#7a6e62", path2: "#5e544a", leaf: "#3a7a3a", leaf2: "#22582a", leafHi: "#6ab05a", trunk: "#6a4a32", rock: "#a89a88", rock2: "#7a6a58", water: "#3a7a9a", water2: "#8ac0d8", wood: "#9c6339", wood2: "#6d4329", roof: "#a8503a", roof2: "#7a3424", walls: ["#c87a5a", "#e8dcc8", "#d8c070", "#e8dcc8", "#7aa86a", "#e8dcc8"], araucaria: true},
   mercadocentral: {g1: "#c8c0b0", g2: "#b8b0a0", tall: "#6a9a4a", tallHi: "#9ac86a", path: "#7e7468", path2: "#625a50", leaf: "#8a4ab8", leaf2: "#6a2a98", leafHi: "#c890e8", trunk: "#5a3a22", rock: "#a89a88", rock2: "#7a6a58", water: "#4a7a9a", water2: "#8ab8d0", wood: "#9c6339", wood2: "#6d4329", roof: "#b8583a", roof2: "#8a3a22", walls: ["#f0ece0", "#3a6ab8", "#f0ece0", "#e8c048", "#2a8a6a"]},
   planopiloto: {g1: "#c8c8b8", g2: "#b8b8a8", tall: "#7a9a4a", tallHi: "#a8c86a", path: "#8a8a80", path2: "#6e6e66", leaf: "#b85ad8", leaf2: "#8a3aa8", leafHi: "#e09af0", trunk: "#5a3a2a", rock: "#a8a49a", rock2: "#7a766e", water: "#3a8ac8", water2: "#9ad0f0", wood: "#9c6339", wood2: "#6d4329", roof: "#a8a8a0", roof2: "#7a7a72", walls: ["#f0f0e8", "#e8e4d8", "#d8e8f0", "#f0e6c8", "#c8d8e8"]},
   // Bonito: o centro (calçada clara, casa baixa colorida) e o Rio da Prata (mata verde e água azul-turquesa transparente)
@@ -80,10 +84,10 @@ const OUTLINE = "#1a2418";
 // toldo das barracas de cada mercado (sem stall: vermelho e branco, como na feira da aldeia)
 Object.entries({praiagrande: ["#2a6ab8", "#f4ecd8"], trocatroca: ["#e8a020", "#c8402a"], orla: ["#3a8a5a", "#f0d890"], recifeantigo: ["#e86a8a", "#f0c840"],
   portocuiaba: ["#e8701c", "#f4ecd8"], centrobonito: ["#2aa8b8", "#f4ecd8"], planopiloto: ["#3a5ab8", "#e8e4d8"], mercadocentral: ["#c8a040", "#6a3a8a"], tiradentes: ["#2a5aa8", "#e8d8b0"],
-  copacabana: ["#e8402a", "#f4ecd8"], paulista: ["#2a2a2e", "#e8c040"]})
+  copacabana: ["#e8402a", "#f4ecd8"], paulista: ["#2a2a2e", "#e8c040"], centrofoz: ["#2a8a4a", "#e8c040"], estancia: ["#c83a3a", "#f4ecd8"]})
   .forEach(([z, c]) => { if (TILE_PAL[z]) TILE_PAL[z].stall = c; });
 // rodoviárias do Nordeste: as cores do centro da cidade (Petrolina com mandacaru no lugar das árvores)
-Object.assign(TILE_PAL, {aero_bel: TILE_PAL.veropeso, aero_rec: TILE_PAL.recifeantigo, aero_bsb: TILE_PAL.planopiloto, aero_cnf: TILE_PAL.mercadocentral, rodo_slz: TILE_PAL.praiagrande, rodo_the: TILE_PAL.trocatroca, rodo_pet: {...TILE_PAL.orla, cactus: true}, rodo_rec: TILE_PAL.recifeantigo});
+Object.assign(TILE_PAL, {aero_bel: TILE_PAL.veropeso, aero_rec: TILE_PAL.recifeantigo, aero_bsb: TILE_PAL.planopiloto, aero_cnf: TILE_PAL.mercadocentral, aero_gru: TILE_PAL.paulista, aero_igu: TILE_PAL.centrofoz, rodo_slz: TILE_PAL.praiagrande, rodo_the: TILE_PAL.trocatroca, rodo_pet: {...TILE_PAL.orla, cactus: true}, rodo_rec: TILE_PAL.recifeantigo});
 const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "~", Y: ".", J: "."};   // U: o barco de linha fica na água; Y e J: entrada e baú do segredo (systems/secrets.js)
 
 function fillEllipse(x, cx, cy, rx, ry, col) {
@@ -179,6 +183,12 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
     x.fillStyle = P.rock2; x.fillRect(ox + 7, oy + 12, 1, 1); x.fillRect(ox + 9, oy + 10, 1, 1);   // casca rachada
     fillEllipse(x, ox + cx, oy + 5, 8, 4.5, OUTLINE); fillEllipse(x, ox + cx, oy + 5, 7, 3.5, P.leaf2); fillEllipse(x, ox + cx - s, oy + 4, 5, 2.5, P.leaf);
     fillEllipse(x, ox + cx - s * 3, oy + 3, 2, 1, P.leafHi);
+  } else if (ch === "T" && P.araucaria) {   // Sul: araucária, tronco reto e alto e a copa em taça achatada, em dois andares
+    grass();
+    x.fillStyle = OUTLINE; x.fillRect(ox + 7, oy + 4, 3, 12); x.fillStyle = P.trunk; x.fillRect(ox + 8, oy + 5, 1, 11);
+    fillEllipse(x, ox + 8, oy + 7.5, 6, 1.8, OUTLINE); fillEllipse(x, ox + 8, oy + 7.5, 5, 1.1, P.leaf2);
+    fillEllipse(x, ox + 8, oy + 3, 8.5, 2.6, OUTLINE); fillEllipse(x, ox + 8, oy + 3, 7.5, 1.8, P.leaf2); fillEllipse(x, ox + 8, oy + 2.4, 5.5, 1.1, P.leaf);
+    fillEllipse(x, ox + 5, oy + 2, 2, .6, P.leafHi);
   } else if (ch === "T" && P.dune) {   // dunas dos Lençóis: montinho de areia branca com a crista clara, sem tronco
     grass();
     fillEllipse(x, ox + 8, oy + 10, 9, 6, P.leaf2); fillEllipse(x, ox + 7, oy + 9, 8, 5, P.leaf); fillEllipse(x, ox + 5, oy + 7, 4, 1.5, P.leafHi);

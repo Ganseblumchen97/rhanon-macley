@@ -45,6 +45,18 @@ const NARRA = {
     {r: "E é tudo ladeira, vô. Minha perna doeu três dias."},
     "E foi numa ladeira dessas que tu conheceu um menino que só tinha uma. Mas isso eu conto depois."
   ],
+  pampa: [
+    "De Foz o ônibus desceu até o pampa, curumim. Campo aberto até onde a vista alcança, coxilha atrás de coxilha, e o vento minuano cortando.",
+    "No pampa quase não tem árvore. A fumaça de Pytuna não tinha onde se esconder: dava pra ver ela de longe, subindo pro norte.",
+    {r: "Me deram chimarrão na cuia, vô. Queimei a língua e todo mundo riu."},
+    "Gaúcho é assim: primeiro o mate, depois a conversa. E quem queima a língua no primeiro mate já é de casa."
+  ],
+  foz: [
+    "E o avião desceu no Sul, curumim. Foz do Iguaçu, na ponta do Paraná, onde o Brasil encosta no Paraguai e na Argentina.",
+    "Fazia frio. Frio de verdade, de soltar fumaça pela boca. E a mata ali é de araucária, o pinheiro alto de copa em taça.",
+    {r: "E dava pra ouvir as Cataratas lá do centro, vô. Um ronco que não para nunca."},
+    "Era o fim da viagem chegando. A fumaça de Pytuna tinha vindo pra cá, pra onde a mata de pinheiro acaba. Agora deixa eu contar do Sul."
+  ],
   bh: [
     "De avião outra vez, curumim, agora pro Sudeste. Belo Horizonte, no meio das montanhas de Minas.",
     "Ali a noite é cheia de poste aceso. Tanta luz que Jaci quase some no céu, e os encantados ficam escondidos.",

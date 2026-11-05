@@ -283,7 +283,7 @@ addEventListener("resize", () => drawScenery());
 /* ---------- tela inicial: o fundo é da região do save ---------- */
 // cada região tem o seu desenho (TITLE_BG) e o montinho de chão debaixo do Rhanon (plat); região sem desenho usa o Norte.
 // A faixa preta inclinada e as letras recortadas (styles.css, com as cores de cada região em [data-region]) dão o Persona
-const TITLE_BG = {norte: {plat: "mata", draw: titleForest}, nordeste: {plat: "caatinga", draw: titleSertao}, centroeste: {plat: "varzea", draw: titlePantanal}, sudeste: {plat: "serra", draw: titleMinas}};
+const TITLE_BG = {norte: {plat: "mata", draw: titleForest}, nordeste: {plat: "caatinga", draw: titleSertao}, centroeste: {plat: "varzea", draw: titlePantanal}, sudeste: {plat: "serra", draw: titleMinas}, sul: {plat: "mata", draw: titleSul}};
 function drawTitleBg() {
   const cv = $("titleBg");
   if (!cv || $("titleScreen").hidden) return;
@@ -463,5 +463,31 @@ function titleMinas(W, H, rect, blob) {
     blob(px, y - 8, 6, "rgba(255,210,120,.18)"); rect(ink, px, y - 8, 1, 9); rect("#ffe6a0", px - 1, y - 9, 3, 2);
   }
   rect(ink, 0, H * .92, W, H);
+}
+// Sul: madrugada fria, lua alta, as Cataratas caindo em degraus no meio com a névoa subindo, e araucárias recortadas na frente
+function titleSul(W, H, rect, blob) {
+  const rnd = sceneRng(7171), hz = H * .58, ink = "#0a1418";
+  const sky = ["#0e1a2a", "#16263a", "#22344a", "#34485a", "#4a5e6a", "#6a7a80", "#8a9a98"];
+  sky.forEach((c, i) => { const a = Math.round(hz * i / sky.length), b = Math.round(hz * (i + 1) / sky.length); rect(c, 0, a, W, b - a); if (i) for (let px = 0; px < W; px += 2) rect(c, px + (a % 2), a - 1, 1, 1); });
+  for (let i = 0; i < W / 4; i++) rect(rnd() < .8 ? "#e8f0ff" : "#ffe8a0", rnd() * W, rnd() * hz * .55, 1, 1);   // céu limpo de frio
+  const mx = W * .22, my = hz * .28, mr = Math.min(W, H) * .09;
+  [[1.9, "rgba(220,230,255,.06)"], [1.35, "rgba(220,230,255,.1)"]].forEach(([k, c]) => blob(mx, my, mr * k, c));
+  blob(mx, my, mr, "#e8ecf4"); blob(mx + mr * .35, my - mr * .1, mr * .22, "#c8d0dc");
+  [[-.5, .2, .55], [.2, .6, .4]].forEach(([dx, dy, k]) => blob(mx + mr * dx, my + mr * dy, mr * k, "#3a4658"));   // a fumaça ainda cobre um pedaço de Jaci
+  // paredão das Cataratas: degraus de pedra com a água branca caindo e a névoa no pé
+  const fx = W * .62, fw = W * .5, top = H * .5;
+  for (let px = 0; px < W; px += 2) { const y = top + Math.sin(px / 23) * 4 + (Math.abs(px - fx) < fw / 2 ? 0 : 10); rect("#2a3a3a", px, y, 2, H - y); }
+  for (let k = 0; k < 18; k++) {
+    const x0 = fx - fw / 2 + k * fw / 18 + rnd() * 4, w = 3 + rnd() * 5, y0 = top + 2 + (k % 3) * 4, h = H * (.16 + rnd() * .1);
+    rect("#d8eef4", x0, y0, w, h); rect("#a8c8d4", x0 + w - 1, y0, 1, h); rect("#ffffff", x0 + 1, y0, 1, h * .6);
+  }
+  for (let k = 0; k < 22; k++) blob(fx - fw / 2 + rnd() * fw, top + H * .2 + rnd() * H * .1, 6 + rnd() * 12, "rgba(220,236,244,.22)");   // névoa
+  // araucárias na frente: tronco reto e a copa em taça, em vários tamanhos
+  const arau = (x0, base, s) => {
+    rect(ink, x0 - s * .4, base - s * 7, s * .8, s * 7);
+    [[-6.5, 0, 4.2], [-5.2, -1.2, 3.2], [-4, -2.2, 2.2]].forEach(([dy, , r]) => { for (let k = -r; k <= r; k += .5) rect(ink, x0 + k * s, base + dy * s - Math.abs(k) * s * .35, s * .6, s * .8); });
+  };
+  for (let k = 0; k < 7; k++) arau(W * (.04 + k * .16) + rnd() * 10, H * (.88 + rnd() * .05), 3 + rnd() * 2.5);
+  rect(ink, 0, H * .9, W, H);
 }
 addEventListener("resize", () => { drawTitleBg(); drawRegionBg(); });

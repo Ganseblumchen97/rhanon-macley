@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Jaci: A Lua que se Apaga</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Luckiest+Guy&family=JetBrains+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="styles.css?v=0.78.0">
+<link rel="stylesheet" href="styles.css?v=0.79.0">
 </head>
 <body>
 <div class="bg" aria-hidden="true">
@@ -77,6 +77,8 @@
     <pattern id="pcerrado" width="22" height="20" patternUnits="userSpaceOnUse"><rect width="22" height="20" fill="#a89a52"/><circle cx="6" cy="6" r="2.6" fill="#6a8a3a"/><path d="M6 8v4" stroke="#6a4a2a" stroke-width="1.2"/><circle cx="16" cy="14" r="1.6" fill="#c8b06a"/><circle cx="17" cy="4" r="1" fill="#e8c020"/></pattern>
     <pattern id="pcerrado2" width="26" height="24" patternUnits="userSpaceOnUse"><rect width="26" height="24" fill="#9a9a4e"/><circle cx="6" cy="7" r="3.4" fill="#6a8a3a"/><path d="M6 10v4" stroke="#6a4a2a" stroke-width="1.4"/><circle cx="19" cy="16" r="2.2" fill="#b8a85e"/><circle cx="19" cy="5" r="1.4" fill="#e8c020"/><circle cx="8" cy="19" r="1.8" fill="#7a9a4a"/></pattern>
     <pattern id="pminas" width="22" height="20" patternUnits="userSpaceOnUse"><rect width="22" height="20" fill="#5a8a5a"/><path d="M1 12 L6 6 L11 12Z" fill="#4a7a5a"/><path d="M11 18 L16 12 L21 18Z" fill="#6a9a62"/><circle cx="17" cy="4" r="1.6" fill="#a86ad0"/></pattern>
+    <pattern id="psul" width="22" height="20" patternUnits="userSpaceOnUse"><rect width="22" height="20" fill="#5a8a5e"/><rect x="5.5" y="5" width="1" height="7" fill="#5a3a22"/><ellipse cx="6" cy="5" rx="5" ry="1.6" fill="#2f6a3a"/><circle cx="17" cy="15" r="1.4" fill="#7aa86a"/></pattern>
+    <pattern id="psul2" width="26" height="24" patternUnits="userSpaceOnUse"><rect width="26" height="24" fill="#4e8256"/><rect x="6.5" y="6" width="1.2" height="8" fill="#5a3a22"/><ellipse cx="7" cy="6" rx="6" ry="2" fill="#2a5e36"/><circle cx="20" cy="18" r="1.8" fill="#6a9a5a"/></pattern>
     <pattern id="pminas2" width="26" height="24" patternUnits="userSpaceOnUse"><rect width="26" height="24" fill="#4e8256"/><path d="M1 13 L7 6 L13 13Z" fill="#3e6e52"/><path d="M13 21 L19 14 L25 21Z" fill="#5e9260"/><circle cx="20" cy="5" r="1.8" fill="#a86ad0"/><circle cx="6" cy="19" r="1.6" fill="#6a9a5a"/></pattern>
     <pattern id="pmata2" width="26" height="24" patternUnits="userSpaceOnUse"><rect width="26" height="24" fill="#2f6a3a"/><circle cx="6" cy="7" r="4" fill="#3f8a46"/><circle cx="19" cy="17" r="4.4" fill="#3a7f42"/><circle cx="18" cy="5" r="2" fill="#4f9a50"/><circle cx="7" cy="19" r="1.8" fill="#275a32"/></pattern>
     <pattern id="psertao2" width="26" height="24" patternUnits="userSpaceOnUse"><rect width="26" height="24" fill="#a8864e"/><circle cx="6" cy="6" r="1.8" fill="#8a6a3a"/><circle cx="18" cy="15" r="2.2" fill="#947440"/><path d="M19 3v5M17 5.5h4" stroke="#5a8a3a" stroke-width="1.4"/><circle cx="8" cy="18" r="2.6" fill="#7a9a4a"/></pattern>
@@ -141,48 +143,48 @@
 </main>
 <div class="girar" id="girar"><div><b>Vire o celular</b><p>O jogo fica melhor deitado: a mata e a luta são largas.</p><button type="button" class="girar-ok" id="girarOk">Jogar assim mesmo</button></div></div>
 <!-- Ordem importa: utilidades e estado, depois dados, depois quem usa os dados. main.js por último. -->
-<script src="js/core/version.js?v=0.78.0"></script>
-<script src="js/core/utils.js?v=0.78.0"></script>
-<script src="js/core/lang.js?v=0.78.0"></script>   <!-- pede sozinho o js/data/lang/<idioma>.js escolhido -->
-<script src="js/core/state.js?v=0.78.0"></script>
-<script src="js/core/assets.js?v=0.78.0"></script>
-<script src="js/data/sprites.js?v=0.78.0"></script>
-<script src="js/data/animals.js?v=0.78.0"></script>
-<script src="js/data/commands.js?v=0.78.0"></script>
-<script src="js/data/skills.js?v=0.78.0"></script>
-<script src="js/data/narration.js?v=0.78.0"></script>
-<script src="js/data/questions.js?v=0.78.0"></script>
-<script src="js/data/world.js?v=0.78.0"></script>
-<script src="js/data/stages.js?v=0.78.0"></script>
-<script src="js/data/art.js?v=0.78.0"></script>
-<script src="js/audio/sfx.js?v=0.78.0"></script>
-<script src="js/audio/music.js?v=0.78.0"></script>
-<script src="js/gfx/sprites.js?v=0.78.0"></script>
-<script src="js/gfx/rig.js?v=0.78.0"></script>
-<script src="js/gfx/beasts.js?v=0.78.0"></script>
-<script src="js/gfx/fx.js?v=0.78.0"></script>
-<script src="js/gfx/actors.js?v=0.78.0"></script>
-<script src="js/gfx/tiles.js?v=0.78.0"></script>
-<script src="js/gfx/scenery.js?v=0.78.0"></script>
-<script src="js/gfx/mapart.js?v=0.78.0"></script>
-<script src="js/ui/screen-fx.js?v=0.78.0"></script>
-<script src="js/ui/theme.js?v=0.78.0"></script>
-<script src="js/ui/options.js?v=0.78.0"></script>
-<script src="js/ui/saves.js?v=0.78.0"></script>
-<script src="js/ui/cutin.js?v=0.78.0"></script>
-<script src="js/ui/mapnav.js?v=0.78.0"></script>
-<script src="js/ui/gamepad.js?v=0.78.0"></script>
-<script src="js/ui/narration.js?v=0.78.0"></script>
-<script src="js/systems/combat.js?v=0.78.0"></script>
-<script src="js/systems/challenge.js?v=0.78.0"></script>
-<script src="js/systems/world-map.js?v=0.78.0"></script>
-<script src="js/systems/local.js?v=0.78.0"></script>
-<script src="js/systems/journal.js?v=0.78.0"></script>
-<script src="js/systems/equip.js?v=0.78.0"></script>
-<script src="js/systems/skills.js?v=0.78.0"></script>
-<script src="js/systems/explore.js?v=0.78.0"></script>
-<script src="js/systems/notebook.js?v=0.78.0"></script>
-<script src="js/systems/secrets.js?v=0.78.0"></script>
-<script src="js/main.js?v=0.78.0"></script>
+<script src="js/core/version.js?v=0.79.0"></script>
+<script src="js/core/utils.js?v=0.79.0"></script>
+<script src="js/core/lang.js?v=0.79.0"></script>   <!-- pede sozinho o js/data/lang/<idioma>.js escolhido -->
+<script src="js/core/state.js?v=0.79.0"></script>
+<script src="js/core/assets.js?v=0.79.0"></script>
+<script src="js/data/sprites.js?v=0.79.0"></script>
+<script src="js/data/animals.js?v=0.79.0"></script>
+<script src="js/data/commands.js?v=0.79.0"></script>
+<script src="js/data/skills.js?v=0.79.0"></script>
+<script src="js/data/narration.js?v=0.79.0"></script>
+<script src="js/data/questions.js?v=0.79.0"></script>
+<script src="js/data/world.js?v=0.79.0"></script>
+<script src="js/data/stages.js?v=0.79.0"></script>
+<script src="js/data/art.js?v=0.79.0"></script>
+<script src="js/audio/sfx.js?v=0.79.0"></script>
+<script src="js/audio/music.js?v=0.79.0"></script>
+<script src="js/gfx/sprites.js?v=0.79.0"></script>
+<script src="js/gfx/rig.js?v=0.79.0"></script>
+<script src="js/gfx/beasts.js?v=0.79.0"></script>
+<script src="js/gfx/fx.js?v=0.79.0"></script>
+<script src="js/gfx/actors.js?v=0.79.0"></script>
+<script src="js/gfx/tiles.js?v=0.79.0"></script>
+<script src="js/gfx/scenery.js?v=0.79.0"></script>
+<script src="js/gfx/mapart.js?v=0.79.0"></script>
+<script src="js/ui/screen-fx.js?v=0.79.0"></script>
+<script src="js/ui/theme.js?v=0.79.0"></script>
+<script src="js/ui/options.js?v=0.79.0"></script>
+<script src="js/ui/saves.js?v=0.79.0"></script>
+<script src="js/ui/cutin.js?v=0.79.0"></script>
+<script src="js/ui/mapnav.js?v=0.79.0"></script>
+<script src="js/ui/gamepad.js?v=0.79.0"></script>
+<script src="js/ui/narration.js?v=0.79.0"></script>
+<script src="js/systems/combat.js?v=0.79.0"></script>
+<script src="js/systems/challenge.js?v=0.79.0"></script>
+<script src="js/systems/world-map.js?v=0.79.0"></script>
+<script src="js/systems/local.js?v=0.79.0"></script>
+<script src="js/systems/journal.js?v=0.79.0"></script>
+<script src="js/systems/equip.js?v=0.79.0"></script>
+<script src="js/systems/skills.js?v=0.79.0"></script>
+<script src="js/systems/explore.js?v=0.79.0"></script>
+<script src="js/systems/notebook.js?v=0.79.0"></script>
+<script src="js/systems/secrets.js?v=0.79.0"></script>
+<script src="js/main.js?v=0.79.0"></script>
 </body>
 </html>

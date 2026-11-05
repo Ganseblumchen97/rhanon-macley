@@ -192,7 +192,8 @@ function toggleMute() {
 const JINGLE = {norte: {motif: [69, 74, 72, 69], home: 74, chord: [62, 66, 69], bass: 50},
   nordeste: {motif: [74, 71, 74, 76], home: 79, chord: [67, 71, 74], bass: 43},
   centroeste: {motif: [76, 73, 74, 71], home: 69, chord: [57, 61, 64], bass: 45},
-  sudeste: {motif: [74, 78, 81, 83], home: 74, chord: [62, 66, 69], bass: 50}};
+  sudeste: {motif: [74, 78, 81, 83], home: 74, chord: [62, 66, 69], bass: 50},
+  sul: {motif: [71, 67, 69, 71], home: 76, chord: [64, 68, 71], bass: 40}};
 const jingleMotif = () => JINGLE[regionOfCity(curCity())] || JINGLE.norte;
 function fanfare(kind) {
   if (!AC) return;

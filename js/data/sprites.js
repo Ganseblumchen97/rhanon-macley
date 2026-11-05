@@ -58,6 +58,8 @@ const VILLAGER_LOOK = {
   peles_centroeste: {pal: {r: "#1a1426", s: "#b47a48", S: "#8a5a32", h: "#3a2a22"}, shirt: ["#c84a3a", "#8a2a22"], pants: ["#3a5a8a", "#24405a"], hat: ["#e8d080", "#b8a050", "#8a7030"], noBand: true, prop: "pelt"},   // peão pantaneiro de chapéu de palha
   comida_centroeste: {pal: {r: "#1a1426", s: "#c8905a", S: "#9a6a3e", h: "#5a3a22"}, shirt: ["#f0c020", "#b8900e"], pants: ["#3a8a5a", "#25663a"], longHair: true, noBand: true, prop: "basket"},   // vestido amarelo de ipê
   peles_sudeste: {pal: {r: "#1a1426", s: "#d8a070", S: "#a87048", h: "#3a2a22"}, shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#3a3a44", "#24242c"], hat: ["#4a4640", "#2a2a30", "#1a1a1e"], noBand: true, prop: "pelt"},   // mineiro de chapéu de feltro
+  peles_sul: {pal: {r: "#1a1426", s: "#e0b08a", S: "#b08060", h: "#5a3a22"}, shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#2a2a30", "#18181c"], hat: ["#2a2a30", "#18181c", "#101014"], noBand: true, prop: "pelt"},   // gaúcho de chapéu preto e bombacha
+  comida_sul: {pal: {r: "#1a1426", s: "#c8905a", S: "#9a6a3e", h: "#1a1420"}, shirt: ["#c83a3a", "#8a2424"], pants: ["#3a3a44", "#24242c"], longHair: true, noBand: true, prop: "basket"},   // vendedora de chipa da fronteira
   comida_sudeste: {pal: {r: "#1a1426", s: "#d8a070", S: "#a87048", h: "#8a8478"}, shirt: ["#6a3a8a", "#4a2a6a"], pants: ["#e8e2cf", "#c8c0a8"], longHair: true, noBand: true, glasses: true, prop: "basket"},   // vovó mineira de óculos e avental
   // gente de Belém: roupa da cidade nas cores de urucum (vermelho), jenipapo (preto), açafrão (amarelo) e folha (verde)
   urbano1: {pal: {g: "#e5401c", G: "#a82a10", r: "#1a1426", s: "#b47a48", S: "#8a5a32"}, shirt: ["#e8c040", "#b8902a"], pants: ["#2a2a30", "#18181c"], longHair: true, prop: "basket"},

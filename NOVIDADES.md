@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.79.0 — o Sul: Foz do Iguaçu e o pampa
+
+- Começou o último capítulo da viagem. Com os 10 chefes do Sudeste acalmados e o app da Bia entregue, voe do novo
+  Aeroporto de Guarulhos, em São Paulo (depois do Ibirapuera), para Foz do Iguaçu. O voo é de graça.
+- Foz do Iguaçu: o centro tem pensão, barracas de chipa, araucárias na calçada e gente da fronteira, que fala
+  português, espanhol e guarani. O Aeroporto das Cataratas leva de volta para as outras regiões.
+- Do mapa do Sul sai um ônibus para o Pampa gaúcho, no Rio Grande do Sul (R$ 1.700, ida e volta). Lá fica uma
+  estância no campo aberto, com galpão, chimarrão e gaúchos de prosa.
+- O Sul tem música própria, com a gaita no centro: chamamé de dia, milonga ao violão de noite e vanerão na batalha.
+  Tem também a sua tela inicial, com araucárias e as Cataratas, e comida da região: chipa, pinhão, chimarrão e barreado.
+- Por enquanto o Sul só tem cidades. As trilhas, os bichos, as Cataratas e Curitiba vêm nas próximas versões.
+
 ## 0.78.0 — fim do Sudeste
 
 - O Sudeste agora tem fim de capítulo. Acalme os 10 chefes da região, de dia e de noite, em Belo Horizonte, Ouro

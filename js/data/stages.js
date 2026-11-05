@@ -273,37 +273,37 @@ const STAGES = {
   },
   // São Paulo: o Parque do Ibirapuera (gerado por tools/gerar_mapas.py)
   ibirapuera: {
-    next: null,
+    next: "aero_gru",
     rows: [
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTT.......TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTT......T.T.T..,....,........,....T.TTTTT..~~~~~.TT.T.TT.TT",
-      "TT......,.......--------------B....T.,.oT.~~~~~~~~~.T..,..TT",
-      "TTTT.T.....,....-.....,........ff....TT.T.~~~~~~~~~TT...T.TT",
-      "TT..............-..T...,f,.,.......TTTT.TT~~~~~~~~~T.TT,T.TT",
-      "TTT.-------------....T.......f....TTa......T~~~~~,..T.T.TTTT",
-      "TT..-...........,...T..T,T.T.T....T.T.....T..f.aoT,TTa..TTTT",
-      "TT..-....a......,,..T..TT.TTTT.TT,......o...,...o.,.....T,TT",
-      "TT..-........,T.TTT.T,,TT.TT.T....TT..,..........,...,T...TT",
-      "TT..-..,.TTTT.TTT.aTTTT.T..oTT,T.....,---------------.T.T.TT",
-      "TT..-...T....TT.....,~~~~~~~T.To...TT.-,a......,.,..-,.T.TTT",
-      "T...-.f.T..T.......~~~~~~~~~~~.TT.,.,.-,.,,.ff..foa.-.,T.TTT",
-      "T.,.-...,TTT.,,.,.~~~~~~~~~~~~~....,..-.TT......T,o.-.,...TT",
-      "T..,-.,fT...------=======~~~~~~TTTTTf.-..,.T...T....-....TTT",
-      "T...-.......-.....~~~~~~=~~~~~~...T,..-.a.ToTTTo...,-.a...TT",
-      "T...-.~~~~~.-.,....~~~~~=~~~~~T.TT....-.....TTT.....-...T.TT",
-      "TT..-~~~~~~~-..,f..o.~~~=~~~..T.T....a-...TT.T...f..-..T..TT",
-      "TT..-~~~~~~~-,..T,T.,f..-.....T.......-...TT...,..f.-.TT.,TT",
-      "TTT,-~~~~~~~-...........-....TT.,.T,.,-.,..,........-.....TT",
-      "TT..-.~~~~~.-,...T..o...-...,T,T,a.T..-..,..---------..TTTTT",
-      "TTT.-.TTT,..-.....TT.T,.-...T.,.f.T.,a-.T.T,-......,,..T..TT",
-      "TTT.-...fT..-.,,,TTo....-.F...........-.TTT.-....f.,...TT.TT",
-      "TTT.-.......-..a.TT.....-..........,..-,TT..-....,...,TTTTTT",
-      "TT.,---------.T.TT...T..---------------,T.T.-,TT.T.T.....TTT",
-      "TTT.a,......,T.,T.TT..T...........,...,.,...-.............TT",
-      "TT.......T.TTT....T,TT,.TT..........a..,TTT.-...,.,.....,.,T",
-      "TT,.T....TTT.,T,.,.TT.T.Ta...a...o..T..TTT..-------------S-E",
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT......,....,...T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTGTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTT...a...,,.,...-.TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TT,o..TT..T..T.,,..........,..-,.T.T,.T..T.T~~~~~.T.T,..T.TT",
+      "TTTTT.T..,f.,.T,--------------B....TT.TTTT~~~~~~~~~TT.T..TTT",
+      "TTT.TT..a..f....-.................o..T..T.~~~~~~~~~..T.,.,TT",
+      "TTTT............-...,.,...........a,.TTT.a~~~~~~~~~..T..T,TT",
+      "TTT.-------------...,.T..T.......T.T..T.T...~~~~~.,T,T.T.TTT",
+      "TT..-............a.,T...T.o,oTT,T,T....TT,.f,...T,T....,o.TT",
+      "TT,.-.......f,.....T.T..T.TTT,T,.....T...o........T.TT,..,TT",
+      "TT..-..T..,,,..T.TT.T......T...TT.TT.Ta.,.a......,.,.....TTT",
+      "TT..-..T.TT..T,T.....T...T.TTT.,.T..o.---------------.T.T.TT",
+      "TT..-.aT....T........~~~~~~~..TTT.T...-...........a.-,,...TT",
+      "T...-..,TTTTT..,...~~~~~~~~~~~,.T..T,.-.......a..f,.-.....TT",
+      "T,,.-...TTT,...,..~~~~~~~~~~~~~...T...-.....f.......-...TTTT",
+      "T..,-....T..------=======~~~~~~...T...-....,TT......-.....TT",
+      "T,..-,..oTT,-...,.~~~~~~=~~~~~~..T....-....,T..T....-.....TT",
+      "T...-.~~~~~.-......~~~~~=~~~~~.,T..a..-......,......-....oTT",
+      "TT..-~~~~~~~-.T......~~~=~~~.TT.......-.,..,oT.,,...-..T..TT",
+      "TT,.-~~~~~~~-....,T,....-...,T..TT...a-,..T....,...,-..,TTTT",
+      "TT,.-~~~~~~~-....,TT,...-..,..........-....,......,.-.....TT",
+      "TT..-.~~~~~.-..,,T.TT..,-..f.T,T.....,-..T.a---------...TTTT",
+      "TT.,-..T....-.o.T.TT.T..-....f.o...Ta.-..T..-...,.,..TTT..TT",
+      "TT..-...,...-....TT..TT.-.F.,.....,...-..T..-.............TT",
+      "TT.a-.....,.-...T...TTT.-.,,...,......-.....-.,o.....TTT.TTT",
+      "TT..---------..aT...TT..---------------,.T..-..T..T....T..TT",
+      "TTT............,T...T.T....,.........a.T....-....,........TT",
+      "TT...,.....o..,T...T.T.....,........T..T..T,-.......,......T",
+      "TT......TT.,T.T.oT.,....TT..T....,TT....,...-------------S-E",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.......,.......T",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
@@ -1006,6 +1006,78 @@ const STAGES = {
   },
   // Aeroporto de Confins: última parada de Belo Horizonte
   aero_cnf: {
+    safe: true, next: null,
+    rows: [
+      "########################",
+      "########################",
+      "#.f..####.......####.f.#",
+      "#....####...P...####...#",
+      "#..P......QQ...........#",
+      "E--S------QQ-----------#",
+      "#.....f.........-.P....#",
+      "rrrrrrrrrrrrrrrrrrrrrrrr",
+      "rrrrrrrrrUUUUUUrrrrrrrrr",
+      "rrrrrrrrrUUUUUUrrrrrrrrr",
+      "rrrrrrrrrrrrrrrrrrrrrrrr",
+      "########################"
+    ]
+  },
+  // São Paulo: o Aeroporto de Guarulhos, última parada do Sudeste (o voo para o Sul sai daqui)
+  aero_gru: {
+    safe: true, next: null,
+    rows: [
+      "########################",
+      "########################",
+      "#.f..####.......####.f.#",
+      "#....####...P...####...#",
+      "#..P......QQ...........#",
+      "E--S------QQ-----------#",
+      "#.....f.........-.P....#",
+      "rrrrrrrrrrrrrrrrrrrrrrrr",
+      "rrrrrrrrrUUUUUUrrrrrrrrr",
+      "rrrrrrrrrUUUUUUrrrrrrrrr",
+      "rrrrrrrrrrrrrrrrrrrrrrrr",
+      "########################"
+    ]
+  },
+  // Foz do Iguaçu (Sul): o centro, avenida com a pensão (O), barracas de chipa (K), araucárias na calçada (T) e
+  // moradores; a saída da direita volta pro mapa e a rua da esquerda sobe pro aeroporto
+  // Pampa gaúcho (Rio Grande do Sul): a estância, campo aberto com coxilha (mato alto), o galpão (O), barracas (K), umbus
+  // (T) e a gente da estância; a saída da direita volta pro mapa
+  estancia: {
+    safe: true, next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTT",
+      "T,,....,,.....,,....,,.T",
+      "T..OOO....KKK..KKK...T.T",
+      "T..OOO.....V....C......T",
+      "T.........-.......f....T",
+      "T..P......-.......-.P..T",
+      "T..-------------------SE",
+      "T..f....,,...T..P...,,.T",
+      "T.,,......f.......,,...T",
+      "T....T.......,,....f...T",
+      "TTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
+  centrofoz: {
+    safe: true, next: "aero_igu",
+    rows: [
+      "########################",
+      "########################",
+      "#..OOO....KKK..KKK...T.#",
+      "#..OOO.....V....C......#",
+      "#.........-.......T....#",
+      "#..P......-.......-.P..#",
+      "G---------------------SE",
+      "#..T....T....T..P.T....#",
+      "#.####.......####......#",
+      "#.####...f...####...f..#",
+      "########################"
+    ]
+  },
+  // Foz do Iguaçu: o Aeroporto das Cataratas (volta pro Sudeste e pras outras regiões)
+  aero_igu: {
     safe: true, next: null,
     rows: [
       "########################",
