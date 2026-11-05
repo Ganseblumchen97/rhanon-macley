@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.84.0 — chegada em Curitiba
+
+- Curitiba, o fim da viagem, abriu. Depois de acalmar a Onça do Iguaçu, compre no mapa do Sul a passagem de ônibus
+  de Foz para Curitiba (R$ 1.900, ida e volta). O ônibus sobe o rio Iguaçu pelo Paraná inteiro.
+- O Largo da Ordem é a parte segura da cidade: rua de pedra, araucárias, feirinha com lembranças e comida, uma pensão
+  com cama quentinha e três moradores (um deles trabalha numa empresa de programação e fala da entrevista).
+- Na chegada, o Pajé conta da nuvem escura parada em cima da cidade: a fumaça de todo o Brasil foi parar ali.
+- Curitiba tem o seu clima, com muita garoa e cerração. As trilhas da cidade e o final vêm nas próximas versões.
+
 ## 0.83.0 — as Cataratas do Iguaçu
 
 - Foz do Iguaçu ganhou a sua trilha: as Cataratas do Iguaçu (níveis 74 a 76), pela rua da esquerda do centro de Foz.

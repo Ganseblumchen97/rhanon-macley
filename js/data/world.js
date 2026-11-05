@@ -35,11 +35,11 @@ const MAP_REGIONS = {
     route: ["bh", "ouropreto", "riodejaneiro", "saopaulo"], pos: {bh: [409, 290], ouropreto: [446, 336], riodejaneiro: [452, 404], saopaulo: [324, 436]}},
   // Sul: Paraná, Santa Catarina e Rio Grande do Sul (contorno estilizado) e o rio Iguaçu descendo até as Cataratas, na
   // ponta oeste do Paraná. A viagem sobe: o avião pousa no Pampa gaúcho (Rio Grande do Sul), a estrada vai pela beira do
-  // mar até Florianópolis (Santa Catarina) e atravessa Santa Catarina até Foz; de lá, o rio Iguaçu leva a Curitiba
-  sul: {n: "Sul", aria: "Mapa estilizado do Sul, com o Pampa gaúcho, Florianópolis e Foz do Iguaçu",
+  // mar até Florianópolis (Santa Catarina) e atravessa Santa Catarina até Foz; de lá, a estrada sobe o rio Iguaçu até Curitiba
+  sul: {n: "Sul", aria: "Mapa estilizado do Sul, com o Pampa gaúcho, Florianópolis, Foz do Iguaçu e Curitiba",
     land: ["M90 120 L150 40 L330 30 L420 70 L470 130 L462 200 L440 300 L380 400 L300 500 L262 522 L180 440 L60 380 L20 330 L80 262 L140 222 L110 180 L70 140Z"],
     river: "M420 74 C360 90 300 92 240 104 C190 114 140 112 98 122",   // rio Iguaçu, de Curitiba até as Cataratas
-    route: ["pampa", "floripa", "foz"], pos: {pampa: [176, 412], floripa: [440, 236], foz: [104, 126]}},
+    route: ["pampa", "floripa", "foz", "cwb"], pos: {pampa: [176, 412], floripa: [440, 236], foz: [104, 126], cwb: [404, 84]}},
   // area = pedaço de cada região (recortado pelo contorno, então pode passar dele); icon = desenho de MAP_ICON no ponto dela
   brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre a aldeia e Curitiba",
     area: {norte: "M80 80 H358 V178 L352 230 L340 280 L345 300 L320 305 L300 300 L230 310 L170 362 H80Z",
@@ -81,6 +81,8 @@ const LOC = {
   pampa: {n: "Pampa gaúcho (RS)", s: "Pampa", txt: "No Rio Grande do Sul, campo aberto até onde a vista alcança: coxilha atrás de coxilha, gado, cavalo, estância com galpão e o vento minuano cortando. Quase não tem árvore, então a fumaça não tem onde se esconder."},
   floripa: {n: "Florianópolis (SC)", s: "Florianópolis", txt: "A Ilha de Santa Catarina: quarenta e duas praias, a Lagoa da Conceição, duna, renda de bilro na porta de casa e casario açoriano colorido. Os antigos juram que as Bruxas da Ilha ainda andam por aí."},
   foz: {n: "Foz do Iguaçu (PR)", s: "Foz do Iguaçu", txt: "Na ponta do Paraná, onde o Brasil encontra o Paraguai e a Argentina: as Cataratas roncando, mata de araucária, chipa na esquina e três países numa ponte só. Daqui, é subir o rio Iguaçu até Curitiba."},
+  // Curitiba nova, o fim da viagem (cwb: o id curitiba é da Curitiba antiga, fechada, com as entrevistas)
+  cwb: {n: "Curitiba (PR)", s: "Curitiba", txt: "A capital do Paraná, lá no alto: frio, garoa, calçada de petit-pavé, ônibus em tubo de vidro e araucária em toda praça. É aqui que fica a vaga de programador. E, dizem, a última mata de pinheiro, pra onde a fumaça fugiu."},
   saopaulo: {n: "São Paulo (SP)", s: "São Paulo", txt: "A maior cidade do Brasil: prédio até onde a vista alcança, avenida que nunca dorme, garoa fina e gente de todo canto do país. No meio do concreto, um parque enorme com lago, capivara e um silêncio que de noite pesa no peito."},
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
   curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
@@ -137,6 +139,7 @@ const SUB = {
   estancia: {city: "pampa", n: "Estância do Pampa", s: "Estância", x: 250, y: 170, txt: "Uma estância no meio do pampa: galpão de madeira com fogo de chão, mate passando de mão em mão, peão, prenda e um tropeiro que já viu de tudo."},
   cataratas: {city: "foz", n: "Cataratas do Iguaçu", s: "Cataratas", x: 120, y: 250, txt: "Quase trezentas quedas d'água no meio da mata, a Garganta do Diabo roncando, passarela por cima do rio, névoa que molha até a alma e arco-íris o dia inteiro. De dia, a dona do parque; de noite, o rio ferve."},
   centrofoz: {city: "foz", n: "Centro de Foz", s: "Centro", x: 250, y: 170, txt: "O centro de Foz do Iguaçu: avenida larga com araucária na calçada, barraca de chipa, gente falando português, espanhol e guarani, e uma pensão do lado."},
+  largoordem: {city: "cwb", n: "Largo da Ordem", s: "Largo", x: 250, y: 170, txt: "O centro velho de Curitiba: rua de pedra, casarão de imigrante, relógio de flores, feirinha de domingo e uma pensão com cobertor grosso. Dá pra ver a fumaça de Pytuna parada em cima da cidade."},
   aero_igu: {city: "foz", n: "Aeroporto das Cataratas", s: "Aeroporto", x: 380, y: 60, txt: "O aeroporto de Foz, no caminho das Cataratas: dá pra ouvir o ronco da água lá da pista."},
   paulista: {city: "saopaulo", n: "Avenida Paulista", s: "Paulista", x: 290, y: 140, txt: "A avenida mais famosa de São Paulo, no alto do espigão: prédio espelhado, museu de pernas vermelhas, feira de artesanato, pastel e gente correndo pra todo lado. Tem pensão e Wi-Fi em toda esquina."},
   ibirapuera: {city: "saopaulo", n: "Parque do Ibirapuera", s: "Ibirapuera", x: 150, y: 236, txt: "O parque grande de São Paulo: gramado, lago, ponte de madeira, maritaca gritando e capivara tomando sol. De dia, tem até golpista no meio da corrida; de noite, quem cochila no banco acorda com um peso no peito."},
@@ -236,7 +239,12 @@ const CITY = {
   // Pampa gaúcho (Sul, Rio Grande do Sul): a estância no meio do campo, um arroio lá embaixo e a estrada subindo para Florianópolis
   pampa: {n: "Pampa gaúcho", look: "sul", map: "sul", route: ["estancia", "coxilhas"], cabin: false,
     land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
-    river: "M0,286 C100,276 180,296 260,282 C340,268 390,286 440,276", road: "M250,170 C200,130 150,90 100,50 C90,40 80,30 70,20", sign: [24, 30, "↑ Florianópolis"], home: "estancia", gate: "estancia"}
+    river: "M0,286 C100,276 180,296 260,282 C340,268 390,286 440,276", road: "M250,170 C200,130 150,90 100,50 C90,40 80,30 70,20", sign: [24, 30, "↑ Florianópolis"], home: "estancia", gate: "estancia"},
+  // Curitiba (Sul, Paraná), o fim da viagem: o Largo da Ordem no meio, o rio Belém lá embaixo e a estrada descendo o Iguaçu
+  // para Foz; as trilhas e o final vêm depois
+  cwb: {n: "Curitiba", look: "sul", map: "sul", route: ["largoordem"], cabin: false,
+    land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
+    river: "M0,284 C100,272 180,292 260,280 C340,266 390,284 440,274", road: "M250,170 C200,190 150,200 100,210 C60,218 20,224 -6,226", sign: [10, 246, "← Foz do Iguaçu"], home: "largoordem", gate: "largoordem"}
 };
 /* Segredos das trilhas do Norte (systems/secrets.js): o que fecha o recanto escondido de cada fase (n, d), o elemento
    que abre (elem, usado fora da batalha), a comida do baú (item) e a lembrança que o Pajé conta ao abrir (lore). */
@@ -347,6 +355,7 @@ const WEATHER_ODDS = {ananindeua: [["limpo", 35], ["chuva", 30], ["neblina", 15]
   foz: [["limpo", 35], ["chuva", 30], ["neblina", 20], ["mormaco", 10], ["ventania", 5]],   // a névoa das Cataratas e chuva de mata
   pampa: [["limpo", 35], ["chuva", 20], ["neblina", 15], ["mormaco", 5], ["ventania", 25]],   // o minuano varrendo o campo
   floripa: [["limpo", 35], ["chuva", 25], ["neblina", 15], ["mormaco", 10], ["ventania", 15]],   // o vento sul da Ilha
+  cwb: [["limpo", 25], ["chuva", 15], ["neblina", 20], ["ventania", 10], ["garoa", 30]],   // a cidade da garoa e da cerração
   ouropreto: [["limpo", 25], ["chuva", 20], ["neblina", 20], ["mormaco", 5], ["ventania", 5], ["garoa", 25]],   // cidade alta: neblina e garoa
   bh: [["limpo", 30], ["chuva", 20], ["neblina", 15], ["mormaco", 10], ["ventania", 10], ["garoa", 15]]};   // serra: neblina de manhã e garoa
 // bichos que o tempo de agora chama em dobro, os da região da cidade (more por região em WEATHER)
@@ -354,7 +363,7 @@ const weatherMore = (w = weatherNow()) => (WEATHER[w].more || {})[regionOfCity(c
 function weatherOn(day, city = curCity()) {
   if (day <= 1) return "limpo";   // primeiro dia (tutorial): tempo bom
   const odds = WEATHER_ODDS[city] || WEATHER_ODDS.ananindeua;
-  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31, bh: 37, ouropreto: 41, riodejaneiro: 43, saopaulo: 47, foz: 53, pampa: 59, floripa: 61}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
+  let r = seeded(day * 17 + ({belem: 5, saoluis: 11, teresina: 13, recife: 17, petrolina: 19, cuiaba: 23, bonito: 29, brasilia: 31, bh: 37, ouropreto: 41, riodejaneiro: 43, saopaulo: 47, foz: 53, pampa: 59, floripa: 61, cwb: 67}[city] || 0)) * odds.reduce((a, [, w]) => a + w, 0);
   for (const [k, w] of odds) if ((r -= w) < 0) return k === "fumaca" && G.portfolio?.mapa_queimadas && seeded(day * 7 + 3) < .66 ? "limpo" : k;   // com o mapa de queimadas, a brigada apaga 2 de cada 3 focos
   return "limpo";
 }
@@ -415,6 +424,8 @@ const BUS_LINES = {
   // das Coxilhas, e o de Florianópolis, com o chefe de dia das Dunas da Joaquina
   floripa: {from: "pampa", price: 1700, pass: "passagemFLO", open: () => !!BS().coxilhas, lock: "O ônibus para Florianópolis sai depois que o Touro Xucro das Coxilhas for acalmado."},
   foz: {from: "floripa", price: 1800, pass: "passagemFOZ", open: () => !!BS().dunas, lock: "O ônibus para Foz sai depois que o Leão-marinho das Dunas da Joaquina for acalmado."},
+  // Curitiba, o fim da viagem: a estrada sobe o rio Iguaçu desde Foz, depois da Onça do Iguaçu
+  cwb: {from: "foz", price: 1900, pass: "passagemCWB", open: () => !!BS().cataratas, lock: "O ônibus para Curitiba sai depois que a Onça do Iguaçu das Cataratas for acalmada."},
   brasilia: {from: "bonito", price: 1300, pass: "passagemBSB", open: () => !!BS().gruta, lock: "O ônibus para Brasília sai depois que a Preguiça-gigante da Gruta do Lago Azul for acalmada."}
 };
 // linha de ônibus entre as cidades a e b (em qualquer sentido), ou nada

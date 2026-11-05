@@ -63,6 +63,12 @@ const NARRA = {
     {r: "Um ronco que não para nunca, vô. E o rio Iguaçu sobe dali até Curitiba."},
     "Então é só seguir o rio, curumim. A fumaça foi pra onde a mata de pinheiro acaba."
   ],
+  cwb: [
+    "E o ônibus subiu o rio Iguaçu até o fim, curumim. Curitiba. A cidade do anúncio, a do sonho dele.",
+    "Fazia um frio de doer o dente. Garoa fina, gente de casaco, ônibus parando dentro de um tubo de vidro.",
+    {r: "E em cima da cidade tinha uma nuvem parada, vô. Escura. Não era chuva."},
+    "Era a fumaça de todo o Brasil, que tinha vindo parar ali. Pytuna estava perto. E a entrevista também."
+  ],
   bh: [
     "De avião outra vez, curumim, agora pro Sudeste. Belo Horizonte, no meio das montanhas de Minas.",
     "Ali a noite é cheia de poste aceso. Tanta luz que Jaci quase some no céu, e os encantados ficam escondidos.",

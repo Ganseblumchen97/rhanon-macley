@@ -76,7 +76,12 @@ function selectSub(id, msg) {
   else if (id === "centrofoz") {
     btn(t("Entrar no centro de Foz"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo da fronteira."));
-    lh(t("A rua da esquerda desce pras Cataratas do Iguaçu. O aeroporto fica depois delas e abre com a Onça do Iguaçu; Curitiba vem em breve."));
+    lh(t("A rua da esquerda desce pras Cataratas do Iguaçu. O aeroporto fica depois delas e abre com a Onça do Iguaçu; o ônibus para Curitiba também."));
+  }
+  else if (id === "largoordem") {
+    btn(t("Entrar no Largo da Ordem"), () => startExplore(id), false, i);
+    lh(t("Lá dentro: lembranças, comida, uma cama quentinha na pensão e o povo de Curitiba."));
+    lh(t("As trilhas de Curitiba e o fim da viagem vêm em breve. Para voar, volte de ônibus até Foz do Iguaçu."));
   }
   else if (id === "paulista") {
     btn(t("Entrar na Avenida Paulista"), () => startExplore(id), false, i);
@@ -167,8 +172,8 @@ function busRide(city, toStage) {
   const onRiver = MAP_REGION === "norte";
   const deBSB = G.loc === "brasilia";   // voltando de Brasília para Bonito
   const deRio = G.loc === "riodejaneiro", deSP = G.loc === "saopaulo";   // voltando do litoral pela serra
-  const deFoz = G.loc === "foz";   // voltando de Foz pela travessia de Santa Catarina
-  $("info").innerHTML = `<h2>${t(onRiver ? "No rio…" : "Na estrada…")}</h2><p>${t({belem: "O barco desce o Tapajós e o Amazonas rumo a Belém.", ananindeua: "O barco sobe o Amazonas e o Tapajós de volta para a aldeia.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: "O ônibus desce do sertão pelo agreste rumo a Recife.", petrolina: volta ? "O ônibus sobe pelo agreste e pelo sertão de volta para Petrolina." : "O ônibus atravessa o sertão rumo a Petrolina.", bonito: deBSB ? "O ônibus volta pelo cerrado até Bonito." : "O ônibus desce pelo Mato Grosso do Sul rumo a Bonito.", brasilia: "O ônibus atravessa o cerrado rumo a Brasília.", ouropreto: deRio ? "O ônibus sobe a serra de volta para Ouro Preto." : "O ônibus desce pela serra rumo a Ouro Preto.", riodejaneiro: deSP ? "O ônibus volta pela beira do mar até o Rio." : "O ônibus desce a serra até o mar do Rio de Janeiro.", saopaulo: "O ônibus vai pela beira do mar e sobe a serra até São Paulo.", pampa: "O ônibus desce pela beira do mar de volta para o pampa.", floripa: deFoz ? "O ônibus atravessa Santa Catarina de volta para Florianópolis." : "O ônibus sobe pela beira do mar até Florianópolis.", foz: "O ônibus atravessa Santa Catarina inteira, de leste a oeste, até Foz do Iguaçu.", bh: "O ônibus sobe pela serra de volta para Belo Horizonte.", cuiaba: "O ônibus sobe pela estrada de volta para Cuiabá."}[city])}</p>`;
+  const deFoz = G.loc === "foz", deCWB = G.loc === "cwb";   // voltando de Foz pela travessia de Santa Catarina
+  $("info").innerHTML = `<h2>${t(onRiver ? "No rio…" : "Na estrada…")}</h2><p>${t({belem: "O barco desce o Tapajós e o Amazonas rumo a Belém.", ananindeua: "O barco sobe o Amazonas e o Tapajós de volta para a aldeia.", teresina: volta ? "O ônibus atravessa o sertão de volta para Teresina." : "O ônibus desce pelo Maranhão rumo a Teresina.", saoluis: "O ônibus volta pelo Maranhão para São Luís.", recife: "O ônibus desce do sertão pelo agreste rumo a Recife.", petrolina: volta ? "O ônibus sobe pelo agreste e pelo sertão de volta para Petrolina." : "O ônibus atravessa o sertão rumo a Petrolina.", bonito: deBSB ? "O ônibus volta pelo cerrado até Bonito." : "O ônibus desce pelo Mato Grosso do Sul rumo a Bonito.", brasilia: "O ônibus atravessa o cerrado rumo a Brasília.", ouropreto: deRio ? "O ônibus sobe a serra de volta para Ouro Preto." : "O ônibus desce pela serra rumo a Ouro Preto.", riodejaneiro: deSP ? "O ônibus volta pela beira do mar até o Rio." : "O ônibus desce a serra até o mar do Rio de Janeiro.", saopaulo: "O ônibus vai pela beira do mar e sobe a serra até São Paulo.", pampa: "O ônibus desce pela beira do mar de volta para o pampa.", floripa: deFoz ? "O ônibus atravessa Santa Catarina de volta para Florianópolis." : "O ônibus sobe pela beira do mar até Florianópolis.", foz: deCWB ? "O ônibus desce o rio Iguaçu de volta para Foz." : "O ônibus atravessa Santa Catarina inteira, de leste a oeste, até Foz do Iguaçu.", cwb: "O ônibus sobe o rio Iguaçu pelo Paraná inteiro, de oeste a leste, até Curitiba.", bh: "O ônibus sobe pela serra de volta para Belo Horizonte.", cuiaba: "O ônibus sobe pela estrada de volta para Cuiabá."}[city])}</p>`;
   let t0 = 0, last = null, vrum = 0;
   const f = ts => {
     t0 = t0 || ts;

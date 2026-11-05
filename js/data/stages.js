@@ -1203,6 +1203,24 @@ const STAGES = {
       "########################"
     ]
   },
+  // Curitiba: o Largo da Ordem, rua de pedra com a pensão (O), a feirinha (K), araucárias (T), canteiros de flores e
+  // moradores; a saída da direita volta pro mapa (as trilhas vêm depois)
+  largoordem: {
+    safe: true, next: null,
+    rows: [
+      "########################",
+      "########################",
+      "#..OOO....KKK..KKK...T.#",
+      "#..OOO.....V....C......#",
+      "#.T.......-.......T..f.#",
+      "#..P......-.......-.P..#",
+      "#.f-------------------SE",
+      "#..T..f.T....T..P.T....#",
+      "#.####.......####...f..#",
+      "#.####..fff..####......#",
+      "########################"
+    ]
+  },
   // Foz do Iguaçu: o Aeroporto das Cataratas (volta pro Sudeste e pras outras regiões)
   aero_igu: {
     safe: true, next: null,
