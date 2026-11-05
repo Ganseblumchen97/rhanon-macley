@@ -45,6 +45,8 @@ const TILE_PAL = {
   ibirapuera: {g1: "#6aa84a", g2: "#5e9c40", tall: "#4a8a38", tallHi: "#8ac860", path: "#a8a49a", path2: "#8a867c", leaf: "#2f7a3a", leaf2: "#22602a", leafHi: "#4a9a48", trunk: "#5a3a22", rock: "#a8a49a", rock2: "#7a766e", water: "#3a7a9a", water2: "#8ac0d8", wood: "#a8703f", wood2: "#6d4329"},
   // Belo Horizonte: a rua do Mercado Central, pedra portuguesa clara, casario mineiro branco de janela colorida, telhado
   // colonial e quaresmeira roxa nas calçadas (o símbolo das serras de Minas)
+  // Pampa gaúcho: as Coxilhas, capim verde do campo, macega dourada (mato alto), umbu de copa larga e sanga escura
+  coxilhas: {g1: "#8aa85a", g2: "#7c9a4e", tall: "#c8b860", tallHi: "#e8d890", path: "#9a7a52", path2: "#7a5e3e", leaf: "#3a6a2a", leaf2: "#2a5020", leafHi: "#6a9a4a", trunk: "#5a3a22", rock: "#a89a88", rock2: "#7a6a58", water: "#3a6a8a", water2: "#8ab0c8", wood: "#9c6339", wood2: "#6d4329"},
   // Pampa gaúcho: a estância, capim verde-amarelado do campo, chão de terra batida, umbu de copa larga e galpão de madeira
   estancia: {g1: "#8aa85a", g2: "#7c9a4e", tall: "#a8b860", tallHi: "#d0d880", path: "#9a7a52", path2: "#7a5e3e", leaf: "#3a6a2a", leaf2: "#2a5020", leafHi: "#6a9a4a", trunk: "#5a3a22", rock: "#a89a88", rock2: "#7a6a58", water: "#4a7a9a", water2: "#8ab8d0", wood: "#9c6339", wood2: "#6d4329", roof: "#6a4a2a", roof2: "#4a3018", walls: ["#a8744a", "#e8dcc8", "#a8744a", "#e8dcc8", "#a8744a", "#e8dcc8"]},
   // Foz do Iguaçu: o centro, calçada de pedra clara, prédio baixo de tijolo e araucária na calçada (araucaria: true)

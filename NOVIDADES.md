@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.81.0 — as Coxilhas do Pampa
+
+- A primeira trilha do Sul: as Coxilhas do Pampa (níveis 70 a 72), pela passagem da esquerda da estância. É campo
+  aberto de capim alto, quase sem árvore, com sangas d'água, graxaim (a raposa do pampa), zorrilho, tachã e
+  joão-de-barro.
+- De dia, o Touro Xucro, um touro que nunca foi laçado, desce a coxilha. Ao ser acalmado, vira aliado no Chamado do
+  aliado ("Tropel do pampa") e libera o ônibus para Florianópolis. De noite, uma luz azul corre pelo campo: é o
+  Boitatá do Sul, primo do Boitatá do Norte.
+- O Pytuna aparece nas coxilhas, fugindo do vento minuano, e a trilha tem um canto secreto com uma história do
+  Negrinho do Pastoreio.
+
 ## 0.80.0 — Florianópolis e a viagem que só sobe
 
 - O Sul agora vai de baixo para cima, até Curitiba. O avião de Guarulhos pousa no Pampa gaúcho, no Rio Grande do Sul,

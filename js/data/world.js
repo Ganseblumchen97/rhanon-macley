@@ -132,6 +132,7 @@ const SUB = {
   tijuca: {city: "riodejaneiro", n: "Floresta da Tijuca", s: "Tijuca", x: 120, y: 96, txt: "Mata atlântica no meio da cidade, plantada de novo à mão onde antes era fazenda de café: cachoeira, gruta, mico-leão e quati pedindo comida. De noite, um riso rouco sai de uma das grutas."},
   aero_gru: {city: "saopaulo", n: "Aeroporto de Guarulhos", s: "Guarulhos", x: 396, y: 54, txt: "Depois do parque, a estrada leva ao aeroporto grande de São Paulo: avião saindo a cada minuto, inclusive pro Sul."},
   lagoa: {city: "floripa", n: "Lagoa da Conceição", s: "Lagoa", x: 250, y: 170, txt: "A vila da Lagoa, no meio da Ilha: casinha açoriana colorida, rendeira na porta, barco de pescador e a água da lagoa logo ali. Tem pensão e uma prosa manezinha que ninguém entende de primeira."},
+  coxilhas: {city: "pampa", n: "Coxilhas do Pampa", s: "Coxilhas", x: 110, y: 236, txt: "Campo aberto que sobe e desce em ondas, capim alto, sanga com água parada e um umbu aqui e outro lá. De dia, um touro que ninguém nunca laçou; de noite, uma luz azul corre rasteira pelo campo."},
   estancia: {city: "pampa", n: "Estância do Pampa", s: "Estância", x: 250, y: 170, txt: "Uma estância no meio do pampa: galpão de madeira com fogo de chão, mate passando de mão em mão, peão, prenda e um tropeiro que já viu de tudo."},
   centrofoz: {city: "foz", n: "Centro de Foz", s: "Centro", x: 250, y: 170, txt: "O centro de Foz do Iguaçu: avenida larga com araucária na calçada, barraca de chipa, gente falando português, espanhol e guarani, e uma pensão do lado."},
   aero_igu: {city: "foz", n: "Aeroporto das Cataratas", s: "Aeroporto", x: 380, y: 60, txt: "O aeroporto de Foz, no caminho das Cataratas: dá pra ouvir o ronco da água lá da pista."},
@@ -231,7 +232,7 @@ const CITY = {
     bay: "M0,325 L0,292 C80,300 160,286 240,298 C300,306 360,290 440,284 L440,325Z",   // a Lagoa da Conceição
     river: "M60,0 C80,60 120,110 150,150 C170,180 190,240 200,300", road: "M250,170 C200,190 120,200 -6,210", sign: [10, 230, "← Continente"], home: "lagoa", gate: "lagoa"},
   // Pampa gaúcho (Sul, Rio Grande do Sul): a estância no meio do campo, um arroio lá embaixo e a estrada subindo para Florianópolis
-  pampa: {n: "Pampa gaúcho", look: "sul", map: "sul", route: ["estancia"], cabin: false,
+  pampa: {n: "Pampa gaúcho", look: "sul", map: "sul", route: ["estancia", "coxilhas"], cabin: false,
     land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
     river: "M0,286 C100,276 180,296 260,282 C340,268 390,286 440,276", road: "M250,170 C200,130 150,90 100,50 C90,40 80,30 70,20", sign: [24, 30, "↑ Florianópolis"], home: "estancia", gate: "estancia"}
 };
@@ -295,6 +296,8 @@ const SECRETS = {
     lore: "Ouro Preto tem mais igreja que esquina, e cada igreja tem um porão. Num deles, alguém escondeu um baú no tempo do ouro. O ouro foi embora. O baú ficou."},
   mina:     {elem: "raio", item: "pao_queijo", n: "Escora de pedra solta", d: "Um monte de pedra solta escora a entrada de uma galeria lateral. Um raio no lugar certo derruba o monte e abre a passagem.",
     lore: "Dizem que um rei africano, trazido escravizado pra cá, juntou ouro escondido no cabelo, pó por pó, até comprar a liberdade dele e a do povo dele. As minas guardam essas histórias melhor que os livros."},
+  coxilhas: {elem: "vento", item: "chimarrao", n: "Monte de macega seca", d: "Um monte de capim seco tapa a boca de uma toca de pedra na encosta. Uma rajada de vento espalha a macega e abre a passagem.",
+    lore: "O Negrinho do Pastoreio perdeu os cavalos do patrão numa noite assim, curumim, e pagou caro. Hoje quem perde alguma coisa no pampa acende uma vela pra ele, e ele ajuda a achar. Não é encantado de briga: é de ajudar."},
   tijuca:   {elem: "planta", item: "cafe", n: "Raízes de figueira", d: "As raízes de uma figueira velha desceram pela pedra e fecharam a boca de uma gruta. Puxando com jeito, elas abrem.",
     lore: "A Floresta da Tijuca já foi fazenda de café, curumim. A mata morreu e a água da cidade secou. Aí plantaram tudo de novo, muda por muda. Num canto, os plantadores deixaram um baú."},
   ibirapuera: {elem: "raio", item: "pao_queijo", n: "Portão do viveiro", d: "O portão de ferro de um viveiro velho do parque, com a trava elétrica sem força.",
@@ -307,13 +310,13 @@ const WEATHER = {
   limpo:    {n: "Tempo bom"},
   chuva:    {n: "Chuva", boost: {agua: 1.2, raio: 1.2, fogo: .8}, fight: "Tá chovendo: água e raio ficam mais fortes, e o fogo mais fraco.",
     more: {norte: ["sapo", "ariranha", "poraque", "jacaretinga"], nordeste: ["siri", "traira", "jacare_papo", "cagado", "lontra"],
-      centroeste: ["jacare_pantanal", "dourado", "piraputanga", "sucuri_amarela"], sudeste: ["paca", "cachorro_mato", "jacu", "sapo_cururu", "capivara_pinheiros"]}},
+      centroeste: ["jacare_pantanal", "dourado", "piraputanga", "sucuri_amarela"], sudeste: ["paca", "cachorro_mato", "jacu", "sapo_cururu", "capivara_pinheiros"], sul: ["zorrilho", "graxaim"]}},
   neblina:  {n: "Neblina", dodge: 12, fight: "Neblina: às vezes o golpe do bicho passa raspando.",
-    more: {norte: ["coruja", "garca", "soco"], nordeste: ["carao", "bigua", "garca_moura"], centroeste: ["mutum", "bugio", "morcego_gruta"], sudeste: ["jacu", "sabia", "gaviao_carijo", "saira", "corujinha"]}},
+    more: {norte: ["coruja", "garca", "soco"], nordeste: ["carao", "bigua", "garca_moura"], centroeste: ["mutum", "bugio", "morcego_gruta"], sudeste: ["jacu", "sabia", "gaviao_carijo", "saira", "corujinha"], sul: ["graxaim", "coruja_buraqueira"]}},
   mormaco:  {n: "Mormaço", boost: {fogo: 1.2, agua: .9}, fight: "Mormaço: o fogo fica mais forte.",
     more: {norte: ["calango", "iguana"], nordeste: ["tatupeba", "prea", "tatu_bola"], centroeste: ["ema", "seriema", "tatu_canastra"], sudeste: ["quero_quero", "jararacucu", "capivara_pinheiros"]}},
   ventania: {n: "Ventania", boost: {vento: 1.2, planta: 1.1}, fight: "Ventania: o vento e as folhas ficam mais fortes.",
-    more: {norte: ["harpia", "urubu", "gaivota"], nordeste: ["asa_branca", "tesourao", "carcara", "periquito"], centroeste: ["arara_azul", "arara_vermelha", "papagaio", "tuiuiu"], sudeste: ["tucano", "gaviao_carijo", "maritaca", "bem_te_vi"]}},
+    more: {norte: ["harpia", "urubu", "gaivota"], nordeste: ["asa_branca", "tesourao", "carcara", "periquito"], centroeste: ["arara_azul", "arara_vermelha", "papagaio", "tuiuiu"], sudeste: ["tucano", "gaviao_carijo", "maritaca", "bem_te_vi"], sul: ["tacha", "joao_barro"]}},
   // climas de cada região: o sol de rachar do sertão, a fumaça das queimadas do Centro-Oeste (a fumaça do Pytuna de
   // perto: os bichos tomados batem mais forte, foe) e a garoa das serras de Minas
   sol:      {n: "Sol de rachar", boost: {fogo: 1.3, agua: .8, planta: .9}, fight: "Sol de rachar: o fogo fica bem mais forte, e a água e as folhas mais fracas.",
@@ -402,9 +405,9 @@ const BUS_LINES = {
   ouropreto: {from: "bh", price: 1400, pass: "passagemOPR", open: () => !!BS().serracurral, lock: "O ônibus para Ouro Preto sai depois que o Muriqui-rei da Serra do Curral for acalmado."},
   riodejaneiro: {from: "ouropreto", price: 1500, pass: "passagemRIO", open: () => !!BS().mina, lock: "O ônibus para o Rio sai depois que o Tatu-rei da Mina abandonada for acalmado."},
   saopaulo: {from: "riodejaneiro", price: 1600, pass: "passagemSAO", open: () => !!BS().tijuca, lock: "O ônibus para São Paulo sai depois que o Quati-rei da Floresta da Tijuca for acalmado."},
-  // Sul: a viagem sobe do Pampa (onde o avião pousa) por Florianópolis até Foz; por enquanto as linhas abrem ao conhecer a
-  // cidade de onde saem (o Sul ainda não tem trilhas)
-  floripa: {from: "pampa", price: 1700, pass: "passagemFLO", open: () => !!G.seen.estancia, lock: "O ônibus para Florianópolis sai depois que você conhecer a estância."},
+  // Sul: a viagem sobe do Pampa (onde o avião pousa) por Florianópolis até Foz; o ônibus do Pampa abre com o chefe de dia
+  // das Coxilhas, e o de Florianópolis, por enquanto, ao conhecer a Lagoa (a Ilha ainda não tem trilha)
+  floripa: {from: "pampa", price: 1700, pass: "passagemFLO", open: () => !!BS().coxilhas, lock: "O ônibus para Florianópolis sai depois que o Touro Xucro das Coxilhas for acalmado."},
   foz: {from: "floripa", price: 1800, pass: "passagemFOZ", open: () => !!G.seen.lagoa, lock: "O ônibus para Foz sai depois que você conhecer a Lagoa da Conceição."},
   brasilia: {from: "bonito", price: 1300, pass: "passagemBSB", open: () => !!BS().gruta, lock: "O ônibus para Brasília sai depois que a Preguiça-gigante da Gruta do Lago Azul for acalmada."}
 };
@@ -453,7 +456,7 @@ const FREELAS = {
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {aero_gru: "ibirapuera", aero_igu: "centrofoz", mina: "ladeiras", tijuca: "copacabana", ibirapuera: "paulista", aero_bel: "baixadas", aero_rec: "arrecifes", aero_bsb: "parquebsb", aero_cnf: "serracurral", rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {coxilhas: "estancia", aero_gru: "ibirapuera", aero_igu: "centrofoz", mina: "ladeiras", tijuca: "copacabana", ibirapuera: "paulista", aero_bel: "baixadas", aero_rec: "arrecifes", aero_bsb: "parquebsb", aero_cnf: "serracurral", rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {

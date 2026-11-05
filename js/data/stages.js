@@ -1043,7 +1043,43 @@ const STAGES = {
   // Foz do Iguaçu (Sul): o centro, avenida com a pensão (O), barracas de chipa (K), araucárias na calçada (T) e
   // moradores; a saída da direita volta pro mapa e a rua da esquerda sobe pro aeroporto
   // Pampa gaúcho (Rio Grande do Sul): a estância, campo aberto com coxilha (mato alto), o galpão (O), barracas (K), umbus
-  // (T) e a gente da estância; a saída da direita volta pro mapa
+  // (T) e a gente da estância; a saída da direita volta pro mapa e a passagem da esquerda leva às Coxilhas
+  // Pampa gaúcho: as Coxilhas (gerado por tools/gerar_mapas.py)
+  coxilhas: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTT.,o..,,TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTT...T,..,...T.,,,.,,.,.,.,..,,...,..,,,,.,~~~~~.,,.....oTT",
+      "TT.,.To,...,,..,--------------B,.,fT,,..,,.~~~~~~~.,,.T,.,TT",
+      "TTT,,T,.,,...,..-....,,.,,..,...,..,,,T,,..~~~~~~~T,,,,..,TT",
+      "TT,,,.,,.,,,.,,,-,,,,,,,,,..,,.,,.o.,.,TT,.~~~~~~~..,,,T,.TT",
+      "TT,.-------------.,,.o,T.,..,.,,.,..TT......~~~~~..,T,,TT,TT",
+      "TT..-,....,,..,.,T,,T,T,,,.T.,,.T.,TTT,..,,,,fa..,..,T,ao,TT",
+      "TT,.-.,,a.,.,..,,T..T.,TT..,...TT.,.TT.,.a...,.,,o.,.,...TTT",
+      "TTT,-,.,f,f.,,,.,T,...,T.,..,T,To,.,T...,,....,....,..T,.TTT",
+      "TTf,-,,T.,.,,,T.,.,..,.,,T..T.,,.,,.a.---------------....TTT",
+      "TT..-...,T,T...f,o,.,,,,.T,T,,T.T..,,.-.,.,..a.,..,.-..T,,TT",
+      "T...-.,o,,.,..,..,f,,a...,TTT.,.T.,,..-,.,.,....,,..-..T,,TT",
+      "To..-,,.T.,.....,..,..,,..T,.T,.,,....-.,,,.o..oa...-....,TT",
+      "T...-.a,..T,-------------.,..o..,,,~~~-,,aT.,T,..,..-,.,,TTT",
+      "T,,.-,.,T,T,-......,a...-,..,.,.TT~~~~=,,f,.Ta.To,,,-...,,TT",
+      "T,.,-,~~~~~,-,.,,..,,,..-.,o,,T,oT~~~~=a,,..T,......-.,,.TTT",
+      "TT..-~~~~~~~-..,,..,.,..-.....,TT,~~~~=..,,,,...f,.,-.,,,.TT",
+      "TT.,-~~~~~~~-,,T,.T,,o..-.,,,,....T~~~-,,,.....,,,.,-,,T..TT",
+      "TT,,-~~~~~~~-..,.,..,.,,-,,....,.T.o..-..,.,.a.,,...-.,.T,TT",
+      "TT..-.~~~~~,-,,.,o.T,..a-,,.T.,,,o.,,,-.,,..---------,,...TT",
+      "TT,.-,,,,ao.-,,.,...,..,-.,.T...,.,,,,-....,-,.......,..,.TT",
+      "TT..-.,,.,.,-.,,T,T..T..-.F,.,.,,,.o,,-..,T,-,,,,...,,.,..TT",
+      "TT..-.,.....-..,,.,,.,T.-.,.,.,,.,..a,-,,T.,-,,.,,,TTT,T,TTT",
+      "TT..---------,..,T.,,,,.---------------.,,,,-.,,T.T.,T....TT",
+      "TT.,.....,.,.,,T,.,,.T,T.,,.,.,,.,.,....,T..-,..,.,..TT..,,T",
+      "TT..,.,,,,,TT,,.,.,T,T,.,.Tf.,..,,.,T,....,,-.,.......,,.,,T",
+      "TTT.T..,,...T,.,.T.,,,.,T,...,f.,.T,.T.,,,,,-------------S-E",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT..,,,,,..,.,,.,T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Florianópolis (Santa Catarina): a vila da Lagoa da Conceição, casario açoriano (#) com a pensão (O), barracas de renda
   // e de peixe (K), árvores (T), moradores e a lagoa (~) embaixo; a saída da direita volta pro mapa
   lagoa: {
@@ -1063,7 +1099,7 @@ const STAGES = {
     ]
   },
   estancia: {
-    safe: true, next: null,
+    safe: true, next: "coxilhas",
     rows: [
       "TTTTTTTTTTTTTTTTTTTTTTTT",
       "T,,....,,.....,,....,,.T",
@@ -1071,7 +1107,7 @@ const STAGES = {
       "T..OOO.....V....C......T",
       "T.........-.......f....T",
       "T..P......-.......-.P..T",
-      "T..-------------------SE",
+      "G..-------------------SE",
       "T..f....,,...T..P...,,.T",
       "T.,,......f.......,,...T",
       "T....T.......,,....f...T",

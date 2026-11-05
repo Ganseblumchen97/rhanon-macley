@@ -228,7 +228,7 @@ const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta 
   aero_bsb: " · o guichê escolhe o destino e o avião espera na pista: chega perto e aperta Z", aero_cnf: " · o guichê escolhe o destino e o avião espera na pista: chega perto e aperta Z",
   aero_gru: " · o guichê escolhe o destino e o avião espera na pista: chega perto e aperta Z", aero_igu: " · o guichê escolhe o destino e o avião espera na pista: chega perto e aperta Z",
   centrofoz: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda sobe pro aeroporto",
-  estancia: " · lembranças, comida e cama no galpão: chega perto e aperta Z",
+  estancia: " · lembranças, comida e cama no galpão: chega perto e aperta Z. A passagem da esquerda vai pras Coxilhas",
   lagoa: " · lembranças, comida e rede na pensão: chega perto e aperta Z",
   portocuiaba: " · lembranças, comida e rede na pensão: chega perto e aperta Z. O cais de baixo leva pro Pantanal",
   centrobonito: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda vai pro Rio da Prata",

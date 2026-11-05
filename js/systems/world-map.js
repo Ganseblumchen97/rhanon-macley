@@ -172,7 +172,7 @@ function openBrasil(pick) {
     : !beenSel ? [t("O voo para {cidade} sai do {aero}.", {cidade: LOC[REGION_START[BR_SEL]].s, aero: t(REGIONS[fromF.a].airport)})]
     : [calm && calm(), BR_SEL === "norte" && t("Entre a aldeia e Belém, vai de barco de linha pelo rio."),
        BR_SEL === "sudeste" && t("Por enquanto, Belo Horizonte, Ouro Preto, o Rio e São Paulo; mais lugares vêm em breve."),
-       BR_SEL === "sul" && t("Por enquanto, o Pampa gaúcho, Florianópolis e Foz do Iguaçu; as trilhas e Curitiba vêm em breve."),
+       BR_SEL === "sul" && t("Por enquanto, o Pampa gaúcho (com as Coxilhas), Florianópolis e Foz do Iguaçu; mais trilhas e Curitiba vêm em breve."),
        t("{aero}: daqui se voa para as regiões que você já conhece.", {aero: t(r.airport)})];
   card.innerHTML = `<h3 style="color:${r.color}">${r.n}</h3><p>${r.txt}</p>` + hints.filter(Boolean).map(h => `<p class="hint">${h}</p>`).join("");
   side.append(card);

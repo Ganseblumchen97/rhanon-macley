@@ -66,7 +66,7 @@ function selectSub(id, msg) {
   else if (id === "estancia") {
     btn(t("Entrar na estância"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma cama no galpão e a gente do pampa."));
-    lh(t("As trilhas do pampa vêm em breve. O ônibus sobe pela beira do mar até Florianópolis; o aeroporto fica em Foz do Iguaçu, no fim da estrada."));
+    lh(t("A passagem da esquerda leva às Coxilhas. O ônibus para Florianópolis sai depois do Touro Xucro; o aeroporto fica em Foz do Iguaçu, no fim da estrada."));
   }
   else if (id === "lagoa") {
     btn(t("Entrar na Lagoa"), () => startExplore(id), false, i);

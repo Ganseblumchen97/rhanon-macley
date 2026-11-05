@@ -105,6 +105,8 @@ const NARRA_BOSS = {
   cuca: ["A Cuca é velha como as cantigas de ninar, curumim. Mora numa gruta e só pega quem não quer dormir.", "Com a fumaça, ela esqueceu a cantiga e ficou só com o caldeirão. Fervia fumaça em vez de chá.", {r: "Ela quase me fez dormir em pé, vô. A voz dela é pesada que nem rede molhada."}, "E tu cantou pra ela a cantiga que eu cantava pra ti. Ela lembrou, coitada. Voltou pra gruta cantarolando."],
   capivara_rainha: ["A Capivara-rainha vive no lago desde antes de ter cidade em volta, curumim. É a bicha mais calma que existe: passarinho dorme em cima dela.", "A fumaça veio pelo rio sujo e ela ficou sem sossego. Capivara sem sossego é feito trovão: devagar, mas não para.", {r: "Ela me empurrou pro lago, vô. Com calma. Mas empurrou."}, "Depois sentou do teu lado na grama e ficou olhando a água. Capivara não pede desculpa. Ela só fica perto."],
   pisadeira: ["A Pisadeira mora nos telhados, curumim. Quando alguém janta demais e dorme de barriga pra cima, ela desce e pisa no peito dele.", "Na cidade grande, com tanta gente cansada e com o peito apertado, a fumaça deu a ela peso de pedra.", {r: "Eu cochilei no banco do parque, vô. Acordei com ela em cima de mim, rindo."}, "E tu levantou mesmo assim, com o peso todo. Ela ficou tão espantada que esqueceu de pisar. Voltou pro telhado e de lá ficou só olhando."],
+  touro_xucro: ["O Touro Xucro nunca foi laçado, curumim. Os peões contam que ele é o dono das coxilhas, e que o gado todo seguia ele.", "A fumaça entrou nas narinas dele e ele começou a correr sem parar, derrubando cerca, espantando a boiada inteira.", {r: "Eu fiquei parado na frente dele, vô, sem lança levantada. Ele parou bem pertinho e cheirou minha mão."}, "Bicho xucro não aceita laço, mas aceita respeito. Agora ele pasta de novo no alto da coxilha."],
+  boitata_sul: ["O Boitatá do Sul é primo do lá de cima, curumim. Os dois são cobra de fogo e os dois cuidam do campo contra quem bota fogo à toa.", "Só que a fumaça confundiu ele: pensou que o fogo era culpa de quem andava no campo, e começou a correr atrás de todo mundo.", {r: "Eu mostrei pra ele que a fumaça vinha de longe, vô. Não era de ninguém dali."}, "E ele foi atrás dela, correndo baixinho pelo campo, pro norte. O fogo dele é pra proteger, não pra queimar."],
   tatu_rei: ["O Tatu-rei cavou a primeira mina daqui, curumim, muito antes dos homens chegarem com a picareta. Os túneis dele iam até debaixo das igrejas.", "A fumaça desceu pelos poços e ficou presa lá embaixo. Ele começou a cavar sem parar, procurando ar, e a serra inteira tremia.", {r: "Eu abri uma galeria pro vento entrar, vô. Ele respirou e parou de cavar."}, "Bicho que cava sabe ouvir a terra. Agora ele dorme de novo, enroladinho na couraça, debaixo de Ouro Preto."],
   alma_mina: ["A Alma da mina era um mineiro que ficou preso numa galeria que desabou, curumim. Desde então ele anda lá dentro com a lamparina.", "A fumaça apagou a luz dele. Sem a lamparina, ele achou que nunca mais ia achar a saída, e ficou bravo com quem entrava.", {r: "Eu acendi a lamparina dele com a tocha, vô. Ele olhou pra luz e sorriu."}, "Com luz, alma perdida acha o caminho. Ele subiu pela boca da mina e foi ver o céu. Fazia cem anos que não via."],
   mula_madrinha: ["A Mula-madrinha guiou as tropas do ouro, curumim. As outras mulas iam atrás do sino dela, ladeira acima, ladeira abaixo.", "A fumaça entrou nas minas velhas e ela achou que a tropa tinha se perdido lá dentro. Ficou brava de tanto procurar.", {r: "Eu toquei o sino dela de volta, vô. Ela parou na hora pra escutar."}, "Sino de madrinha a gente não esquece. Ela foi pro pasto devagar, balançando o cincerro."],
@@ -237,6 +239,14 @@ const NARRA_PYT = {
     {r: "Tem gente que planta fogo de propósito. Não é descuido."},
     {p: "Então tu já entendeu. Quem manda no fogo não mora no mato. Mora na cidade do meio, a de concreto."},
     "E a fumaça foi pro leste, na direção de Brasília."
+  ],
+  // Sul: no pampa a fumaça não tem onde se esconder; aparece depois do Touro Xucro, o último chefe de dia do Pampa
+  touro_xucro: [
+    "Nas coxilhas, quando o Touro Xucro voltou a pastar, a fumaça apareceu baixinha, fugindo do vento.",
+    {p: "Bah, como venta nesse lugar, curumim. Aqui eu não paro em pé."},
+    {r: "No pampa não tem onde se esconder. Nem árvore tem."},
+    {p: "Mas tem chão comprido até o norte. Lá onde o pinheiro acaba eu te espero, e lá eu sou maior que tu."},
+    "E o minuano empurrou a fumaça pro norte, pro lado do mar."
   ],
   // Sudeste: nas cidades que não dormem, a fumaça se esconde na luz dos postes e no barulho; aparece depois do último
   // chefe de dia de cada cidade (BH, Ouro Preto, Rio e São Paulo)
