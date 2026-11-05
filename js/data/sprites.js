@@ -19,6 +19,7 @@ const ART = {queixada_chefe: "queixada", cobra_grande: "sucuri", onca_rei: "onca
   capivara_pinheiros: "capivara", corujinha: "coruja", gamba: "cassaco", capivara_rainha: "capivara",
   cachorro_mato: "lobo", paca: "cotia", bacurau: "coruja", muriqui_rei: "macaco",
   veado_campeiro: "veado", irara: "ariranha", jaguarundi: "jaguatirica", tamandua_rei: "tamandua",
+  morcego_mina: "morcego", aranha_armadeira: "caranguejeira", cuica: "cassaco", tatu_rei: "tatu",
   morcego_gruta: "morcego", aranha_chicote: "caranguejeira", cateto: "queixada", bagre_cego: "piranha", preguica_gigante: "preguica",
   piraputanga: "piranha", bugio: "macaco", gato_palheiro: "jaguatirica", ariranha_mae: "ariranha",
   tatu_canastra: "tatu", tamandua_mirim: "tamandua", coruja_buraqueira: "coruja", guara_rei: "lobo",
@@ -67,6 +68,7 @@ const VILLAGER_LOOK = {
   // técnico da lan house (feira) e a Dona Graça, cliente do freela no Ver-o-Peso
   tecnico: {pal: {g: "#2a6ab8", G: "#1a4a8a", r: "#ffd23a", s: "#a86f40", S: "#7d4f2c"}, shirt: ["#3a3a44", "#24242c"], hat: ["#6a645a", "#4a4640", "#2a2a30"], noBand: true, prop: "cloth"},   // chapéu de feltro de inventor
   cordelista: {pal: {g: "#a8743a", G: "#6e4a24", r: "#1a1426", s: "#8a5a32", S: "#5e3a1e", h: "#e8e4d8"}, shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#3a3028", "#24201a"], cap: ["#a8743a", "#6e4a24"], glasses: true},   // Seu Dedé, cordelista do Recife: cabelo branco, chapéu de couro e óculos
+  startup: {pal: {g: "#3a3a44", G: "#22222a", r: "#1a1426", s: "#c8905a", S: "#9a6a3e", h: "#e8702a"}, shirt: ["#3a3a44", "#22222a"], pants: ["#3a5a8a", "#24405a"], longHair: true, glasses: true},   // Bia, da startup da Paulista: moletom escuro, jeans, óculos e cabelo laranja
   brigadista: {pal: {g: "#e8701c", G: "#a84a10", r: "#1a1426", s: "#a86f40", S: "#7d4f2c", h: "#2a1a14"}, shirt: ["#e8701c", "#b8500e"], pants: ["#8a7a52", "#5e5236"], cap: ["#f0c020", "#b8900e"], longHair: true},   // Iara, brigadista do cerrado: farda laranja e capacete amarelo
   cliente: {pal: {g: "#7a2a8a", G: "#4e1a5a", r: "#1a1426", s: "#9a6236", S: "#6e4424", h: "#3a2a22"}, shirt: ["#6a2a8a", "#4a1a6a"], pants: ["#e8c040", "#b8902a"], longHair: true, prop: "basket"},
   armeiro: {pal: {h: "#3a2a22", g: "#e5741c", G: "#a8480e", r: "#2a2230", s: "#9a6236", S: "#6e4424", t: "#5a4a40", T: "#3a2e28"}, feather: "#ffffff", top: "#7d4f2c", prop: "spear"}

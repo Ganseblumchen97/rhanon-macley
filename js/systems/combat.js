@@ -784,17 +784,17 @@ function allyCall(id) {
     lunge(T, 220, 900);
     [0, 1, 2].forEach(i => at(T + 220 + i * 280, () => { sp.show(i % 2 ? "crouch" : "attack"); sfx("claw"); hit(dmg(1), i === 2 && (id === "quati_rei" ? t("O bando do Corcovado passa unhando {bicho}!", v) : t("Três mordidas do recife n{bicho}!", v))); }));
     end = T + 220 + 3 * 280 + 400;
-  } else if (mv.fx === "tropa") {   // o cincerro toca e uma fila de mulas de luar atravessa o palco
-    at(500, () => { sp.show("attack"); sfx("bloqueio"); setTimeout(() => sfx("bloqueio"), 220); shake("gshake-s"); });   // blém, blém: o cincerro
-    at(800, () => {
-      const W = $("fx").clientWidth;
-      for (let i = 0; i < 5; i++) setTimeout(() => {
-        const c = spiritEl(id, .8, -60); c.show(i % 2 ? "attack" : "idle"); c.el.style.opacity = .7; sfx("claw");
-        c.el.animate([{transform: "translateX(0)"}, {transform: `translateX(${W + 140}px)`}], {duration: 900, easing: "linear"}).onfinish = () => c.el.remove();
-      }, i * 140);
-      shake("gshake");
+  } else if (mv.fx === "tunel") {   // o tatu afunda no chão, cava por baixo do bicho e o chão cede embaixo dele
+    at(500, () => { sp.show("crouch"); sp.el.animate([{transform: "translateY(0)", opacity: .85}, {transform: "translateY(40px)", opacity: 0}], {duration: 420, easing: "ease-in", fill: "forwards"}); sfx("claw"); });
+    for (let i = 0; i < 4; i++) at(900 + i * 150, () => {   // a terra levanta no caminho do túnel
+      const r = $("fx").getBoundingClientRect(), x = sp.x + (b.x - sp.x) * (i + 1) / 4, [gx, gy] = PFX.toGrid(r.left + x, r.top + b.y + 30);
+      PFX.burst(6, "puff", ["#8a6a3a", "#b8955a", "#5e4a3a"], gx, gy, 10, {life: .8, up: 6}); shake("gshake-s");
     });
-    at(1450, () => { hit(dmg(1), t("A tropa de luar passa por cima d{bicho}!", v)); hitImpact("furia"); });
+    at(1500, () => {
+      const r = $("fx").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + b.x, r.top + b.y + 20);
+      PFX.burst(22, "puff", ["#8a6a3a", "#c8a85a", "#5e4a3a"], gx, gy, 24, {life: 1.2, up: 10}); shake("gshake");
+      hit(dmg(1), t("O chão cede embaixo d{bicho}!", v)); hitImpact("furia");
+    });
     end = 2300;
   } else if (mv.fx === "bando") {   // muriquis pequenos de luar pulam por cima do bicho; folhas verdes caem no Rhanon
     at(600, () => {
@@ -927,6 +927,8 @@ function special() {
   else if (s === "sono") { e.hp = Math.min(e.max, e.hp + 8); foeAttack("roar", 0); say(t("{bicho} tira um cochilo: +8 PV.", {bicho: foe(1)})); }
   else if (s === "assobio") { const n = hit(Math.ceil(d * .7)); p.medo = 3; setTimeout(() => HERO_A.set("scared"), 400); say(t("\"Fiiit!\" O assobio d{bicho} gela o sangue: −{n} PV. Sem defesa por 3 turnos.", {bicho: foe(), n})); }
   else if (s === "espinhos") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Espinhos"}; say(t("{bicho} se sacode e crava espinhos! −{n} PV e −3 por turno.", {bicho: foe(1), n})); }
+  else if (s === "spam") { const n = hit(Math.ceil(d * .5)); p.weak = 2; say(t("{bicho} dispara 99 notificações! −{n} PV, e Rhanon se distrai: golpes mais fracos por 2 turnos.", {bicho: foe(1), n})); }   // bug da Notificação
+  else if (s === "queda") { const n = hit(Math.ceil(d * 1.2)), sp = Math.min(p.sp, 6); p.sp -= sp; say(t("{bicho} cai e leva o servidor junto! −{n} PV e −{sp} PE.", {bicho: foe(1), n, sp})); }   // bug da Nuvem
   else if (s === "confusao") { const n = hit(Math.ceil(d * .6)); p.weak = 3; say(t("{bicho} deixa pegadas trocadas. −{n} PV, e Rhanon se perde: golpes mais fracos por 3 turnos.", {bicho: foe(1), n})); }
   else if (s === "dinheiro") {   // malandro: leva dinheiro de verdade; vencendo, ele devolve (reward)
     const n = Math.min(G.money, rnd(20, 45)); G.money -= n; e.stolen = (e.stolen || 0) + n; foeAttack("roar", 0);
@@ -984,7 +986,8 @@ function tick() {
 function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: quem chamou mostra a subida de nível (cartão da luta)
   noteWin(a.id);   // caderno de bichos e pedido de "vencer"
   const back = a.stolen || 0; if (back) { G.money += back; a.stolen = 0; }   // dinheiro que o malandro levou volta
-  if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult), L0 = G.lv; vit();
+  if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult * (G.portfolio?.app_trilha ? 1.15 : 1)), L0 = G.lv;   // o app de trilhas (freela de SP) dá 15% a mais
+  vit();
   const got = drop || a.bug ? 0 : a.boss ? rnd(1, 3) : 1;   // chefe deixa de 1 a 3 (o Pajé faz talismã com elas); bug não deixa nada
   const part = NB_DROP[a.id] && G.nb.tem && !G.nb[NB_DROP[a.id]] ? NB_DROP[a.id] : null;   // macaco e ariranha largam peças do notebook
   if (part) { G.nb[part] = true; G.nbNew.push(part); }   // nbNew: a tela do notebook mostra ela encaixando

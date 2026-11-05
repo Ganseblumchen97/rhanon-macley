@@ -228,7 +228,7 @@ const SAFE_TIP = {aldeia: " · chega perto da fogueira ou dos aldeões e aperta 
   mercadocentral: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda sobe pra Serra do Curral",
   tiradentes: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A ladeira da esquerda desce pras ruas de pedra",
   copacabana: " · lembranças, comida e rede na pensão: chega perto e aperta Z. O calçadão da esquerda sobe pra Floresta da Tijuca",
-  paulista: " · lembranças, comida e rede na pensão: chega perto e aperta Z. A rua da esquerda desce pro Ibirapuera",
+  paulista: " · lembranças, comida, rede na pensão e a Bia, da startup, que tem um freela: chega perto e aperta Z. A rua da esquerda desce pro Ibirapuera",
   planopiloto: " · lembranças, comida, rede na pensão e a Iara, da brigada, que tem um freela: chega perto e aperta Z",
   recifeantigo: " · lembranças, comida, rede na pensão e o Seu Dedé, que tem um freela: chega perto e aperta Z",
   parada: " · compra a passagem na bilheteria e embarca no barco", terminal: " · o barco volta pra aldeia; a trilha da esquerda vai pro Ver-o-Peso"};
@@ -891,6 +891,7 @@ const SAOPAULO_TIPS = [
   "Eu rodo a cidade inteira de moto. Trânsito, garoa e buraco, todo dia. O lugar mais tranquilo é o Ibirapuera, mano.",
   "Cuidado com quem oferece ingresso barato e pede Pix. É golpe, véio. Tem um monte deles rodando no parque.",
   "Eu pinto parede de prédio. Esse muro aí eu pintei com a lua de um lado e uma fumaça do outro. Da hora, né?",
+  "A Bia, do moletom, tem uma startup aqui na Paulista e tá doida atrás de programador. Diz que o app dela não para em pé.",
   "As capivaras vieram pelo rio Pinheiros e moram no lago do parque. Tem uma enorme que manda em todas, meu.",
   "Minha mãe dizia: janta leve, senão a Pisadeira sobe no teu peito de noite. Eu ri. Depois dormi no banco do parque e não ri mais."
 ];

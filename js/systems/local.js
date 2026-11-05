@@ -65,7 +65,7 @@ function selectSub(id, msg) {
   }
   else if (id === "paulista") {
     btn(t("Entrar na Avenida Paulista"), () => startExplore(id), false, i);
-    lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo de São Paulo."));
+    lh(t("Lá dentro: lembranças, comida, uma rede na pensão e a Bia, de uma startup, que precisa de um programador."));
   }
   else if (id === "tiradentes") {
     btn(t("Entrar na Praça Tiradentes"), () => startExplore(id), false, i);

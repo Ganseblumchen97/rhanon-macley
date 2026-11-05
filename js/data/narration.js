@@ -87,6 +87,8 @@ const NARRA_BOSS = {
   cuca: ["A Cuca é velha como as cantigas de ninar, curumim. Mora numa gruta e só pega quem não quer dormir.", "Com a fumaça, ela esqueceu a cantiga e ficou só com o caldeirão. Fervia fumaça em vez de chá.", {r: "Ela quase me fez dormir em pé, vô. A voz dela é pesada que nem rede molhada."}, "E tu cantou pra ela a cantiga que eu cantava pra ti. Ela lembrou, coitada. Voltou pra gruta cantarolando."],
   capivara_rainha: ["A Capivara-rainha vive no lago desde antes de ter cidade em volta, curumim. É a bicha mais calma que existe: passarinho dorme em cima dela.", "A fumaça veio pelo rio sujo e ela ficou sem sossego. Capivara sem sossego é feito trovão: devagar, mas não para.", {r: "Ela me empurrou pro lago, vô. Com calma. Mas empurrou."}, "Depois sentou do teu lado na grama e ficou olhando a água. Capivara não pede desculpa. Ela só fica perto."],
   pisadeira: ["A Pisadeira mora nos telhados, curumim. Quando alguém janta demais e dorme de barriga pra cima, ela desce e pisa no peito dele.", "Na cidade grande, com tanta gente cansada e com o peito apertado, a fumaça deu a ela peso de pedra.", {r: "Eu cochilei no banco do parque, vô. Acordei com ela em cima de mim, rindo."}, "E tu levantou mesmo assim, com o peso todo. Ela ficou tão espantada que esqueceu de pisar. Voltou pro telhado e de lá ficou só olhando."],
+  tatu_rei: ["O Tatu-rei cavou a primeira mina daqui, curumim, muito antes dos homens chegarem com a picareta. Os túneis dele iam até debaixo das igrejas.", "A fumaça desceu pelos poços e ficou presa lá embaixo. Ele começou a cavar sem parar, procurando ar, e a serra inteira tremia.", {r: "Eu abri uma galeria pro vento entrar, vô. Ele respirou e parou de cavar."}, "Bicho que cava sabe ouvir a terra. Agora ele dorme de novo, enroladinho na couraça, debaixo de Ouro Preto."],
+  alma_mina: ["A Alma da mina era um mineiro que ficou preso numa galeria que desabou, curumim. Desde então ele anda lá dentro com a lamparina.", "A fumaça apagou a luz dele. Sem a lamparina, ele achou que nunca mais ia achar a saída, e ficou bravo com quem entrava.", {r: "Eu acendi a lamparina dele com a tocha, vô. Ele olhou pra luz e sorriu."}, "Com luz, alma perdida acha o caminho. Ele subiu pela boca da mina e foi ver o céu. Fazia cem anos que não via."],
   mula_madrinha: ["A Mula-madrinha guiou as tropas do ouro, curumim. As outras mulas iam atrás do sino dela, ladeira acima, ladeira abaixo.", "A fumaça entrou nas minas velhas e ela achou que a tropa tinha se perdido lá dentro. Ficou brava de tanto procurar.", {r: "Eu toquei o sino dela de volta, vô. Ela parou na hora pra escutar."}, "Sino de madrinha a gente não esquece. Ela foi pro pasto devagar, balançando o cincerro."],
   saci: ["O Saci é o mais levado dos encantados, curumim. Esconde as coisas, trança a crina dos cavalos, azeda o leite... mas nunca fez mal de verdade.", "A fumaça de Pytuna virou redemoinho de brasa no pito dele. Aí a brincadeira ficou perigosa.", {r: "Eu peguei o gorro dele, vô. Ele ficou sem graça e prometeu se comportar."}, "E tu devolveu o gorro, não foi? Por isso ele ainda te deve um favor. Saci não esquece quem foi justo com ele."],
   muriqui_rei: ["O Muriqui-rei é o macaco mais calmo da mata, curumim. Briga de muriqui se resolve com abraço.", "A fumaça desceu nas grotas da serra e ele esqueceu como se abraça sem apertar.", {r: "Ele me deu um abraço que tirou meus pés do chão, vô."}, "Quando a fumaça saiu, o abraço ficou macio. Era o jeito dele de pedir desculpa."],
@@ -217,6 +219,35 @@ const NARRA_PYT = {
     {r: "Tem gente que planta fogo de propósito. Não é descuido."},
     {p: "Então tu já entendeu. Quem manda no fogo não mora no mato. Mora na cidade do meio, a de concreto."},
     "E a fumaça foi pro leste, na direção de Brasília."
+  ],
+  // Sudeste: nas cidades que não dormem, a fumaça se esconde na luz dos postes e no barulho; aparece depois do último
+  // chefe de dia de cada cidade (BH, Ouro Preto, Rio e São Paulo)
+  muriqui_rei: [
+    "No alto da Serra do Curral, com Belo Horizonte inteira acesa lá embaixo, a fumaça apareceu do lado do menino. Quase não dava pra ver, de tanta luz.",
+    {p: "Gostou da vista, curumim? Tanto poste aceso que ninguém olha pro céu. Aqui eu nem preciso apagar Jaci. Eles esqueceram dela sozinhos."},
+    {r: "Eu não esqueci."},
+    {p: "Tu é um só. Lá embaixo tem dois milhões."}
+  ],
+  tatu_rei: [
+    "Na boca da mina, quando o Tatu-rei voltou a dormir, a fumaça saiu das galerias cheirando a terra revirada.",
+    {p: "Sabe por que esse povo cavou tanto, curumim? Atrás de ouro. Cavaram a serra, sujaram o rio, e o ouro foi embora num navio."},
+    {r: "E o povo ficou. As igrejas ficaram. As histórias ficaram."},
+    {p: "Histórias... Tu fala igual teu avô. Vamos ver se tu ainda fala assim no meio de cidade de verdade."},
+    "E a fumaça desceu a serra, pro lado do mar."
+  ],
+  quati_rei: [
+    "Na Floresta da Tijuca, com o Cristo lá em cima no meio da névoa, a fumaça se enrolou num galho e ficou olhando o mar.",
+    {p: "Essa mata foi derrubada inteira, curumim. Café, fazenda, carvão. Aí plantaram de novo, árvore por árvore."},
+    {r: "Então dá pra plantar de novo. Tu mesmo tá contando."},
+    {p: "Dá. Mas demora cem anos. E eu sou rápida."},
+    "E foi embora pela estrada da serra, pro lado de São Paulo."
+  ],
+  capivara_rainha: [
+    "Na beira do lago do Ibirapuera, com os prédios de São Paulo em volta até onde a vista alcança, a fumaça apareceu fraquinha, quase sem cor.",
+    {p: "A maior cidade do Brasil, curumim. Aqui eu me escondo atrás de qualquer chaminé. Ninguém repara numa fumaça a mais."},
+    {r: "A capivara reparou. O passarinho que dorme em cima dela reparou. Eu reparei."},
+    {p: "Tu é teimoso... Tá bom. Vou pra onde a mata de pinheiro acaba. Lá no frio, lá eu sou maior que tu."},
+    "E o vento frio levou a fumaça pro sul. Fazia tempo que o menino não sentia frio."
   ],
   carranca: [
     "Na beira do Velho Chico, quando a carranca voltou pra proa, a fumaça desceu baixinha, sem força.",

@@ -3,6 +3,22 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.77.0 — a mina de Ouro Preto e o freela da startup
+
+- Ouro Preto ganhou a última fase: a Mina abandonada (níveis 64 a 66). Desça pela passagem no largo de baixo das
+  Ladeiras e entre nas galerias escuras, com estalagmites, trilho de vagonete e galerias alagadas. Lá vivem o
+  morcego-da-mina, a aranha-armadeira, a cuíca e o vendedor de ouro de tolo.
+- De dia, o Tatu-rei sai cavando a pedra com unhas do tamanho de picareta. De noite, uma lamparina acende sozinha: é a
+  Alma da mina, um mineiro que ainda procura a saída. A mina também tem um canto secreto, aberto com raio.
+- Agora é o Tatu-rei que libera o ônibus para o Rio, e ele entra no lugar da Mula-madrinha no Chamado do aliado, com
+  o "Túnel do tatu": cava por baixo do bicho e o chão cede. O Rio e São Paulo subiram 2 níveis para acompanhar.
+- Na Avenida Paulista, a Bia, de uma startup, tem um freela: o app de trilhas dela vive caindo. Abra o e-mail no
+  notebook e enfrente três bugs seguidos, o Conflito de Merge, a Notificação Infinita (que distrai você com 99
+  notificações) e a Nuvem Fora do Ar (que derruba o servidor e leva PE). Ela paga R$ 1.200, e depois as lutas dão 15%
+  a mais de XP.
+- O Pytuna chegou ao Sudeste: depois do último chefe de dia de Belo Horizonte, Ouro Preto, Rio e São Paulo, a fumaça
+  aparece para provocar o Rhanon. Em São Paulo ela foge para o Sul.
+
 ## 0.76.0 — dá para jogar no celular
 
 - O jogo agora funciona no celular. Na exploração, arraste o dedo na roda da esquerda para andar (até na diagonal) e

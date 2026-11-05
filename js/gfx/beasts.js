@@ -1265,8 +1265,8 @@ function bugEye(d, x, y, r, o, s = 1, pu = [-1, .5]) {
   d.ellipse(x, y, r, r * 1.1, BW); bEye(d, x + pu[0], y + pu[1], {eye: "open"});
   if (o.eye === "angry" || o.mad) d.limb(x - (r + 1) * s, y - r - 1.5, x + r * .6 * s, y - r + .5, 1.2, BN);
 }
-// letrinhas de pixel (3x5) para o 404 e o "?" do caractere quebrado
-const BUG_GLYPH = {4: ["1.1", "1.1", "111", "..1", "..1"], 0: ["111", "1.1", "1.1", "1.1", "111"]};
+// letrinhas de pixel (3x5) para o 404, o "?" do caractere quebrado e o 99+ da notificação
+const BUG_GLYPH = {4: ["1.1", "1.1", "111", "..1", "..1"], 0: ["111", "1.1", "1.1", "1.1", "111"], 9: ["111", "1.1", "111", "..1", "111"], "+": ["...", ".1.", "111", ".1.", "..."]};
 function bugText(d, s, x, y, c) { [...s].forEach((ch, i) => BUG_GLYPH[ch].forEach((r, j) => [...r].forEach((v, k) => { if (v === "1") d.dots([[x + i * 4 + k, y + j]], c); }))); }
 // ponteiro de relógio (braço do Prazo): haste fina com a ponta de flecha
 function bugHand(d, x0, y0, x1, y1, c) {
@@ -1463,6 +1463,77 @@ function bugLento(pose, f) {
   return {c: d.canvas(), head: [X(24), Y(13)]};
 }
 
+// Conflito de Merge: duas cabeças grudadas, a verde (a versão de um) e a vermelha (a do outro), se encarando bravas, com
+// os sinais do conflito no peito (<<< === >>>); no bote, as duas dão cabeçada uma na outra
+function bugMerge(pose, f) {
+  const d = rigGrid(1, 46, 42), gr = "#4ad87a", Gr = "#1e9a4a", rd = "#f06a5a", Rd = "#b03a30", ln = "#fff2a8";
+  if (pose === "ko") {   // as duas metades caídas, cada uma para um lado
+    d.part().ellipse(12, 36, 10, 5, gr, Gr, .6); d.part().ellipse(34, 36, 10, 5, rd, Rd, .6);
+    bugEye(d, 10, 35, 2, {eye: "x"}); bugEye(d, 36, 35, 2, {eye: "x"});
+    return {c: d.canvas(), head: [23, 34]};
+  }
+  const {at, o, X, Y} = bugPose(pose, f), ln2 = at ? 2 : 0; o.mad = true;
+  d.part().limb(X(15), Y(35), X(14), 41, 2, Gr).limb(X(31), Y(35), X(32), 41, 2, Rd);
+  d.part().limb(X(8), Y(24), X(3), Y(at ? 16 : 18 + f), 2, gr, Gr).ellipse(X(3), Y(at ? 16 : 18 + f), 1.8, 1.8, BW);   // dedo apontado pro outro lado
+  d.part().limb(X(38), Y(24), X(43), Y(at ? 16 : 18 - f), 2, rd, Rd).ellipse(X(43), Y(at ? 16 : 18 - f), 1.8, 1.8, BW);
+  d.part().ellipse(X(16) + ln2, Y(23), 10, 13, gr, Gr, .6);
+  d.part().ellipse(X(30) - ln2, Y(23), 10, 13, rd, Rd, .6);
+  d.rect(X(22.5), Y(12), 1, 22, BN);   // a costura do conflito
+  for (let i = 0; i < 3; i++) {
+    const a = X(10 + i * 3) + ln2, b = X(32 + i * 3) - ln2;
+    d.dots([[a, Y(30)], [a + 1, Y(29)], [a + 1, Y(31)]], ln).dots([[b + 1, Y(30)], [b, Y(29)], [b, Y(31)]], ln);   // <<< e >>>
+  }
+  bugEye(d, X(17) + ln2, Y(17), 3, o, 1, [1, .5]); bugEye(d, X(29) - ln2, Y(17), 3, o, -1, [-1, .5]);   // um encarando o outro
+  if (at) d.part().ellipse(X(16) + ln2, Y(24), 2.5, 2, "#3a1410").ellipse(X(30) - ln2, Y(24), 2.5, 2, "#3a1410");
+  else d.rect(X(14), Y(24), 5, 1, BN).rect(X(28), Y(24), 5, 1, BN).dots([[X(13), Y(25)], [X(33), Y(25)]], BN);   // boca torta de birra
+  return {c: d.canvas(), head: [X(23), Y(17)]};
+}
+// Notificação Infinita: o sininho amarelo com o selo vermelho de 99+, tremendo sem parar (risquinhos dos lados) e com o
+// badalo balançando
+function bugNotifica(pose, f) {
+  const d = rigGrid(1, 40, 42), yl = "#f8c830", Yl = "#c8901a", bd = "#e83a3a", Bd = "#a82020";
+  if (pose === "ko") {   // o sino tombado, o selo zerado
+    d.part().poly([[3, 31], [22, 24], [34, 31], [34, 40], [3, 40]], yl, Yl, 20);
+    d.part().ellipse(31, 26, 4, 3.5, "#a0a0a8", "#6a6a74", .6);
+    bugEye(d, 13, 34, 2, {eye: "x"}); bugEye(d, 20, 34, 2, {eye: "x"});
+    return {c: d.canvas(), head: [16, 33]};
+  }
+  const {at, o, X, Y: Y0} = bugPose(pose, f), Y = v => Y0(v + 2), sw = at ? 0 : f ? 2 : -2;
+  d.part().ellipse(X(19) + sw, Y(34), 3, 3, Yl);   // o badalo
+  d.part().ellipse(X(19), Y(5), 2, 2, yl, Yl);
+  d.part().poly([[X(12), Y(9)], [X(26), Y(9)], [X(29), Y(26)], [X(34), Y(31)], [X(4), Y(31)], [X(9), Y(26)]], yl, Yl, X(24));
+  d.rect(X(12), Y(12), 2, 8, "#fff0b0");   // o brilho do metal
+  bugEye(d, X(15), Y(18), 2.5, o, 1); bugEye(d, X(23), Y(18), 2.5, o, -1);
+  if (at) d.part().ellipse(X(19), Y(25), 2.5, 2, "#3a1410"); else d.rect(X(17), Y(25), 4, 1, BN).dots([[X(16), Y(24)], [X(21), Y(24)]], BN);
+  d.part().ellipse(X(30), Y(6), 7, 5, bd, Bd, .6); bugText(d, "99+", X(24), Y(4), BW);   // o selo
+  const v = at ? 3 : 1 + f;   // risquinhos de vibrar
+  d.part().rect(X(1) - v, Y(14), 1, 3, Yl).rect(X(2) - v, Y(20), 1, 3, Yl).rect(X(36) + v, Y(16), 1, 3, Yl).rect(X(35) + v, Y(22), 1, 3, Yl);
+  return {c: d.canvas(), head: [X(19), Y(18)]};
+}
+// Nuvem Fora do Ar: a nuvem cinza e carrancuda, de sobrancelha franzida, com o fio da tomada solto balançando; parada,
+// pinga chuva; no bote, solta o raio
+function bugNuvem(pose, f) {
+  const d = rigGrid(1, 54, 50), cl = "#b8c0d0", Cl = "#7a8498", ry = "#ffe24a", Ry = "#e8a020";
+  if (pose === "ko") {   // a nuvem murcha no chão
+    d.part().ellipse(27, 42, 22, 6, cl, Cl, .6).ellipse(18, 39, 9, 5, cl, Cl, .6).ellipse(34, 38, 10, 6, cl, Cl, .6);
+    bugEye(d, 22, 40, 2, {eye: "x"}); bugEye(d, 32, 40, 2, {eye: "x"});
+    d.part().limb(6, 44, 1, 47, 1.5, "#3a3a44").rect(0, 46, 3, 3, "#e8e8e8");
+    return {c: d.canvas(), head: [27, 39]};
+  }
+  const {at, o, X, Y} = bugPose(pose, f), cy = v => Y(v - 4); o.mad = true;   // -4: sobra lugar embaixo pro raio
+  d.part().limb(X(12), cy(30), X(7), cy(42) + f, 1.5, "#3a3a44").rect(X(5), cy(42) + f, 4, 3, "#e8e8e8").dots([[X(6), cy(45) + f], [X(8), cy(45) + f]], "#a0a0a8");   // fio da tomada
+  d.part().ellipse(X(16), cy(22), 10, 8, cl, Cl, .6);
+  d.part().ellipse(X(38), cy(22), 10, 8, cl, Cl, .6);
+  d.part().ellipse(X(27), cy(16), 13, 11, cl, Cl, .6);
+  d.part().ellipse(X(27), cy(26), 19, 6, cl, Cl, .6);
+  bugEye(d, X(22), cy(19), 3, o, 1); bugEye(d, X(32), cy(19), 3, o, -1);
+  if (at) d.part().ellipse(X(27), cy(26), 3, 2, "#3a1410");
+  else d.dots([[X(24), cy(27)], [X(25), cy(26)], [X(26), cy(26)], [X(27), cy(26)], [X(28), cy(26)], [X(29), cy(26)], [X(30), cy(27)]], BN);   // boca de muxoxo
+  if (at) d.part().poly([[X(27), cy(31)], [X(32), cy(31)], [X(29), cy(38)], [X(34), cy(38)], [X(24), cy(52)], [X(27), cy(41)], [X(22), cy(41)]], ry, Ry, X(28));
+  else for (const [x, y] of [[16, 34], [24, 37], [33, 35], [40, 38]]) d.part().rect(X(x), cy(y) + (f ? 2 : 0), 1, 3, "#7ab8e8");   // chuvinha
+  return {c: d.canvas(), head: [X(27), cy(19)]};
+}
+
 /* ---------- registro e cache ---------- */
 const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, coruja, chupacabra, garca, pirarucu, caranguejo, matinta, curupira, mapinguari, pombo,
   gaivota: (pose, f) => garca(pose, f, {b: "#f4f4f4", B: "#a8b0b8", y: "#e8b030", Y: "#b88a20", k: "#e8b030"}),   // gaivota: a garça em branco e cinza
@@ -1484,7 +1555,8 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   sabia: (pose, f) => pombo(pose, f, {b: "#8a7a5a", B: "#5e5238", n: "#e8843a", p: "#e8843a", w: "#7a6a4a", y: "#d8b040"}),   // sabiá-laranjeira: pardo de peito laranja
   jacu: (pose, f) => pombo(pose, f, {b: "#2a2a30", B: "#16161a", n: "#d8282a", p: "#3a3a44", w: "#22222a", y: "#9aa0a8"}),   // jacu: preto, papo vermelho
   pepita: pessoa({pal: {s: "#c8905a", S: "#9a6a3e", h: "#3a2a1e"}, shirt: ["#d8c8a0", "#b0a078"], pants: ["#5a4a3a", "#3e3226"], noBand: true, cap: ["#d8b860", "#a88a38"]}),   // vendedor de ouro de tolo: chapéu de palha e camisa de garimpeiro
-  saci: saciFrame,   // Saci: pele escura, calção e gorro vermelhos e uma perna só
+  saci: saciFrame,
+  alma_mina: pessoa({pal: {s: "#c8d0d0", S: "#9aa4a8", h: "#3a3a40"}, shirt: ["#6a6458", "#4a463e"], pants: ["#5a5248", "#3e3a32"], noBand: true, cap: ["#e8c030", "#b89020"]}),   // Alma da mina: mineiro pálido de capacete amarelo e roupa cor de terra   // Saci: pele escura, calção e gorro vermelhos e uma perna só
   saira: (pose, f) => pombo(pose, f, {b: "#3ab86a", B: "#22804a", n: "#3ad0e0", p: "#e8702a", w: "#1a1a2a", y: "#3a3a3a"}),   // saíra-sete-cores: verde, cabeça turquesa, laranja e asa preta
   jararacucu: cobra({b: "#2a2a24", B: "#16160f", k: "#e8c840"}, true),   // jararacuçu: preta com os desenhos amarelos, cabeça triangular
   cuca, pisadeira,
@@ -1527,7 +1599,7 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   num_se_pode: visagem({w: "#ece4d4", W: "#b0a890", s: "#d8c8b0", h: "#2a1a10", e: "#ffd23a"}),   // Num-se-pode: a mulher de branco das estradas do Piauí
   perna_cabeluda: pernaCabeluda,
   bug_loop: bugLoop, bug_404: bug404, bug_prazo: bugPrazo, bug_memoria: bugMemoria, bug_acento: bugAcento, bug_mutante: bugMutante,
-  bug_falso: bugFalso, bug_coordenada: bugCoordenada, bug_lento: bugLento};
+  bug_falso: bugFalso, bug_coordenada: bugCoordenada, bug_lento: bugLento, bug_merge: bugMerge, bug_notifica: bugNotifica, bug_nuvem: bugNuvem};
 Object.keys(QUADS).forEach(id => { BEAST_DRAW[id] = (pose, f) => quad(QUADS[id], pose, f); });
 const BEAST_CACHE = new Map();
 const beastId = id => BEAST_DRAW[id] ? id : BEAST_DRAW[ART[id]] ? ART[id] : null;   // chefes usam o desenho do bicho base

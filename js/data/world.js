@@ -118,6 +118,7 @@ const SUB = {
   ladeiras: {city: "ouropreto", n: "Ladeiras de Ouro Preto", s: "Ladeiras", x: 120, y: 240, txt: "Ruas de pedra que sobem e descem entre igreja e casarão, com quintal de mata no meio. De dia, bicho e espertalhão vendendo ouro de tolo; de noite, um assobio e um redemoinho no meio da rua."},
   tiradentes: {city: "ouropreto", n: "Praça Tiradentes", s: "Praça", x: 248, y: 150, txt: "O coração de Ouro Preto: a praça no alto do morro, o museu, a igreja, casarão colorido de janela azul, pensão e o povo da cidade, que fala devagar e conta causo."},
   copacabana: {city: "riodejaneiro", n: "Copacabana", s: "Copacabana", x: 300, y: 214, txt: "O calçadão de ondas pretas e brancas, quiosque de água de coco, prédio de frente pro mar e a praia mais famosa do Brasil. Tem pensão, barraca e muito carioca querendo prosa."},
+  mina: {city: "ouropreto", n: "Mina abandonada", s: "Mina", x: 60, y: 286, txt: "A boca de uma mina de ouro fechada há mais de cem anos, depois das ladeiras: galeria escura, trilho de vagonete e pedra que ainda brilha. De dia, um bicho enorme cava lá dentro; de noite, uma lamparina anda sozinha."},
   tijuca: {city: "riodejaneiro", n: "Floresta da Tijuca", s: "Tijuca", x: 120, y: 96, txt: "Mata atlântica no meio da cidade, plantada de novo à mão onde antes era fazenda de café: cachoeira, gruta, mico-leão e quati pedindo comida. De noite, um riso rouco sai de uma das grutas."},
   paulista: {city: "saopaulo", n: "Avenida Paulista", s: "Paulista", x: 290, y: 140, txt: "A avenida mais famosa de São Paulo, no alto do espigão: prédio espelhado, museu de pernas vermelhas, feira de artesanato, pastel e gente correndo pra todo lado. Tem pensão e Wi-Fi em toda esquina."},
   ibirapuera: {city: "saopaulo", n: "Parque do Ibirapuera", s: "Ibirapuera", x: 150, y: 236, txt: "O parque grande de São Paulo: gramado, lago, ponte de madeira, maritaca gritando e capivara tomando sol. De dia, tem até golpista no meio da corrida; de noite, quem cochila no banco acorda com um peso no peito."},
@@ -189,7 +190,7 @@ const CITY = {
     river: "M0,236 C90,226 160,250 240,236 C320,222 380,240 440,226", road: "M226,196 C240,140 270,90 300,40 C310,24 316,10 320,-6", sign: [326, 18, "✈ Confins ↑"], home: "mercadocentral", gate: "mercadocentral"},
   // Ouro Preto (Sudeste): a Praça Tiradentes no alto, as ladeiras descendo para o sudoeste e o ribeirão do Funil lá
   // embaixo; a estrada sobe para Belo Horizonte, ao norte
-  ouropreto: {n: "Ouro Preto", look: "minas", map: "sudeste", route: ["tiradentes", "ladeiras"], cabin: false,
+  ouropreto: {n: "Ouro Preto", look: "minas", map: "sudeste", route: ["tiradentes", "ladeiras", "mina"], cabin: false,
     land: "26,44 170,18 320,24 420,80 432,200 400,290 280,316 150,312 40,280 14,160",
     river: "M0,290 C100,280 180,300 260,286 C340,272 390,290 440,280", road: "M248,150 C270,110 300,70 330,30 C336,20 340,10 344,-6", sign: [350, 18, "Belo Horizonte ↑"], home: "tiradentes", gate: "tiradentes"},
   // Rio de Janeiro (Sudeste): o mar embaixo (Copacabana), o maciço da Tijuca no alto à esquerda e a estrada subindo a
@@ -263,6 +264,8 @@ const SECRETS = {
     lore: "A Serra do Curral é feita de ferro, e muita gente queria levar ela embora em trem. O povo de BH não deixou. O baú ficou lá, junto com a serra."},
   ladeiras: {elem: "fogo", item: "tropeiro", n: "Porta de madeira podre", d: "Uma porta velha de madeira, inchada de umidade, tranca o porão de uma igreja. O fogo seca e abre ela.",
     lore: "Ouro Preto tem mais igreja que esquina, e cada igreja tem um porão. Num deles, alguém escondeu um baú no tempo do ouro. O ouro foi embora. O baú ficou."},
+  mina:     {elem: "raio", item: "pao_queijo", n: "Escora de pedra solta", d: "Um monte de pedra solta escora a entrada de uma galeria lateral. Um raio no lugar certo derruba o monte e abre a passagem.",
+    lore: "Dizem que um rei africano, trazido escravizado pra cá, juntou ouro escondido no cabelo, pó por pó, até comprar a liberdade dele e a do povo dele. As minas guardam essas histórias melhor que os livros."},
   tijuca:   {elem: "planta", item: "cafe", n: "Raízes de figueira", d: "As raízes de uma figueira velha desceram pela pedra e fecharam a boca de uma gruta. Puxando com jeito, elas abrem.",
     lore: "A Floresta da Tijuca já foi fazenda de café, curumim. A mata morreu e a água da cidade secou. Aí plantaram tudo de novo, muda por muda. Num canto, os plantadores deixaram um baú."},
   ibirapuera: {elem: "raio", item: "pao_queijo", n: "Portão do viveiro", d: "O portão de ferro de um viveiro velho do parque, com a trava elétrica sem força.",
@@ -363,7 +366,7 @@ const BUS_LINES = {
   recife:   {from: "petrolina", price: 1100, pass: "passagemREC", open: () => !!BS().beira, lock: "O ônibus para Recife sai depois que a Carranca da beira do Velho Chico for acalmada."},
   bonito: {from: "cuiaba", price: 1200, pass: "passagemBON", open: () => !!BS().chapada, lock: "O ônibus para Bonito sai depois que o Lobo-guará-rei da Chapada for acalmado."},
   ouropreto: {from: "bh", price: 1400, pass: "passagemOPR", open: () => !!BS().serracurral, lock: "O ônibus para Ouro Preto sai depois que o Muriqui-rei da Serra do Curral for acalmado."},
-  riodejaneiro: {from: "ouropreto", price: 1500, pass: "passagemRIO", open: () => !!BS().ladeiras, lock: "O ônibus para o Rio sai depois que a Mula-madrinha das Ladeiras for acalmada."},
+  riodejaneiro: {from: "ouropreto", price: 1500, pass: "passagemRIO", open: () => !!BS().mina, lock: "O ônibus para o Rio sai depois que o Tatu-rei da Mina abandonada for acalmado."},
   saopaulo: {from: "riodejaneiro", price: 1600, pass: "passagemSAO", open: () => !!BS().tijuca, lock: "O ônibus para São Paulo sai depois que o Quati-rei da Floresta da Tijuca for acalmado."},
   brasilia: {from: "bonito", price: 1300, pass: "passagemBSB", open: () => !!BS().gruta, lock: "O ônibus para Brasília sai depois que a Preguiça-gigante da Gruta do Lago Azul for acalmada."}
 };
@@ -381,7 +384,7 @@ const NB_DROP = {macaco: "teclado", ariranha: "carregador"};   // bicho que larg
 /* Freelas: um por capital. bugs = lutas em sequência (BUGS em data/animals.js), pay = R$ na entrega, prog = programa que
    fica no notebook (G.portfolio[id]) e dá uma vantagem no jogo. */
 // em que fase fica o cliente de cada freela (W no mapa)
-const FREELA_AT = {veropeso: "site_feira", recifeantigo: "app_cordel", planopiloto: "mapa_queimadas"};
+const FREELA_AT = {veropeso: "site_feira", recifeantigo: "app_cordel", planopiloto: "mapa_queimadas", paulista: "app_trilha"};
 const FREELAS = {
   site_feira: {n: "Site da feira do Ver-o-Peso", client: "Dona Graça", look: "cliente", bugs: ["bug_loop", "bug_404", "bug_prazo"], pay: 300,
     prog: "Lembranças valem 20% a mais na feira (o site mostra o preço certo).",
@@ -401,11 +404,18 @@ const FREELAS = {
     prog: "A brigada apaga os focos antes: os bichos tomados pela fumaça chegam na luta com 10% menos PV.",
     ask: "Tu que é o programador que veio do Norte? Sou da brigada do cerrado. Preciso de um mapa que mostre os focos de queimada na hora, pra gente chegar antes do fogo. Pago R$ {n}. O sistema que fizeram pra nós vive dando pau...",
     thanks: "Funcionou! Apareceu um foco agorinha lá pros lados do Parque e a equipe já tá indo. Toma, tu salvou muito cerrado hoje.",
-    after: "Com o teu mapa a gente chega antes do fogo crescer, menino. Tem bicho vivo hoje por causa de umas linhas de código."}
+    after: "Com o teu mapa a gente chega antes do fogo crescer, menino. Tem bicho vivo hoje por causa de umas linhas de código."},
+  // São Paulo: a Bia, de uma startup da Paulista, faz o Trilheiro, um app de trilhas que dá medalha por cada passo no
+  // mato; o freela mais difícil e o que paga melhor (junta o dinheiro pro Sul). Com ele, as lutas dão 15% a mais de XP (reward)
+  app_trilha: {n: "App de trilhas da startup", client: "Bia", look: "startup", bugs: ["bug_merge", "bug_notifica", "bug_nuvem"], pay: 1200,
+    prog: "O Trilheiro conta cada passo na mata: as lutas dão 15% a mais de XP.",
+    ask: "Meu, tu que é o dev que veio do Norte? Minha startup faz o Trilheiro, um app de trilhas pra paulistano largar o celular e ir pro mato. Pago R$ {n}. Só que a gente lança na segunda e o código tá um caos, mano...",
+    thanks: "Da hora! Subiu sem cair nenhuma vez. Toma, e se um dia quiser vaga aqui, a porta tá aberta.",
+    after: "O Trilheiro já tem mil trilheiros, meu! E tem gente que nunca tinha visto um bugio na vida postando foto de bugio."}
 };
 const PENSAO = {descanso: 8, noite: 10, dormir: 15};   // diária da rede na pensão do Ver-o-Peso (barata: não atrapalha a progressão)
 // local que só abre depois do chefe de outro (NEED) e a próxima fase na passagem do fim da trilha (NEXT_Z)
-const NEED = {tijuca: "copacabana", ibirapuera: "paulista", aero_bel: "baixadas", aero_rec: "arrecifes", aero_bsb: "parquebsb", aero_cnf: "serracurral", rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
+const NEED = {mina: "ladeiras", tijuca: "copacabana", ibirapuera: "paulista", aero_bel: "baixadas", aero_rec: "arrecifes", aero_bsb: "parquebsb", aero_cnf: "serracurral", rodo_slz: "lencois", rodo_the: "setecidades", rodo_pet: "beira", rodo_rec: "arrecifes", setecidades: "encontro", arrecifes: "olinda", ladeiras: "tiradentes", serracurral: "mercadocentral", parquebsb: "planopiloto", gruta: "rioprata", rioprata: "centrobonito", chapada: "pantanal", pantanal: "portocuiaba", beira: "serra", serra: "caatinga", caatinga: "orla", olinda: "recifeantigo", encontro: "trocatroca", lencois: "mangueilha", fechada: "mata", rio: "fechada", igarape: "rio", manguezal: "igarape", seringal: "manguezal", varzea: "seringal", parada: "varzea", porto: "cidadevelha", baixadas: "porto"}, NEXT_Z = {encontro: "setecidades", olinda: "arrecifes", rioprata: "gruta", pantanal: "chapada", serra: "beira", caatinga: "serra", mangueilha: "lencois", mata: "fechada", fechada: "rio", rio: "igarape", igarape: "manguezal", manguezal: "seringal", seringal: "varzea", cidadevelha: "porto", porto: "baixadas"};
 /* Itens da bolsa (vendidos na barraca de comida; usados na batalha em "Itens" ou no inventário).
    Para criar um item novo, acrescente uma linha: hp/sp = quanto recupera. */
 const ITEMS = {
