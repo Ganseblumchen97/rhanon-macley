@@ -18,6 +18,7 @@ const SCENES = {
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
   tijuca:      {sky: ["#7ab8a0", "#5a9a7a", "#3e7a52"], far: "#1e5a2e", trees: "fechada", plat: "musgo", vines: true},   // Floresta da Tijuca: mata atlântica fechada, luz verde
   ibirapuera:  {sky: ["#b8c4d0", "#c8d0d4", "#d8dcd0"], far: "#7a8a94", trees: "copa", plat: "grama", water: true},   // Ibirapuera: céu de garoa e o lago
+  araucaria:   {sky: ["#0e1020", "#141a30", "#1c2440"], far: "#16301e", trees: "fechada", plat: "musgo"},   // a última mata: noite sem lua entre os pinheiros
   barigui:     {sky: ["#a8b8c8", "#c0ccd4", "#d8dcd8"], far: "#2f5a34", trees: "copa", plat: "grama", water: true},   // Parque Barigui: céu frio de Curitiba e o lago
   cataratas:   {sky: ["#c8d8d8", "#a8c8c0", "#7aa890"], far: "#2e6a3e", trees: "fechada", plat: "musgo", water: true, vines: true},   // Cataratas do Iguaçu: névoa branca e mata molhada
   dunas:       {sky: ["#7ab8e0", "#a8d0ec", "#e0eef4"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // Dunas da Joaquina: céu do Sul e a areia branca

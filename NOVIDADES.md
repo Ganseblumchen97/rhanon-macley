@@ -3,6 +3,18 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.86.0 — o final
+
+- A viagem tem fim! Depois da Gralha-rainha, a passagem de cima do Parque Barigui leva à última mata de araucária
+  (níveis 78 a 80). Lá a noite cai de uma vez, e numa clareira, lá no alto, o Pytuna espera.
+- A luta com o Pytuna tem três fases. Primeiro ele é só fumaça e dois olhos vermelhos. Depois aparece uma máscara de
+  carvão rachada, ele imita golpes de chefes do caminho e os chefes que viraram aliados vêm ajudar juntos. Por último a
+  máscara cai e mostra o rosto dele: a cada turno a luz de Jaci cresce, você recupera PV e PE e ele enfraquece.
+- Vencido, o Pytuna vira fumaça rala e Jaci volta inteira. No dia seguinte vem a entrevista de emprego em Curitiba
+  (os programas dos freelas entram na conversa), o Pajé fecha a história na fogueira e aparece a tela do fim.
+- Depois do fim, o jogo continua: "Continuar jogando" volta para a mata, e dá para seguir treinando com os chefes.
+- A trilha do Parque Barigui ganhou a passagem para a última mata, então o desenho dela mudou um pouco.
+
 ## 0.85.0 — o Parque Barigui
 
 - Curitiba ganhou a sua trilha: o Parque Barigui (níveis 76 a 78), pela rua da esquerda do Largo da Ordem. É gramado

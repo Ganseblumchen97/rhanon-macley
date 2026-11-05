@@ -1560,6 +1560,7 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   andorinhao: (pose, f) => pombo(pose, f, {b: "#3a3a40", B: "#22222a", n: "#e8e8e0", p: "#4a4a52", w: "#2a2a30", y: "#2a2a2a"}),   // andorinhão-de-coleira: escuro de colar branco
   jacutinga: (pose, f) => pombo(pose, f, {b: "#1a1a2a", B: "#0e0e1a", n: "#f0f0f0", p: "#d8282a", w: "#22223a", y: "#5a8ad8"}),   // jacutinga: preta brilhante, cabeça branca, papo vermelho
   mboi: cobra({b: "#2a5a3a", B: "#163a24", k: "#7ad0a0", eye: "#ffd23a"}, false),   // M'Boi: a serpente gigante verde-escura do fundo do Iguaçu
+  pytuna: pytunaFrame,
   gralha_azul: (pose, f) => pombo(pose, f, {b: "#2a5ad8", B: "#1a3a98", n: "#1a1a22", p: "#5a8ae8", w: "#1e48b8", y: "#1a1a1a"}),   // gralha-azul: azul do céu e cabeça preta
   gralha_rainha: (pose, f) => pombo(pose, f, {b: "#2a5ad8", B: "#1a3a98", n: "#1a1a22", p: "#5a8ae8", w: "#1e48b8", y: "#1a1a1a"}),   // Gralha-rainha: a mesma, enorme (scale do chefe)
   saracura: (pose, f) => garca(pose, f, {b: "#a8603a", B: "#7a4024", n: "#8a8a90", N: "#5a5a62", y: "#b8c830", Y: "#8a9a20", k: "#d8302a"}),   // saracura-do-mato: peito ruivo, cabeça cinza e pernas vermelhas
@@ -1615,6 +1616,32 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   bug_loop: bugLoop, bug_404: bug404, bug_prazo: bugPrazo, bug_memoria: bugMemoria, bug_acento: bugAcento, bug_mutante: bugMutante,
   bug_falso: bugFalso, bug_coordenada: bugCoordenada, bug_lento: bugLento, bug_merge: bugMerge, bug_notifica: bugNotifica, bug_nuvem: bugNuvem};
 Object.keys(QUADS).forEach(id => { BEAST_DRAW[id] = (pose, f) => quad(QUADS[id], pose, f); });
+/* Pytuna, o chefe final, em três fases (PYT_FASE, trocada pela luta em combat.js): 1 = só fumaça e dois olhos vermelhos;
+   2 = a fumaça com uma máscara de carvão rachada, brasa nas rachaduras; 3 = a máscara caiu: um rosto cansado, quase
+   triste, com a fumaça mais rala. Trocou a fase: pytunaCacheClear() e remontar o desenho */
+let PYT_FASE = 1;
+function pytunaFrame(pose, f) {
+  const n = PYT_FASE, d = rigGrid(1, 48, 52), ko = pose === "ko", at = pose === "attack", cr = pose === "crouch", hu = pose === "hurt";
+  const by = (pose === "idle" ? f : 0) + (cr ? 3 : 0), bx = at ? -3 : hu ? 3 : 0, X = v => v + bx, Y = v => v + by;
+  const S = ["#2a2a34", "#3a3a46", "#1a1a22"], k = n === 3 ? .78 : 1;
+  const blobs = [[24, 30, 15, 12], [13, 24, 8, 7], [35, 24, 8, 7], [24, 15, 11, 9], [12, 38, 7, 6], [36, 38, 7, 6], [24, 43, 10, 6]];
+  blobs.forEach(([cx, cy, rx, ry], i) => d.part().ellipse(X(cx + (i % 2 ? f : -f) * .6), ko ? 36 + (cy - 30) * .35 : Y(cy), rx * k, (ko ? ry * .55 : ry) * k, S[i % 3], S[2], .6));
+  const hx = X(24), hy = ko ? 34 : Y(17);
+  if (n === 2) {   // máscara de carvão rachada, com brasa nas rachaduras
+    d.part().ellipse(hx, hy + 1, 8, 9, "#2e2622", "#16120e", .7);
+    d.dots([[hx - 4, hy - 6], [hx - 3, hy - 5], [hx - 3, hy - 4], [hx - 2, hy - 3], [hx + 2, hy + 3], [hx + 3, hy + 4], [hx + 3, hy + 5], [hx + 4, hy + 6]], "#ff8a3a");
+  } else if (n === 3) {   // o rosto: pele cinza-azulada, olhar cansado, boca triste e uma lágrima
+    d.part().ellipse(hx, hy + 1, 7.5, 9, "#9aa0b8", "#6a7088", .7);
+    d.dots([[hx - 2, hy + 6], [hx - 1, hy + 5], [hx, hy + 5], [hx + 1, hy + 5], [hx + 2, hy + 6]], "#3a3040");
+    if (!hu && !ko) d.dots([[hx + 4, hy + 2], [hx + 4, hy + 3]], "#bfe8ff");
+  }
+  // olhos: vermelhos na fumaça e na máscara; no rosto, cansados e azuis
+  if (ko || hu) { d.rect(hx - 5, hy, 3, 1, n === 3 ? "#2a2a3a" : "#ff2a2a"); d.rect(hx + 2, hy, 3, 1, n === 3 ? "#2a2a3a" : "#ff2a2a"); }
+  else if (n === 3) { d.rect(hx - 5, hy - 1, 3, 1, "#2a2a3a").rect(hx + 2, hy - 1, 3, 1, "#2a2a3a"); d.rect(hx - 4, hy, 2, 1, "#5a6ad8").rect(hx + 3, hy, 2, 1, "#5a6ad8"); }
+  else { const w = at ? 4 : 3, h = at ? 3 : 2; d.rect(hx - 6, hy - 1, w, h, "#ff2a2a").rect(hx + 2, hy - 1, w, h, "#ff2a2a"); d.dots([[hx - 6, hy - 1], [hx + 2, hy - 1]], "#ffd0c8"); }
+  return {c: d.canvas(), head: [hx, hy - 4]};
+}
+const pytunaCacheClear = () => [...BEAST_CACHE.keys()].forEach(k => k.startsWith("pytuna") && BEAST_CACHE.delete(k));
 const BEAST_CACHE = new Map();
 const beastId = id => BEAST_DRAW[id] ? id : BEAST_DRAW[ART[id]] ? ART[id] : null;   // chefes usam o desenho do bicho base
 function beastFrame(id, pose = "idle", f = 0, evil = false) {

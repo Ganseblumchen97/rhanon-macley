@@ -165,6 +165,7 @@ function startExplore(zone, after, from) {
   if (moving || (EX && EX.starting)) return;
   if (EX) EX.starting = true;
   wipe(() => {
+    if (ZONES[zone] && ZONES[zone].final && !G.night) { G.night = true; save(); }   // a última mata: a noite cai de uma vez
     const st = STAGES[zone], rows = st.safe ? st.rows : secretRows(zone, st.rows);   // fase de caça: com o recanto secreto cavado
     EX = {zone, st, rows, map: drawStageMap(rows, zone), pal: TILE_PAL[zone] || TILE_PAL.mata,
       night: !!G.night, ents: [], fx: [], loot: [], spits: [], spots: [], spear: null, cool: 0, jab: 0, hero: null, fighting: null, locked: false, invulnUntil: 0, dialog: null};
@@ -181,7 +182,7 @@ function startExplore(zone, after, from) {
       if (ch === "S") EX.hero = {x: tx * TILE + 8, y: ty * TILE + 12, hw: 5, hh: 3, dir: "down", aim: {x: 0, y: 1}, walk: 0, flip: false, movedT: 0};
       else if (ch === "a") { const a = pickFromPool(zone, "terra"); if (a) EX.ents.push(makeAnimalEnt(a, tx, ty)); }
       else if (ch === "B" && !BS()[bossKey(zone)]) EX.ents.push(makeAnimalEnt(ANIMALS.find(a => a.id === zoneDef(zone).boss), tx, ty));
-      else if (ch === "B") EX.spots.push({kind: "lembranca", x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});   // chefe vencido: dá para enfrentar de novo
+      else if (ch === "B" && !zoneDef(zone).final) EX.spots.push({kind: "lembranca", x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});   // chefe vencido: dá para enfrentar de novo
       else if (SPOTS[ch]) EX.spots.push({kind: SPOTS[ch], look: SPOTS[ch] === "cliente" ? FREELAS[FREELA_AT[zone] || "site_feira"].look : SPOTS[ch] === "aldeao" ? (cityOf(zone) !== "ananindeua" ? "urbano" : "aldeao") + (EX.spots.filter(q => q.kind === "aldeao").length % 3 + 1) : VILLAGER_LOOK[SPOTS[ch] + "_" + CITY[cityOf(zone)].map] ? SPOTS[ch] + "_" + CITY[cityOf(zone)].map : SPOTS[ch], x: tx * TILE + 8, y: ty * TILE + 8, tx, ty});   // vendedor com a roupa da região (peles_nordeste...)
     }));
     if (from === "back") {   // do lado de dentro da passagem, virado para a fase
@@ -203,6 +204,7 @@ function startExplore(zone, after, from) {
     else if (cityOf(zone) === "belem" && !G.narrated.belem) { G.narrated.belem = true; save(); setTimeout(() => narrate(NARRA.belem), 600); }   // primeira vez na capital
     else if (cityOf(zone) === "saoluis" && !G.narrated.saoluis) { G.narrated.saoluis = true; save(); setTimeout(() => narrate(NARRA.saoluis), 600); }   // chegou no Nordeste
     else if (cityOf(zone) === "riodejaneiro" && !G.narrated.riodejaneiro) { G.narrated.riodejaneiro = true; save(); setTimeout(() => narrate(NARRA.riodejaneiro), 600); }
+    else if (zone === "araucaria" && !G.narrated.araucaria) { G.narrated.araucaria = true; save(); setTimeout(() => narrate(NARRA.araucaria), 600); }   // o final
     else if (cityOf(zone) === "cwb" && !G.narrated.cwb) { G.narrated.cwb = true; save(); setTimeout(() => narrate(NARRA.cwb), 600); }   // chegou em Curitiba
     else if (cityOf(zone) === "floripa" && !G.narrated.floripa) { G.narrated.floripa = true; save(); setTimeout(() => narrate(NARRA.floripa), 600); }
     else if (cityOf(zone) === "pampa" && !G.narrated.pampa) { G.narrated.pampa = true; save(); setTimeout(() => narrate(NARRA.pampa), 600); }
@@ -255,7 +257,7 @@ function resumeExplore(result) {
   else if (en && result === "win" && !en.boss) exCalm(en);   // agradece e corre para o mato
   if (en && result === "win" && en.boss) {   // chefe acalmado fica no lugar como aliado (ponto de treino)
     en.alive = false;
-    if (!EX.spots.some(s => s.kind === "lembranca")) EX.spots.push({kind: "lembranca", x: en.homeX, y: en.homeY - 4, tx: Math.floor(en.homeX / TILE), ty: Math.floor(en.homeY / TILE)});
+    if (!zoneDef(EX.zone).final && !EX.spots.some(s => s.kind === "lembranca")) EX.spots.push({kind: "lembranca", x: en.homeX, y: en.homeY - 4, tx: Math.floor(en.homeX / TILE), ty: Math.floor(en.homeY / TILE)});
   }
   if (en && result === "flee") { en.stunUntil = now + 3500; EX.invulnUntil = now + 2500; }
   $("explore").hidden = false; $("homeButton").hidden = true;

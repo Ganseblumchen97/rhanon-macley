@@ -18,7 +18,7 @@ function setBattleDecor(zone) {
 const BATTLE_WATER = new Set(["rio", "igarape", "manguezal", "varzea"]), BATTLE_CITY = new Set(["cidadevelha", "porto", "baixadas"]);
 function getBattleTrackFor(animal) {
   if (animal.bug) return "battleBug";   // o freela é coisa do Rhanon: tema dele, em versão eletrônica
-  if (animal.possuido) return "battlePytuna";   // Pytuna segurou o chefe: o tema dele em versão de batalha até o fim da luta
+  if (animal.possuido || animal.id === "pytuna") return "battlePytuna";   // Pytuna em pessoa: o tema dele do começo ao fim   // Pytuna segurou o chefe: o tema dele em versão de batalha até o fim da luta
   if (animal.boss) return "battleBoss";
   if (regionOfCity(curCity()) === "nordeste" && !animal.bug) return "battleNordeste";   // Nordeste: o tema da região num forró de batalha
   if (regionOfCity(curCity()) === "centroeste" && !animal.bug) return "battleCentroOeste";   // Centro-Oeste: pagode de viola
@@ -99,6 +99,7 @@ function init(opts = {}) {
   mode = "hunt";
   buildCmds();
   const animal = opts.animal || pickAnimal();
+  if (animal.id === "pytuna") { PYT_FASE = 1; pytunaCacheClear(); }   // o final começa sempre na fumaça
   noteSeen(animal.id);   // entra no caderno de bichos
   $("plate").querySelector("b").textContent = animal.name; $("plate").querySelector(".lv").textContent = t("Nv") + " " + (animal.lv || 1); plateElem(animal);
   $("beast").innerHTML = ""; $("beast").appendChild(animalSprite(animal)); refreshHero();
@@ -113,6 +114,7 @@ function init(opts = {}) {
   const far = !animal.bug && !!ZONES[curZone] && CITY[cityOf(curZone)].map !== "norte";   // chefe de fora do Norte: mais vida e o golpe forte
   const ehp = Math.round(animal.hp * (G.portfolio.mapa_queimadas && !animal.bug && isTomado(animal) ? .9 : 1) * (animal.boss && far ? BOSS_HP_FAR : 1) * beastToughness(animal));
   e = { ...animal, hp:ehp, max:ehp, intent:null, known:false, assustada:false, rematch: !!opts.rematch, far, turn: 0 };   // rematch: revanche pela lembrança do chefe
+  if (animal.id === "pytuna") { e.fase = 1; e.luz = 0; pytunaLuz(); }   // noite sem lua nenhuma
   const wf = WEATHER[weatherNow()].foe; if (wf && isTomado(animal) && !opts.rematch) e.damage = e.damage.map(d => Math.round(d * wf));   // fumaça de queimada: o bicho tomado bate mais forte
   busy = false;
   lines = [animal.intro];
@@ -443,7 +445,7 @@ function enemyTurn() {
    a fumaça entra de volta nele, ele levanta com PYT_HOLD da vida, mais forte e com o tema de Pytuna tocando, e a luz de
    Jaci devolve PYT_SP do PE ao Rhanon. Ninguém morre: o chefe só não voltou a si ainda */
 const PYT_HOLD = .6, PYT_DMG = 1.15, PYT_SP = .35;
-const pytunaBosses = () => Object.values(CITY).map(c => c.route.filter(z => ZONES[z]).pop()).filter(Boolean).map(z => ZONES[z].boss);   // o último chefe de dia de cada cidade
+const pytunaBosses = () => Object.values(CITY).map(c => c.route.filter(z => ZONES[z] && !ZONES[z].final).pop()).filter(Boolean).map(z => ZONES[z].boss);   // o último chefe de dia de cada cidade
 const pytunaHolds = () => mode === "hunt" && e.boss && !e.rematch && !e.night && !e.possuido && !bugMode && ZONES[curZone] && !BS()[curZone] && pytunaBosses().includes(e.id);
 function pytunaPossess() {
   const me = e; e.possuido = true; e.segurando = true; busy = true; render();   // segurando: a vida fica em 0 durante a cena, e nenhuma vitória conta
@@ -471,8 +473,56 @@ function pytunaPossess() {
     pick(); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus();
   });
 }
+/* O final: Pytuna em três fases (fumaça, máscara de carvão, rosto; o desenho em gfx/beasts.js, PYT_FASE). Quando a vida
+   de uma fase acaba, ele se desfaz e se junta de novo com a vida cheia; a fala do Pajé (NARRA_FIM.fase2/fase3) entra no
+   meio. Na máscara, os chefes aliados vêm todos de uma vez (pytunaAllies); no rosto, a luz de Jaci cresce a cada turno
+   (pytunaJaci): o Rhanon recupera PV e PE e Pytuna bate mais fraco. A noite da luta (--jaci) clareia junto */
+const PYT_FASES = {2: {luz: .15, sub: "a máscara de carvão", special: ["fumaca", "noite", "eco", "eco"]}, 3: {luz: .35, sub: "o rosto de Pytuna", special: ["noite", "fumaca"]}};
+const pytunaLuz = () => $("stage").style.setProperty("--jaci", (e.luz || 0).toFixed(2));
+function pytunaPhase(n) {
+  const me = e; e.segurando = true; busy = true; qteClear(); render();
+  const at = (ms, fn) => setTimeout(() => { if (e === me && mode === "hunt" && p.hp > 0) fn(); }, REDUCE ? ms / 3 : ms);
+  BEAST_A.set("hurt"); musicStop(); say(t(n === 2 ? "A fumaça de Pytuna se desfaz... e se junta de novo." : "A máscara de carvão racha e cai.")); render();
+  at(1100, () => {   // a fumaça volta de todo lado e ele levanta com a vida cheia, com a cara nova
+    const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .45);
+    for (let i = 0; i < 30; i++) { const a = i / 30 * Math.PI * 2, R = 30 + (i % 3) * 9; PFX.emit("puff", PYT_SMOKE, gx + Math.cos(a) * R, gy + Math.sin(a) * R * .7, -Math.cos(a) * R / 1.1, -Math.sin(a) * R * .7 / 1.1, 1.1); }
+    PYT_FASE = n; pytunaCacheClear(); e.fase = n; e.special = PYT_FASES[n].special; e.hp = e.max; e.segurando = false; e.luz = PYT_FASES[n].luz; pytunaLuz();
+    if (n === 3) e.damage = e.damage.map(d => Math.round(d * 1.15));
+    BEAST_A.mount($("beast"), animalSprite(e), {id: e.id, boss: true, scale: e.scale, state: "idle", fit: true, smoke: true});
+    BEAST_A.set("bigroar"); animalCry(e.id, true, 1.4); sfx("rugidoChefe"); hitImpact("forte"); shake("gshake"); musicStart("battlePytuna");
+    encounterBanner("Pytuna", t(PYT_FASES[n].sub)); render();
+  });
+  at(2700, () => narrate(NARRA_FIM["fase" + n], () => {
+    if (e !== me || mode !== "hunt") return;
+    const go = () => { pick(); busy = false; render(); $("cmds").firstChild && $("cmds").firstChild.focus(); };
+    if (n === 2) return pytunaAllies(go);
+    jaciJingle(); go();
+  }));
+}
+// na máscara: os chefes que viraram aliados (até três) atacam um depois do outro; nenhum deles termina a fase sozinho
+function pytunaAllies(done) {
+  const me = e, ids = allyList().slice().sort(() => Math.random() - .5).slice(0, 3);
+  if (!ids.length) return done();
+  say(t("Os chefes que viraram aliados atendem a luz de Jaci!")); render();
+  const next = i => {
+    if (e !== me || mode !== "hunt") return;
+    if (i >= ids.length) { e.hp = Math.max(1, e.hp); render(); return done(); }
+    const r = allyCall(ids[i]);
+    setTimeout(() => { if (e === me) { e.hp = Math.max(1, e.hp); render(); next(i + 1); } }, (r.wait || 1800) + 400);
+  };
+  setTimeout(() => next(0), REDUCE ? 200 : 700);
+}
+function pytunaJaci() {
+  e.jaci = (e.jaci || 0) + 1; e.luz = Math.min(1, .35 + e.jaci * .13); pytunaLuz();
+  const a = Math.min(p.max - p.hp, Math.round(p.max * .06)), b = Math.min(p.msp - p.sp, Math.round(p.msp * .1));
+  p.hp += a; p.sp += b; e.damage = e.damage.map(d => Math.max(1, Math.round(d * .93)));
+  const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .35);
+  PFX.burst(10, "dot", ["#fff8c8", "#ffffff", "#bfe8ff"], gx, gy, 16, {life: 1, up: 12});
+  say(a && b ? t("A luz de Jaci cresce: +{a} PV e +{b} PE. Pytuna fica mais fraco.", {a, b}) : a ? t("A luz de Jaci cresce: +{a} PV. Pytuna fica mais fraco.", {a}) : b ? t("A luz de Jaci cresce: +{b} PE. Pytuna fica mais fraco.", {b}) : t("A luz de Jaci cresce. Pytuna fica mais fraco."));
+}
 function finish(kind) {
   if (kind === "win" && e.segurando) return;   // um golpe atrasado no meio da cena do Pytuna
+  if (kind === "win" && e.id === "pytuna" && (e.fase || 1) < 3 && !e.possuido) return pytunaPhase((e.fase || 1) + 1);   // o final: mais uma fase
   if (kind === "win" && pytunaHolds()) return pytunaPossess();
   if (kind === "win" && e.bug && bugChain()) return;   // freela: o próximo bug já entra
   if (kind !== "win" && e.bug && fromExplore && EX) freelaReset();   // perdeu ou fechou o notebook: recomeça do primeiro bug
@@ -488,6 +538,7 @@ function finish(kind) {
   const O = theName(e, true), pick = l => l[rnd(0, l.length - 1)], home = t({belem: "Acordou no Ver-o-Peso, com metade das forças", saoluis: "Acordou na Praia Grande, com metade das forças", teresina: "Acordou no Troca-Troca, com metade das forças", recife: "Acordou no Recife Antigo, com metade das forças", petrolina: "Acordou na orla do Velho Chico, com metade das forças", cuiaba: "Acordou no Porto de Cuiabá, com metade das forças", bh: "Acordou no Mercado Central, com metade das forças", ouropreto: "Acordou na Praça Tiradentes, com metade das forças", riodejaneiro: "Acordou em Copacabana, com metade das forças", saopaulo: "Acordou na Paulista, com metade das forças", foz: "Acordou no centro de Foz, com metade das forças", cwb: "Acordou no Largo da Ordem, com metade das forças", pampa: "Acordou na estância, com metade das forças", floripa: "Acordou na Lagoa, com metade das forças", bonito: "Acordou no centro de Bonito, com metade das forças", brasilia: "Acordou no Plano Piloto, com metade das forças"}[curCity()] || "Acordou na aldeia, com metade das forças");
   const T = {
     win:  e.bug ? [t("Bug resolvido!"), t("{bicho} sumiu do código.", {bicho: O})] : e.rematch ? [t("Treino concluído!"), t("{bicho} gostou do treino.", {bicho: O})]
+      : e.id === "pytuna" ? [t("Pytuna se desfez!"), t("A fumaça ficou rala, e o vento levou.")]
       : e.boss ? [t(ending(e, "Chefe acalmado!", "Chefe acalmada!")), t("{bicho} voltou a si. A trilha está livre.", {bicho: O})]
       : [t(pick(["Vitória!", "Mandou bem!", "É isso aí!"])), t(WATER_BATTLE.has(e.id) ? "{bicho} sumiu na água." : pick(["{bicho} saiu correndo.", "{bicho} desistiu da briga.", "{bicho} não quer mais conversa."]), {bicho: O})],
     flee: [t("Fugiu!"), t("{bicho} fica pra próxima.", {bicho: O})],
@@ -533,6 +584,10 @@ function overXp(from) {
 function beastThanks() {
   const id = e.id, g = id === "macaco" ? "thumb" : BIRDS.has(id) ? "note" : "heart", person = MOTION[id] === "person";
   BEAST_A.set("idle");
+  if (id === "pytuna") {   // Pytuna não agradece nem corre: a fumaça fica rala e sobe com o vento
+    const r = $("beast").getBoundingClientRect(), [sx, sy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .45);
+    PFX.burst(40, "puff", PYT_SMOKE, sx, sy, 30, {life: 1.8, up: 26}); $("beast").classList.add("desfaz"); return;
+  }
   if (e.bug) return setTimeout(() => $("beast").classList.add("glitch"), 300);   // bug: pisca em pedaços e some
   const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .15);
   $("beast").classList.remove("tomado", "possuido");
@@ -912,8 +967,12 @@ function pickAnimal() {
 // defesa na hora do golpe: com medo (chocalho do Boitatá, uivo do lobo) ela some e o golpe ainda dói mais
 const pdef = () => p && p.medo > 0 ? -2 : defense();
 function special() {
-  const s = Array.isArray(e.special) ? e.special[Math.floor(Math.random() * e.special.length)] : e.special, d = rnd(e.damage[0], e.damage[1]);   // lista = sorteia um dos golpes
+  let s = Array.isArray(e.special) ? e.special[Math.floor(Math.random() * e.special.length)] : e.special, d = rnd(e.damage[0], e.damage[1]);   // lista = sorteia um dos golpes
   const hit = (n, k) => { if (p.def) n = Math.ceil(n / 2); n = Math.max(1, n - pdef()); p.hp -= n; foeAttack(k || "claw", n); return n; };
+  // Pytuna: a fumaça na cara (dano por turno), a noite fechada (tira PE e a defesa) e, de máscara, o eco de um golpe de chefe do caminho
+  if (s === "eco") { s = ["estouro", "fogo", "prender", "onda", "frenesi"][rnd(0, 4)]; say(t("Pytuna lembra o jeito de brigar de um chefe do caminho!")); }
+  if (s === "fumaca") { const n = hit(d); p.dot = {d: 4, t: 3, n: "Fumaça"}; say(t("{bicho} sopra fumaça na cara do Rhanon! −{n} PV, e mais 4 por turno.", {bicho: foe(1), n})); return; }
+  if (s === "noite") { const n = hit(Math.ceil(d * .7)); p.sp = Math.max(0, p.sp - 8); p.medo = 2; setTimeout(() => HERO_A.set("scared"), 400); say(t("{bicho} apaga tudo em volta: −{n} PV e −8 PE. Sem defesa por 2 turnos.", {bicho: foe(1), n})); return; }
   if (s === "drenar") { const n = hit(d); p.dot = {d: 3, t: 3, n: "Drenagem"}; say(t("{bicho} crava os dentes e suga! −{n} PV, e mais 3 por turno.", {bicho: foe(1), n})); return; }
   if (s === "fogo") { const n = hit(Math.ceil(d * 1.4), "fire"); p.dot = {d: 3, t: 2, n: "Queimadura"}; say(t("{bicho} solta uma labareda! −{n} PV e queimadura por 2 turnos.", {bicho: foe(1), n})); return; }
   if (s === "prender") { const n = hit(d); p.preso = 3; say(t("{bicho} se enrola em Rhanon! −{n} PV, e nada de fugir por 3 turnos.", {bicho: foe(1), n})); return; }
@@ -976,7 +1035,8 @@ function tick() {
     else say(`${t(p.dot.n)}: −${p.dot.d} ${t("PV")}.`);
   }
   if (e.espanto > 0) e.espanto--;
-  if (p.fiel > 0 && e.hp > 0) allyEcho();   // Aliado fiel: o espírito volta e ataca no fim do turno
+  if (p.fiel > 0 && e.hp > 0) allyEcho();
+  if (e.id === "pytuna" && e.fase === 3 && e.hp > 0 && p.hp > 0) pytunaJaci();   // no rosto de Pytuna, a luz de Jaci cresce a cada turno   // Aliado fiel: o espírito volta e ataca no fim do turno
   if (hasSkill("regen") && p.hp > 0) { p.hp = Math.min(p.max, p.hp + 3); p.sp = Math.min(p.msp, p.sp + 1); }   // Proteção dos encantados
   if (p.medo > 0) p.medo--;
   if (p.weak > 0) p.weak--;
@@ -989,7 +1049,7 @@ function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: 
   const back = a.stolen || 0; if (back) { G.money += back; a.stolen = 0; }   // dinheiro que o malandro levou volta
   if (a.boss) BS()[bossKey(curZone)] = true; else K()[curZone] = (K()[curZone] || 0) + 1; const xp = Math.round(a.xp * mult * (G.portfolio?.app_trilha ? 1.15 : 1)), L0 = G.lv;   // o app de trilhas (freela de SP) dá 15% a mais
   vit();
-  const got = drop || a.bug ? 0 : a.boss ? rnd(1, 3) : 1;   // chefe deixa de 1 a 3 (o Pajé faz talismã com elas); bug não deixa nada
+  const got = drop || a.bug || a.id === "pytuna" ? 0 : a.boss ? rnd(1, 3) : 1;   // Pytuna não deixa nada: vira fumaça rala   // chefe deixa de 1 a 3 (o Pajé faz talismã com elas); bug não deixa nada
   const part = NB_DROP[a.id] && G.nb.tem && !G.nb[NB_DROP[a.id]] ? NB_DROP[a.id] : null;   // macaco e ariranha largam peças do notebook
   if (part) { G.nb[part] = true; G.nbNew.push(part); }   // nbNew: a tela do notebook mostra ela encaixando
   if (got) G.pelts[a.id] = (G.pelts[a.id] || 0) + got;
@@ -1004,7 +1064,7 @@ function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: 
     back && t("R$ {n} de volta no bolso", {n: back}),
     xp ? `+${xp} XP` : drop && t("Sem XP (fraco demais)"),
     part && t(part === "teclado" ? "O macaco largou o teclado do notebook!" : "A ariranha largou o carregador do notebook!"),
-    a.bug ? null : drop ? t("{pele} no chão: passa por cima", {pele: peltName(a.id)}) : got > 1 ? t("{pele} ×{q} (R$ {n} cada na feira)", {pele: peltName(a.id), q: got, n: peltValue(a.id)}) : t("{pele} (R$ {n} na feira)", {pele: peltName(a.id), n: peltValue(a.id)}),
+    a.bug || a.id === "pytuna" ? null : drop ? t("{pele} no chão: passa por cima", {pele: peltName(a.id)}) : got > 1 ? t("{pele} ×{q} (R$ {n} cada na feira)", {pele: peltName(a.id), q: got, n: peltValue(a.id)}) : t("{pele} (R$ {n} na feira)", {pele: peltName(a.id), n: peltValue(a.id)}),
     G.lv > L0 && t("Nível {n}!", {n: G.lv}),
     CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv && t("Destino novo no mapa"),
     a.boss && NEXT_Z[curZone] ? t("Liberou: {lugar}", {lugar: ZONES[NEXT_Z[curZone]].n}) : a.boss && NEED.parada === curZone && !G.night && t("Liberou: {lugar}", {lugar: SUB.parada.n}),

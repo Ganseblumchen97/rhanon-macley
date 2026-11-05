@@ -63,6 +63,13 @@ const NARRA = {
     {r: "Um ronco que não para nunca, vô. E o rio Iguaçu sobe dali até Curitiba."},
     "Então é só seguir o rio, curumim. A fumaça foi pra onde a mata de pinheiro acaba."
   ],
+  // entrando na última mata de araucária (o final): a noite cai de uma vez
+  araucaria: [
+    "E o menino entrou na última mata de araucária, curumim. Pinheiro velho, mais velho que a cidade, e um silêncio de doer o ouvido.",
+    "Quando ele passou da primeira árvore, a noite caiu de uma vez. Sem lua nenhuma no céu.",
+    {r: "Toda a fumaça do caminho tava ali, vô. Do Tapajós, do sertão, das queimadas, das cidades. Tudo junto."},
+    "E lá no fundo, numa clareira, alguém esperava por ele."
+  ],
   cwb: [
     "E o ônibus subiu o rio Iguaçu até o fim, curumim. Curitiba. A cidade do anúncio, a do sonho dele.",
     "Fazia um frio de doer o dente. Garoa fina, gente de casaco, ônibus parando dentro de um tubo de vidro.",
@@ -115,6 +122,7 @@ const NARRA_BOSS = {
   mboi: ["O M'Boi é a serpente da lenda dos guaranis, curumim. Foi ele que rachou o rio de raiva quando Naipi fugiu com Tarobá, e assim nasceram as Cataratas.", "A fumaça acordou a raiva velha dele. Ele achou que todo mundo que passava na passarela vinha roubar alguma coisa do rio.", {r: "Eu contei pra ele que Naipi e Tarobá viraram pedra e palmeira, vô, e que as Cataratas ficaram bonitas por causa disso."}, "Até a raiva vira beleza, se o tempo deixar. Ele afundou devagar e o rio parou de ferver."],
   gralha_rainha: ["A Gralha-rainha é a que planta as araucárias, curumim. Cada pinhão que ela esquece no chão vira pinheiro daqui a cem anos.", "A fumaça entrou nela e ela parou de plantar. Começou a esconder os pinhões de todo mundo, até dos filhotes.", {r: "Eu enterrei um pinhão do lado dela, vô. Ela olhou, piscou, e enterrou outro do lado do meu."}, "Aí a fumaça saiu. Quem planta não consegue ficar bravo muito tempo."],
   bicho_papao: ["O Bicho-papão, curumim. Todo pai do Brasil já chamou ele pra criança dormir. Ele mora no escuro que ninguém tem coragem de olhar.", "Com a lua fraca, o escuro cresceu, e ele cresceu junto. Já não cabia embaixo da cama: ocupava o parque inteiro.", {r: "Eu acendi a tocha e olhei bem pra ele, vô. De perto, era só um bicho com medo de ficar sozinho."}, "Escuro que a gente olha de frente fica pequeno. Ele voltou pra baixo da cama, onde é o lugar dele."],
+  pytuna: ["E Pytuna não morreu, curumim. Ninguém morre nessa história.", "A fumaça foi ficando rala, rala, até virar aquela neblina fininha de madrugada. E o vento levou ela pro alto.", {r: "Antes de sumir ele olhou pra lua, vô. E não fez careta."}],
   leao_marinho: ["O Leão-marinho subiu do frio lá do sul, curumim, pra descansar nas pedras da Ilha. Bicho do mar não briga à toa.", "A fumaça veio rasteira em cima da água e entrou no fôlego dele. Aí ele não deixava ninguém chegar nem na areia.", {r: "Eu sentei longe e esperei, vô. Quando o vento mudou, ele dormiu de novo na pedra."}, "Às vezes acalmar é só deixar o outro descansar. Ele voltou pro mar quando quis."],
   bruxa_ilha: ["As Bruxas da Ilha são das histórias dos pescadores, curumim. Trançam a crina dos cavalos, dão nó nas redes, levam a canoa pro mar sozinha.", "Mas são brincadeira de pescador velho. A fumaça é que deixou a brincadeira brava: o nó virou laço e a gargalhada virou ventania.", {r: "Eu desatei os nós das redes um por um, vô. Ela ficou olhando e acabou rindo de mim."}, "Bruxa que ri não faz mal. Agora ela voltou pras histórias, que é o lugar dela."],
   touro_xucro: ["O Touro Xucro nunca foi laçado, curumim. Os peões contam que ele é o dono das coxilhas, e que o gado todo seguia ele.", "A fumaça entrou nas narinas dele e ele começou a correr sem parar, derrubando cerca, espantando a boiada inteira.", {r: "Eu fiquei parado na frente dele, vô, sem lança levantada. Ele parou bem pertinho e cheirou minha mão."}, "Bicho xucro não aceita laço, mas aceita respeito. Agora ele pasta de novo no alto da coxilha."],
@@ -178,6 +186,41 @@ const NARRA_BOSS = {
    NARRA_PYT: noite = primeira noite na exploração; os outros, depois do chefe com esse id (último de dia de cada cidade).
    norte = fim do capítulo, quando os 20 chefes do Norte estão acalmados (Jaci inteira de novo); nordeste = fim do
    Nordeste, com os chefes de lá acalmados (a calma de Guaraci, guaraciCalm). */
+/* O final (Curitiba, a última mata de araucária): as trocas de fase do Pytuna na luta (fase2, fase3, combat.js), a lua
+   voltando inteira, a entrevista no dia seguinte (fala {e: ...} = a entrevistadora; o portfólio entra no meio, em
+   fimEntrevista) e o Pajé fechando a história na fogueira (ui/narration.js, pytunaFinale) */
+const NARRA_FIM = {
+  fase2: [
+    {p: "Tu acha que é só soprar, curumim? Eu sou a fumaça de todo o Brasil."},
+    {p: "Cada bicho que tu acalmou, eu ainda lembro do jeito de brigar dele."},
+    {r: "Eu também lembro deles. E eles lembram de mim."}
+  ],
+  fase3: [
+    "A máscara de carvão caiu, curumim. E embaixo dela tinha um rosto. Cansado. Quase triste.",
+    {p: "Eu também sou filho do céu, sabia? A Jaci ganhou a luz. Eu fiquei com o escuro, sozinho."},
+    {r: "Ninguém precisa apagar ninguém pra ter lugar no céu, Pytuna."},
+    "E a luz de Jaci começou a crescer, pouquinho a pouquinho, em cima da clareira."
+  ],
+  lua: [
+    "Aí Jaci apareceu inteira em cima das araucárias. Redonda, branca, do jeito que eu via quando era moço.",
+    "Lá na aldeia, na beira do Tapajós, todo mundo saiu da oca pra olhar. Eu chorei, curumim. Não conta pra ninguém.",
+    {r: "Eu vi, vô. Ela brilhava até no rio de Curitiba, que é escuro que só."}
+  ],
+  entrevista: [
+    "No dia seguinte, de banho tomado e com a única camisa limpa, o menino foi pra entrevista.",
+    {e: "Rhanon Macley? Senta aí. Tu veio de onde mesmo?"},
+    {r: "Do Tapajós. Vim de barco, de ônibus e de avião. E programei pelo caminho, num notebook montado com peça de todo canto."},
+    {e: "E se aparecer um bug feio, na sexta-feira de noite, o que tu faz?"},
+    {r: "Olho ele de frente. Bug que a gente olha de frente fica pequeno."},
+    {e: "...Começa segunda. Traz casaco, que aqui faz frio."}
+  ],
+  epilogo: [
+    "E foi assim, curumim. O menino da nossa aldeia trabalha em Curitiba agora. Programa o dia inteiro e reclama do frio.",
+    "Mas ele fez um programa que avisa a aldeia quando vem fumaça. E a brigada chega antes do fogo.",
+    {r: "E todo ano eu volto, vô. Pra ver a lua do Tapajós, que é a mais bonita."},
+    "Agora vai dormir. Jaci tá lá em cima, olhando por todo mundo."
+  ]
+};
 const NARRA_PYT = {
   noite: [
     "Foi na primeira noite que ele viu. A fumaça desceu do céu, devagar, e ficou olhando pra ele.",

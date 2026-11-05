@@ -12,10 +12,10 @@ function narraNext() {
   const n = NARRA_RUN; if (!n) return;
   n.i++;
   if (n.i >= n.lines.length) return narraEnd();
-  const l = n.lines[n.i], who = typeof l !== "object" ? "paje" : l.p ? "pytuna" : "rhanon", rh = who === "rhanon";
-  const txt = who === "paje" ? l : l.p || l.r; n.full = t(txt); n.t0 = performance.now(); n.shown = 0;
+  const l = n.lines[n.i], who = typeof l !== "object" ? "paje" : l.p ? "pytuna" : l.e ? "entrevista" : "rhanon", rh = who === "rhanon";
+  const txt = who === "paje" ? l : l.p || l.e || l.r; n.full = t(txt); n.t0 = performance.now(); n.shown = 0;
   $("narra").classList.toggle("rhanon", rh); $("narra").classList.toggle("pytuna", who === "pytuna");
-  $("narra").querySelector("b").textContent = who === "pytuna" ? "Pytuna" : rh ? "Rhanon" : t("Pajé");
+  $("narra").querySelector("b").textContent = who === "pytuna" ? "Pytuna" : who === "entrevista" ? t("Entrevistadora") : rh ? "Rhanon" : t("Pajé");
   narraPortrait(who); sfx(who === "pytuna" ? "roar" : "blip");
   $("narra").querySelector("small").innerHTML = padBadge("z") + " ▶";   // Z ou o botão do controle
   requestAnimationFrame(narraType);
@@ -42,6 +42,7 @@ function narraPortrait(who) {
   const c = $("narra").querySelector("canvas"), x = c.getContext("2d"), rh = who === "rhanon";
   x.imageSmoothingEnabled = false; x.clearRect(0, 0, c.width, c.height);
   if (who === "pytuna") { x.fillStyle = "#0a0a14"; x.fillRect(0, 0, 48, 48); drawSmoke(x, 24, 26, 1.1, performance.now()); return; }
+  if (who === "entrevista") { x.fillStyle = "#3a4a6a"; x.fillRect(0, 0, 48, 48); x.drawImage(rigCanvas("front", {face: "happy"}, VILLAGER_LOOK.startup, 1), 8, 4); return; }   // a entrevistadora da empresa
   const g = x.createRadialGradient(24, 40, 2, 24, 30, 34); g.addColorStop(0, "#c8602a"); g.addColorStop(1, "#2a140a");
   x.fillStyle = g; x.fillRect(0, 0, 48, 48);
   const fig = rh ? rigCanvas("front", {face: "happy"}, rhanonLook(), 1) : rigCanvas("front", {sit: true}, VILLAGER_LOOK.xama, 1);
@@ -139,12 +140,44 @@ function bossStory(id, done) {
     G.narrated.centroeste_fim = true; save(); musicStart("jaci");   // as estrelas voltam ao céu do cerrado: o tema da esperança
     narrate(NARRA_PYT.centroeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Centro-Oeste"), t("A história continua no Sudeste: o voo sai do Aeroporto de Brasília.")); setTimeout(next, 1500); });
   });
+  if (id === "pytuna" && !G.narrated.fim) steps.push(pytunaFinale);   // o final: a lua, a entrevista e o Pajé
   if (luaCidade() >= 1 && !G.narrated.sudeste_fim) steps.push(next => {
     G.narrated.sudeste_fim = true; save(); musicStart("jaci");   // apagão na cidade grande: todo mundo vê a lua
     narrate(NARRA_PYT.sudeste, () => { setTimeout(() => { if (EX) musicStart("local"); }, 5200); chapterBanner(t("Fim do Sudeste"), t("A história continua no Sul, onde a viagem termina. Em breve!")); setTimeout(next, 1500); });
   });
   const run = () => steps.length ? steps.shift()(run) : done && done();
   run();
+}
+/* O final, depois de acalmar Pytuna: Jaci volta inteira (tema de Jaci), a faixa "Fim da viagem", o dia seguinte com a
+   entrevista (o portfólio dos freelas no meio da conversa), o Pajé fechando a história e os créditos. Depois disso o jogo
+   continua aberto (G.fim) */
+function pytunaFinale(done) {
+  G.narrated.fim = true; G.fim = true; save(); musicStart("jaci");
+  narrate(NARRA_FIM.lua, () => {
+    chapterBanner(t("Fim da viagem"), t("Jaci brilha inteira de novo."));
+    setTimeout(() => dawnWipe(() => { G.night = false; G.day++; save(); if (EX) EX.night = false; }, t("O dia seguinte")), 5000);
+    setTimeout(() => narrate(fimEntrevista(), () => narrate(NARRA_FIM.epilogo, () => endCredits(done))), 5000 + DAWN_MS);
+  });
+}
+function fimEntrevista() {
+  const prog = Object.keys(G.portfolio || {}).filter(k => FREELAS[k]).map(k => FREELAS[k].prog), L = NARRA_FIM.entrevista.slice();
+  if (prog.length) L.splice(2, 0, {e: t("Vi o teu portfólio: {lista}. Tudo feito na estrada?", {lista: prog.join(", ")})});
+  return L;
+}
+// tela do fim: o nome do jogo, um resumo e "Continuar jogando" (Z, Enter ou X fecham)
+function endCredits(done) {
+  const b = document.createElement("div"); b.className = "creditos"; b.setAttribute("role", "dialog");
+  b.innerHTML = `<h2 class="title"></h2><p class="nome">Jaci: The Fading Moon</p><p class="sub">${t("Uma aventura de Rhanon Macley")}</p>`
+    + `<p>${t("Do Tapajós a Curitiba, o menino acalmou os bichos do Brasil inteiro, devolveu a lua pro avô e começou no emprego que sonhava.")}</p>`
+    + `<p class="obrigado">${t("Obrigado por jogar!")}</p><button class="cmd" type="button"><span>${t("Continuar jogando")}</span></button>`;
+  document.body.appendChild(b); ransom(b.querySelector("h2"), [t("Fim").toUpperCase()], 7); levelUpJingle();
+  const btn = b.querySelector("button"), key = ev => {
+    if (!["z", "Z", "Enter", " ", "x", "X", "Escape"].includes(ev.key)) return;
+    ev.preventDefault(); ev.stopImmediatePropagation(); if (!ev.repeat) btn.click();
+  };
+  document.addEventListener("keydown", key, true);
+  btn.addEventListener("click", () => { document.removeEventListener("keydown", key, true); b.remove(); if (EX) musicStart("local"); if (done) done(); });
+  setTimeout(() => btn.focus(), 300);
 }
 // dica quando o jogador perde duas lutas seguidas: a primeira que servir, na ordem
 function pajeHint() {

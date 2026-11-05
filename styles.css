@@ -1345,3 +1345,13 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 @media (pointer:coarse){.ex-dialog .cmd,.info .cmd{padding-block:.22em}}
 @media (max-width:640px){.bag-list .cmd.bagrow>span{grid-template-columns:minmax(0,1fr) 2.6em minmax(0,8.5em);gap:6px;padding:0 6px}.bag-list .cmd.bagrow small{font-size:11px;overflow:hidden;text-overflow:ellipsis}}   /* bolsa em tela estreita: o nome não some */
 .nbos-off{all:unset;cursor:pointer;padding:3px 8px;background:#3a2a3a;color:#ffd0d0;font:700 11px var(--mono);border-radius:3px}.nbos-off:hover,.nbos-off:focus-visible{background:#a8283a;color:#fff}
+
+/* O final: Pytuna se desfaz em fumaça rala (combat.js, beastThanks) e a tela do fim (ui/narration.js, endCredits) */
+.beast.desfaz{transition:opacity 1.8s ease-out,filter 1.8s ease-out;opacity:0;filter:blur(6px)}
+.creditos{position:fixed;inset:0;z-index:1700;display:grid;place-content:center;justify-items:center;gap:10px;padding:16px;text-align:center;color:#f4f0e0;
+  background:radial-gradient(circle at 50% 22%,#fff8d8 0 4%,rgba(255,240,190,.35) 6%,rgba(255,240,190,.08) 14%,transparent 24%),linear-gradient(#0c1430,#16243a 60%,#1c3a28);animation:rpop .5s var(--pop) backwards}
+.creditos .nome{font-size:clamp(18px,3vw,28px);font-weight:700;letter-spacing:.04em;margin:0}
+.creditos .sub{opacity:.85;margin:0}
+.creditos p{max-width:560px;margin:4px 0}
+.creditos .obrigado{color:#ffd23a;font-weight:700}
+.creditos .cmd{margin-top:12px;min-width:220px}
