@@ -1041,9 +1041,45 @@ const STAGES = {
     ]
   },
   // Foz do Iguaçu (Sul): o centro, avenida com a pensão (O), barracas de chipa (K), araucárias na calçada (T) e
-  // moradores; a saída da direita volta pro mapa e a rua da esquerda sobe pro aeroporto
+  // moradores; a saída da direita volta pro mapa e a rua da esquerda desce pras Cataratas
   // Pampa gaúcho (Rio Grande do Sul): a estância, campo aberto com coxilha (mato alto), o galpão (O), barracas (K), umbus
   // (T) e a gente da estância; a saída da direita volta pro mapa e a passagem da esquerda leva às Coxilhas
+  // Foz do Iguaçu: as Cataratas do Iguaçu (gerado por tools/gerar_mapas.py)
+  cataratas: {
+    next: "aero_igu",
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TT...,,TTTTTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTTTT~~TTTTTTTTTTTT",
+      "T,f...,.TTa,.,.TTTTT~~..,.,....TTTTTTTTTTTTTTT~~TTTTTTTTTTTT",
+      "G---B...,.,..,,.a...~~...,,,.,,,TTTTTTTTTTTTTT~~TTTTTTTTTTTT",
+      "T.,,----------------==---------,,TTTTTTTTTTT.a~~.TTTTTTTTTTT",
+      "T,,.....a.....,...,,~~,...,.,a-,,,TTTTTTTT....~~,...aTTTTTTT",
+      "T.,,of..TT.,...TTTTT~~...,..,.-..,TTTTTTTT..--==--===~~TTTTT",
+      "TT...,fTTTTTTTTTTTTT~~TT..,.,.-.,,TTTTTTTT,,-,~~.~~~=~~~TTTT",
+      "TTTTTTTTTTTTTTa.....~~.,......-,aTTTTTTTTTTa-.~~.~~~=~~~TTTT",
+      "TTTTTTTTTTTT,,.,,...~~...,..,.-.TTTTTTTTTTT,-.~~.~~~=~~~TTTT",
+      "TTTTTTTTTT..--------==---------,TTTTTTTTTTT.-,~~,.~~=~~TTTTT",
+      "TTTTTTTTTT.,-,......~~.,,.,,~~~~~TTTTTTTTTT.-.~~....-,.TTTTT",
+      "TTTTTTTTT.,.-.,,,...~~,...,~~~~~~~TTTTTTTTo.-,~~,,.,-..TTTTT",
+      "TTTTTTTTT...-...TTTT~~TT,,~~~~~~~~~TTTTTT...-.~~a...-.....TT",
+      "TTTTTTTTT.,.-.,,TTTT~~TTTT~~~~~~~~~TTTTTT.,,-.~~....------,T",
+      "TTTTTTTTTT.,-,.TTTTT~~TTTT~~~~~~~~~TTTTTT...-.~~...,.....-,T",
+      "TTTTTTTTTT,,-..a,..T~~TTTTT~~~~~~~TTTTTTTTf,-.~~TTTTT..,.-.T",
+      "TTTTTTTTTT..-..,....~~..,.TT~~~~~TTTTTTTTTT.-a~~TTTT.f...-.T",
+      "TTTTTTTTTT.,--------==---,.TTTTTTTTTTTTTTTT.-.~~TTT,,,...-.T",
+      "TTTTTTTTTTTT..,..,,,~~..-,,.TTTTTTTTTT...,,,-.~~TTT......-.T",
+      "TTTTTTTT~~~~~......T~~.,-...TTTTTTTT,,-------.~~TTT,,....-,T",
+      "TTTTTT~~~~~~~~~TTTTT~~..-..,TTTTTTTT,.-,..,.,T~~TTT......-.T",
+      "TTTTTT~~~~~~~~~TTTTT~~,a-.,.TTTTTTTT,.-,,.,,.T~~TTT.f,.,.-.T",
+      "TTTTTT~~~~~~~~~TTTTT~~..-..,f..,.,TT.,F,.,..aT~~TTTT.,.,,-.T",
+      "TTTTTTTT~~~~~TTTTTTT~~..-,..,..,a,..,.-,.,.,TT~~TTTTT..,.-.T",
+      "TTTTTTTTTTTTTTTTTTTT~~T,-,,,...,,,.,.,-...,TTT~~TTTTTTTT,-.T",
+      "TTTTTTTTTTTTTTTTTTTT~~T.---------------.aTTTTT~~TTTTTTTT.-,T",
+      "TTTTTTTTTTTTTTTTTTTT~~TT....,...,..,.,.TTTTTTT~~TTTTTTTT.S-E",
+      "TTTTTTTTTTTTTTTTTTTT~~TT....,.a.TTTTTTTTTTTTTT~~TTTTTTTTT,.T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Florianópolis: as Dunas da Joaquina (gerado por tools/gerar_mapas.py)
   dunas: {
     next: null,
@@ -1152,7 +1188,7 @@ const STAGES = {
     ]
   },
   centrofoz: {
-    safe: true, next: "aero_igu",
+    safe: true, next: "cataratas",
     rows: [
       "########################",
       "########################",

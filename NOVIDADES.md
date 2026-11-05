@@ -3,6 +3,16 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.83.0 — as Cataratas do Iguaçu
+
+- Foz do Iguaçu ganhou a sua trilha: as Cataratas do Iguaçu (níveis 74 a 76), pela rua da esquerda do centro de Foz.
+  É mata molhada cortada por dois braços de rio, com o quati das Cataratas (que assalta mochila), tucano-de-bico-verde,
+  andorinhão (que sai voando de dentro da cachoeira) e jacutinga.
+- De dia, a Onça do Iguaçu, a dona do parque. Ao ser acalmada, vira aliada no Chamado do aliado ("Salto da
+  Garganta"). De noite, o rio ferve e sobe o M'Boi, a serpente da lenda guarani que rachou o rio e criou as Cataratas.
+- O Aeroporto das Cataratas agora fica depois da trilha e abre com a Onça do Iguaçu, como nas outras regiões.
+- O Pytuna aparece na névoa da Garganta do Diabo e conta para onde está indo: Curitiba, o fim da viagem.
+
 ## 0.82.0 — as Dunas da Joaquina
 
 - Florianópolis ganhou a sua trilha: as Dunas da Joaquina (níveis 72 a 74), pela passagem da esquerda da Lagoa da

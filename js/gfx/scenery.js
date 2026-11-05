@@ -18,6 +18,7 @@ const SCENES = {
   varzea:      {sky: ["#a8dcf0", "#8acce4", "#c8e8d8"], far: "#3f7f36", trees: "campo", plat: "flores", water: true},
   tijuca:      {sky: ["#7ab8a0", "#5a9a7a", "#3e7a52"], far: "#1e5a2e", trees: "fechada", plat: "musgo", vines: true},   // Floresta da Tijuca: mata atlântica fechada, luz verde
   ibirapuera:  {sky: ["#b8c4d0", "#c8d0d4", "#d8dcd0"], far: "#7a8a94", trees: "copa", plat: "grama", water: true},   // Ibirapuera: céu de garoa e o lago
+  cataratas:   {sky: ["#c8d8d8", "#a8c8c0", "#7aa890"], far: "#2e6a3e", trees: "fechada", plat: "musgo", water: true, vines: true},   // Cataratas do Iguaçu: névoa branca e mata molhada
   dunas:       {sky: ["#7ab8e0", "#a8d0ec", "#e0eef4"], far: "#f2ead2", trees: "campo", plat: "areia", water: true},   // Dunas da Joaquina: céu do Sul e a areia branca
   coxilhas:    {sky: ["#a8c0d8", "#c0d0dc", "#d8e0d8"], far: "#6a8a4a", trees: "campo", plat: "grama"},   // Coxilhas do Pampa: céu frio e limpo e as coxilhas verdes lá atrás
   mina:        {sky: ["#0e0a08", "#1a140e", "#2a2016"], far: "#4a3a2a", trees: "campo", plat: "pedra"},   // Mina abandonada: teto de pedra e o escuro da galeria

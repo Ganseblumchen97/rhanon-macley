@@ -1,6 +1,6 @@
 [Português](README.md) · **English**
 
-# Jaci: The Fading Moon (alpha 0.82.0)
+# Jaci: The Fading Moon (alpha 0.83.0)
 
 *Jaci: A Lua que se Apaga* · a Rhanon Macley adventure · turn-based RPG in the browser
 

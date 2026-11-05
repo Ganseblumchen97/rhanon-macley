@@ -1556,6 +1556,10 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   jacu: (pose, f) => pombo(pose, f, {b: "#2a2a30", B: "#16161a", n: "#d8282a", p: "#3a3a44", w: "#22222a", y: "#9aa0a8"}),   // jacu: preto, papo vermelho
   pepita: pessoa({pal: {s: "#c8905a", S: "#9a6a3e", h: "#3a2a1e"}, shirt: ["#d8c8a0", "#b0a078"], pants: ["#5a4a3a", "#3e3226"], noBand: true, cap: ["#d8b860", "#a88a38"]}),   // vendedor de ouro de tolo: chapéu de palha e camisa de garimpeiro
   saci: saciFrame,
+  tucano_verde: (pose, f) => pombo(pose, f, {b: "#1e1e22", B: "#0e0e12", n: "#f0d020", p: "#f0d020", w: "#2a2a30", y: "#5ab04a"}),   // tucano-de-bico-verde: preto, peito amarelo e bico verde
+  andorinhao: (pose, f) => pombo(pose, f, {b: "#3a3a40", B: "#22222a", n: "#e8e8e0", p: "#4a4a52", w: "#2a2a30", y: "#2a2a2a"}),   // andorinhão-de-coleira: escuro de colar branco
+  jacutinga: (pose, f) => pombo(pose, f, {b: "#1a1a2a", B: "#0e0e1a", n: "#f0f0f0", p: "#d8282a", w: "#22223a", y: "#5a8ad8"}),   // jacutinga: preta brilhante, cabeça branca, papo vermelho
+  mboi: cobra({b: "#2a5a3a", B: "#163a24", k: "#7ad0a0", eye: "#ffd23a"}, false),   // M'Boi: a serpente gigante verde-escura do fundo do Iguaçu
   gaivotao: (pose, f) => garca(pose, f, {b: "#f0f0ec", B: "#2a2a32", y: "#e8c030", Y: "#b88a20", k: "#e8c030"}),   // gaivotão: branco de costas pretas, bico amarelo
   tie_sangue: (pose, f) => pombo(pose, f, {b: "#d8202a", B: "#9a1418", n: "#d8202a", p: "#e8303a", w: "#2a2a2a", y: "#3a3a3a"}),   // tiê-sangue: vermelho-vivo, asa preta
   bruxa_ilha: visagem({w: "#3a2a4a", W: "#22182e", s: "#c8c0b0", h: "#e8e8e0", e: "#9aff6a"}),   // Bruxa da Ilha: vestido escuro, cabelo branco e olho verde

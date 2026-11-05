@@ -76,7 +76,7 @@ function selectSub(id, msg) {
   else if (id === "centrofoz") {
     btn(t("Entrar no centro de Foz"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma rede na pensão e o povo da fronteira."));
-    lh(t("As Cataratas e as trilhas do Sul vêm em breve. O aeroporto, lá em cima, leva de volta pras outras regiões; dali, o rio Iguaçu sobe até Curitiba."));
+    lh(t("A rua da esquerda desce pras Cataratas do Iguaçu. O aeroporto fica depois delas e abre com a Onça do Iguaçu; Curitiba vem em breve."));
   }
   else if (id === "paulista") {
     btn(t("Entrar na Avenida Paulista"), () => startExplore(id), false, i);
