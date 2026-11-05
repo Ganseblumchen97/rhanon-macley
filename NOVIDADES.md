@@ -3,6 +3,20 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.76.0 — dá para jogar no celular
+
+- O jogo agora funciona no celular. Na exploração, arraste o dedo na roda da esquerda para andar (até na diagonal) e
+  use os botões GOLPE, ARCO e ESQUIVA da direita. Tocar no mapa também golpeia para aquele lado.
+- Jogue com o celular deitado: em pé, o jogo pede para virar (dá para escolher "Jogar assim mesmo"). Deitado, a luta
+  põe o palco grande à esquerda e os comandos, a vida e o registro numa coluna à direita.
+- No alto da tela, o botão ☰ guarda a bolsa, o equipamento, as habilidades, o notebook, as opções e a saída.
+- Os textos falam dos botões da tela em vez das teclas: o tutorial do Mateiro, os avisos ("toca em GOLPE") e o anel da
+  luta, que você acerta tocando no palco. Para pular uma cena, segure o aviso na tela.
+- As telas cabem em pé: a lista do armeiro e do Pajé rola na própria caixa com a ficha logo embaixo, o mapa do Brasil
+  encolhe para mostrar a região escolhida, o notebook ganhou o botão "✕ Desligar" e os pontos da teia de habilidades
+  ficaram mais fáceis de tocar.
+- No computador e no controle, tudo continua como antes.
+
 ## 0.75.0 — o Rio de Janeiro e São Paulo
 
 - O Sudeste chega ao litoral. Depois de acalmar a Mula-madrinha em Ouro Preto, compre a passagem para o Rio de Janeiro

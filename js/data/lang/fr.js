@@ -2835,6 +2835,23 @@ TX.fr = {
     "O ônibus sobe a serra de volta para Ouro Preto.": "Le bus remonte la montagne vers Ouro Preto.",
     "O ônibus volta pela beira do mar até o Rio.": "Le bus revient le long de la mer jusqu'à Rio.",
     "O ônibus desce a serra até o mar do Rio de Janeiro.": "Le bus descend la montagne jusqu'à la mer de Rio de Janeiro.",
-    "O ônibus vai pela beira do mar e sobe a serra até São Paulo.": "Le bus longe la mer et grimpe la montagne jusqu'à São Paulo."
+    "O ônibus vai pela beira do mar e sobe a serra até São Paulo.": "Le bus longe la mer et grimpe la montagne jusqu'à São Paulo.",
+    "Vire o celular": "Tourne ton téléphone",
+    "O jogo fica melhor deitado: a mata e a luta são largas.": "Le jeu est meilleur à l'horizontale : la forêt et les combats sont larges.",
+    "Jogar assim mesmo": "Jouer quand même",
+    "Menu": "Menu",
+    "Direcional": "Joystick",
+    "Pra andar: arrasta o dedo na roda da esquerda, até na diagonal. ESQUIVA é o rolamento: tu passa pelo bote do bicho sem levar.": "Pour marcher : fais glisser ton doigt sur la roue de gauche, même en diagonale. ESQUIVE, c'est la roulade : tu passes sous l'attaque de la bête sans être touché.",
+    "GOLPE é a lançada. Também serve pra conversar com o pessoal e usar a fogueira e as barracas. Tocar no mapa golpeia pra aquele lado.": "COUP, c'est le coup de lance. Il sert aussi à parler aux gens et à utiliser le feu de camp et les stands. Toucher la carte frappe de ce côté.",
+    "ARCO atira flecha, mas só depois que tu comprar um arco com o armeiro da feira.": "ARC tire des flèches, mais seulement après avoir acheté un arc à l'armurier du marché.",
+    "No ☰ lá em cima tem a bolsa, com comida e lembranças, e o equipamento pra trocar arma e roupa. Nos menus é só tocar.": "Dans le ☰ en haut, il y a le sac, avec la nourriture et les souvenirs, et l'équipement pour changer d'arme et de vêtements. Dans les menus, il suffit de toucher.",
+    "Na briga, quando aparecer o anel, toca no palco na hora que ele ficar verde: o golpe sai perfeito, ou tu bloqueia metade do ataque do bicho.": "Au combat, quand l'anneau apparaît, touche la scène au moment où il devient vert : le coup est parfait, ou tu bloques la moitié de l'attaque de la bête.",
+    "toque para comer": "touche pour manger",
+    "Toque de novo para aprender.": "Touche encore pour apprendre.",
+    "toca em {botao}": "touche {botao}",
+    "Segure aqui para pular": "Maintiens ici pour passer",
+    "Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Toca numa peça pra ver o que ela pede.": "Lance, arc, gilet... Apporte-moi les bons souvenirs et un peu d'argent et je te fais un truc génial. Touche une pièce pour voir ce qu'il faut.",
+    "Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Toca num talismã pra ver o que ele pede.": "Chaque chef que tu apaises libère un peu du clair de lune que la fumée avait piégé. Apporte-moi ce clair de lune et je te fais un talisman. Touche un talisman pour voir ce qu'il faut.",
+    "Desligar": "Éteindre"
   }
 };

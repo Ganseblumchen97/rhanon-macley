@@ -713,6 +713,7 @@ function exHud(show) {
   $("exNb").hidden = !G.nb.on; $("exNb").classList.toggle("pts", G.nb.on && nbUnread() > 0);   // notebook: e-mail novo chama atenção
 }
 function exToast(msg) {
+  if (isTouch()) msg = msg.replace(/\b(aperta|press|pulsa|appuie sur) Z\b/g, () => t("toca em {botao}", {botao: t("GOLPE")}));   // no celular, o botão da tela no lugar da tecla
   const el = $("exMsg"); el.textContent = msg; el.classList.add("show");
   clearTimeout(exMsgTimer); exMsgTimer = setTimeout(() => el.classList.remove("show"), 3600);
 }
@@ -746,20 +747,41 @@ function setupExploreInput() {
   sk.addEventListener("pointerdown", ev => { ev.preventDefault(); if (EX && EX.camp) EX.skipHold = performance.now(); });
   sk.addEventListener("pointerup", stop); sk.addEventListener("pointerleave", stop); sk.addEventListener("pointercancel", stop);
   window.addEventListener("blur", () => exKeys.clear());
-  document.querySelectorAll("#exPad [data-dir]").forEach(b => {
-    const k = b.dataset.dir, off = () => exKeys.delete(k);
-    b.addEventListener("pointerdown", ev => { ev.preventDefault(); exKeys.add(k); b.setPointerCapture(ev.pointerId); });
-    b.addEventListener("pointerup", off); b.addEventListener("pointercancel", off); b.addEventListener("lostpointercapture", off);
-  });
+  // no celular: joystick virtual (uma área só; o ângulo do dedo liga uma ou duas direções em exKeys, então anda na
+  // diagonal e dá para girar o polegar sem soltar)
+  const st = $("exStick"), knob = st.querySelector("i"), mine = new Set();
+  const stickSet = dirs => { mine.forEach(k => { if (!dirs.includes(k)) { exKeys.delete(k); mine.delete(k); } }); dirs.forEach(k => { exKeys.add(k); mine.add(k); }); };
+  const stickMove = ev => {
+    const r = st.getBoundingClientRect(), R = r.width / 2, dx = ev.clientX - r.left - R, dy = ev.clientY - r.top - R, n = Math.hypot(dx, dy), m = Math.min(n, R * .55);
+    knob.style.translate = n ? `${dx / n * m}px ${dy / n * m}px` : "";
+    if (n < R * .22) return stickSet([]);   // zona morta no meio
+    const a = Math.atan2(dy, dx), dirs = [];   // oito fatias de 45 graus
+    if (Math.abs(Math.cos(a)) > .38) dirs.push(dx > 0 ? "right" : "left");
+    if (Math.abs(Math.sin(a)) > .38) dirs.push(dy > 0 ? "down" : "up");
+    stickSet(dirs);
+  };
+  let stickId = null;   // o dedo que está no joystick (os outros dedos apertam os botões)
+  const stickEnd = ev => { if (ev && ev.pointerId !== stickId) return; stickId = null; stickSet([]); knob.style.translate = ""; };
+  st.addEventListener("pointerdown", ev => { ev.preventDefault(); stickId = ev.pointerId; try { st.setPointerCapture(ev.pointerId); } catch (er) {} stickMove(ev); });
+  st.addEventListener("pointermove", ev => { if (ev.pointerId === stickId) stickMove(ev); });
+  st.addEventListener("pointerup", stickEnd); st.addEventListener("pointercancel", stickEnd); st.addEventListener("lostpointercapture", stickEnd);
+  // no toque, os botões do alto não mostram a tecla ("Bolsa (I)" vira "Bolsa"); o texto já veio traduzido
+  if (isTouch()) document.querySelectorAll(".ex-btns>button").forEach(b => { b.textContent = b.textContent.replace(/\s*\([A-Z]\)$/, ""); });
+  // menu do alto: em tela estreita, os botões ficam dentro do ☰
+  const btns = document.querySelector(".ex-btns");
+  $("exMenu").addEventListener("click", () => { const o = btns.classList.toggle("open"); $("exMenu").setAttribute("aria-expanded", o); });
+  $("girarOk").addEventListener("click", () => document.body.classList.add("girar-feito"));   // aviso de virar o celular
+  btns.addEventListener("click", ev => { if (ev.target.closest("button") && ev.target.id !== "exMenu") { btns.classList.remove("open"); $("exMenu").setAttribute("aria-expanded", false); } });
   $("exA").addEventListener("pointerdown", ev => { ev.preventDefault(); exStrike(); });
   $("exC").addEventListener("pointerdown", ev => { ev.preventDefault(); exDodge(); });
   const cv = $("exCanvas");
   cv.addEventListener("mousemove", ev => { if (EX && !EX.camp) { const w = exMouseWorld(ev); EX.mouse = {...w, t: performance.now()}; } });
-  cv.addEventListener("mousedown", ev => {
+  // mouse: esquerdo golpeia e direito atira na direção da mira; no toque, tocar no mapa golpeia para aquele lado
+  cv.addEventListener("pointerdown", ev => {
     if (!EX || EX.locked || EX.dialog || EX.camp || (ev.button !== 0 && ev.button !== 2)) return;
     ev.preventDefault();
     const w = exMouseWorld(ev); EX.mouse = {...w, t: performance.now()}; exAimAt(w.x, w.y);
-    ev.button === 0 ? exStrike() : exThrow();
+    ev.button === 2 ? exThrow() : exStrike();
   });
   cv.addEventListener("contextmenu", ev => ev.preventDefault());
   $("exB").addEventListener("pointerdown", ev => { ev.preventDefault(); exThrow(); });
@@ -973,10 +995,10 @@ function drawNpc(x, s, cx, cy, now) {
   if (mark) drawQuestMark(x, sx, top - 4, mark, now);
   if (sleeping && !REDUCE) { const p = (now / 1100 + s.tx * .37) % 1; glyphP(x, "z", "#ffffff", sx + 4 + p * 6, top + 6 - p * 10); }
 }
-const skipText = () => padStyle() ? t("Segure {sel} para pular", padVars()) : t("Segure C para pular");
+const skipText = () => padStyle() ? t("Segure {sel} para pular", padVars()) : isTouch() ? t("Segure aqui para pular") : t("Segure C para pular");
 // setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
 function drawSpotPrompt(x, cx, cy, now) {
-  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `${padStyle() ? padLabel("z") : t("Z / GOLPE")}: ${s.kind === "cliente" ? t("falar com {cliente}", {cliente: FREELAS[freelaHere()].client}) : rodoCity(EX.zone) && s.kind === "cabine" ? t("comprar passagem") : rodoCity(EX.zone) && s.kind === "onibus" ? t("embarcar no ônibus") : SPOT_LABEL[s.kind]}` : "";
+  const s = !EX.dialog && !EX.locked ? nearSpot() : null, el = $("exPrompt"), txt = s ? `${padStyle() ? padLabel("z") : isTouch() ? t("GOLPE") : t("Z / GOLPE")}: ${s.kind === "cliente" ? t("falar com {cliente}", {cliente: FREELAS[freelaHere()].client}) : rodoCity(EX.zone) && s.kind === "cabine" ? t("comprar passagem") : rodoCity(EX.zone) && s.kind === "onibus" ? t("embarcar no ônibus") : SPOT_LABEL[s.kind]}` : "";
   if (el.textContent !== txt) { el.textContent = txt; el.classList.toggle("show", !!s); }
   if (!s) return;
   const px = Math.round(s.x - cx), py = Math.round(s.y - cy) - (PEOPLE.includes(s.kind) ? 30 : 10) - Math.floor(now / 250) % 2;
@@ -1017,8 +1039,8 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "peles") { say(t("Comprador de lembranças"), t("Pena, dente, pele que a cobra largou... tudo vira artesanato. Mostra aí o que a mata te deu.")); peltButtons(d); }
   else if (kind === "comida") { say(t("Barraca de comida"), t(FOOD_TALK[foodRegion()] || FOOD_TALK.norte)); foodButtons(d); }
   else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão, tocha, cuia d'água e chicote de cipó pra espantar bicho. Me traz faísca de poraquê que eu te faço coisa melhor. Arma e armadura é com o armeiro, ali na barraca do meio.")); gearButtons(d); }
-  else if (kind === "armeiro") { say(t("Armeiro"), t("Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
-  else if (kind === "xama") { say(t("Pajé"), t("Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem luar de chefe nenhum pra eu trabalhar. Acalma um chefe e me traz o luar dele."), d);
+  else if (kind === "armeiro") { say(t("Armeiro"), t(isTouch() ? "Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Toca numa peça pra ver o que ela pede." : "Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
+  else if (kind === "xama") { say(t("Pajé"), t(isTouch() ? "Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Toca num talismã pra ver o que ele pede." : "Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem luar de chefe nenhum pra eu trabalhar. Acalma um chefe e me traz o luar dele."), d);
     if (Object.keys(G.skills).length) btn(t("Esquecer habilidades · R$ {n}", {n: SKILL_RESET(G.lv)}), ask(t("Esquecer todas as habilidades por R$ {n}? Os pontos voltam para gastar de novo.", {n: SKILL_RESET(G.lv)}), skillReset), G.money < SKILL_RESET(G.lv), d); }
   else if (kind === "tecnico") nbTechnician(say, d);
   else if (kind === "notebook") { say(t("Notebook"), ""); d.querySelector("p").remove(); nbView(d); }
@@ -1445,11 +1467,21 @@ const TUTORIAL = [
   "Na briga, quando aparecer o anel com Z, aperta Z na hora que ele ficar verde: o golpe sai perfeito, ou tu bloqueia metade do ataque do bicho.",
   "Bicho com etiqueta verde se acalma com uma lançada só. E se tu acertar primeiro, começa a briga na frente. Bora, e não vai ficar panema!"
 ];
+// no celular (toque, sem controle): as mesmas falas, com os botões da tela no lugar das teclas
+const TUTORIAL_TOQUE = [
+  "Égua, Rhanon, acordou! Dormiu bem aí do lado do fogo? Antes de tu ir pra mata, deixa eu te lembrar do básico.",
+  "Pra andar: arrasta o dedo na roda da esquerda, até na diagonal. ESQUIVA é o rolamento: tu passa pelo bote do bicho sem levar.",
+  "GOLPE é a lançada. Também serve pra conversar com o pessoal e usar a fogueira e as barracas. Tocar no mapa golpeia pra aquele lado.",
+  "ARCO atira flecha, mas só depois que tu comprar um arco com o armeiro da feira.",
+  "No ☰ lá em cima tem a bolsa, com comida e lembranças, e o equipamento pra trocar arma e roupa. Nos menus é só tocar.",
+  "Na briga, quando aparecer o anel, toca no palco na hora que ele ficar verde: o golpe sai perfeito, ou tu bloqueia metade do ataque do bicho.",
+  "Bicho com etiqueta verde se acalma com uma lançada só. E se tu acertar primeiro, começa a briga na frente. Bora, e não vai ficar panema!"
+];
 function startTutorial() { EX.tutPage = 0; showTutorial(); }
 function showTutorial() {
   const d = $("exDialog"), i = EX.tutPage, last = i === TUTORIAL.length - 1;
   EX.dialog = "tutorial"; exKeys.clear();
-  d.innerHTML = `<h2>${VILLAGER_NAME.aldeao1}</h2><div class="tut"><canvas width="24" height="33"></canvas><p>${TUTORIAL[i]}</p></div>`;
+  d.innerHTML = `<h2>${VILLAGER_NAME.aldeao1}</h2><div class="tut"><canvas width="24" height="33"></canvas><p>${(isTouch() ? TUTORIAL_TOQUE : TUTORIAL)[i]}</p></div>`;
   d.querySelector("canvas").getContext("2d").drawImage(villagerSprite("aldeao1"), 0, 0);   // retratinho de quem fala
   btn(last ? t("Bora!") : t("Próximo"), () => { if (last) endTutorial(); else { EX.tutPage++; sfx("blip"); showTutorial(); } }, false, d);
   d.hidden = false;

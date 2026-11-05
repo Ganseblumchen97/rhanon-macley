@@ -2832,6 +2832,23 @@ TX.es = {
     "O ônibus sobe a serra de volta para Ouro Preto.": "El autobús sube la sierra de vuelta a Ouro Preto.",
     "O ônibus volta pela beira do mar até o Rio.": "El autobús vuelve por la orilla del mar hasta Río.",
     "O ônibus desce a serra até o mar do Rio de Janeiro.": "El autobús baja la sierra hasta el mar de Río de Janeiro.",
-    "O ônibus vai pela beira do mar e sobe a serra até São Paulo.": "El autobús va por la orilla del mar y sube la sierra hasta São Paulo."
+    "O ônibus vai pela beira do mar e sobe a serra até São Paulo.": "El autobús va por la orilla del mar y sube la sierra hasta São Paulo.",
+    "Vire o celular": "Gira el celular",
+    "O jogo fica melhor deitado: a mata e a luta são largas.": "El juego queda mejor acostado: el bosque y las peleas son anchos.",
+    "Jogar assim mesmo": "Jugar así igual",
+    "Menu": "Menú",
+    "Direcional": "Joystick",
+    "Pra andar: arrasta o dedo na roda da esquerda, até na diagonal. ESQUIVA é o rolamento: tu passa pelo bote do bicho sem levar.": "Para caminar: arrastra el dedo en la rueda de la izquierda, hasta en diagonal. ESQUIVAR es la voltereta: pasas por el ataque del bicho sin recibirlo.",
+    "GOLPE é a lançada. Também serve pra conversar com o pessoal e usar a fogueira e as barracas. Tocar no mapa golpeia pra aquele lado.": "GOLPE es el lanzazo. También sirve para hablar con la gente y usar la fogata y los puestos. Tocar el mapa golpea hacia ese lado.",
+    "ARCO atira flecha, mas só depois que tu comprar um arco com o armeiro da feira.": "ARCO dispara flechas, pero solo después de que compres un arco al armero de la feria.",
+    "No ☰ lá em cima tem a bolsa, com comida e lembranças, e o equipamento pra trocar arma e roupa. Nos menus é só tocar.": "En el ☰ de arriba está la bolsa, con comida y recuerdos, y el equipo para cambiar arma y ropa. En los menús, solo toca.",
+    "Na briga, quando aparecer o anel, toca no palco na hora que ele ficar verde: o golpe sai perfeito, ou tu bloqueia metade do ataque do bicho.": "En la pelea, cuando aparezca el anillo, toca el escenario justo cuando se ponga verde: el golpe sale perfecto, o bloqueas la mitad del ataque del bicho.",
+    "toque para comer": "toca para comer",
+    "Toque de novo para aprender.": "Toca otra vez para aprender.",
+    "toca em {botao}": "toca {botao}",
+    "Segure aqui para pular": "Mantén aquí para saltar",
+    "Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Toca numa peça pra ver o que ela pede.": "Lanza, arco, chaleco... Tráeme los recuerdos justos y algo de plata y te hago algo bárbaro. Toca una pieza para ver lo que pide.",
+    "Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Toca num talismã pra ver o que ele pede.": "Cada jefe que calmas suelta un poco de la luz de luna que el humo le atrapó. Tráeme esa luz de luna y te hago un talismán. Toca un talismán para ver lo que pide.",
+    "Desligar": "Apagar"
   }
 };

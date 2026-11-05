@@ -552,12 +552,33 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .ex-pad{display:none;position:absolute;left:12px;right:12px;bottom:12px;z-index:5;justify-content:space-between;align-items:center;user-select:none;-webkit-user-select:none;touch-action:none}
 .ex-pad button{all:unset;display:grid;place-items:center;background:var(--paper);color:var(--ink);font-family:var(--display);box-shadow:4px 4px 0 var(--ink);touch-action:none}
 .ex-pad button:active{background:var(--accent);color:var(--on-accent)}
-.ex-dpad{display:grid;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(3,54px);gap:4px}
-.ex-dpad [data-dir=up]{grid-area:1/2}.ex-dpad [data-dir=left]{grid-area:2/1}.ex-dpad [data-dir=right]{grid-area:2/3}.ex-dpad [data-dir=down]{grid-area:3/2}
-.ex-dpad button{font-size:22px;border-radius:8px}
-.ex-ab{display:flex;gap:12px;align-items:center}
-.ex-ab button{width:78px;height:78px;border-radius:50%;font-size:15px}
-.ex-ab #exC{width:60px;height:60px;font-size:11px}
+/* joystick virtual (celular): a base redonda e o pino que segue o dedo; tamanhos pela menor medida da tela, para caber
+   em retrato e em paisagem */
+.ex-stick{position:relative;width:clamp(108px,30vmin,150px);aspect-ratio:1;border-radius:50%;background:rgba(246,233,196,.25);border:3px solid var(--paper);box-shadow:4px 4px 0 var(--ink);touch-action:none}
+.ex-stick i{position:absolute;left:28%;top:28%;width:44%;height:44%;border-radius:50%;background:var(--paper);box-shadow:3px 3px 0 var(--ink);pointer-events:none}
+.ex-ab{display:flex;gap:clamp(6px,2vmin,12px);align-items:center}
+.ex-ab button{width:clamp(54px,17vmin,78px);height:clamp(54px,17vmin,78px);border-radius:50%;font-size:clamp(11px,3.4vmin,15px)}
+.ex-ab #exC{width:clamp(44px,13vmin,60px);height:clamp(44px,13vmin,60px);font-size:clamp(9px,2.6vmin,11px)}
+.ex-pad{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}
+#exCanvas{touch-action:none}
+/* menu do alto em tela estreita (ou celular deitado): os botões ficam dentro do ☰ */
+.ex-menu{display:none}
+@media (max-width:760px),(pointer:coarse) and (max-height:520px){
+  .ex-menu{display:block}
+  .ex-btns{flex-direction:column;align-items:flex-end}
+  .ex-btns>button:not(.ex-menu){display:none}
+  .ex-btns.open>button:not(.ex-menu):not([hidden]){display:block}
+}
+/* celular em pé: aviso para virar (fora da tela inicial); "Jogar assim mesmo" esconde até fechar o jogo */
+.girar{display:none;position:fixed;inset:0;z-index:5000;background:rgba(14,26,18,.95);place-items:center;text-align:center;color:var(--paper);padding:24px}
+.girar b{display:block;font:400 30px var(--display);text-transform:uppercase}
+.girar b::before{content:"📱";display:block;font-size:52px;margin-bottom:8px;animation:girarCel 2.4s ease-in-out infinite}
+.girar p{font:700 13px/1.5 var(--mono);max-width:280px;margin:10px auto 18px}
+.girar-ok{all:unset;cursor:pointer;font-family:var(--display);font-size:16px;letter-spacing:.06em;padding:8px 18px;background:var(--paper);color:var(--ink)}
+@keyframes girarCel{0%,30%{rotate:0deg}60%,100%{rotate:90deg}}
+@media (pointer:coarse) and (orientation:portrait){body:has(#titleScreen[hidden]):not(.girar-feito) .girar{display:grid}}
+/* batalha no toque: comandos mais altos para o dedo */
+@media (pointer:coarse){.ui .cmd{min-height:38px;display:flex;align-items:center}}
 #exA{translate:0 -18px}
 @media (pointer:coarse),(max-width:760px){.ex-pad{display:flex}.ex-help{display:none}#exHud{max-width:100%;font-size:11px}}
 /* ===== cinemática de abertura da batalha ===== */
@@ -1105,7 +1126,7 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .br-card{border-top:2px dashed var(--wood);padding-top:6px;margin-top:6px}
 .br-card h3{margin:0;font:400 22px var(--display);text-transform:uppercase}
 .br-card p{margin:4px 0;font:13px/1.45 var(--mono);color:var(--brown)}
-@media(max-width:640px){.br-wrap{grid-template-columns:1fr}}
+@media(max-width:640px){.br-wrap{grid-template-columns:1fr}.br-wrap svg{height:min(300px,38vh)}}   /* em pé: o mapa menor, para a ficha da região aparecer embaixo */
 @media (prefers-reduced-motion:reduce){.br-dot.open circle{animation:none}}
 
 /* ===== HUD do guardião da floresta: medalhão com o rosto do Rhanon (heroMedal), barras de tronco com a cor de cada
@@ -1297,3 +1318,24 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 /* mapa do Brasil: as regiões e os pontos também escolhem (clicando); no voo, o motivo de não dar pra ir */
 #brasil svg [data-k]{cursor:pointer}
 .br-why{color:#c8402a;font-weight:700}
+
+/* ===== celular deitado (tela baixa): o palco da luta fica à esquerda na altura toda e o registro, os comandos e o
+   painel do Rhanon numa coluna à direita (embaixo do palco não sobrava altura para ver o Rhanon) ===== */
+@media (max-height:500px) and (orientation:landscape){
+  .game{grid-template-columns:minmax(0,1fr) minmax(250px,36%);grid-template-rows:minmax(0,1fr) auto}
+  .game>.stage{grid-column:1;grid-row:1/3;height:100%}
+  .game>.ui{grid-column:2;grid-row:1;grid-template-columns:1fr;padding:46px 8px 4px;gap:6px;align-content:start;align-items:start}
+  .game>.log{grid-column:2;grid-row:2;height:calc(3 * 1.3em + 10px);font-size:11px;line-height:1.3}
+  .ui .cmds{grid-template-columns:repeat(2,max-content);gap:4px 14px}
+  .ui .cmd{font-size:16px}
+  .ui .desc{display:none}
+  .ui .me{padding:4px 10px 6px}
+  .ui .me>.xp-row,.ui .me>.bar.xp{display:none}   /* o XP aparece no fim da luta */
+}
+
+/* celular em pé: a lista do armeiro rola na própria caixa, para a ficha (o que a peça pede e "Fabricar") ficar logo
+   embaixo, à vista; no toque, os botões dos painéis ganham altura para o dedo */
+@media (max-width:640px){.forge-list{max-height:30vh;overflow-y:auto;overscroll-behavior:contain}.ex-dialog{bottom:2%;max-height:84%}}
+@media (pointer:coarse){.ex-dialog .cmd,.info .cmd{padding-block:.22em}}
+@media (max-width:640px){.bag-list .cmd.bagrow>span{grid-template-columns:minmax(0,1fr) 2.6em minmax(0,8.5em);gap:6px;padding:0 6px}.bag-list .cmd.bagrow small{font-size:11px;overflow:hidden;text-overflow:ellipsis}}   /* bolsa em tela estreita: o nome não some */
+.nbos-off{all:unset;cursor:pointer;padding:3px 8px;background:#3a2a3a;color:#ffd0d0;font:700 11px var(--mono);border-radius:3px}.nbos-off:hover,.nbos-off:focus-visible{background:#a8283a;color:#fff}

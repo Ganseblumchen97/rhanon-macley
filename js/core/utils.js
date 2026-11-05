@@ -1,5 +1,7 @@
 /* Utilidades usadas em todo o jogo. */
 const $ = id => document.getElementById(id);
+// tela de toque sem controle ligado (celular): troca nome de tecla por botão da tela nos textos
+const isTouch = () => matchMedia("(pointer:coarse)").matches && !(typeof padStyle === "function" && padStyle());
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 // número pseudoaleatório fixo para cada semente (letras de recorte sempre iguais)
 function rand(seed) { let x = Math.sin(seed * 9301 + 49297) * 233280; return x - Math.floor(x); }

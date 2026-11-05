@@ -66,7 +66,7 @@ function nbDesk() {
   box.innerHTML = NB_APPS.map((a, i) => `<button class="nbos-ic${i === NB_SEL ? " sel" : ""}" type="button" data-i="${i}">${nbIconSvg(a.id)}${a.id === "mail" && un ? `<em class="nbos-badge">${un}</em>` : ""}<span>${nbAppName(a.id)}</span></button>`).join("");
   box.querySelectorAll(".nbos-ic").forEach(b => b.addEventListener("click", () => { NB_SEL = +b.dataset.i; nbOpenApp(NB_APPS[NB_SEL].id); }));
   const wifi = nbWifi();
-  $("nbosBar").innerHTML = `<b>▣ Rhanon OS</b><span class="nbos-sp"></span><span class="nbos-wifi${wifi ? "" : " off"}">${t(wifi ? "Wi-Fi" : "sem Wi-Fi")}</span><span class="nbos-bat"><i></i></span><span>${t(G.night ? "Dia {n} · noite" : "Dia {n} · dia", {n: G.day})}</span>`;
+  $("nbosBar").innerHTML = `<b>▣ Rhanon OS</b><span class="nbos-sp"></span><span class="nbos-wifi${wifi ? "" : " off"}">${t(wifi ? "Wi-Fi" : "sem Wi-Fi")}</span><span class="nbos-bat"><i></i></span><span>${t(G.night ? "Dia {n} · noite" : "Dia {n} · dia", {n: G.day})}</span><button class="nbos-off" type="button">✕ ${t("Desligar")}</button>`;   // fecha o notebook (no celular não tem tecla nem sobra fora)
 }
 function nbFocusIcon() {
   const bs = [...$("nbosIcons").querySelectorAll(".nbos-ic")];
@@ -168,6 +168,7 @@ function setupNotebook() {
   document.addEventListener("keydown", nbKey, true);
   $("nbos").addEventListener("click", ev => { if (ev.target === $("nbos")) closeNotebook(); });
   $("nbosX").addEventListener("click", nbCloseApp);
+  $("nbosBar").addEventListener("click", ev => { if (ev.target.closest(".nbos-off")) closeNotebook(); });
   $("exNb").addEventListener("click", () => { if (EX && !EX.locked && !EX.camp && EX.dialog !== "tutorial") openNotebook(); });
   addEventListener("resize", () => { if (!$("nbos").hidden) nbWall(); });
 }

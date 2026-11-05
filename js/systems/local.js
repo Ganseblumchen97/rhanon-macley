@@ -374,7 +374,7 @@ function invButtons(i) {
     if (fn) b.addEventListener("click", fn); else b.setAttribute("aria-disabled", "true");
     list.appendChild(b);
   };
-  head(t("Comida") + (food.length ? " · " + t("Z para comer") : ""));
+  head(t("Comida") + (food.length ? " · " + t(isTouch() ? "toque para comer" : "Z para comer") : ""));
   if (food.length) food.forEach(([k, n]) => row(ITEMS[k].n, n, itemEffect(ITEMS[k]), () => eatItem(k)));
   else list.insertAdjacentHTML("beforeend", `<div class="bag-empty">${t("Nada para comer. A barraca de comida da feira vende.")}</div>`);
   head(t("Materiais"));

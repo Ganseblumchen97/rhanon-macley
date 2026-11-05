@@ -254,7 +254,7 @@ function qteArm(impactIn, target) {
   qteClear();
   const q = pos(target), el = el$("qte", {left: q.x + "px", top: q.y - 34 + "px"}), lead = Math.max(0, impactIn - QTE_EARLY);
   // alvo fixo (::before), o anel que fecha até ele (i) e a tecla no meio; no controle, o botão dele (ui/gamepad.js)
-  el.innerHTML = `<i></i><u></u><b>${padLabel("z")}</b>`; el.style.setProperty("--dur", lead + "ms");
+  el.innerHTML = `<i></i><u></u><b>${isTouch() ? "☝" : padLabel("z")}</b>`; el.style.setProperty("--dur", lead + "ms");
   qte = {at: performance.now() + impactIn, el, ok: false, tried: false};
   setTimeout(() => { if (el.isConnected) { el.classList.add("agora"); sfx("janela"); } }, lead);
   setTimeout(() => el.remove(), impactIn + QTE_LATE + 260);

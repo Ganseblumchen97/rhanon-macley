@@ -58,7 +58,7 @@ function skillSvg() {
   for (const w of Object.values(nodes)) {
     const st = skillState(w.id), R = w.r >= 5 ? 19 : 16, cor = w.tr.color, apagado = st === "locked", ic = SK_ICON_OF(w.nd);
     const tinta = st === "learned" ? "#f4ecd8" : apagado ? "#3a5232" : cor;
-    s += `<g class="sk-no ${st}" data-id="${w.id}" transform="translate(${w.x.toFixed(1)} ${w.y.toFixed(1)})">`;
+    s += `<g class="sk-no ${st}" data-id="${w.id}" transform="translate(${w.x.toFixed(1)} ${w.y.toFixed(1)})"><circle r="${R + 14}" fill="transparent"/>`;   // área de toque maior que o desenho (celular)
     if (st === "open") s += `<circle r="${R + 7}" fill="none" stroke="${cor}" stroke-width="3" class="sk-pulsa"/>`;
     if (w.id === SK_SEL) s += `<circle r="${R + 9}" fill="none" stroke="#ffd23a" stroke-width="3"/>`;
     s += `<circle r="${R + 3}" fill="#0a120c"/><circle r="${R}" fill="${st === "learned" ? cor : "#1d2e21"}" stroke="${st === "learned" ? "#f4ecd8" : apagado ? "#3a5232" : cor}" stroke-width="3"/>`;
@@ -73,7 +73,7 @@ function openSkills(msg) {
   box.querySelectorAll(".sk-no").forEach(g => g.addEventListener("click", () => { if (g.dataset.id === SK_SEL) skillLearn(); else { SK_SEL = g.dataset.id; sfx("blip"); openSkills(); } }));
   // ficha do nó escolhido: tamanho fixo, a tela não muda de largura com a descrição
   const card = document.createElement("div"); card.className = "sk-card"; card.style.setProperty("--sk", w.tr.color);
-  card.innerHTML = `<h3>${nd.n}</h3><span class="sk-custo">${w.tr.n} · ${nd.cost === 1 ? t("1 ponto") : t("{n} pontos", {n: nd.cost})}</span><p>${nd.d}</p><p class="hint">${msg || {learned: t("Já aprendida."), locked: t("Aprenda antes uma habilidade ligada a esta."), short: t("Faltam pontos: suba de nível."), open: padStyle() ? t("{z} aprende.", padVars()) : t("Z aprende.")}[st]}</p>`;
+  card.innerHTML = `<h3>${nd.n}</h3><span class="sk-custo">${w.tr.n} · ${nd.cost === 1 ? t("1 ponto") : t("{n} pontos", {n: nd.cost})}</span><p>${nd.d}</p><p class="hint">${msg || {learned: t("Já aprendida."), locked: t("Aprenda antes uma habilidade ligada a esta."), short: t("Faltam pontos: suba de nível."), open: padStyle() ? t("{z} aprende.", padVars()) : isTouch() ? t("Toque de novo para aprender.") : t("Z aprende.")}[st]}</p>`;
   box.append(card);
   box.insertAdjacentHTML("beforeend", `<p class="hint eq-keys">${padStyle() ? t("{dir} escolhem · {z} aprende · {x} fecha", padVars()) : t("Setas escolhem · Z aprende · X fecha")}</p>`);
   btn(t("Fechar"), closeSkills, false, box);

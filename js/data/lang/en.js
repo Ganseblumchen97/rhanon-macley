@@ -2829,6 +2829,23 @@ TX.en = {
     "O ônibus sobe a serra de volta para Ouro Preto.": "The bus climbs the mountains back to Ouro Preto.",
     "O ônibus volta pela beira do mar até o Rio.": "The bus heads back along the sea to Rio.",
     "O ônibus desce a serra até o mar do Rio de Janeiro.": "The bus goes down the mountains to the sea of Rio de Janeiro.",
-    "O ônibus vai pela beira do mar e sobe a serra até São Paulo.": "The bus runs along the sea and climbs the mountains to São Paulo."
+    "O ônibus vai pela beira do mar e sobe a serra até São Paulo.": "The bus runs along the sea and climbs the mountains to São Paulo.",
+    "Vire o celular": "Turn your phone",
+    "O jogo fica melhor deitado: a mata e a luta são largas.": "The game plays better sideways: the forest and the fights are wide.",
+    "Jogar assim mesmo": "Play like this anyway",
+    "Menu": "Menu",
+    "Direcional": "Joystick",
+    "Pra andar: arrasta o dedo na roda da esquerda, até na diagonal. ESQUIVA é o rolamento: tu passa pelo bote do bicho sem levar.": "To walk: drag your finger on the wheel on the left, even diagonally. DODGE is the roll: you slip past the creature's lunge without getting hit.",
+    "GOLPE é a lançada. Também serve pra conversar com o pessoal e usar a fogueira e as barracas. Tocar no mapa golpeia pra aquele lado.": "STRIKE is the spear thrust. It also lets you talk to people and use the campfire and the stalls. Tapping the map strikes toward that side.",
+    "ARCO atira flecha, mas só depois que tu comprar um arco com o armeiro da feira.": "BOW shoots arrows, but only after you buy a bow from the armorer at the market.",
+    "No ☰ lá em cima tem a bolsa, com comida e lembranças, e o equipamento pra trocar arma e roupa. Nos menus é só tocar.": "In the ☰ up top there's the bag, with food and mementos, and the equipment to swap weapon and clothes. In the menus, just tap.",
+    "Na briga, quando aparecer o anel, toca no palco na hora que ele ficar verde: o golpe sai perfeito, ou tu bloqueia metade do ataque do bicho.": "In a fight, when the ring shows up, tap the stage the moment it turns green: the strike comes out perfect, or you block half the creature's attack.",
+    "toque para comer": "tap to eat",
+    "Toque de novo para aprender.": "Tap again to learn.",
+    "toca em {botao}": "tap {botao}",
+    "Segure aqui para pular": "Hold here to skip",
+    "Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Toca numa peça pra ver o que ela pede.": "Spear, bow, vest... Bring me the right mementos and some cash and I'll make something awesome. Tap a piece to see what it needs.",
+    "Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Toca num talismã pra ver o que ele pede.": "Every boss you calm releases a bit of the moonlight the smoke trapped in it. Bring me that moonlight and I'll make a charm. Tap a charm to see what it needs.",
+    "Desligar": "Shut down"
   }
 };
