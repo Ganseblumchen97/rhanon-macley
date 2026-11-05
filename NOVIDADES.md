@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.85.0 — o Parque Barigui
+
+- Curitiba ganhou a sua trilha: o Parque Barigui (níveis 76 a 78), pela rua da esquerda do Largo da Ordem. É gramado
+  com bosques de araucária e um lago comprido, com gralha-azul, serelepe, bugio-ruivo e saracura.
+- De dia, a Gralha-rainha, a que planta as araucárias. Ao ser acalmada, vira aliada no Chamado do aliado ("Semeadura
+  da gralha", golpe de planta). De noite, o murucututu aparece no bosque e o Bicho-papão desce do telhado do pavilhão.
+- Depois da Gralha-rainha, o Pytuna aparece em cima do lago e chama o Rhanon para a última mata de araucária.
+- O canto secreto do parque abre com vento e guarda a lenda da gralha-azul.
+
 ## 0.84.0 — chegada em Curitiba
 
 - Curitiba, o fim da viagem, abriu. Depois de acalmar a Onça do Iguaçu, compre no mapa do Sul a passagem de ônibus

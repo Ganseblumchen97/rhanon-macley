@@ -57,6 +57,7 @@ const MAP_ICON = {
   estancia: ["#6a8a3a", `<path d="M-6 -2 Q-7 8 0 9 Q7 8 6 -2Z" fill="#8a5a2a" ${MI.s}/><ellipse cy="-2" rx="6" ry="2" fill="#3a8a3a" ${MI.s}/><path d="M2 -2 L6 -10" stroke="#c8c8d0" stroke-width="1.8"/>`],   // a cuia de chimarrão com a bomba
   centrofoz: ["#7a4ac8", `<path d="M-2 9 L-1 -8 L1 -8 L2 9Z" fill="${MI.c}" ${MI.s}/><rect x="-2" y="-2" width="4" height="3" fill="#3a9a4a"/><rect x="-2" y="1" width="4" height="3" fill="#e8402a"/><rect x="-2" y="4" width="4" height="3" fill="#4a8ad8"/>` + MI_WAVE(8)],   // o Marco das Três Fronteiras, com as cores dos três países
   largoordem: ["#3a5a8a", `<path d="M-9 9 V-1 L0 -8 L9 -1 V9Z" fill="#d8b8e0" ${MI.s}/><path d="M-3 9 V1 H3 V9Z M-7 -1 H7" fill="#6a8ab8" stroke="#6a8ab8" stroke-width="1"/>`],   // a Ópera de Arame, de vidro e ferro
+  barigui: ["#3a7a4a", `<rect x="-1" y="0" width="2" height="9" fill="${MI.t}"/><path d="M-9 0 Q0 -5 9 0 M-7 -4 Q0 -8 7 -4" fill="none" stroke="#2f6a34" stroke-width="2.6" stroke-linecap="round"/><path d="M4 -9 l3 1 l-3 1Z" fill="#2a5ad8"/>`],   // araucária com a gralha-azul no topo
   curitiba: ["#4a3a8a", `<rect x="-1.2" y="-1" width="2.4" height="9" fill="${MI.t}"/><path d="M-8 -1 Q0 -6 8 -1 M-6 -5 Q0 -9 6 -5" fill="none" stroke="#3a7a3a" stroke-width="2.6" stroke-linecap="round"/>`]
 };
 MAP_ICON.terminal = MAP_ICON.parada;   // o cais de Belém também é o barco de linha

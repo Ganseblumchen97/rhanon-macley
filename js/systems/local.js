@@ -81,7 +81,7 @@ function selectSub(id, msg) {
   else if (id === "largoordem") {
     btn(t("Entrar no Largo da Ordem"), () => startExplore(id), false, i);
     lh(t("Lá dentro: lembranças, comida, uma cama quentinha na pensão e o povo de Curitiba."));
-    lh(t("As trilhas de Curitiba e o fim da viagem vêm em breve. Para voar, volte de ônibus até Foz do Iguaçu."));
+    lh(t("A rua da esquerda vai pro Parque Barigui. O fim da viagem vem em breve. Para voar, volte de ônibus até Foz do Iguaçu."));
   }
   else if (id === "paulista") {
     btn(t("Entrar na Avenida Paulista"), () => startExplore(id), false, i);

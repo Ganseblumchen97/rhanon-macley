@@ -1560,6 +1560,10 @@ const BEAST_DRAW = {macaco, harpia, caranguejeira, piranha, poraque, morcego, co
   andorinhao: (pose, f) => pombo(pose, f, {b: "#3a3a40", B: "#22222a", n: "#e8e8e0", p: "#4a4a52", w: "#2a2a30", y: "#2a2a2a"}),   // andorinhão-de-coleira: escuro de colar branco
   jacutinga: (pose, f) => pombo(pose, f, {b: "#1a1a2a", B: "#0e0e1a", n: "#f0f0f0", p: "#d8282a", w: "#22223a", y: "#5a8ad8"}),   // jacutinga: preta brilhante, cabeça branca, papo vermelho
   mboi: cobra({b: "#2a5a3a", B: "#163a24", k: "#7ad0a0", eye: "#ffd23a"}, false),   // M'Boi: a serpente gigante verde-escura do fundo do Iguaçu
+  gralha_azul: (pose, f) => pombo(pose, f, {b: "#2a5ad8", B: "#1a3a98", n: "#1a1a22", p: "#5a8ae8", w: "#1e48b8", y: "#1a1a1a"}),   // gralha-azul: azul do céu e cabeça preta
+  gralha_rainha: (pose, f) => pombo(pose, f, {b: "#2a5ad8", B: "#1a3a98", n: "#1a1a22", p: "#5a8ae8", w: "#1e48b8", y: "#1a1a1a"}),   // Gralha-rainha: a mesma, enorme (scale do chefe)
+  saracura: (pose, f) => garca(pose, f, {b: "#a8603a", B: "#7a4024", n: "#8a8a90", N: "#5a5a62", y: "#b8c830", Y: "#8a9a20", k: "#d8302a"}),   // saracura-do-mato: peito ruivo, cabeça cinza e pernas vermelhas
+  bicho_papao: visagem({w: "#2a2220", W: "#16100e", s: "#4a3a30", h: "#1a1410", e: "#ffd23a"}),   // Bicho-papão: uma sombra comprida de olho amarelo
   gaivotao: (pose, f) => garca(pose, f, {b: "#f0f0ec", B: "#2a2a32", y: "#e8c030", Y: "#b88a20", k: "#e8c030"}),   // gaivotão: branco de costas pretas, bico amarelo
   tie_sangue: (pose, f) => pombo(pose, f, {b: "#d8202a", B: "#9a1418", n: "#d8202a", p: "#e8303a", w: "#2a2a2a", y: "#3a3a3a"}),   // tiê-sangue: vermelho-vivo, asa preta
   bruxa_ilha: visagem({w: "#3a2a4a", W: "#22182e", s: "#c8c0b0", h: "#e8e8e0", e: "#9aff6a"}),   // Bruxa da Ilha: vestido escuro, cabelo branco e olho verde

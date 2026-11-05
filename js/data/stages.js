@@ -1116,6 +1116,42 @@ const STAGES = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ]
   },
+  // Curitiba: o Parque Barigui (gerado por tools/gerar_mapas.py)
+  barigui: {
+    next: null,
+    rows: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTT......oTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTT,TT,T...a......,..,...,..Ta..TT...T~~~~~TT,TToT.TTT",
+      "TT...T.T.,.,,TT.--------------B.,...T,TT,,T~~~~~~~T.T.TT..TT",
+      "TTTTTT...,,..,,.-.,.,...........,.o.T...T.,~~~~~~~TTTTTTT.TT",
+      "TT.............a-..T...,.,f...,.f.,T..TTTT.~~~~~~~TTT,.TT.TT",
+      "TTa.-------------..,.T..T.TT....oTTTT.TTTTTT~~~~~TT.TTTTTTTT",
+      "TT..-.,....,......T.,.....T...TTTTTT.TT,T.T.....T,TTTTTTTTTT",
+      "TT,.-...f...,.f..T.TTT.T..T.TT,TTT,,.T...........,T.,TT.T.TT",
+      "TT..-.TT.....T.TT....T..,TT.T.TT.TT..T........,,.....T.,T.TT",
+      "TT..-,.TT.T.TTT.T.T..TTTTT..TT,T,..TT.---------------.TT.,TT",
+      "TT,.-.,TTT,TTTTTTT..,TT..TTTT.T.T.T.T.-.......,....,-,aT..TT",
+      "T,a.-,.,TTT,.TTT,T..,T~~~~~~~~~...T.T.-...,....,,.f.-..TT,TT",
+      "T...-.,aTT.TT.TT.,,.~~~~~~~~~~~~~T.TT.-.T.......T..,-,,.T.TT",
+      "T.,.-.....T.TTo.TTT~~~~~~~~~~~~~~~.T..-...T.,.,.,ff.-,...TTT",
+      "T.o,-...TT..TTT,T.TT~~~~~~~~~~~~~TT.a.-.,,.TT,TT..,.-..,TTTT",
+      "T,..-,~~~~~T.T.....,.T~~~~~~~~~TT,T...-....T...TTT,.-,..TTTT",
+      "TT..-~~~~~~~,.,..,......,..TTT.T,T.,..-.f.TT.o..,..,-...,TTT",
+      "TT,.-~~~~~~~-------------,..TT.,.T....-...TT.....,,.-.T,.,TT",
+      "TTT.-~~~~~~~-...,....,..-.fT...aTTT,..-.f.T..,......-..,T.TT",
+      "TTT.-.~~~~~.-...,.,.,.,.-.o....T.T.T.,-..aT,---------....TTT",
+      "TT..-...T...-,..T.......-.,.....,.TTT.-,TTT,-,,..,....TTT.TT",
+      "TTT.-.,,..,.-a,,.aTT,o,.-,F,........T.-.T.T,-.........T.TTTT",
+      "TT,.-.,,....-,,.T....T..-.,..,.....a..-,T...-.f....TT..TT.TT",
+      "TTT.---------.TT,oT..T..---------------.TTT,-,.TT.T,TTTTT.TT",
+      "TTT....,.....T,TTT..T...................,TT.-.T....f.,TT.,.T",
+      "TTTToa.,,TT.T.TT.T,.,.T.,.....f..a..TT..,TT.-a..........,..T",
+      "TTTTT..TTT..,.T.TTT.T..,T.TTT.....TTT,TTT..,-------------S-E",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...a...,.,,..,.T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ]
+  },
   // Pampa gaúcho: as Coxilhas (gerado por tools/gerar_mapas.py)
   coxilhas: {
     next: null,
@@ -1204,9 +1240,9 @@ const STAGES = {
     ]
   },
   // Curitiba: o Largo da Ordem, rua de pedra com a pensão (O), a feirinha (K), araucárias (T), canteiros de flores e
-  // moradores; a saída da direita volta pro mapa (as trilhas vêm depois)
+  // moradores; a saída da direita volta pro mapa e a rua da esquerda vai pro Parque Barigui
   largoordem: {
-    safe: true, next: null,
+    safe: true, next: "barigui",
     rows: [
       "########################",
       "########################",
@@ -1214,7 +1250,7 @@ const STAGES = {
       "#..OOO.....V....C......#",
       "#.T.......-.......T..f.#",
       "#..P......-.......-.P..#",
-      "#.f-------------------SE",
+      "G---------------------SE",
       "#..T..f.T....T..P.T....#",
       "#.####.......####...f..#",
       "#.####..fff..####......#",
