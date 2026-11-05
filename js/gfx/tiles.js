@@ -84,10 +84,12 @@ const OUTLINE = "#1a2418";
 // toldo das barracas de cada mercado (sem stall: vermelho e branco, como na feira da aldeia)
 Object.entries({praiagrande: ["#2a6ab8", "#f4ecd8"], trocatroca: ["#e8a020", "#c8402a"], orla: ["#3a8a5a", "#f0d890"], recifeantigo: ["#e86a8a", "#f0c840"],
   portocuiaba: ["#e8701c", "#f4ecd8"], centrobonito: ["#2aa8b8", "#f4ecd8"], planopiloto: ["#3a5ab8", "#e8e4d8"], mercadocentral: ["#c8a040", "#6a3a8a"], tiradentes: ["#2a5aa8", "#e8d8b0"],
-  copacabana: ["#e8402a", "#f4ecd8"], paulista: ["#2a2a2e", "#e8c040"], centrofoz: ["#2a8a4a", "#e8c040"], estancia: ["#c83a3a", "#f4ecd8"]})
+  copacabana: ["#e8402a", "#f4ecd8"], paulista: ["#2a2a2e", "#e8c040"], centrofoz: ["#2a8a4a", "#e8c040"], estancia: ["#c83a3a", "#f4ecd8"], lagoa: ["#2a7ab8", "#f4ecd8"]})
   .forEach(([z, c]) => { if (TILE_PAL[z]) TILE_PAL[z].stall = c; });
 // rodoviárias do Nordeste: as cores do centro da cidade (Petrolina com mandacaru no lugar das árvores)
 Object.assign(TILE_PAL, {aero_bel: TILE_PAL.veropeso, aero_rec: TILE_PAL.recifeantigo, aero_bsb: TILE_PAL.planopiloto, aero_cnf: TILE_PAL.mercadocentral, aero_gru: TILE_PAL.paulista, aero_igu: TILE_PAL.centrofoz, rodo_slz: TILE_PAL.praiagrande, rodo_the: TILE_PAL.trocatroca, rodo_pet: {...TILE_PAL.orla, cactus: true}, rodo_rec: TILE_PAL.recifeantigo});
+// Florianópolis: a Lagoa da Conceição, areia clara como Copacabana, mas com casario açoriano colorido e árvore comum (sem coqueiro)
+TILE_PAL.lagoa = Object.assign({}, TILE_PAL.copacabana, {palm: false, path: "#d8c8a0", path2: "#c4b28a", water: "#2a7ab8", water2: "#9ad0f0", roof: "#c8583a", roof2: "#8a3a24", walls: ["#f0e8d0", "#2a7ab8", "#e8c048", "#f0e8d0", "#d8586a", "#f0e8d0"]});
 const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "~", Y: ".", J: "."};   // U: o barco de linha fica na água; Y e J: entrada e baú do segredo (systems/secrets.js)
 
 function fillEllipse(x, cx, cy, rx, ry, col) {

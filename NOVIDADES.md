@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.80.0 — Florianópolis e a viagem que só sobe
+
+- O Sul agora vai de baixo para cima, até Curitiba. O avião de Guarulhos pousa no Pampa gaúcho, no Rio Grande do Sul,
+  e de lá a viagem só sobe: ônibus pela beira do mar até Florianópolis (R$ 1.700) e depois atravessando Santa
+  Catarina até Foz do Iguaçu (R$ 1.800). Do Aeroporto das Cataratas, em Foz, dá para voar de volta.
+- Florianópolis é cidade nova: a vila da Lagoa da Conceição, com casario açoriano colorido, rendeiras de bilro,
+  pescadores, pensão e a lagoa logo ali. Os moradores falam manezinho e contam das Bruxas da Ilha.
+- Por enquanto cada ônibus do Sul abre quando você conhece a cidade de onde ele sai. A passagem antiga de Foz para o
+  Pampa vale as duas novas.
+- O Pajé conta a chegada de cada cidade na ordem nova: o frio do pampa, a Ilha e as Cataratas.
+
 ## 0.79.0 — o Sul: Foz do Iguaçu e o pampa
 
 - Começou o último capítulo da viagem. Com os 10 chefes do Sudeste acalmados e o app da Bia entregue, voe do novo

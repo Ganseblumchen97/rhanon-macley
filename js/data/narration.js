@@ -46,16 +46,22 @@ const NARRA = {
     "E foi numa ladeira dessas que tu conheceu um menino que só tinha uma. Mas isso eu conto depois."
   ],
   pampa: [
-    "De Foz o ônibus desceu até o pampa, curumim. Campo aberto até onde a vista alcança, coxilha atrás de coxilha, e o vento minuano cortando.",
-    "No pampa quase não tem árvore. A fumaça de Pytuna não tinha onde se esconder: dava pra ver ela de longe, subindo pro norte.",
-    {r: "Me deram chimarrão na cuia, vô. Queimei a língua e todo mundo riu."},
-    "Gaúcho é assim: primeiro o mate, depois a conversa. E quem queima a língua no primeiro mate já é de casa."
+    "E o avião desceu no Sul, curumim. No pampa gaúcho, lá embaixo no Rio Grande do Sul: campo aberto até onde a vista alcança, coxilha atrás de coxilha.",
+    "Fazia frio. Frio de verdade, com o vento minuano cortando e fumaça saindo da boca. E no pampa quase não tem árvore: a fumaça de Pytuna não tinha onde se esconder.",
+    {r: "Dava pra ver ela de longe, vô, subindo pro norte. E me deram chimarrão na cuia: queimei a língua e todo mundo riu."},
+    "Gaúcho é assim: primeiro o mate, depois a conversa. Era o fim da viagem começando, curumim. Daqui pra frente, é sempre subir."
+  ],
+  floripa: [
+    "Do pampa o ônibus subiu pela beira do mar até Florianópolis, a Ilha de Santa Catarina.",
+    "Ponte comprida, lagoa no meio da ilha, renda de bilro na porta das casas. E uma história que todo pescador conta: as Bruxas da Ilha.",
+    {r: "Uma rendeira me disse que elas trançam a crina dos cavalos de noite, vô. Igual ao Saci lá de Minas."},
+    "Encantado de lá, encantado de cá... Tudo parente, curumim. Agora deixa eu contar da Ilha."
   ],
   foz: [
-    "E o avião desceu no Sul, curumim. Foz do Iguaçu, na ponta do Paraná, onde o Brasil encosta no Paraguai e na Argentina.",
-    "Fazia frio. Frio de verdade, de soltar fumaça pela boca. E a mata ali é de araucária, o pinheiro alto de copa em taça.",
-    {r: "E dava pra ouvir as Cataratas lá do centro, vô. Um ronco que não para nunca."},
-    "Era o fim da viagem chegando. A fumaça de Pytuna tinha vindo pra cá, pra onde a mata de pinheiro acaba. Agora deixa eu contar do Sul."
+    "De Florianópolis o ônibus atravessou Santa Catarina inteira até Foz do Iguaçu, na ponta do Paraná, onde o Brasil encosta no Paraguai e na Argentina.",
+    "A mata ali é de araucária, o pinheiro alto de copa em taça. E dava pra ouvir as Cataratas lá do centro.",
+    {r: "Um ronco que não para nunca, vô. E o rio Iguaçu sobe dali até Curitiba."},
+    "Então é só seguir o rio, curumim. A fumaça foi pra onde a mata de pinheiro acaba."
   ],
   bh: [
     "De avião outra vez, curumim, agora pro Sudeste. Belo Horizonte, no meio das montanhas de Minas.",

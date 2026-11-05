@@ -47,7 +47,7 @@ function vit() {
   // notebook: jogo novo começa sem ele (missão do começo); save antigo já tem tudo ligado
   if (!G.nb) G.nb = G.tutorial ? {} : {tem: true, bateria: true, teclado: true, carregador: true, on: true};
   G.freela = G.freela || {}; G.portfolio = G.portfolio || {}; G.mail = G.mail || {}; G.secrets = G.secrets || {}; G.regions = G.regions || {}; G.passagemTHE = !!G.passagemTHE; G.passagemREC = !!G.passagemREC; G.passagemPET = !!G.passagemPET || G.passagemREC;   // save de antes da troca (Petrolina antes do Recife): quem pagou Teresina–Recife leva Teresina–Petrolina
-  G.passagemBON = !!G.passagemBON; G.passagemBSB = !!G.passagemBSB; G.passagemOPR = !!G.passagemOPR; G.passagemRIO = !!G.passagemRIO; G.passagemSAO = !!G.passagemSAO; G.passagemPAM = !!G.passagemPAM;
+  G.passagemBON = !!G.passagemBON; G.passagemBSB = !!G.passagemBSB; G.passagemOPR = !!G.passagemOPR; G.passagemRIO = !!G.passagemRIO; G.passagemSAO = !!G.passagemSAO; G.passagemFLO = !!(G.passagemFLO || G.passagemPAM); G.passagemFOZ = !!(G.passagemFOZ || G.passagemPAM); delete G.passagemPAM;   // a passagem antiga Foz ↔ Pampa (0.79) vale as duas de agora
   G.regions = G.regions || {norte: true};   // regiões já visitadas (o aeroporto voa entre elas)
   if (!G.narrated) G.narrated = G.belemVisto ? {belem: true} : {};   // falas do Pajé já contadas (prólogo, Belém, cada chefe)
   G.loseStreak = G.loseStreak || 0;   // lutas perdidas seguidas (2 = o Pajé dá uma dica)   // bugs resolvidos por freela; freelas entregues
@@ -86,7 +86,8 @@ function debugSetup() {
     if (city === "ouropreto" || city === "riodejaneiro" || city === "saopaulo") G.passagemOPR = true;
     if (city === "riodejaneiro" || city === "saopaulo") G.passagemRIO = true;
     if (city === "saopaulo") G.passagemSAO = true;
-    if (city === "pampa") G.passagemPAM = true;
+    if (city === "floripa" || city === "foz") G.passagemFLO = true;
+    if (city === "foz") G.passagemFOZ = true;
     const regs = ["norte", "nordeste", "centroeste", "sudeste", "sul"], ri = regs.indexOf(CITY[city].map);   // regiões na ordem da viagem
     if (ri >= 2) { NORDESTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.app_cordel = true; G.narrated.nordeste_fim = true; G.passagemTHE = G.passagemREC = G.passagemPET = true; }   // e o Nordeste também
     if (ri >= 3) { CENTROESTE_BOSSES().forEach(k => { BS()[k] = true; }); G.portfolio.mapa_queimadas = true; G.narrated.centroeste_fim = true; G.passagemBON = G.passagemBSB = true; }   // e o Centro-Oeste

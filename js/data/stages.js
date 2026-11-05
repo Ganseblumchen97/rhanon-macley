@@ -1044,6 +1044,24 @@ const STAGES = {
   // moradores; a saída da direita volta pro mapa e a rua da esquerda sobe pro aeroporto
   // Pampa gaúcho (Rio Grande do Sul): a estância, campo aberto com coxilha (mato alto), o galpão (O), barracas (K), umbus
   // (T) e a gente da estância; a saída da direita volta pro mapa
+  // Florianópolis (Santa Catarina): a vila da Lagoa da Conceição, casario açoriano (#) com a pensão (O), barracas de renda
+  // e de peixe (K), árvores (T), moradores e a lagoa (~) embaixo; a saída da direita volta pro mapa
+  lagoa: {
+    safe: true, next: null,
+    rows: [
+      "########################",
+      "########################",
+      "#f...OOO.....KKK....T..#",
+      "#....OOO......V...P....#",
+      "#.....-.........-......#",
+      "#.--------------------SE",
+      "#.T..P....KKK...-..T...#",
+      "#..........C....-....P.#",
+      "#..f..T.........T...f..#",
+      "~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~"
+    ]
+  },
   estancia: {
     safe: true, next: null,
     rows: [
