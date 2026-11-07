@@ -1455,3 +1455,30 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 .polido .br-area.sel{transform:translateY(-5px) scale(1.03);filter:drop-shadow(0 6px 0 rgba(6,18,10,.6)) brightness(1.1);stroke:#ffd23a;stroke-width:3;stroke-dasharray:none}
 .polido .br-area:not(.sel):hover{fill-opacity:.7}
 @media (prefers-reduced-motion:reduce){.polido :is(.nuvens,.river-hi,.lroute,#route,.node.sel .micon,.pin){animation:none!important}}
+/* ===== Acabamento: letras. Menus e títulos dos painéis em Lilita One (grossa e arredondada), a narração do Pajé em
+   Lora itálica grande, e a fala de lojas, moradores e do Rhanon em Nunito. Letra que falta (chinês, japonês, coreano)
+   cai na fonte de sempre do idioma ===== */
+.polido{--menu:'Lilita One',var(--display);--conto:'Lora',Georgia,var(--body),serif;--fala:'Nunito',var(--body),sans-serif}
+.polido .cmd:not(.bagrow){font-family:var(--menu);text-transform:none;letter-spacing:.01em}
+.polido .ui .cmd{font-size:clamp(16px,1.85vw,23px)}
+.polido .ex-dialog .cmd{font-size:clamp(17px,2vw,24px)}
+.polido :is(.info,.me) h2{font-family:var(--menu);text-transform:none;letter-spacing:.01em}
+.polido .ex-dialog p{font:600 clamp(16px,1.5vw,19px)/1.45 var(--fala)}
+.polido .ex-dialog p.hint,.polido .ex-dialog .hint{font-weight:700}
+.polido .ui .desc{font:700 13px/1.35 var(--fala)}
+/* painel de diálogo maior: retrato grande, nome numa plaquinha de madeira presa na borda e setinha pulando */
+.polido .narra{width:min(980px,calc(100vw - 32px));bottom:3vh;padding:24px 22px 14px;gap:20px;border-width:4px}
+.polido .narra canvas{width:clamp(88px,10vw,128px);height:clamp(88px,10vw,128px);border-width:4px;box-shadow:inset 0 0 0 3px #6b4126,3px 3px 0 rgba(0,0,0,.25)}
+.polido .narra b{position:absolute;top:-19px;left:clamp(118px,calc(10vw + 30px),160px);font:400 22px/1.15 var(--menu);text-transform:none;color:#f6e9c4;
+  background:linear-gradient(180deg,#8a5a34,#6b4126);padding:3px 18px 4px;border:3px solid #06120a;rotate:-2deg;box-shadow:3px 3px 0 var(--red)}
+.polido .narra.rhanon b{left:auto;right:clamp(118px,calc(10vw + 30px),160px);rotate:2deg;color:#fff;background:linear-gradient(180deg,#5fbe72,#3f9a5c);box-shadow:-3px 3px 0 #25663a}
+.polido .narra.pytuna b{color:#ff7a6a;background:linear-gradient(180deg,#3a1a1e,#1a0a0e);box-shadow:3px 3px 0 #6a1010}
+.polido .narra p{font:italic 500 clamp(17px,1.75vw,22px)/1.5 var(--conto);min-height:3em;margin:2px 0 4px}
+.polido .narra.rhanon p{font:700 clamp(16px,1.65vw,21px)/1.5 var(--fala);font-style:normal}
+.polido .narra.pytuna p{font-style:normal;font-weight:500;letter-spacing:.01em}
+.polido .narra small{opacity:.75;animation:narraSeta .6s ease-in-out infinite alternate}
+@keyframes narraSeta{to{translate:4px 0}}
+.polido body:has(.narra:not([hidden])) .ex-help{visibility:hidden}
+@media (max-height:500px){.polido .narra{padding:18px 14px 10px}.polido .narra canvas{width:72px;height:72px}.polido .narra p{font-size:16px}}
+@media (prefers-reduced-motion:reduce){.polido .narra small{animation:none}}
+.polido .forge-list .cmd{font-size:clamp(14px,1.45vw,18px)}

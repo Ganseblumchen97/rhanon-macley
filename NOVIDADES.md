@@ -3,6 +3,14 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.87.1 — letras novas
+
+- Os diálogos ficaram maiores e mais fáceis de ler. A fala do Pajé ganhou letra de livro de história, maior, e o
+  Rhanon, as lojas e os moradores falam numa letra redonda e clara. O nome de quem fala aparece numa plaquinha presa
+  em cima do painel, e as dicas de teclado somem enquanto alguém está falando.
+- Os botões dos menus, da batalha e das lojas usam uma letra mais grossa e arredondada, no lugar da antiga, alta e
+  quadrada.
+
 ## 0.87.0 — visual novo
 
 - As fases ganharam outra cara. As árvores agora têm copa em cachos que se encostam, e cada região tem as suas:
