@@ -11,6 +11,7 @@ function setBattleDecor(zone) {
   stage.classList.remove(...[...stage.classList].filter(c => c.startsWith("w-"))); stage.classList.add("w-" + weatherNow());   // clima do dia (data/world.js)
   decor.innerHTML = "";
   setScenery(zone || curZone || "mata");   // cenário em pixel art (gfx/scenery.js)
+  stage.dataset.bioma = (zone || curZone) === "codigo" ? "codigo" : polishBiome(TILE_PAL[zone || curZone] || TILE_PAL.mata);   // luz por cima do palco (styles.css, .stage-light)
 }
 
 // batalha comum: o tema do Norte num arranjo do lugar (mata: roda de capoeira; água: carimbó; Belém: guitarrada);
@@ -34,8 +35,9 @@ let subMenu = null, subFrom = 0;   // opções do submenu aberto no lugar dos co
 function cmdButton(html, desc, fn, off) {
   const b = document.createElement("button"); b.className = "cmd"; b.type = "button"; b.innerHTML = `<span>${html}</span>`;
   if (off) b.setAttribute("aria-disabled", "true");
-  b.addEventListener("click", () => { if (!off) fn(); });
-  const showDesc = () => { $("desc").textContent = desc; sfx("blip"); }; b.addEventListener("focus", showDesc); b.addEventListener("mouseenter", showDesc);
+  b.style.setProperty("--i", $("cmds").children.length);   // ordem na cascata de entrada (gfx/polish.js + styles.css)
+  b.addEventListener("click", () => { if (!off) { polishConfirm(b); fn(); } });
+  const showDesc = () => { const d = $("desc"); d.textContent = desc; d.classList.remove("novo"); void d.offsetWidth; d.classList.add("novo"); sfx("blip"); polishCursor(); }; b.addEventListener("focus", showDesc); b.addEventListener("mouseenter", showDesc);
   $("cmds").appendChild(b);
 }
 function buildCmds() {
@@ -224,13 +226,14 @@ function avail(id) {
 }
 function render() {
   const eh = holdE !== null ? holdE : e.hp, ph = holdP ? holdP.hp : p.hp, ps = holdP ? holdP.sp : p.sp;
-  $("ehp").style.width = (100 * eh / e.max) + "%";
-  $("pv").style.width = (100 * ph / p.max) + "%";
+  $("ehp").style.width = (100 * eh / e.max) + "%"; polishGhost("ehp", 100 * eh / e.max);
+  $("pv").style.width = (100 * ph / p.max) + "%"; polishGhost("pv", 100 * ph / p.max);
   $("sp").style.width = (100 * ps / p.msp) + "%";
   $("pvTxt").textContent = ph + " / " + p.max;
   $("spTxt").textContent = ps + " / " + p.msp;
   drawXp();
-  $("log").innerHTML = lines.map(l => "<p>" + l + "</p>").join("");
+  const logTxt = lines.join("|");   // registro igual: não refaz (a linha nova está no meio da animação de escrever, gfx/polish.js)
+  if ($("log").dataset.txt !== logTxt || $("log").childElementCount !== lines.length) { $("log").innerHTML = lines.map((l, i) => (i === lines.length - 1 ? "<p class=\"novo\">" : "<p>") + l + "</p>").join(""); $("log").dataset.txt = logTxt; }
   $("intentTxt").textContent = e.intent === "forte" ? t("{bicho} junta forças: golpe forte! Defenda.", {bicho: foe(1)}) : e.known ? t("Próximo golpe: {golpe}", {golpe: moveName()}) : t("{bicho} prepara o golpe…", {bicho: foe(1)});
   $("intent").className = "intent" + (e.known ? " known" : "") + (e.intent === "forte" ? " forte" : "");
   // estados como ícones (ui/theme.js), com os turnos que faltam; o nome aparece ao passar o mouse e para leitores de tela
@@ -238,6 +241,7 @@ function render() {
   $("furia").className = "furia" + (furyReady() ? " cheia" : ""); $("furia").closest(".furia-row").style.display = furyOn() ? "" : "none";   // sem a Fúria da mata, sem barra
   $("hero").classList.toggle("escudo", p.escudo > 0);   // rabo-bandeira e Brilho das estrelas: escudo de luar na frente do Rhanon
   [...$("furia").children].forEach((d, i) => { d.classList.toggle("on", i < (p ? p.furia || 0 : 0)); d.hidden = i >= furyMax(); });
+  const cmds = $("cmds"), espera = !!busy; if (cmds.classList.contains("espera") !== espera) { cmds.classList.toggle("espera", espera); if (!espera) { cmds.classList.remove("volta"); void cmds.offsetWidth; cmds.classList.add("volta"); } setTimeout(polishCursor, 30); }
   if (!subMenu) CMDS.forEach((c, i) => {
     const b = $("cmds").children[i];
     if (c.id === "atacar" && b.dataset.f !== String(furyReady())) {   // fúria pronta: a lança vira o golpe da fúria

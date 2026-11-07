@@ -227,7 +227,7 @@ function makeHeroActor() {
 
 /* ---------- ator dos bichos (e de quem mais for desenhado pronto) ---------- */
 function makeBeastActor() {
-  let cv = null, g = null, base = null, white = null, w = 0, h = 0, f = 1, k = 1, CW = 0, CH = 0, kind = "", motion = "", state = "idle", since = 0, lastFx = 0, nextHop = 0, info = {}, swT = 0, smT = 0, rig = null;
+  let cv = null, g = null, base = null, white = null, w = 0, h = 0, f = 1, k = 1, CW = 0, CH = 0, kind = "", motion = "", state = "idle", since = 0, lastFx = 0, nextHop = 0, info = {}, swT = 0, smT = 0, rig = null, nextAct = 0, act = "";
   const whites = new WeakMap(), whiteFrame = c => whites.get(c) || (whites.set(c, whiteOf(c)), whites.get(c));
   let MX = 6, MT = 8;
   const MB = 2;
@@ -256,7 +256,7 @@ function makeBeastActor() {
     const u = n => `calc(var(--px) * -${(n * f).toFixed(2)})`;
     cv.style.margin = `${u(MT)} ${u(MX)} ${u(MB)} ${u(MX)}`;
     el.innerHTML = ""; el.appendChild(cv); g = cv.getContext("2d");
-    nextHop = animNow() + 1500;
+    nextHop = animNow() + 1500; nextAct = animNow() + 2500 + Math.random() * 2500;
     set(opts.state || "idle");
     return cv;
   }
@@ -295,6 +295,8 @@ function makeBeastActor() {
       if (motion === "swim") lift = Math.round(Math.sin(t / 380));
       if (motion === "jitter") ox = Math.floor(t / 300) % 3 === 0 ? -1 : 0;
       if (motion === "hop" && t > nextHop) { nextHop = t + 1400 + Math.random() * 1600; set("hop"); }
+      // gestos de espera (gfx/polish.js): de vez em quando o bicho fareja, bate o pé, ameaça, sacode ou dá um passo
+      if (POLISH && rig && t > nextAct && state === "idle") { act = polishFidget(motion, !!info.boss); nextAct = t + 2600 + Math.random() * 3400; if (act) set("fidget"); }
       if (motion === "curl" && Math.floor(t / 2600) % 3 === 2) o.dy = 2;
       if (motion === "snort" && t - lastFx > 2400) { lastFx = t; const [gx, gy] = grid(MX - 1, MT + h * .45); PFX.emit("puff", ["#e8e4dc"], gx, gy, -8, -2, .5); PFX.emit("puff", ["#e8e4dc"], gx, gy + 1, -10, 0, .45); }
       if (evilNow() && t - smT > 420) {   // tomado: um fiapo da fumaça subindo do corpo, de vez em quando
@@ -318,6 +320,13 @@ function makeBeastActor() {
       case "enter":
         o.dy = 0;
         break;
+      case "fidget": {   // gesto de espera (act); a pose do traço novo sai de polishFidgetPose
+        const fp = polishFidgetFrame(act, t - since);   // "el" foi medido antes de o gesto começar neste quadro
+        lift = fp.lift + (motion === "hover" ? 2 : 0); ox = fp.ox; o.dy = fp.dy ?? o.dy;
+        if (fp.dust && !lastFx) { lastFx = 1; const [gx, gy] = grid(MX + w * .5, CH - 2); PFX.burst(6, "puff", ["#d8d2c0", "#a89f8a"], gx, gy, 12, {life: .45, up: 2}); }
+        if (fp.done) set("idle");
+        break;
+      }
       case "prep":     // vai atacar: fica agachado, tremendo (hora de se preparar para o Z)
         sx = 1.05; sy = .88; ox = REDUCE ? 0 : Math.floor(t / 55) % 2 ? 1 : -1;
         break;
@@ -366,7 +375,7 @@ function makeBeastActor() {
     let rp = null;
     if (rig) {
       sx = sy = scale = 1;
-      rp = state === "prep" ? "crouch" : state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" || state === "bigroar" ? (QUADS[rig] ? "roar" : "attack") : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
+      rp = state === "fidget" ? polishFidgetFrame(act, t - since).pose : state === "prep" ? "crouch" : state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" || state === "bigroar" ? (QUADS[rig] ? "roar" : "attack") : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
       if (rp === "idle" && t % 3400 < 140) rp = "blink";   // pisca de vez em quando
     }
     g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;

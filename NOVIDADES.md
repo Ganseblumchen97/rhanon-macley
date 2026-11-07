@@ -3,6 +3,24 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.87.0 — visual novo
+
+- As fases ganharam outra cara. As árvores agora têm copa em cachos que se encostam, e cada região tem as suas:
+  coqueiro curvo na praia, mandacaru e árvore seca no sertão, árvore torta do cerrado, araucária em andares, estalagmite
+  na gruta e dunas em cristas nos Lençóis. O chão tem manchas de luz e sombra, flores, conchinhas ou pedrinhas conforme
+  o lugar, a trilha tem beira de capim e a água tem margem com espuma.
+- Luz em cima de tudo: fachos de sol na mata fechada, sombra de nuvem passando, poeira brilhando e a gruta mais escura.
+  De noite, a fogueira solta um brilho laranja e a lua pisca na água.
+- O mato alto não é mais um quadrado: cada tufo é desenhado de verdade, balança quando você passa e faz barulho.
+- Menu da batalha animado: uma setinha desliza até o comando escolhido, os comandos entram em cascata, confirmar dá
+  uma pancada com folhinhas voando, o registro aparece sendo escrito e a barra de vida deixa um rastro do dano.
+- Na batalha, o bicho não fica só parado esperando: ele fareja o chão, bate as patas, ameaça o bote, sacode o corpo
+  ou dá um passo à frente. O palco também ganhou a luz do lugar (sol, luar com vaga-lumes, escuro da gruta).
+- Os moradores têm jeito próprio: uns dançam, outros conversam gesticulando, ficam de mão na cintura ou acenam. Quando
+  você chega perto, eles sorriem, acenam e mostram um "!" num balãozinho.
+- Os painéis das lojas e conversas entram animados, e os mapas ganharam relevo, nuvens passando, rio correndo e o
+  lugar escolhido pulsando.
+
 ## 0.86.0 — o final
 
 - A viagem tem fim! Depois da Gralha-rainha, a passagem de cima do Parque Barigui leva à última mata de araucária

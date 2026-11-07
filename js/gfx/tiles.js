@@ -104,10 +104,24 @@ TILE_PAL.dunas = Object.assign({}, TILE_PAL.lencois, {water: "#2a8aa8", water2: 
 TILE_PAL.lagoa = Object.assign({}, TILE_PAL.copacabana, {palm: false, path: "#d8c8a0", path2: "#c4b28a", water: "#2a7ab8", water2: "#9ad0f0", roof: "#c8583a", roof2: "#8a3a24", walls: ["#f0e8d0", "#2a7ab8", "#e8c048", "#f0e8d0", "#d8586a", "#f0e8d0"]});
 const TILE_BASE = {S: "-", E: "-", G: "-", a: ".", B: ".", U: "~", Y: ".", J: "."};   // U: o barco de linha fica na água; Y e J: entrada e baú do segredo (systems/secrets.js)
 
+// tufos do mato alto (","): lugar de cada um no quadrado; sw = quanto as pontas pendem para o lado (balanço)
+const TUFTS = [[1, 3], [9, 1], [5, 9], [12, 10]];
+function drawTuft(x, ox, oy, bx, by, P, sw) {
+  const s = Math.round(sw || 0), s2 = Math.round((sw || 0) / 2);
+  x.fillStyle = P.tall;
+  x.fillRect(ox + bx, oy + by + 4, 1, 2); x.fillRect(ox + bx + s2, oy + by + 2, 1, 2);
+  x.fillRect(ox + bx + 2, oy + by + 3, 1, 3); x.fillRect(ox + bx + 2 + s2, oy + by + 1, 1, 2);
+  x.fillRect(ox + bx + 4, oy + by + 4, 1, 2); x.fillRect(ox + bx + 4 + s2, oy + by + 2, 1, 2);
+  x.fillStyle = P.tallHi; x.fillRect(ox + bx + 2 + s, oy + by, 1, 1); x.fillRect(ox + bx + 1 + s, oy + by + 1, 1, 1); x.fillRect(ox + bx + 3 + s, oy + by + 1, 1, 1);
+}
 function fillEllipse(x, cx, cy, rx, ry, col) {
-  x.fillStyle = col;
-  for (let py = Math.floor(cy - ry); py <= cy + ry; py++) for (let px = Math.floor(cx - rx); px <= cx + rx; px++)
-    if (((px + .5 - cx) / rx) ** 2 + ((py + .5 - cy) / ry) ** 2 <= 1) x.fillRect(px, py, 1, 1);
+  x.fillStyle = col;   // uma faixa por linha (o mesmo desenho de pintar ponto a ponto, bem mais rápido)
+  const x0 = Math.floor(cx - rx), x1 = Math.floor(cx + rx);
+  for (let py = Math.floor(cy - ry); py <= cy + ry; py++) {
+    const d = 1 - ((py + .5 - cy) / ry) ** 2; if (d < 0) continue;
+    const w = rx * Math.sqrt(d), a = Math.max(x0, Math.ceil(cx - w - .5)), b = Math.min(x1, Math.floor(cx + w - .5));
+    if (b >= a) x.fillRect(a, py, b - a + 1, 1);
+  }
 }
 // desenha um quadrado do terreno em (ox, oy); tx/ty variam os detalhes de forma fixa
 function drawTile(x, ch, ox, oy, P, tx, ty) {
@@ -115,14 +129,12 @@ function drawTile(x, ch, ox, oy, P, tx, ty) {
   const grass = () => {
     x.fillStyle = P.g1; x.fillRect(ox, oy, TILE, TILE);
     x.fillStyle = P.g2; for (let k = 0; k < 5; k++) x.fillRect(ox + Math.floor(r(k) * 14), oy + Math.floor(r(k + 9) * 15), 2, 1);
+    if (POLISH) polishGrassNoise(x, ox, oy, P);   // manchas de luz e sombra (gfx/polish.js)
   };
   if (ch === ".") grass();
   else if (ch === ",") {
-    grass();
-    for (const [bx, by] of [[1, 3], [9, 1], [5, 9], [12, 10]]) {
-      x.fillStyle = P.tall; x.fillRect(ox + bx, oy + by + 2, 1, 4); x.fillRect(ox + bx + 2, oy + by + 1, 1, 5); x.fillRect(ox + bx + 4, oy + by + 2, 1, 4);
-      x.fillStyle = P.tallHi; x.fillRect(ox + bx + 2, oy + by, 1, 2); x.fillRect(ox + bx + 1, oy + by + 1, 1, 1); x.fillRect(ox + bx + 3, oy + by + 1, 1, 1);
-    }
+    grass();   // os tufos do mato alto não ficam no mapa fixo: explore.js desenha cada um vivo (drawTuft), na ordem de quem está na frente
+    x.fillStyle = "rgba(20,60,30,.18)"; for (const [bx, by] of TUFTS) x.fillRect(ox + bx, oy + by + 5, 5, 2);   // sombrinha no pé de cada tufo
   } else if (ch === "f") {
     grass();
     for (let k = 0; k < 3; k++) {
@@ -305,6 +317,7 @@ function drawStageMap(rows, zone) {
       }
     }
   }));
+  if (polishOn(zone)) polishMap(x, rows, P, zone);   // acabamento da mata (gfx/polish.js)
   rows.forEach((row, ty) => [...row].forEach((ch, tx) => {   // blocos por cima dos quadrados deles: cabine e motel
     if ("QO".includes(ch) && at(tx - 1, ty) !== ch && at(tx, ty - 1) !== ch) (ch === "Q" ? drawCabin : drawMotel)(x, tx * TILE, ty * TILE);
   }));

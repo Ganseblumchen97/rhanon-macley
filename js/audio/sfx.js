@@ -46,6 +46,7 @@ const SFX = {
   onibus: t => { tone(70, t, .4, "sawtooth", .05, 60); tone(105, t + .05, .3, "square", .025, 95); noise(t, .3, .04, 200); },
   // esquiva: um "fuup" de ar (ruído agudo descendo) e um toque leve no chão
   esquiva: t => { noise(t, .16, .1, 2200); tone(900, t, .12, "triangle", .04, 300); tone(140, t + .1, .06, "sine", .06, 90); },
+  mato: t => { noise(t, .07, .035, 2800); noise(t + .05, .09, .03, 4200); noise(t + .11, .06, .02, 3400); },   // farfalhar do mato alto (explore.js, grassStir)
   // fúria pronta / golpe da fúria: subida rápida e um acorde forte
   furia: t => { [392, 523, 659, 784].forEach((f, i) => tone(f, t + i * .04, .12, "square", .06)); [523, 659, 784].forEach(f => tone(f, t + .18, .35, "sawtooth", .045)); noise(t + .18, .25, .12, 1200); },
   crit:  t => { noise(t, .18, .25, 400); tone(440, t, .25, "square", .14, 80); tone(880, t + .05, .2, "square", .08, 160); },

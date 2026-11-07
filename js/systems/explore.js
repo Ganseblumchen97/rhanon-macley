@@ -452,7 +452,7 @@ function exUpdate(dt, now) {
       else h.dir = iy < 0 ? "up" : "down";
     }
     if (slide(h, ix / n * sp, iy / n * sp) || nudge(h, ix, iy)) {
-      h.walk += sp; h.movedT = now;
+      h.walk += sp; h.movedT = now; grassStir(h, now, true);
       if ((h.dust = (h.dust || 0) + sp) > 13) {   // a cada passo: poeirinha na trilha ou folhinhas no mato alto
         h.dust = 0;
         const ch = stageTile(Math.floor(h.x / TILE), Math.floor(h.y / TILE)), grass = ch === ",";
@@ -487,11 +487,20 @@ function exBurst(x, y, cols, n) {
 /* ---------- desenho ---------- */
 const OW_ART = {};
 function overworldArt(dir, f) { const key = dir + f; return OW_ART[key] || (OW_ART[key] = artCanvas("hero/walk/" + dir, f)); }
-// mato alto na frente dos pés de quem está nele
-function grassOver(x, ent, cx, cy) {
-  const ty = Math.floor(ent.y / TILE);
-  for (let tx = Math.floor((ent.x - ent.hw) / TILE); tx <= Math.floor((ent.x + ent.hw) / TILE); tx++)
-    if (stageTile(tx, ty) === ",") x.drawImage(EX.map, tx * TILE, ty * TILE + 9, TILE, 7, tx * TILE - cx, ty * TILE + 9 - cy, TILE, 7);
+/* mato alto: cada tufo é desenhado vivo. Os que estão perto de alguém entram na ordenação por altura com os bichos e
+   o Rhanon (quem está atrás fica atrás, quem passa na frente cobre o tufo); os outros vão no fundo. Quem anda no meio
+   balança o mato (EX.shake: quadrado -> hora do empurrão) e o Rhanon faz um farfalhar ao entrar num quadrado de mato */
+function tuftSway(tx, ty, now) {
+  const t0 = EX.shake && EX.shake[tx + "," + ty], wind = Math.sin(now / 900 + tx * .7 + ty * 1.3) > .75 ? 1 : 0;
+  if (!t0 || now - t0 > 700) return wind;
+  const k = 1 - (now - t0) / 700; return Math.sin((now - t0) / 45) * 2.4 * k;
+}
+function grassStir(ent, now, loud) {   // marca o quadrado de mato onde a pessoa/bicho está (e os vizinhos de lado)
+  const tx = Math.floor(ent.x / TILE), ty = Math.floor(ent.y / TILE);
+  if (stageTile(tx, ty) !== ",") { if (loud) EX.grassAt = null; return; }
+  EX.shake = EX.shake || {};
+  for (const dx of [-1, 0, 1]) if (stageTile(tx + dx, ty) === ",") { const k = (tx + dx) + "," + ty; if (!EX.shake[k] || now - EX.shake[k] > 250) EX.shake[k] = now - (dx ? 120 : 0); }
+  if (loud && EX.grassAt !== tx + "," + ty) { EX.grassAt = tx + "," + ty; sfx("mato"); }
 }
 function drawShadow(x, sx, sy, w) { x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(sx - w / 2, sy - 1, w, 2); x.fillRect(sx - w / 2 + 2, sy - 2, w - 4, 4); }
 function drawHeroEnt(x, h, cx, cy, now) {
@@ -528,7 +537,6 @@ function drawHeroEnt(x, h, cx, cy, now) {
   x.drawImage(img, sx - iw / 2 + ox, sy - ih + 1 + oy, iw, ih);
   if (B) drawAimBow(x, sx - iw / 2 + B[0] * OW_SCALE, sy - ih + 1 + B[1] * OW_SCALE, bowAim, pull, !!EX.draw, now);
   if (EX.jab > 0 && !behind) jab();
-  grassOver(x, h, cx, cy);
   drawDodgeCool(x, sx, sy, now);
 }
 // rolamento: o Rhanon de perfil, encolhido, dá uma volta inteira no ar baixo enquanto avança (lança guardada)
@@ -597,7 +605,6 @@ function drawAnimalEnt(x, en, cx, cy, now) {
   else x.drawImage(img, sx - Math.round(w / 2), sy - hg - bob, w, hg);
   x.restore();
   if (en.alive && en.tomado) drawTomado(x, sx, sy - bob, w, hg, now, en.homeX);
-  grassOver(x, en, cx, cy);
 }
 /* fumaça de Pytuna num bicho tomado (some quando ele é acalmado), no mesmo desenho da fumaça dele: back = bolhas
    girando atrás do corpo (drawSmokeAura); senão, bolhinhas redondas subindo das costas e sumindo */
@@ -657,10 +664,12 @@ function exDraw(now) {
   for (let ty = t0y; ty <= t0y + ny; ty++) for (let tx = t0x; tx <= t0x + nx; tx++) {
     const ch = stageTile(tx, ty), sx = tx * TILE - cx, sy = ty * TILE - cy;
     if (ch === "~") {   // água: brilhos piscando e uma marolinha correndo
+      if (POLISH) polishShore(x, tx, ty, sx, sy, now);   // espuma da margem (gfx/polish.js)
       if ((tx * 7 + ty * 13 + Math.floor(now / 450)) % 9 === 0) { x.fillStyle = "#ffffffb0"; x.fillRect(sx + 4 + (tx % 3) * 3, sy + 6 + (ty % 2) * 4, 3, 1); }
       const off = Math.floor(now / 90 + tx * 5 + ty * 3) % 16; x.fillStyle = "#bff3ff70"; x.fillRect(sx + off, sy + 3 + (tx * 5 + ty * 7) % 10, Math.min(4, 16 - off), 1);
     }
-    if (ch === "T" && (tx * 3 + ty * 5) % 3 === 0) {   // copa balançando com o vento: dois pontinhos de luz indo e voltando
+    if (ch === "T" && polishOn(EX.zone)) polishSway(x, tx, ty, sx, sy, now);
+    else if (ch === "T" && (tx * 3 + ty * 5) % 3 === 0) {   // copa balançando com o vento: dois pontinhos de luz indo e voltando
       const sw = Math.round(Math.sin(now / 650 + tx * .9 + ty * .4) * 1.4); x.fillStyle = EX.night ? "#5a8a6a90" : "#9ad87a";
       x.fillRect(sx + 5 + sw, sy + 3, 2, 1); x.fillRect(sx + 9 + sw, sy + 5, 1, 1);
     }
@@ -671,11 +680,25 @@ function exDraw(now) {
   }
   EX.loot.forEach(l => drawLoot(x, l, cx, cy, now));   // no chão, embaixo de todo mundo
   const alive = EX.ents.filter(en => en.alive), knocked = EX.ents.filter(en => !en.alive && (en.calm || en.ko) && en.koUntil > now);
+  // mato alto: tufos perto de alguém vão para a ordenação, os outros já são desenhados aqui
+  const near = new Set(), tufts = [];
+  for (const en of [h, ...alive, ...knocked]) {
+    if (en !== h && Math.hypot(en.x - (en.px ?? en.x), en.y - (en.py ?? en.y)) > .2) grassStir(en, now, false);
+    if (en !== h) { en.px = en.x; en.py = en.y; }
+    for (let ty = Math.floor((en.y - 40) / TILE); ty <= Math.floor((en.y + 16) / TILE); ty++)
+      for (let tx = Math.floor((en.x - 24) / TILE); tx <= Math.floor((en.x + 24) / TILE); tx++) near.add(tx + "," + ty);
+  }
+  for (let ty = t0y; ty <= t0y + ny; ty++) for (let tx = t0x; tx <= t0x + nx; tx++) {
+    if (stageTile(tx, ty) !== ",") continue;
+    const sw = tuftSway(tx, ty, now), ox = tx * TILE - cx, oy = ty * TILE - cy;
+    if (near.has(tx + "," + ty)) TUFTS.forEach(([bx, by], i) => tufts.push({y: ty * TILE + by + 6, draw: () => drawTuft(x, ox, oy, bx, by, EX.pal, sw * (i % 2 ? -.8 : 1))}));
+    else TUFTS.forEach(([bx, by], i) => drawTuft(x, ox, oy, bx, by, EX.pal, sw * (i % 2 ? -.8 : 1)));
+  }
   const people = EX.spots.filter(s => PEOPLE.includes(s.kind)).map(s => ({y: s.y + 5, draw: () => drawNpc(x, s, cx, cy, now)}));
   if (EX.bus) people.push({y: EX.bus.y + EX.bus.h, draw: () => drawBus(x, EX.bus, cx, cy, now)});
   EX.spots.filter(s => s.kind === "lembranca").forEach(s => people.push({y: s.y + 4, draw: () => drawMemento(x, s, cx, cy, now)}));
   [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...knocked.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...people, (EX.camp ? {y: EX.camp.y, draw: () => drawCampHero(x, cx, cy, now)} : {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)})]
-    .sort((a, b) => a.y - b.y).forEach(o => o.draw());
+    .concat(tufts).sort((a, b) => a.y - b.y).forEach(o => o.draw());
   const s = EX.spear;
   if (s) {
     const n = Math.hypot(s.vx, s.vy) || 1, ux = s.vx / n, uy = s.vy / n, sx = s.x - cx, sy = s.y - cy;
@@ -683,8 +706,9 @@ function exDraw(now) {
     lineP(x, sx - ux * 5, sy - uy * 5, sx + ux * 4, sy + uy * 4, "#c9a46a");   // flecha: haste, ponta e penas
     pxl(x, sx + ux * 5, sy + uy * 5, "#eef3f5"); pxl(x, sx - ux * 5 - uy, sy - uy * 5 + ux, "#e5001c"); pxl(x, sx - ux * 5 + uy, sy - uy * 5 - ux, "#e5001c");
   }
+  polishOverlay(x, cx, cy, now);   // luz entre as copas e sombra de nuvem (gfx/polish.js)
   drawAmbient(x, cx, cy, now, false);
-  if (EX.night) drawNightShade(x, cx, cy, now);
+  if (EX.night) { drawNightShade(x, cx, cy, now); polishNight(x, cx, cy, now); }   // brilho da fogueira e luar na água (gfx/polish.js)
   drawPytuna(x, cx, cy, now);   // fumaça de Pytuna nas cenas dele (ui/narration.js)
   drawAmbient(x, cx, cy, now, true);
   drawWeather(x, now);
@@ -1039,7 +1063,7 @@ function drawNpc(x, s, cx, cy, now) {
   if (EX.night) pose = {sit: true, face: sleeping || (now / 1000 + s.tx) % 4 < .15 ? "blink" : undefined, dy: sleeping ? 1 : 0};
   else {
     const b = MUS.beat() ?? now / 625, step = Math.floor(b);   // sem música tocando, segue um ritmo parecido (96 batidas por minuto)
-    pose = {...GINGA[step % 2], dy: b % 1 < .5 ? 1 : 0};
+    pose = (POLISH && polishNpcPose(s, now, b)) || {...GINGA[step % 2], dy: b % 1 < .5 ? 1 : 0};   // cada morador com seu jeito (gfx/polish.js)
   }
   const img = villagerSprite(s.look, pose), hw = img.width / 2, top = sy - img.height + 1 - bob;
   drawShadow(x, sx, sy, pose.sit ? 14 : 10);
@@ -1047,6 +1071,7 @@ function drawNpc(x, s, cx, cy, now) {
   else x.drawImage(img, sx - hw, top);
   if (mark) drawQuestMark(x, sx, top - 4, mark, now);
   if (sleeping && !REDUCE) { const p = (now / 1100 + s.tx * .37) % 1; glyphP(x, "z", "#ffffff", sx + 4 + p * 6, top + 6 - p * 10); }
+  if (POLISH && !EX.night && !mark) polishNpcBubble(x, s, sx, top, now);   // balãozinho: "!" quando o Rhanon chega, nota ou reticências
 }
 const skipText = () => padStyle() ? t("Segure {sel} para pular", padVars()) : isTouch() ? t("Segure aqui para pular") : t("Segure C para pular");
 // setinha pulando em cima do ponto mais perto + texto "Z: ..." embaixo da tela
@@ -1061,7 +1086,8 @@ function drawSpotPrompt(x, cx, cy, now) {
 // painel do ponto de conversa; msg aparece em destaque (resultado da última ação)
 function exOpenDialog(kind, msg, look) {
   look = look || EX.dialogLook; EX.dialogLook = look;
-  const d = $("exDialog"); EX.dialog = kind; exKeys.clear(); sfx("blip");
+  const d = $("exDialog"), fresh = d.hidden || EX.dialog !== kind; EX.dialog = kind; exKeys.clear(); sfx("blip");
+  d.classList.toggle("abre", fresh);   // painel que acabou de abrir entra animado (gfx/polish.js + styles.css); atualizar não repete
   const say = (title, text) => { d.innerHTML = `<h2>${title}</h2><p>${text}</p>`; };
   if (kind === "fogueira" && EX.st.safe) {   // fogueira da aldeia: escolhe até quando descansar
     say(t("Fogueira"), (G.night ? t("Noite alta. Descansar recupera tudo sem passar o tempo; dormir já começa o outro dia.")
