@@ -6,8 +6,10 @@ const NARRA = {
   prologo: [
     "Senta aqui perto do fogo, curumim. Essa história eu vi acontecer. Uma parte com os olhos, outra com o fumo.",
     "Foi no tempo em que Jaci, a lua, começou a apagar. Uma fumaça cinza subia de longe e deixava os bichos bravos.",
-    "O Rhanon era um menino da nossa aldeia. Lança na mão e a cabeça cheia de computador. Sonhava com Curitiba, imagina.",
-    "Naquela manhã ele acordou do lado dessa mesma fogueira. E foi aí que tudo começou."
+    "O Rhanon era um menino da nossa aldeia. Lança na mão e a cabeça cheia de computador. Ele e a Franciscane andavam juntos desde pequenos.",
+    "Ela foi primeiro pra Curitiba: passou numa vaga de programadora e mandou pra ele o anúncio de outra. \"Vem, que aqui tem lugar pra ti.\"",
+    {r: "Eu guardei esse anúncio no bolso a viagem inteira, vô."},
+    "Naquela manhã ele acordou do lado dessa mesma fogueira, com o anúncio no bolso. E foi aí que tudo começou."
   ],
   saoluis: [
     "E foi de avião! O menino que nunca tinha saído do Pará, lá em cima das nuvens, agarrado na poltrona.",
@@ -71,7 +73,7 @@ const NARRA = {
     "E lá no fundo, numa clareira, alguém esperava por ele."
   ],
   cwb: [
-    "E o ônibus subiu o rio Iguaçu até o fim, curumim. Curitiba. A cidade do anúncio, a do sonho dele.",
+    "E o ônibus subiu o rio Iguaçu até o fim, curumim. Curitiba. A cidade do anúncio, onde a Franciscane esperava.",
     "Fazia um frio de doer o dente. Garoa fina, gente de casaco, ônibus parando dentro de um tubo de vidro.",
     {r: "E em cima da cidade tinha uma nuvem parada, vô. Escura. Não era chuva."},
     "Era a fumaça de todo o Brasil, que tinha vindo parar ali. Pytuna estava perto. E a entrevista também."
@@ -212,15 +214,34 @@ const NARRA_FIM = {
     {r: "Do Tapajós. Vim de barco, de ônibus e de avião. E programei pelo caminho, num notebook montado com peça de todo canto."},
     {e: "E se aparecer um bug feio, na sexta-feira de noite, o que tu faz?"},
     {r: "Olho ele de frente. Bug que a gente olha de frente fica pequeno."},
-    {e: "...Começa segunda. Traz casaco, que aqui faz frio."}
+    {e: "...Começa segunda. Traz casaco, que aqui faz frio."},
+    "Na saída, no Largo da Ordem, debaixo de uma araucária, tinha alguém esperando com um casaco na mão.",
+    {r: "Era a Fran, vô. Ela disse que eu tava atrasado. Eu disse que tinha um Brasil inteiro no caminho."}
   ],
   epilogo: [
-    "E foi assim, curumim. O menino da nossa aldeia trabalha em Curitiba agora. Programa o dia inteiro e reclama do frio.",
-    "Mas ele fez um programa que avisa a aldeia quando vem fumaça. E a brigada chega antes do fogo.",
-    {r: "E todo ano eu volto, vô. Pra ver a lua do Tapajós, que é a mais bonita."},
+    "E foi assim, curumim. O Rhanon e a Franciscane trabalham em Curitiba agora. Programam o dia inteiro e reclamam do frio.",
+    "E juntos fizeram um programa que avisa a aldeia quando vem fumaça. A brigada chega antes do fogo.",
+    {r: "E todo ano a gente volta, vô. Pra ver a lua do Tapajós, que é a mais bonita."},
     "Agora vai dormir. Jaci tá lá em cima, olhando por todo mundo."
   ]
 };
+/* Créditos do fim (ui/narration.js, endCredits): sobem devagar como nos jogos grandes. h = função (passa pelo t()),
+   n = nomes (ficam como estão), d = linha pequena embaixo. Elenco, chefes e freelas entram sozinhos a partir dos dados */
+const CRED_DEV = "Yan Sanches";   // o nome do criador nos créditos
+const CREDITOS = [
+  {h: "Criação, história e direção", n: [CRED_DEV]},
+  {h: "Design de jogo", n: [CRED_DEV, "Claude"]},
+  {h: "Programação", n: ["Claude", CRED_DEV]},
+  {h: "Pixel art", n: ["Claude"], d: "Cada bicho, pessoa e pedaço de mato é desenhado em código, forma por forma."},
+  {h: "Música e efeitos sonoros", n: ["Claude"], d: "Tudo tocado pelo próprio navegador, nota por nota."},
+  {h: "Testes", n: [CRED_DEV]},
+  {h: "Traduções", n: ["Claude"], d: "Feitas por IA."}
+];
+// elenco: quem viajou e quem esperou em Curitiba vêm primeiro, de quem o jogador escolheu (endCredits)
+const CRED_ELENCO = [
+  ["O Pajé", "o avô da aldeia toda, que conta a história"], ["Jaci", "a lua"], ["Pytuna", "a noite que se perdeu"],
+  ["O Mateiro", "quem ensinou o caminho"], ["Seu Bugiganga", "juntador de tralha da Vila Paranã"]
+];
 const NARRA_PYT = {
   noite: [
     "Foi na primeira noite que ele viu. A fumaça desceu do céu, devagar, e ficou olhando pra ele.",

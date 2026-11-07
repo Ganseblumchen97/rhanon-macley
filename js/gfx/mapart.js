@@ -67,7 +67,7 @@ MAP_ICON.rodo_slz = MAP_ICON.rodo_the = MAP_ICON.rodo_pet = MAP_ICON.rodo_rec = 
 // aeroportos (última parada da cidade): o avião de linha visto de cima, com as asas abertas e a cauda
 MAP_ICON.aero_bel = MAP_ICON.aero_rec = MAP_ICON.aero_bsb = MAP_ICON.aero_cnf = MAP_ICON.aero_gru = MAP_ICON.aero_igu = ["#3a5a8a", `<path d="M0 -10 Q2 -9 2 -5 V-1 L10 3 V5 L2 3 V7 L5 9 V10 L0 9 L-5 10 V9 L-2 7 V3 L-10 5 V3 L-2 -1 V-5 Q-2 -9 0 -10Z" fill="${MI.c}" ${MI.s}/><path d="M-1 -6 H1" stroke="#2a4a6a" stroke-width="2"/>`];
 // no mapa grande, cada cidade aparece com o desenho do lugar dela
-const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", brasilia: "planopiloto", bh: "mercadocentral", ouropreto: "tiradentes", riodejaneiro: "copacabana", saopaulo: "paulista", foz: "centrofoz", cwb: "largoordem", pampa: "estancia", floripa: "lagoa", curitiba: "curitiba"};
+const CITY_ICON = {ananindeua: "aldeia", belem: "veropeso", saoluis: "praiagrande", teresina: "encontro", recife: "recifeantigo", petrolina: "orla", cuiaba: "portocuiaba", bonito: "centrobonito", brasilia: "planopiloto", bh: "mercadocentral", ouropreto: "tiradentes", riodejaneiro: "copacabana", saopaulo: "paulista", foz: "centrofoz", cwb: "largoordem", pampa: "estancia", floripa: "lagoa"};
 // disco do ponto do mapa (r = raio): cor da área, aro claro e o desenho; sem desenho, a bolinha de antes
 function mapIcon(k, r = 15) {
   const a = MAP_ICON[k]; if (!a) return `<circle r="10"/>`;

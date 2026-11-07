@@ -96,7 +96,7 @@ const cmdName = c => bugMode && BUG_CMD[c.id] ? t(BUG_CMD[c.id]) : c.n;
 function init(opts = {}) {
   bugMode = !!(opts.animal && opts.animal.bug);
   $("homeButton").hidden = true; $("map").hidden = true; $("local").hidden = true;
-  $("game").classList.remove("working-mode", "challenge-mode"); $("stage").classList.remove("working"); $("workScene").hidden = true; $("beast").style.display = ""; $("hero").style.display = "";
+  $("beast").style.display = ""; $("hero").style.display = "";
   setBattleDecor(curZone);
   mode = "hunt";
   buildCmds();
@@ -127,7 +127,7 @@ function init(opts = {}) {
   const wet = WATER_BATTLE.has(animal.id);   // bicho de água: laguinho no lugar do chão e ele meio submerso
   // peixes afundam mais; jacaré, ariranha e cobras só um pouco
   $("beast").className = "beast" + (wet ? " submerged" + (AQUATIC.has(animal.id) ? "" : " shallow") : "") + (isTomado(animal) && !opts.rematch ? " tomado" : "");   // tomado: brilho escuro da fumaça
-  $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("meMedal").style.backgroundImage = `url(${heroMedal()})`; $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
+  $("hero").className = "hero"; $("stage").classList.toggle("aquatic", wet); holdE = null; holdP = null; $("meMedal").style.backgroundImage = `url(${heroMedal()})`; $("meName").textContent = heroName(); $("hero").setAttribute("aria-label", heroName()); $("lvTxt").textContent = t("Nv") + " " + G.lv + (defense() ? " · " + t("DEF") + " " + defense() : "");
   pick(); render();
   $("cmds").firstChild.focus(); if (!opts.chain) musicStart(getBattleTrackFor(animal));
   if (opts.chain) return bugChainEnter();
@@ -803,7 +803,7 @@ function spiritFrame(id, pose) {
   const k = id + pose; if (SPIRIT_C.has(k)) return SPIRIT_C.get(k);
   const a = ANIMALS.find(x => x.id === id) || {}, src = beastFrame(id, pose, 0) || animalSprite(a), pad = 8;
   const o = document.createElement("canvas"); o.width = src.width; o.height = src.height;
-  const og = o.getContext("2d"); og.filter = a.tint || "none"; og.drawImage(src, 0, 0); og.filter = "none";
+  const og = o.getContext("2d"); og.filter = beastTint(a) || "none"; og.drawImage(src, 0, 0); og.filter = "none";
   og.globalCompositeOperation = "source-atop"; og.fillStyle = "rgba(200,220,255,.4)"; og.fillRect(0, 0, o.width, o.height);
   const c = document.createElement("canvas"); c.width = src.width + pad * 2; c.height = src.height + pad * 2;
   const g = c.getContext("2d"); g.shadowColor = "#cfe0ff"; g.shadowBlur = 6; g.drawImage(o, pad, pad); g.shadowBlur = 0; g.drawImage(o, pad, pad);
@@ -1070,7 +1070,6 @@ function reward(a = e, mult = 1, drop = false, quietLv = false) {   // quietLv: 
     part && t(part === "teclado" ? "O macaco largou o teclado do notebook!" : "A ariranha largou o carregador do notebook!"),
     a.bug || a.id === "pytuna" ? null : drop ? t("{pele} no chão: passa por cima", {pele: peltName(a.id)}) : got > 1 ? t("{pele} ×{q} (R$ {n} cada na feira)", {pele: peltName(a.id), q: got, n: peltValue(a.id)}) : t("{pele} (R$ {n} na feira)", {pele: peltName(a.id), n: peltValue(a.id)}),
     G.lv > L0 && t("Nível {n}!", {n: G.lv}),
-    CURITIBA_OPEN && L0 < REQ.lv && G.lv >= REQ.lv && t("Destino novo no mapa"),
     a.boss && NEXT_Z[curZone] ? t("Liberou: {lugar}", {lugar: ZONES[NEXT_Z[curZone]].n}) : a.boss && NEED.parada === curZone && !G.night && t("Liberou: {lugar}", {lugar: SUB.parada.n}),
     [...Object.values(EQUIP.legs), ...Object.values(EQUIP.torso)].some(it => it.price && L0 < it.lv && G.lv >= it.lv) && t("Roupa nova na feira")
   ].filter(Boolean);

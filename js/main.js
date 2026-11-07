@@ -1,7 +1,7 @@
 /* Inicialização: monta os mapas, liga os botões e o teclado e abre a tela inicial.
    É o último arquivo carregado, então tudo dos outros arquivos já existe aqui. */
-applyLangData(); translateStatic();   // idioma escolhido nas Opções (core/lang.js); em português (ou sem o arquivo do idioma) não faz nada
-if (!CURITIBA_OPEN && G.loc === "curitiba") { G.loc = "ananindeua"; save(); }   // Curitiba fechada por enquanto
+applyLangData(); translateStatic();   // idioma escolhido nas Opções e quem viaja (core/lang.js): troca os textos dos dados
+if (G.loc === "curitiba") { G.loc = "ananindeua"; save(); }   // save antigo parado na Curitiba das entrevistas (removida)
 $("gameVersion").textContent = t("ALFA") + " " + GAME_VERSION;
 syncRegion();   // mapa grande da cidade do save (Pará ou Maranhão)
 buildLocalNodes();
@@ -24,7 +24,7 @@ $("homeButton").addEventListener("click", () => {
 $("mute").addEventListener("click", toggleMute);
 $("cmds").addEventListener("scroll", cmdsMore, {passive: true});   // setinhas da lista de especiais/itens
 // cartão de resultado: "Lutar de novo" / "Continuar" e "Voltar ao mapa"
-$("again").addEventListener("click", () => { if (mode === "interview" || mode === "betterInterview" || mode === "work") { if ($("overTitle").textContent.includes("encerrado")) startChallenge(challengeKind); else showMap(); } else init(); });
+$("again").addEventListener("click", () => init());
 $("toMap").addEventListener("click", () => {
   $("over").hidden = true; $("again").style.display = ""; $("toMap").textContent = t("Voltar ao mapa");
   if (fromExplore) { fromExplore = false; return wipe(() => resumeExplore(battleResult)); }
@@ -77,19 +77,17 @@ document.addEventListener("keyup", ev => { if (ev.key === " " && ev.target.close
 // tocando, o clique não troca nada (antes, clicar de volta na janela trocava a faixa de um chefe ou do Pytuna pela da tela)
 document.addEventListener("pointerdown", () => {
   audio();
-  if (MUS.current || legacyTimer) return;
+  if (MUS.current) return;
   if (!$("titleScreen").hidden) musicStart("title");
   else if (!$("local").hidden || !$("explore").hidden) musicStart("local");
   else if (!$("map").hidden) musicStart("map");
   else if ($("over").hidden && mode === "hunt") musicStart(e ? getBattleTrackFor(e) : "battleP3");
-  else if ($("over").hidden && (mode === "interview" || mode === "betterInterview")) musicStart("interview");
-  else if ($("over").hidden && mode === "work") musicStart("work");
 }, {capture: true});
 document.addEventListener("visibilitychange", () => { if (AC) document.hidden ? AC.suspend() : AC.resume(); });
 
 /* ----- tela inicial ----- */
 ransom($("titleLogo"), ["JACI"], 7);   // o nome do jogo; o subtítulo (.title-sub) é traduzido
-TITLE_A.mount($("titleArt"));
+heroTitle();   // monta o desenho da tela inicial (TITLE_A) e o subtítulo com quem o save escolheu
 drawMap(); themeReady = true;
 $("titleScreen").hidden = false; drawTitleBg();
 startAnimationLoop();

@@ -3,6 +3,25 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.88.0 — Franciscane, chefes de coroa e créditos de verdade
+
+- Agora dá para escolher quem viaja. Ao começar um jogo novo, escolha entre o Rhanon e a Franciscane Macley: ela tem a
+  pele um pouco mais clara, cabelo castanho em duas tranças e a parte de cima da tanga. A história inteira se ajusta:
+  o Pajé conta "a menina", os moradores chamam de "mana", e a batalha diz "Franciscane tá presa". Os saves que já
+  existem continuam com o Rhanon.
+- Os dois são um casal desde a aldeia. Quem você não escolheu já está em Curitiba, foi na frente e mandou o anúncio
+  da vaga. Pela viagem chegam cartas no E-mail do notebook, uma por região, e no fim tem reencontro debaixo da
+  araucária.
+- Os chefes que pareciam só um bicho comum de outra cor ganharam cara própria: coroa nos reis (Onça-Rei, Quati-rei,
+  Tatu-rei...), tiara nas rainhas, cicatriz nos mais brigões e flor nas mães.
+- O final ganhou créditos que sobem devagar, como nos jogos grandes, com música própria: o tema do Rhanon tocado
+  calmo, como lembrança da viagem, emendando no tema de Jaci quando a lua volta. Aparecem todos os chefes do caminho:
+  os que você acalmou com brilho, e os que faltam de silhueta com "???". Segure Z para acelerar ou aperte X para
+  pular. Depois vem um cartão com a sua viagem em números (nível, dias, chefes, freelas, bichos no caderno) e o que
+  ainda dá para fazer.
+- Saíram as entrevistas e missões de trabalho da Curitiba antiga, que não combinavam mais com o jogo. Quem tinha
+  passado na entrevista não aparece mais de blazer e óculos escuros.
+
 ## 0.87.1 — letras novas
 
 - Os diálogos ficaram maiores e mais fáceis de ler. A fala do Pajé ganhou letra de livro de história, maior, e o

@@ -52,7 +52,7 @@ const sceneSeed = z => [...z].reduce((a, c) => a * 31 + c.charCodeAt(0), 7);
 let sceneLast = "";
 function drawScenery(force) {
   const cv = $("sceneBg"), stage = $("stage");
-  if (!cv || !stage || $("game").classList.contains("working-mode")) return;
+  if (!cv || !stage) return;
   const r = stage.getBoundingClientRect();
   if (r.height < 40) return;
   const k = Math.max(3, Math.round(r.height / 130)), W = Math.ceil(innerWidth / k), H = Math.ceil(innerHeight / k);

@@ -1,13 +1,6 @@
-/* Pixel art em texto: paletas, linhas de sprite (entrevistador/trabalho, chama), glifos e o visual dos aldeões.
+/* Pixel art em texto: paletas, linhas de sprite (chama), glifos e o visual dos aldeões.
    Os bichos são desenhados em gfx/beasts.js. */
 const PAL_H = {k:"#1a0f0a", s:"#c98a56", d:"#9c6339", r:"#d62828", t:"#e8c36a", g:"#3f9a5c", w:"#7a4a1e", m:"#cfd8dc"};
-const PAL_BUS = {k:"#1a0f0a",s:"#c98a56",d:"#9c6339",j:"#26364a",c:"#f4ecd8",q:"#d62828",b:"#294f86",g:"#3f9a5c"};
-const INTERVIEWER = ["....kkkkkk....","...kkkkkkkk...","...kssssssk...","...ksskkssk...","...kssssssk...","....ssssss....","...jjjjjjjj...","..jjccqqccjj..","..jjccqqccjj..","..jjccqqccjj..","...jjjjjjjj...","....jjjjjj....","....bbbbbb....","....bb..bb....","....bb..bb....","....kk..kk...."];
-const WORKER = [
-"....kkkkkk....","...kkkkkkkk...","...kssssssk...","...kskssksk...","...kssssssk...","....ssssss....",
-"....jjjjjj....","...jjccccjj...","..jjjjjjjjjj..","..jjjjjjjjjj..","...jjjjjjjj...","....jj..jj....",
-"...bb....bb...","..bbb....bbb..",".bbbb....bbbb.",".kkk......kkk."
-];
 // chefes que usam o desenho de outro bicho (com a cor trocada por "tint" em ANIMALS)
 const ART = {queixada_chefe: "queixada", cobra_grande: "sucuri", onca_rei: "onca", morcego_vampiro: "morcego", morcego_pescador: "morcego",
   jacaretinga: "jacare", caranguejo_rei: "caranguejo", urubu: "harpia", gaviao_real: "harpia", bufalo_touro: "bufalo",

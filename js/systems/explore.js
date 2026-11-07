@@ -589,7 +589,7 @@ function drawAnimalEnt(x, en, cx, cy, now) {
   if (c && el < CALM_WAIT + 300) drawThanks(x, en, sx, sy - hg - 6 - Math.min(4, el / 120), el);
   if (en.aquatic && (en.alive || c)) {   // na água: só a parte de cima aparece, com marolinhas em volta
     const vis = Math.round(hg * .6), top = sy - vis + 2 + (Math.floor(now / 400 + en.x) % 2), sh = img.height * .6;
-    x.save(); if (en.a.tint) x.filter = en.a.tint;
+    x.save(); if (beastTint(en.a)) x.filter = beastTint(en.a);
     if (en.face > 0) { x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, 0, 0, img.width, sh, -Math.round(w / 2), top, w, vis); }
     else x.drawImage(img, 0, 0, img.width, sh, sx - Math.round(w / 2), top, w, vis);
     x.restore();
@@ -600,7 +600,7 @@ function drawAnimalEnt(x, en, cx, cy, now) {
   drawShadow(x, sx, sy, Math.max(8, Math.round(w * .7)));
   if (en.alive && en.tomado) drawTomado(x, sx, sy - bob, w, hg, now, en.homeX, true);   // halo escuro atrás do bicho
   x.save();
-  if (en.a.tint) x.filter = en.a.tint;
+  if (beastTint(en.a)) x.filter = beastTint(en.a);
   if (en.face > 0) { x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -Math.round(w / 2), sy - hg - bob, w, hg); }
   else x.drawImage(img, sx - Math.round(w / 2), sy - hg - bob, w, hg);
   x.restore();
@@ -843,7 +843,7 @@ function drawMemento(x, s, cx, cy, now) {
     const sx = Math.round(s.x - cx), sy = Math.round(s.y - cy) + 6, w = al.w, hg = al.h, f = Math.floor(now / 600) % 2;
     const img = al.blink && now % 4200 < 140 ? al.blink : f ? al.img2 : al.img;
     drawShadow(x, sx, sy, Math.max(8, Math.round(w * .7)));
-    x.save(); if (al.a.tint) x.filter = al.a.tint; x.globalAlpha = .95;
+    x.save(); if (beastTint(al.a)) x.filter = beastTint(al.a); x.globalAlpha = .95;
     x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -Math.round(w / 2), sy - hg, w, hg); x.restore();
     const p = now % 5200;
     if (p < 900) drawThanks(x, al, sx, sy - hg - 6 - p / 300, p);

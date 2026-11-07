@@ -26,8 +26,22 @@ if (LANG !== "pt") {
 }
 // aviso mostrado na tela inicial e nas Opções quando o idioma não é o português (o texto vem traduzido)
 const LANG_NOTE = "Tradução feita por IA a partir do português: pode haver erros.";
+/* Quem viaja (G.heroi, core/state.js): jogando com a Franciscane, a frase sai na versão dela. Primeiro a versão escrita à mão
+   (HERO_FEM em data/heroi.js para o português, TX.<id>.heroFem nos outros idiomas: "menino" -> "menina", "ele" -> "ela"...);
+   sem ela, só o nome troca (heroSwap). O nome de quem ficou em Curitiba vem marcado com HERO_MARK e nunca é trocado. */
+const HERO_MARK = "⁠";   // "word joiner": invisível, só marca o nome do par que não é quem viaja
+const heroFran = () => typeof G !== "undefined" && G && G.heroi === "fran";
+function heroSwap(s) {
+  if (s.indexOf("Rhanon") < 0) return s;
+  if (LANG === "pt") s = s.replace(/\b([DdNn])o Rhanon(?!⁠)/g, "$1a Franciscane").replace(/\b([Pp])ro Rhanon(?!⁠)/g, "$1ra Franciscane")
+    .replace(/\b([Pp])elo Rhanon(?!⁠)/g, "$1ela Franciscane").replace(/\bao Rhanon(?!⁠)/g, "à Franciscane").replace(/\bAo Rhanon(?!⁠)/g, "À Franciscane")
+    .replace(/\b([Oo]) Rhanon(?!⁠)/g, (m, o) => (o === "O" ? "A" : "a") + " Franciscane");
+  return s.replace(/Rhanon(?!⁠)/g, "Franciscane");
+}
 function t(pt, vars) {
-  let s = LANG !== "pt" && TX[LANG] && TX[LANG].t[pt] || pt;
+  const fem = heroFran() && (LANG === "pt" ? typeof HERO_FEM !== "undefined" && HERO_FEM[pt] : TX[LANG] && TX[LANG].heroFem && TX[LANG].heroFem[pt]);
+  let s = fem || LANG !== "pt" && TX[LANG] && TX[LANG].t[pt] || pt;
+  if (heroFran() && !fem) s = heroSwap(s);
   if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => k in vars ? vars[k] : m);
   return vars && LANG !== "pt" && TX[LANG] && TX[LANG].fix ? TX[LANG].fix(s) : s;   // ajustes do idioma (no espanhol, "a el" -> "al")
 }
@@ -46,7 +60,7 @@ const LANG_FIELDS = [
   ["LOC", "*", "@n"], ["LOC", "*", "@s"], ["LOC", "*", "@txt"],
   ["ITEMS", "*", "@n"], ["EQUIP", "*", "*", "@n"], ["CMDS", "*", "@n"], ["CMDS", "*", "@d"], ["SPECIALS", "*", "@n"], ["SPECIALS", "*", "@d"], ["ELEMENTS", "*", "@n"], ["WEATHER", "*", "@n"], ["SECRETS", "*", "@n"], ["SECRETS", "*", "@d"], ["SECRETS", "*", "@lore"], ["WEATHER", "*", "@fight"],
   ["QUESTS", "*", "@text"], ["QUESTS", "*", "@thanks"], ["VILLAGER_NAME", "*"], ["VILLAGER_TIPS", "*"], ["BELEM_TIPS", "*"], ["SAOLUIS_TIPS", "*"], ["SAOLUIS_NAME", "*"], ["TERESINA_TIPS", "*"], ["TERESINA_NAME", "*"], ["RECIFE_TIPS", "*"], ["RECIFE_NAME", "*"], ["PETROLINA_TIPS", "*"], ["PETROLINA_NAME", "*"], ["CUIABA_TIPS", "*"], ["CUIABA_NAME", "*"], ["BH_TIPS", "*"], ["BH_NAME", "*"], ["OUROPRETO_TIPS", "*"], ["OUROPRETO_NAME", "*"], ["RIO_TIPS", "*"], ["RIO_NAME", "*"], ["SAOPAULO_TIPS", "*"], ["SAOPAULO_NAME", "*"], ["FOZ_TIPS", "*"], ["FOZ_NAME", "*"], ["CWB_TIPS", "*"], ["CWB_NAME", "*"], ["PAMPA_TIPS", "*"], ["PAMPA_NAME", "*"], ["FLORIPA_TIPS", "*"], ["FLORIPA_NAME", "*"], ["BONITO_TIPS", "*"], ["BONITO_NAME", "*"], ["BRASILIA_TIPS", "*"], ["BRASILIA_NAME", "*"], ["FLIGHTS", "*", "@paid"], ["AIRPORT", "*"], ["PENSAO_NAME", "*"], ["CITY_WAKE", "*"],
-  ["TUTORIAL", "*"], ["TUTORIAL_TOQUE", "*"], ["SAFE_TIP", "*"], ["FOOD_TALK", "*"], ["SPOT_LABEL", "*"], ["EQ_SLOTS", "*", "@n"], ["EQ_SLOTS", "*", "@none"], ["CHARM_FX", "*"], ["BUGS", "*", "@name"], ["BUGS", "*", "@intro"], ["BUGS", "*", "@moves", "*"], ["FREELAS", "*", "@n"], ["FREELAS", "*", "@client"], ["FREELAS", "*", "@prog"], ["BUS_LINES", "*", "@lock"], ["FREELAS", "*", "@ask"], ["FREELAS", "*", "@thanks"], ["FREELAS", "*", "@after"], ["BUG_CMD", "*"], ["NARRA", "*", "*"], ["NARRA", "*", "*", "@r"], ["NARRA_BOSS", "*", "*"], ["NARRA_BOSS", "*", "*", "@r"], ["NARRA_HINT", "*"], ["REGIONS", "*", "@n"], ["REGIONS", "*", "@txt"], ["REGIONS", "*", "@airport"], ["NARRA_PYT", "*", "*"], ["NARRA_PYT", "*", "*", "@r"], ["NARRA_PYT", "*", "*", "@p"], ["NARRA_FIM", "*", "*"], ["NARRA_FIM", "*", "*", "@r"], ["NARRA_FIM", "*", "*", "@p"], ["NARRA_FIM", "*", "*", "@e"],
+  ["TUTORIAL", "*"], ["TUTORIAL_TOQUE", "*"], ["SAFE_TIP", "*"], ["FOOD_TALK", "*"], ["SPOT_LABEL", "*"], ["EQ_SLOTS", "*", "@n"], ["EQ_SLOTS", "*", "@none"], ["CHARM_FX", "*"], ["BUGS", "*", "@name"], ["BUGS", "*", "@intro"], ["BUGS", "*", "@moves", "*"], ["FREELAS", "*", "@n"], ["FREELAS", "*", "@client"], ["FREELAS", "*", "@prog"], ["BUS_LINES", "*", "@lock"], ["FREELAS", "*", "@ask"], ["FREELAS", "*", "@thanks"], ["FREELAS", "*", "@after"], ["BUG_CMD", "*"], ["NARRA", "*", "*"], ["NARRA", "*", "*", "@r"], ["NARRA_BOSS", "*", "*"], ["NARRA_BOSS", "*", "*", "@r"], ["NARRA_HINT", "*"], ["REGIONS", "*", "@n"], ["REGIONS", "*", "@txt"], ["REGIONS", "*", "@airport"], ["NARRA_PYT", "*", "*"], ["NARRA_PYT", "*", "*", "@r"], ["NARRA_PYT", "*", "*", "@p"], ["NARRA_FIM", "*", "*"], ["NARRA_FIM", "*", "*", "@r"], ["NARRA_FIM", "*", "*", "@p"], ["NARRA_FIM", "*", "*", "@e"], ["CARTAS", "*", "@as"], ["CARTAS", "*", "@txt"],
   ["SKILL_TREES", "*", "@n"], ["SKILL_TREES", "*", "@d"], ["SKILL_TREES", "*", "nodes", "*", "@n"], ["SKILL_TREES", "*", "nodes", "*", "@d"], ["ALLY_MOVES", "*", "@n"], ["ALLY_MOVES", "*", "@d"]
 ];
 // percorre um caminho de LANG_FIELDS e chama fn(objeto, chave) em cada texto encontrado
@@ -59,12 +73,18 @@ function langWalk(root, path, fn) {
     else if (typeof root[k] === "string") fn(root, k);
   });
 }
+// guarda o português de cada campo na primeira vez: quem viaja pode mudar sem recarregar (escolha do save), e aí os dados
+// são trocados de novo a partir do original (useSlotDone em ui/saves.js chama de novo)
+let LANG_SRC = null;
 function applyLangData() {
-  if (LANG === "pt" || !TX[LANG]) return;
-  LANG_FIELDS.forEach(([name, ...path]) => {
-    let root; try { root = eval(name); } catch (_) { return; }   // const globais não ficam em window
-    langWalk(root, path, (o, k) => { o[k] = t(o[k]); });
-  });
+  if (!LANG_SRC) {
+    LANG_SRC = [];
+    LANG_FIELDS.forEach(([name, ...path]) => {
+      let root; try { root = eval(name); } catch (_) { return; }   // const globais não ficam em window
+      langWalk(root, path, (o, k) => LANG_SRC.push([o, k, o[k]]));
+    });
+  }
+  LANG_SRC.forEach(([o, k, pt]) => { o[k] = t(pt); });
 }
 // textos fixos do index.html: troca cada texto e cada aria-label/title que tenha tradução
 function translateStatic() {

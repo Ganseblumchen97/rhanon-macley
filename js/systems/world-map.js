@@ -1,10 +1,6 @@
 /* Mapa grande (Pará ou Brasil, ver MAP_REGION em data/world.js): HUD, painel de informações, viagem e troca de telas. */
-const curVis = () => CURITIBA_OPEN && (G.lv >= REQ.lv || G.loc === "curitiba");
 function drawMap() {
-  vit(); $("hud").textContent = `${t("Nv")} ${G.lv} · XP ${G.xp}/${need(G.lv)} · R$ ${G.money}` + (CITY[G.loc] ? ` · ${t("PV")} ${G.hp}/${maxHP(G.lv)} · ${t("PE")} ${G.sp}/${maxSP(G.lv)}` : "") + (G.job ? ` · PROGRAMADOR · XP PROF. ${G.jobXp||0}` : "") + (G.betterJob ? " · SÊNIOR" : "");
-  const R = MAP_REGIONS[MAP_REGION];
-  if ($("n-curitiba")) $("n-curitiba").style.display = curVis() ? "" : "none";
-  $("route").style.display = R.route.includes("curitiba") && !curVis() ? "none" : "";
+  vit(); $("hud").textContent = `${t("Nv")} ${G.lv} · XP ${G.xp}/${need(G.lv)} · R$ ${G.money}` + (CITY[G.loc] ? ` · ${t("PV")} ${G.hp}/${maxHP(G.lv)} · ${t("PE")} ${G.sp}/${maxSP(G.lv)}` : "");
   const l = LOC[G.loc]; $("mk").setAttribute("transform", `translate(${l.x} ${l.y})`);
   applyTheme();
 }
@@ -69,21 +65,6 @@ function select(id) {
     else i.insertAdjacentHTML("beforeend", '<p class="hint">Para chegar à capital, compre a passagem do barco no porto do Tapajós, no fim da trilha da aldeia.</p>');
   } else if (here && id === "ananindeua") {
     btn(t("Entrar na aldeia"), openLocal);
-    i.insertAdjacentHTML("beforeend", !CURITIBA_OPEN ? (MAP_REGION === "norte" ? "" : '<p class="hint">Em breve: novos destinos.</p>') : curVis() ? '<p class="hint">Curitiba apareceu no mapa. Toque nela para viajar.</p>' : `<p class="hint">Existe um destino distante. Para ir até lá: Nv ${REQ.lv} e R$ ${REQ.money}.</p>`);
-  } else if (here && id === "curitiba") {
-    if (!G.job) {
-      btn("Entrevista: vaga de programador", () => startChallenge("interview"));
-      i.insertAdjacentHTML("beforeend", '<p class="hint">Responda cinco perguntas. Errar custa PV.</p>');
-    } else {
-      i.insertAdjacentHTML("beforeend", `<p class="hint">${G.betterJob ? "Você trabalha na empresa melhor e recebe mais." : "Você é programador! Complete missões para ganhar XP profissional e desbloquear uma empresa que paga melhor."}</p>`);
-      btn("Missão de trabalho", () => startChallenge("work"));
-      if (!G.betterJob && (G.jobXp||0) >= 150) { btn("Entrevista para empresa melhor", () => startChallenge("betterInterview")); i.insertAdjacentHTML("beforeend", '<p class="hint">Requisito cumprido: XP profissional suficiente.</p>'); }
-      else if (!G.betterJob) i.insertAdjacentHTML("beforeend", `<p class="hint">Entrevista melhor desbloqueia com 150 XP profissional. Faltam ${Math.max(0,150-(G.jobXp||0))} XP.</p>`);
-    }
-  } else if (!here) {
-    const cost = id === "curitiba" ? REQ.money : 0, miss = cost - G.money;
-    i.insertAdjacentHTML("beforeend", `<p class="hint">Passagem: R$ ${cost}</p>`);
-    btn(miss > 0 ? t("Faltam R$ {n}", {n: miss}) : t("Viajar"), () => go(id, cost), miss > 0);
   }
   btn(t("Mapa do Brasil"), () => openBrasil(null));   // as cinco regiões da viagem
   resetButton(i, () => { drawMap(); select(G.loc); });
@@ -214,27 +195,10 @@ function resetButton(host, after) {
   r.className = "cmd"; r.type = "button"; r.style.opacity = ".6"; r.innerHTML = `<span>${t("Zerar progresso")}</span>`;
   r.addEventListener("click", () => {
     if (!sure) { sure = true; r.firstChild.textContent = t("Clique de novo para confirmar"); return; }
-    sure = false; G = {lv: 1, xp: 0, money: 0, loc: "ananindeua", job:false, jobXp:0, jobMissions:0, betterJob:false}; save(); after();
+    sure = false; G = {lv: 1, xp: 0, money: 0, loc: "ananindeua"}; save(); after();
   });
   host.appendChild(r);
 }
 function showMap() { wipe(showMapNow); }
 // sem a transição (usado ao sair da tela inicial)
-function showMapNow() { $("local").hidden = true; $("explore").hidden = true; $("homeButton").hidden = false; $("game").classList.remove("working-mode"); $("stage").classList.remove("working"); $("workScene").hidden = true; $("beast").style.display = ""; $("hero").style.display = ""; $("over").hidden = true; $("map").hidden = false; drawRegionBg(); musicStart("map"); refreshHero(); drawMap(); select(G.loc); }
-function go(id, cost) {
-  if (moving) return;
-  moving = true;
-  const a = LOC[G.loc], b = LOC[id];
-  G.money -= cost; save(); drawMap();
-  $("info").innerHTML = `<h2>${t("Viajando…")}</h2><p>${t("A trilha é longa. Cuidado com os animais pelo caminho.")}</p>`; sfx("look");
-  let t0 = 0;
-  const travelMs = 3200;
-  const f = ts => {
-    t0 = t0 || ts;
-    const k = Math.min(1, Math.round((ts - t0) / travelMs * 24) / 24);
-    $("mk").setAttribute("transform", `translate(${a.x + (b.x - a.x) * k} ${a.y + (b.y - a.y) * k})`);
-    if (k < 1) requestAnimationFrame(f);
-    else { G.loc = id; save(); moving = false; drawMap(); select(id); sfx("more"); }
-  };
-  requestAnimationFrame(f);
-}
+function showMapNow() { $("local").hidden = true; $("explore").hidden = true; $("homeButton").hidden = false; $("beast").style.display = ""; $("hero").style.display = ""; $("over").hidden = true; $("map").hidden = false; drawRegionBg(); musicStart("map"); refreshHero(); drawMap(); select(G.loc); }

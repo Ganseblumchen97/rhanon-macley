@@ -6,6 +6,7 @@
    evil = bicho tomado pela fumaça de Pytuna: olho vermelho aceso e cenho franzido (nos que usam bEye). */
 const BEAST_K = 2, BN = "#22100a", BW = "#ffffff", BR = "#e2363d", BEAST_EVIL_EYE = "#ff2a2a";
 let BEAST_EVIL = false;   // ligado só enquanto beastFrame desenha um quadro "tomado"
+let BEAST_EYES = null;    // enquanto beastFrame desenha: onde ficaram os olhos (para os acessórios dos chefes)
 const PYT_SMOKE = ["#2a2a34", "#3a3a46", "#1a1a22", "#4a3a5a"];   // fumaça de Pytuna saindo dos bichos tomados
 // quem a fumaça toma: bicho de verdade (bug do freela e gente não; ver MOTION "person")
 const isTomado = a => !!a && !a.bug && MOTION[a.id] !== "person";
@@ -13,6 +14,7 @@ const isTomado = a => !!a && !a.bug && MOTION[a.id] !== "person";
 /* ---------- peças comuns ---------- */
 // olho: open (aberto, com brilho), angry (sobrancelha), shut (fechado), x (desmaio)
 function bEye(d, x, y, o, n = BN) {
+  if (BEAST_EYES && o.eye !== "x") BEAST_EYES.push([x, y]);
   if (o.eye === "x") d.dots([[x - 1, y - 1], [x + 1, y - 1], [x, y], [x - 1, y + 1], [x + 1, y + 1]], n);
   else if (o.eye === "shut") d.rect(x - 1, y, 3, 1, n);
   else if (BEAST_EVIL) {   // tomado: olho vermelho com brilho e sempre bravo
@@ -1644,17 +1646,85 @@ function pytunaFrame(pose, f) {
 const pytunaCacheClear = () => [...BEAST_CACHE.keys()].forEach(k => k.startsWith("pytuna") && BEAST_CACHE.delete(k));
 const BEAST_CACHE = new Map();
 const beastId = id => BEAST_DRAW[id] ? id : BEAST_DRAW[ART[id]] ? ART[id] : null;   // chefes usam o desenho do bicho base
-function beastFrame(id, pose = "idle", f = 0, evil = false) {
-  const k = beastId(id); if (!k) return null;
-  evil = evil && pose !== "ko";   // desmaiado já voltou a si
+// quadro do desenho base (guardado), com a posição do olho em dataset.eye
+function beastBase(k, pose, f, evil) {
   const key = k + pose + f + (evil ? "!" : "");
   if (!BEAST_CACHE.has(key)) {
-    BEAST_EVIL = evil;
+    BEAST_EVIL = evil; BEAST_EYES = [];
     try {
       const r = BEAST_DRAW[k](pose, f);
       r.c.dataset.scale = BEAST_K; r.c.dataset.head = r.head.join(",");
+      const e = BEAST_EYES.sort((a, b) => a[0] - b[0])[0];   // o olho mais à frente (todos olham para a esquerda)
+      if (e) r.c.dataset.eye = e.join(",");
       BEAST_CACHE.set(key, r.c);
-    } finally { BEAST_EVIL = false; }
+    } finally { BEAST_EVIL = false; BEAST_EYES = null; }
   }
   return BEAST_CACHE.get(key);
+}
+function beastFrame(id, pose = "idle", f = 0, evil = false) {
+  const k = beastId(id); if (!k) return null;
+  evil = evil && pose !== "ko";   // desmaiado já voltou a si
+  const base = beastBase(k, pose, f, evil);
+  if (!BOSS_ACC[id]) return base;
+  const key = id + "@" + pose + f + (evil ? "!" : "");
+  if (!BEAST_CACHE.has(key)) BEAST_CACHE.set(key, bossDress(id, base, pose));
+  return BEAST_CACHE.get(key);
+}
+
+/* ---------- cara própria dos chefes que usam o desenho de um bicho comum: coroa, tiara, cicatriz e flor ----------
+   O acessório vai por cima do quadro já com a cor do chefe (tint), para a coroa continuar dourada: o quadro sai com a cor
+   "assada" e quem desenha não aplica o tint de novo (beastTint). Lugar: o olho (bEye) e o alto da cabeça, achados no próprio
+   quadro; dx/dy por chefe acertam o que a busca não pega. Desmaiado (ko): sem acessório (a coroa caiu). */
+const BOSS_ACC = {
+  queixada_chefe: ["cicatriz"], cobra_grande: ["coroa"], onca_rei: ["coroa"], caranguejo_rei: ["coroa"], gaviao_real: ["cicatriz"],
+  bufalo_touro: ["cicatriz"], iguana_rei: ["coroa"], ratao: ["cicatriz"], jacare_canal: ["cicatriz"], sucuarana: ["cicatriz"],
+  mero: ["cicatriz"], surubim: ["cicatriz"], tubarao_rei: ["coroa", "cicatriz"], teiu_rei: ["coroa"], bode_rei: ["coroa"],
+  onca_dagua: ["cicatriz"], guara_rei: ["coroa"], ariranha_mae: ["flor"], preguica_gigante: ["flor"], tamandua_rei: ["coroa"],
+  muriqui_rei: ["coroa"], tatu_rei: ["coroa"], quati_rei: ["coroa"], capivara_rainha: ["tiara", "flor"],
+  touro_xucro: ["cicatriz"], leao_marinho: ["cicatriz"], onca_iguacu: ["cicatriz"], gralha_rainha: ["tiara"],
+  zabele_rei: ["coroa"]
+};
+const BOSS_ACC_POS = {caranguejo_rei: {coroa: [7, 9]}, tamandua_rei: {coroa: [-4, 0]}};   // acertos finos por chefe: {coroa: [dx, dy], olho: [dx, dy]}
+const CAN_FILTER = (() => { try { return "filter" in document.createElement("canvas").getContext("2d"); } catch (e) { return false; } })();
+// a cor (CSS filter) que ainda falta aplicar no desenho: nenhuma quando o quadro já sai com ela
+const beastTint = a => a && a.tint && !(BOSS_ACC[a.id] && CAN_FILTER) ? a.tint : "";
+function bossDress(id, base, pose) {
+  const W = base.width, H = base.height, c = document.createElement("canvas"); c.width = W; c.height = H;
+  const g = c.getContext("2d"), a = typeof ANIMALS !== "undefined" && ANIMALS.find(q => q.id === id);
+  if (a && a.tint && CAN_FILTER) g.filter = a.tint;
+  g.drawImage(base, 0, 0); g.filter = "none";
+  Object.assign(c.dataset, base.dataset);
+  if (pose === "ko") return c;
+  const px = g.getImageData(0, 0, W, H).data, on = (x, y) => x >= 0 && y >= 0 && x < W && y < H && px[(y * W + x) * 4 + 3] > 0;
+  const [hx, hy] = base.dataset.head.split(",").map(Number), adj = BOSS_ACC_POS[id] || {};
+  let [ex, ey] = base.dataset.eye ? base.dataset.eye.split(",").map(Number) : [hx - 2, hy - 1];
+  if (adj.olho) { ex += adj.olho[0]; ey += adj.olho[1]; }
+  // alto da cabeça: sobe pela coluna de trás do olho até sair do desenho
+  let cx = Math.round((ex + hx) / 2) + 2, top = Math.min(ey, hy);
+  while (top > 0 && on(cx, top - 1)) top--;
+  if (adj.coroa) { cx += adj.coroa[0]; top += adj.coroa[1]; }
+  const dot = (x, y, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), 1, 1); };
+  const rect = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), w, h); };
+  const K = RIG_K;
+  for (const it of BOSS_ACC[id]) {
+    if (it === "coroa" || it === "tiara") {   // aro com três pontas e uma pedra; a tiara é menor e de prata
+      const big = it === "coroa", w = big ? 9 : 7, x0 = cx - (w >> 1), y0 = top - (big ? 3 : 2);
+      const ou = big ? ["#ffd23a", "#c8901a", "#fff2a0"] : ["#e8eef4", "#9aa4b8", "#ffffff"], gem = big ? "#e2363d" : "#e85ab0";
+      const tips = big ? [0, 4, 8] : [0, 3, 6], tall = big ? 3 : 2;
+      rect(x0 - 1, y0 - 1, w + 2, (big ? 3 : 2) + 2, K);
+      tips.forEach(t => rect(x0 + t - 1, y0 - tall - 1, 3, tall + 1, K));
+      rect(x0, y0, w, big ? 3 : 2, ou[0]); rect(x0, y0 + (big ? 2 : 1), w, 1, ou[1]);
+      tips.forEach(t => { rect(x0 + t, y0 - tall, 1, tall, ou[0]); dot(x0 + t, y0 - tall, ou[2]); });
+      dot(x0 + (w >> 1), y0 + (big ? 1 : 0), gem); dot(x0 + 1, y0, ou[2]);
+    } else if (it === "cicatriz") {   // risco claro em diagonal cortando o olho, com os pontos da costura
+      [[-3, -5], [-2, -4], [-1, -3], [0, -2], [2, 2], [3, 3], [4, 4], [5, 5]].forEach(([x, y]) => { dot(ex + x, ey + y, "#ffd0c4"); dot(ex + x + 1, ey + y, "#b03a3a"); });
+      [[-3, -3], [-1, -5], [3, 5], [5, 3]].forEach(([x, y]) => dot(ex + x, ey + y, "#ffd0c4"));
+    } else if (it === "flor") {   // flor (vitória-régia rosa) presa atrás da orelha
+      const fx = cx + 7, fy = top + 3;
+      [[0, -2], [-2, 0], [2, 0], [0, 2]].forEach(([x, y]) => { rect(fx + x - 1, fy + y - 1, 3, 3, K); });
+      [[0, -2], [-2, 0], [2, 0], [0, 2]].forEach(([x, y]) => { rect(fx + x, fy + y, 1, 1, "#f48ac0"); dot(fx + x + (x ? 0 : 1), fy + y + (y ? 0 : 1), "#d85a98"); });
+      rect(fx - 1, fy - 1, 3, 3, "#f48ac0"); dot(fx, fy, "#ffd23a");
+    }
+  }
+  return c;
 }

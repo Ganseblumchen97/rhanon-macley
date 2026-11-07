@@ -1,7 +1,5 @@
 /* Locais do mapa grande (Pará ou Brasil), sublocais de Ananindeua e de Belém, loja e equipamentos. */
-const REQ = {lv: 4, money: 150};   // para Curitiba aparecer e a passagem
-const CURITIBA_OPEN = false;       // false = Curitiba fica escondida (foco em Ananindeua por enquanto)
-/* Mapa grande: um por região ("norte", "nordeste") ou "brasil" (a aldeia e Curitiba).
+/* Mapa grande: um por região ("norte", "nordeste", "centroeste", "sudeste", "sul"); "brasil" é só o contorno do mapa do Brasil (openBrasil).
    Cada mapa tem o contorno (land), um rio opcional, a trilha tracejada (route) e onde fica cada local de LOC. */
 let MAP_REGION = "norte";   // mapa grande da cidade atual (CITY[...].map); muda quando o Rhanon voa para outra região (syncRegion)
 const MAP_REGIONS = {
@@ -41,15 +39,14 @@ const MAP_REGIONS = {
     river: "M420 74 C360 90 300 92 240 104 C190 114 140 112 98 122",   // rio Iguaçu, de Curitiba até as Cataratas
     route: ["pampa", "floripa", "foz", "cwb"], pos: {pampa: [176, 412], floripa: [440, 236], foz: [104, 126], cwb: [404, 84]}},
   // area = pedaço de cada região (recortado pelo contorno, então pode passar dele); icon = desenho de MAP_ICON no ponto dela
-  brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com rota entre a aldeia e Curitiba",
+  brasil: {n: "Brasil", aria: "Mapa do Brasil em silhueta, com as cinco regiões da viagem",
     area: {norte: "M80 80 H358 V178 L352 230 L340 280 L345 300 L320 305 L300 300 L230 310 L170 362 H80Z",
       nordeste: "M358 80 H480 V365 L400 362 L345 355 V300 L340 280 L352 230 L358 178Z",
       centroeste: "M80 362 H170 L230 310 L300 300 L320 305 L345 300 V355 L315 370 L300 400 L285 428 L267 452 H80Z",
       sudeste: "M345 355 L400 362 L480 365 V452 H352 L300 440 L285 428 L300 400 L315 370Z",
       sul: "M80 452 H267 L285 428 L300 440 L352 452 H480 V560 H80Z"},
     icon: {norte: "manguezal", nordeste: "caatinga", centroeste: "pantanal", sudeste: "tiradentes", sul: "curitiba"},
-    land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"],
-    route: ["ananindeua", "curitiba"], pos: {ananindeua: [268, 172], curitiba: [315, 478]}}
+    land: ["M205 106 L262 101 320 128 350 175 382 190 405 196 440 228 444 268 427 302 416 322 394 387 374 421 361 442 343 479 326 527 294 538 263 507 267 465 246 433 226 401 204 370 165 359 110 349 99 311 126 286 109 254 147 213 162 180 172 139Z"]}
 };
 /* Regiões do Brasil (mapa do Brasil, systems/world-map.js; ver HISTORIA.md): a viagem vai do Norte ao Sul. pos = ponto no
    contorno de MAP_REGIONS.brasil (viewBox 600x620); map = mapa grande da região (por enquanto só o Pará, no Norte);
@@ -81,11 +78,10 @@ const LOC = {
   pampa: {n: "Pampa gaúcho (RS)", s: "Pampa", txt: "No Rio Grande do Sul, campo aberto até onde a vista alcança: coxilha atrás de coxilha, gado, cavalo, estância com galpão e o vento minuano cortando. Quase não tem árvore, então a fumaça não tem onde se esconder."},
   floripa: {n: "Florianópolis (SC)", s: "Florianópolis", txt: "A Ilha de Santa Catarina: quarenta e duas praias, a Lagoa da Conceição, duna, renda de bilro na porta de casa e casario açoriano colorido. Os antigos juram que as Bruxas da Ilha ainda andam por aí."},
   foz: {n: "Foz do Iguaçu (PR)", s: "Foz do Iguaçu", txt: "Na ponta do Paraná, onde o Brasil encontra o Paraguai e a Argentina: as Cataratas roncando, mata de araucária, chipa na esquina e três países numa ponte só. Daqui, é subir o rio Iguaçu até Curitiba."},
-  // Curitiba nova, o fim da viagem (cwb: o id curitiba é da Curitiba antiga, fechada, com as entrevistas)
+  // Curitiba nova, o fim da viagem (id cwb: o id curitiba era da Curitiba antiga das entrevistas, removida, e ainda aparece em saves velhos)
   cwb: {n: "Curitiba (PR)", s: "Curitiba", txt: "A capital do Paraná, lá no alto: frio, garoa, calçada de petit-pavé, ônibus em tubo de vidro e araucária em toda praça. É aqui que fica a vaga de programador. E, dizem, a última mata de pinheiro, pra onde a fumaça fugiu."},
   saopaulo: {n: "São Paulo (SP)", s: "São Paulo", txt: "A maior cidade do Brasil: prédio até onde a vista alcança, avenida que nunca dorme, garoa fina e gente de todo canto do país. No meio do concreto, um parque enorme com lago, capivara e um silêncio que de noite pesa no peito."},
   saoluis: {n: "São Luís (MA)", s: "São Luís", txt: "A ilha do Maranhão: casarão de azulejo, maré que sobe e desce metros num dia e bumba-meu-boi em toda esquina. O Nordeste começa aqui."},
-  curitiba: {n: "Curitiba (PR)", s: "Curitiba", x: 315, y: 478, txt: "Cidade grande, frio e oportunidades na programação. Conquiste a primeira vaga, complete missões de trabalho e tente uma empresa melhor."}
 };
 /* Mapa da aldeia no Tapajós (viewBox 440x325): uma trilha só, em zigue-zague, na ordem de dificuldade (ROUTE).
    Embaixo, da esquerda para a direita, até cruzar o rio; no meio, de volta para a esquerda, cruzando de novo;

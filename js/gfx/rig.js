@@ -6,6 +6,8 @@
 const RIG_W = 32, RIG_H = 44, RIG_K = "#1a1426", RIG_LENS = "#bfe0ea";   // RIG_LENS: lente dos óculos
 const RIG_PAL = {h: "#2a2238", H: "#4d4170", s: "#d0925a", S: "#99603a", g: "#3fb35f", G: "#237a40", r: "#e2363d",
   t: "#a0663a", T: "#6b4126", w: "#f6eedb", p: SPEAR_WOOD, P: "#a9823f", m: "#e6edf0", b: "#9c6339", f: "#7a4a1e"};
+// cores de quem o jogador escolheu (G.heroi, ver heroi() em core/state.js): o Rhanon usa o próprio RIG_PAL
+const HERO_PAL = {fran: {s: "#e2aa7a", S: "#b0784c", h: "#5e3a22", H: "#8e6040"}};
 const FLAMES = [["#d62828", "#f2740c", "#ffd23a"], ["#f2740c", "#ffd23a", "#fff3a0"], ["#d62828", "#ffd23a", "#f2740c"]];
 
 /* ---------- grade de desenho: cada pixel guarda cor e "parte" (o contorno separa partes) ---------- */
@@ -106,7 +108,8 @@ function rigTorch(d, C, x0, y0, x1, y1, f) {   // cabo de (x0,y0) até a chama e
 /* ---------- o personagem ---------- */
 const RIG_CACHE = new Map();
 // pose: {lf, rf: pés [x,y]; lh, rh: mãos; lean, dy: parte de cima; sit; face; weapon; side; pull; f (quadro da chama)}
-// look: {pal, shirt, pants, glasses, noBand, bowBack, longHair, feather, top, prop, charm, cap, hat: [feltro, sombra, fita]}
+// look: {pal, shirt, pants, glasses, noBand, bowBack, longHair, feather, top, prop, charm, cap, hat: [feltro, sombra, fita], trancas}
+// trancas = a Franciscane: duas tranças e, sem camisa, a parte de cima da tanga (mesma palha/couro, no mesmo espaço da roupa)
 function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   const key = view + scale + JSON.stringify(pose) + JSON.stringify(look);
   if (RIG_CACHE.has(key)) return RIG_CACHE.get(key);
@@ -146,8 +149,11 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   // tronco
   const ty = 21 + hy;
   d.part().poly([[10 + lean, ty], [22 + lean, ty], [21, hip], [11, hip]], look.shirt ? look.shirt[0] : C.s, look.shirt ? look.shirt[1] : C.S, 19 + lean / 2);
-  if (!back && !look.shirt) d.dots([[13 + lean, 25 + hy], [13 + lean, 26 + hy], [13 + lean, 27 + hy], [19 + lean, 25 + hy], [19 + lean, 26 + hy], [19 + lean, 27 + hy]], C.r)   // pintura
+  if (look.trancas && !look.shirt) d.part().rect(10 + lean, 24 + hy, 12, 3, C.t).rect(10 + lean, 26 + hy, 12, 1, C.T).part();   // parte de cima da tanga (de costas, a amarração)
+  if (!back && !look.shirt && !look.trancas) d.dots([[13 + lean, 25 + hy], [13 + lean, 26 + hy], [13 + lean, 27 + hy], [19 + lean, 25 + hy], [19 + lean, 26 + hy], [19 + lean, 27 + hy]], C.r)   // pintura
     .dots([[12 + lean, 22 + hy], [14 + lean, 23 + hy], [16 + lean, 23 + hy], [18 + lean, 23 + hy], [20 + lean, 22 + hy]], C.w);                                     // colar de dentes
+  if (!back && look.trancas && !look.shirt) d.dots([[13 + lean, 28 + hy], [13 + lean, 29 + hy], [19 + lean, 28 + hy], [19 + lean, 29 + hy]], C.r)   // pintura na barriga e o colar por cima da faixa
+    .dots([[13 + lean, 22 + hy], [16 + lean, 22 + hy], [19 + lean, 22 + hy]], C.r);   // continhas de semente vermelha
   if (look.top) d.rect(10 + lean, 23 + hy, 12, 2, look.top);
   if (look.charm && !back) d.part().limb(hx - 3, 20 + hy, hx, 23 + hy, .8, "#3a2414").limb(hx + 3, 20 + hy, hx, 23 + hy, .8, "#3a2414").part().ellipse(hx, 24 + hy, 1.6, 1.6, look.charm);   // colar com a pedra do talismã
   // cintura: faixa e aba da tanga (ou a cintura da calça/short)
@@ -187,6 +193,12 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
     if (!look.noBand) d.part().rect(hx - 8, 9 + hy, 17, 2, C.g).rect(hx - 8, 10 + hy, 17, 1, C.G);
     if (look.cap) d.part().ellipse(hx, 8 + hy, 8.5, 4.5, look.cap[0]).rect(hx - 9, 10 + hy, 19, 2, look.cap[1]);   // boné (gente da cidade)
     if (look.hat) d.part().ellipse(hx, 5 + hy, 6.5, 4.5, look.hat[0]).rect(hx - 6, 7 + hy, 13, 2, look.hat[2]).rect(hx - 11, 9 + hy, 23, 2, look.hat[1]).dots([e(-3, 2), e(-2, 2)], look.hat[2]);   // chapéu de feltro de aba larga
+  }
+  if (look.trancas) {   // duas tranças: na frente caem por cima dos ombros, de costas descem pelas costas; ponta amarrada com a fita verde
+    const [ax, bx, y0, y1] = back ? [-4, -5, 20, 31] : [-8, -10, 15, 29];
+    [-1, 1].forEach(sd => { const x0 = hx + ax * -sd, x1 = hx + bx * -sd;
+      d.part().limb(x0, y0 + hy, x1, y1 + hy, 2.6, C.h, C.H).dots([[x0 + (x1 - x0) * .35, y0 + hy + (y1 - y0) * .35], [x0 + (x1 - x0) * .7, y0 + hy + (y1 - y0) * .7]], C.H)
+        .part().rect(x1 - 1, y1 + hy, 3, 1, C.g).part().ellipse(x1, y1 + 2 + hy, 1.4, 1.4, C.h); });
   }
   if (look.feather) d.part().limb(hx + 5, 9 + hy, hx + 7, 2 + hy, 1.5, look.feather);
   // armas na frente do corpo
@@ -243,10 +255,9 @@ function rhanonLook() {
   const q = G?.equip || {}, T = EQUIP.torso[q.torso], L = EQUIP.legs[q.legs], look = {bowBack: !!q.ranged};
   const pal = {...EQUIP.weapon[q.weapon]?.look, ...EQUIP.ranged[q.ranged]?.look};   // cores da lança e do arco em uso
   if (q.amulet && EQUIP.amulet[q.amulet]) look.charm = EQUIP.amulet[q.amulet].night ? "#b07ae8" : "#ffd23a";   // talismã no peito
+  if (heroi() === "fran") { Object.assign(pal, HERO_PAL.fran); look.trancas = true; }   // Franciscane: pele mais clara, cabelo castanho e duas tranças
   if (Object.keys(pal).length) look.pal = pal;
-  if (G?.betterJob) Object.assign(look, {shirt: ["#26364a", "#18222f"], pants: ["#18222f", "#0f1620"], glasses: true, noBand: true});
-  else if (G?.job) Object.assign(look, {shirt: ["#f4ecd8", "#cdbf9a"], pants: ["#26364a", "#18222f"], noBand: true});
-  else { if (T) look.shirt = [T.color, T.shade]; if (L && L.color) look.pants = [L.color, L.shade]; }
+  if (T) look.shirt = [T.color, T.shade]; if (L && L.color) look.pants = [L.color, L.shade];
   return look;
 }
 // medalhão do HUD (exploração e batalha): o rosto do Rhanon num círculo de mata, como o guardião da floresta.
@@ -298,7 +309,8 @@ function rigSideCanvas(pose = {}, look = {}, scale = 1) {
   if (look.pants) d.part().limb(17, hip, (17 + nearFoot[0]) / 2, (hip + nearFoot[1]) / 2, 5, legs[0], legs[1]);
   // tronco de perfil (pintura e colar só sem camisa)
   d.part().poly([[12 + lean, 21 + hy], [20 + lean, 21 + hy], [21, hip], [12, hip]], skin[0], skin[1], 18 + lean / 2);
-  if (!look.shirt) d.dots([[19 + lean, 25 + hy], [19 + lean, 26 + hy], [19 + lean, 27 + hy]], C.r).dots([[15 + lean, 22 + hy], [17 + lean, 23 + hy], [19 + lean, 23 + hy]], C.w);
+  if (!look.shirt && look.trancas) d.part().rect(12 + lean, 24 + hy, 9, 3, C.t).rect(12 + lean, 26 + hy, 9, 1, C.T).part().dots([[16 + lean, 22 + hy], [19 + lean, 22 + hy]], C.r);   // parte de cima da tanga
+  else if (!look.shirt) d.dots([[19 + lean, 25 + hy], [19 + lean, 26 + hy], [19 + lean, 27 + hy]], C.r).dots([[15 + lean, 22 + hy], [17 + lean, 23 + hy], [19 + lean, 23 + hy]], C.w);
   const band = look.pants || [C.t, C.T];
   d.part().rect(12, hip - 1, 9, 2, band[0]).rect(12, hip, 9, 1, band[1]);
   if (!look.pants) d.part().poly([[17, hip], [21, hip], [21, hip + 5], [19, hip + 6]], C.t, C.T, 20);
@@ -312,6 +324,7 @@ function rigSideCanvas(pose = {}, look = {}, scale = 1) {
   // cabelo por cima da parte de trás da cabeça, orelha e franja
   d.part().poly([[hx - 8, 7 + hy], [hx - 2, 3 + hy], [hx + 2, 4 + hy], [hx + 2, 13 + hy], [hx, 18 + hy], [hx - 1, 23 + hy], [hx - 3, 19 + hy], [hx - 5, 23 + hy], [hx - 7, 18 + hy], [hx - 9, 21 + hy], [hx - 9, 12 + hy]], C.h)
     .dots([[hx - 4, 5 + hy], [hx - 3, 5 + hy], [hx - 2, 4 + hy], [hx - 1, 4 + hy]], C.H);
+  if (look.trancas) d.part().limb(hx - 6, 17 + hy, hx - 8, 29 + hy, 2.6, C.h, C.H).dots([[hx - 7, 21 + hy], [hx - 7, 25 + hy]], C.H).part().rect(hx - 9, 29 + hy, 3, 1, C.g).part().ellipse(hx - 8, 31 + hy, 1.4, 1.4, C.h);   // a trança de trás
   d.part().ellipse(hx + 1, 15 + hy, 1.6, 2.2, C.s).dots([[hx + 1, 15 + hy]], C.S);
   d.part().poly([[hx, 4 + hy], [hx + 5, 5 + hy], [hx + 8, 8 + hy], [hx + 9, 11 + hy], [hx + 7, 10 + hy], [hx + 6, 12 + hy], [hx + 4, 10 + hy], [hx + 2, 12 + hy], [hx, 10 + hy]], C.h);
   if (!look.noBand) {   // faixa do cocar com as pontas soltas atrás

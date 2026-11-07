@@ -26,7 +26,8 @@ let NB_SEL = 0, NB_APP = null, NB_MAIL = null;   // ícone escolhido, app aberto
 // Wi-Fi: só nas fases seguras das cidades (pensão, mercado, praça, rodoviária); a aldeia e a vila não têm
 const nbWifi = () => !!(EX && !$("explore").hidden && EX.st.safe && cityOf(EX.zone) !== "ananindeua");
 const nbMailIn = id => !!(G.mail[id] || G.portfolio[id] || G.freela[id]);
-const nbMails = () => Object.keys(FREELAS).filter(nbMailIn);
+// cartas de quem está em Curitiba (CARTAS em data/heroi.js) vêm antes dos freelas, a mais nova em cima
+const nbMails = () => [...Object.keys(CARTAS).filter(id => G.mail[id]).reverse(), ...Object.keys(FREELAS).filter(nbMailIn)];
 const nbUnread = () => nbMails().filter(id => G.mail[id] === 1).length;
 const nbMailPlace = id => SUB[Object.keys(FREELA_AT).find(ph => FREELA_AT[ph] === id)].n;
 // ao entrar numa fase: chega o e-mail do freela da cidade, se ainda não chegou
@@ -36,6 +37,10 @@ function nbMailArrive() {
   Object.entries(FREELA_AT).filter(([ph, id]) => cityOf(ph) === c && !nbMailIn(id)).forEach(([, id]) => {
     G.mail[id] = 1; save();
     setTimeout(() => { if (EX && !$("explore").hidden) { exToast(t("Chegou um e-mail de {cliente}! Abre o notebook (N).", {cliente: FREELAS[id].client})); sfx("more"); exHud(); } }, 900);
+  });
+  Object.entries(CARTAS).filter(([id, carta]) => carta.city === c && !G.mail[id]).forEach(([id]) => {   // carta de Curitiba
+    G.mail[id] = 1; save();
+    setTimeout(() => { if (EX && !$("explore").hidden) { exToast(t("Chegou um e-mail de {cliente}! Abre o notebook (N).", {cliente: parName()})); sfx("more"); exHud(); } }, 2400);
   });
 }
 
@@ -66,7 +71,7 @@ function nbDesk() {
   box.innerHTML = NB_APPS.map((a, i) => `<button class="nbos-ic${i === NB_SEL ? " sel" : ""}" type="button" data-i="${i}">${nbIconSvg(a.id)}${a.id === "mail" && un ? `<em class="nbos-badge">${un}</em>` : ""}<span>${nbAppName(a.id)}</span></button>`).join("");
   box.querySelectorAll(".nbos-ic").forEach(b => b.addEventListener("click", () => { NB_SEL = +b.dataset.i; nbOpenApp(NB_APPS[NB_SEL].id); }));
   const wifi = nbWifi();
-  $("nbosBar").innerHTML = `<b>▣ Rhanon OS</b><span class="nbos-sp"></span><span class="nbos-wifi${wifi ? "" : " off"}">${t(wifi ? "Wi-Fi" : "sem Wi-Fi")}</span><span class="nbos-bat"><i></i></span><span>${t(G.night ? "Dia {n} · noite" : "Dia {n} · dia", {n: G.day})}</span><button class="nbos-off" type="button">✕ ${t("Desligar")}</button>`;   // fecha o notebook (no celular não tem tecla nem sobra fora)
+  $("nbosBar").innerHTML = `<b>▣ ${heroName()} OS</b><span class="nbos-sp"></span><span class="nbos-wifi${wifi ? "" : " off"}">${t(wifi ? "Wi-Fi" : "sem Wi-Fi")}</span><span class="nbos-bat"><i></i></span><span>${t(G.night ? "Dia {n} · noite" : "Dia {n} · dia", {n: G.day})}</span><button class="nbos-off" type="button">✕ ${t("Desligar")}</button>`;   // fecha o notebook (no celular não tem tecla nem sobra fora)
 }
 function nbFocusIcon() {
   const bs = [...$("nbosIcons").querySelectorAll(".nbos-ic")];
@@ -109,11 +114,20 @@ function nbMailView(body) {
   body.innerHTML = `<div class="nbos-mail"><div class="nbos-lista"></div><div class="nbos-ler"></div></div>`;
   const list = body.querySelector(".nbos-lista"), read = body.querySelector(".nbos-ler"), f = FREELAS[NB_MAIL];
   ids.forEach(id => {
+    if (CARTAS[id]) {   // carta: o nome de quem escreveu e o assunto
+      btn(`<b>♥ ${parName()}</b> <small>${CARTAS[id].as}${G.mail[id] === 1 ? " · " + t("novo") : ""}</small>`, () => { NB_MAIL = id; nbOpenApp("mail"); }, false, list);
+      list.lastChild.classList.toggle("aberto", id === NB_MAIL); return;
+    }
     const g = FREELAS[id], done = G.freela[id] || 0;
     const tag = G.portfolio[id] ? t("entregue") : done >= g.bugs.length ? t("pronto pra entregar") : G.mail[id] === 1 ? t("novo") : t("{n} de {total} bugs", {n: done, total: g.bugs.length});
     btn(`<b>${g.client}</b> <small>${t(g.n)} · ${tag}</small>`, () => { NB_MAIL = id; nbOpenApp("mail"); }, false, list);
     list.lastChild.classList.toggle("aberto", id === NB_MAIL);
   });
+  if (CARTAS[NB_MAIL]) {   // carta de Curitiba: só ler
+    const c = CARTAS[NB_MAIL];
+    read.innerHTML = `<p class="nbos-de">${t("De: {cliente} · {lugar}", {cliente: parName(), lugar: "Curitiba"})}</p><p class="nbos-de"><b>${c.as}</b></p><p class="nbos-msg carta">${c.txt}</p><p class="nbos-msg carta">— ${parName()}</p>`;
+    return;
+  }
   const done = G.freela[NB_MAIL] || 0, wifi = nbWifi(), all = done >= f.bugs.length;
   read.innerHTML = `<p class="nbos-de">${t("De: {cliente} · {lugar}", {cliente: f.client, lugar: nbMailPlace(NB_MAIL)})}</p><p class="nbos-msg">${t(f.ask, {n: f.pay})}</p>`
     + (G.portfolio[NB_MAIL] ? `<p class="nbos-msg resp">${t(f.thanks)}</p><p class="nbos-ok">${t("Entregue · R$ {n}", {n: f.pay})}</p>`

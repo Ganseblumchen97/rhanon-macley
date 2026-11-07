@@ -15,7 +15,7 @@ function narraNext() {
   const l = n.lines[n.i], who = typeof l !== "object" ? "paje" : l.p ? "pytuna" : l.e ? "entrevista" : "rhanon", rh = who === "rhanon";
   const txt = who === "paje" ? l : l.p || l.e || l.r; n.full = t(txt); n.t0 = performance.now(); n.shown = 0;
   $("narra").classList.toggle("rhanon", rh); $("narra").classList.toggle("pytuna", who === "pytuna");
-  $("narra").querySelector("b").textContent = who === "pytuna" ? "Pytuna" : who === "entrevista" ? t("Entrevistadora") : rh ? "Rhanon" : t("Pajé");
+  $("narra").querySelector("b").textContent = who === "pytuna" ? "Pytuna" : who === "entrevista" ? t("Entrevistadora") : rh ? heroName() : t("Pajé");
   narraPortrait(who); sfx(who === "pytuna" ? "roar" : "blip");
   $("narra").querySelector("small").innerHTML = padBadge("z") + " ▶";   // Z ou o botão do controle
   requestAnimationFrame(narraType);
@@ -164,19 +164,80 @@ function fimEntrevista() {
   if (prog.length) L.splice(2, 0, {e: t("Vi o teu portfólio: {lista}. Tudo feito na estrada?", {lista: prog.join(", ")})});
   return L;
 }
-// tela do fim: o nome do jogo, um resumo e "Continuar jogando" (Z, Enter ou X fecham)
+/* créditos do fim, como nos jogos grandes: sobem devagar com o tema de Jaci (CREDITOS e CRED_ELENCO em data/narration.js;
+   os chefes e os freelas vêm dos dados, os que faltam aparecem apagados). Z/Enter segura = mais rápido, X/Esc pula.
+   No fim, o cartão com a viagem do jogador, "Obrigado por jogar!" e "Continuar jogando" */
 function endCredits(done) {
+  const b = document.createElement("div"); b.className = "creditos rolando"; b.setAttribute("role", "dialog");
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
+  const sec = (h, body) => `<section><h3>${esc(h)}</h3>${body}</section>`;
+  const chefes = ANIMALS.filter(a => a.boss && a.id !== "pytuna"), freelas = Object.keys(FREELAS);
+  let html = `<div class="cred-logo"><p class="nome">Jaci: The Fading Moon</p><p class="sub">${esc(heroAventura())}</p></div>`;
+  html += CREDITOS.map(c => sec(t(c.h), c.n.map(n => `<p class="cn">${esc(n)}</p>`).join("") + (c.d ? `<p class="cd">${esc(t(c.d))}</p>` : ""))).join("");
+  const par = [[heroName() + " Macley", t("quem viajou")], [parName() + " Macley", t("quem esperou em Curitiba")]];
+  html += sec(t("Elenco"), par.map(([n, d]) => `<p class="cn">${esc(n)}</p><p class="cd">${esc(d)}</p>`).join("") + CRED_ELENCO.map(([n, d]) => `<p class="cn">${esc(t(n))}</p><p class="cd">${esc(t(d))}</p>`).join("")
+    + freelas.map(k => `<p class="cn">${esc(FREELAS[k].client)}</p><p class="cd">${esc(t("cliente do {freela}", {freela: FREELAS[k].n}))}</p>`).join(""));
+  html += sec(t("Os chefes do caminho"), `<p class="cd">${esc(t("{n} de {total} acalmados", {n: chefes.filter(a => bossBeaten(a.id)).length, total: chefes.length}))}</p><div class="cred-chefes"></div>`);
+  html += sec(t("Feito com"), `<p class="cd">${esc(t("HTML, CSS e JavaScript, sem nenhuma biblioteca."))}</p><p class="cd">${esc(t("Letras: Lilita One, Lora e Nunito (Google Fonts)."))}</p>`);
+  html += sec(t("Agradecimentos"), `<p class="cd">${esc(t("Ao folclore brasileiro, aos bichos do Brasil e a você, que jogou até aqui."))}</p>`);
+  b.innerHTML = `<div class="rolo">${html}</div><p class="cred-dica"></p>`;
+  const grid = b.querySelector(".cred-chefes");
+  chefes.forEach(a => {   // cada chefe com o desenho dele; o que ainda não foi acalmado fica de silhueta
+    const ok = bossBeaten(a.id), src = beastFrame(a.id), fig = document.createElement("figure");
+    if (src) {
+      const c = document.createElement("canvas"); c.width = src.width; c.height = src.height; const x = c.getContext("2d"); x.drawImage(src, 0, 0);
+      if (!ok) { x.globalCompositeOperation = "source-in"; x.fillStyle = "#24304a"; x.fillRect(0, 0, c.width, c.height); }
+      else c.style.filter = (beastTint(a) + " drop-shadow(0 0 5px rgba(255,240,190,.55))").trim();   // acalmado: com a cor dele e o brilho do luar
+      c.style.width = Math.round(src.width / BEAST_K * 2) + "px"; fig.append(c);
+    }
+    fig.insertAdjacentHTML("beforeend", `<figcaption>${ok ? esc(a.name) : "???"}</figcaption>`);
+    if (!ok) fig.className = "falta";
+    grid.append(fig);
+  });
+  const dica = b.querySelector(".cred-dica");
+  dica.textContent = isTouch() ? t("Segure para acelerar · toque em Pular") : t("Segure {z} para acelerar · {x} pula", padVars());
+  if (isTouch()) { const pul = document.createElement("button"); pul.type = "button"; pul.className = "cred-pular"; pul.textContent = t("Pular"); b.append(pul); pul.addEventListener("click", ev => { ev.stopPropagation(); fim(); }); }
+  document.body.appendChild(b); musicStart("creditos");   // os temas do Rhanon e de Jaci emendados (music.js)
+  const rolo = b.querySelector(".rolo"), H = rolo.offsetHeight, V = b.clientHeight;
+  const anim = rolo.animate([{transform: `translateY(${V}px)`}, {transform: `translateY(${-H}px)`}], {duration: Math.max(30000, (H + V) * 20), easing: "linear", fill: "forwards"});
+  const fast = on => { anim.playbackRate = on ? 5 : 1; };
+  let acabou = false;
+  const key = ev => {
+    if (acabou) return;
+    if (["z", "Z", "Enter", " "].includes(ev.key)) { ev.preventDefault(); ev.stopImmediatePropagation(); fast(ev.type === "keydown"); }
+    else if (["x", "X", "Escape"].includes(ev.key) && ev.type === "keydown") { ev.preventDefault(); ev.stopImmediatePropagation(); if (!ev.repeat) fim(); }
+  };
+  const down = () => fast(true), up = () => fast(false);
+  window.addEventListener("keydown", key, true); window.addEventListener("keyup", key, true);
+  b.addEventListener("pointerdown", down); b.addEventListener("pointerup", up); b.addEventListener("pointercancel", up);
+  anim.finished.then(fim, () => {});
+  function fim() {
+    if (acabou) return; acabou = true;
+    window.removeEventListener("keydown", key, true); window.removeEventListener("keyup", key, true);
+    anim.cancel(); b.remove(); endCard(done, chefes, freelas);
+  }
+}
+// o cartão depois dos créditos: a viagem em números, o que ainda dá para fazer e "Continuar jogando" (Z, Enter ou X fecham)
+function endCard(done, chefes, freelas) {
+  const nc = chefes.filter(a => bossBeaten(a.id)).length, nf = freelas.filter(k => G.portfolio && G.portfolio[k]).length;
+  const nb = ANIMALS.filter(a => G.bestiary[a.id] && G.bestiary[a.id].seen).length;
+  const linha = (k, v) => `<li><span>${k}</span><b>${v}</b></li>`;
+  const falta = [nc < chefes.length && t("acalmar os chefes que faltam (de noite também)"), nf < freelas.length && t("entregar os freelas que faltam"),
+    nb < ANIMALS.length && t("completar o caderno de bichos")].filter(Boolean);
   const b = document.createElement("div"); b.className = "creditos"; b.setAttribute("role", "dialog");
-  b.innerHTML = `<h2 class="title"></h2><p class="nome">Jaci: The Fading Moon</p><p class="sub">${t("Uma aventura de Rhanon Macley")}</p>`
-    + `<p>${t("Do Tapajós a Curitiba, o menino acalmou os bichos do Brasil inteiro, devolveu a lua pro avô e começou no emprego que sonhava.")}</p>`
+  b.innerHTML = `<h2 class="title"></h2><p class="nome">Jaci: The Fading Moon</p><p class="sub">${heroAventura()}</p>`
+    + `<p>${t("Do Tapajós a Curitiba, o menino acalmou os bichos do Brasil inteiro, devolveu a lua pro avô e reencontrou a Franciscane.")}</p>`
+    + `<ul class="viagem">${linha(t("Nível"), G.lv)}${linha(t("Dias na estrada"), G.day || 1)}${linha(t("Chefes acalmados"), `${nc}/${chefes.length}`)}`
+    + `${linha(t("Freelas entregues"), `${nf}/${freelas.length}`)}${linha(t("Bichos no caderno"), `${nb}/${ANIMALS.length}`)}</ul>`
+    + (falta.length ? `<p class="falta">${t("O Brasil continua aberto. Ainda dá para: {lista}.", {lista: falta.join(", ")})}</p>` : `<p class="falta">${t("Tu fez tudo. Pai d'égua!")}</p>`)
     + `<p class="obrigado">${t("Obrigado por jogar!")}</p><button class="cmd" type="button"><span>${t("Continuar jogando")}</span></button>`;
   document.body.appendChild(b); ransom(b.querySelector("h2"), [t("Fim").toUpperCase()], 7); levelUpJingle();
   const btn = b.querySelector("button"), key = ev => {
     if (!["z", "Z", "Enter", " ", "x", "X", "Escape"].includes(ev.key)) return;
     ev.preventDefault(); ev.stopImmediatePropagation(); if (!ev.repeat) btn.click();
   };
-  document.addEventListener("keydown", key, true);
-  btn.addEventListener("click", () => { document.removeEventListener("keydown", key, true); b.remove(); if (EX) musicStart("local"); if (done) done(); });
+  setTimeout(() => window.addEventListener("keydown", key, true), 600);   // o Z que pulou os créditos não fecha o cartão
+  btn.addEventListener("click", () => { window.removeEventListener("keydown", key, true); b.remove(); if (EX) musicStart("local"); if (done) done(); });
   setTimeout(() => btn.focus(), 300);
 }
 // dica quando o jogador perde duas lutas seguidas: a primeira que servir, na ordem

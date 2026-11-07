@@ -1,21 +1,5 @@
-/* Música: motor novo (MUS) para título, mapas e batalhas; motor antigo só para entrevista e trabalho. */
+/* Música: o motor MUS toca todas as faixas (título, mapas, exploração e batalhas). */
 const hz = n => 440 * 2 ** ((n - 69) / 12);
-/* Trilha de entrevista: chiptune corporativo, leve tensão e acordes jazzy. */
-function stepInterview(s, t) {
-  const b=s>>4, i=s&15, roots=[53,48,50,45][b%4], seq=[0,3,7,10,7,3,5,7,0,4,7,11,7,4,2,5];
-  if (i%2===0) tone(hz(72+seq[i]+(b%2?2:0)),t,.13,"triangle",.045);
-  if ([0,6,8,14].includes(i)) [0,3,7,10].forEach((n,j)=>tone(hz(roots+24+n),t,.24,"sine",j===0?.035:.018));
-  if (i===4||i===12) tone(hz(roots-12),t,.16,"triangle",.055);
-  if (i===7||i===15) noise(t,.018,.009,6500);
-}
-/* Trilha de trabalho: loop eletrônico focado, pulsação constante e arpejos. */
-function stepWork(s, t) {
-  const b=s>>4, i=s&15, roots=[45,41,48,43][b%4], pat=[0,7,12,7,3,7,10,7,0,7,14,7,5,7,12,7];
-  tone(hz(roots+pat[i]),t,.075,"square",.035);
-  if (i%4===0) tone(hz(roots-12),t,.18,"triangle",.12);
-  if (i===4||i===12) tone(hz(roots+19),t,.11,"triangle",.045);
-  if (i%4===2) noise(t,.018,.012,7200);
-}
 /* ===== Música (motor da vitrine) =====
    Cada faixa passa por um barramento com reverb e compressor, entra e sai com transição suave
    e é composta por instrumentos sintetizados (sino, flauta, piano elétrico, pad, baixo, bateria,
@@ -987,6 +971,30 @@ const MUS = (() => {
         if (m) { flute(mtof(m.note), t, m.len * d * .95, .03); if (lap % 2) bell(mtof(m.note + 12), t, .01, 1.6); }
       }
     },
+    // créditos do fim (endCredits): os dois temas emendados, sem pressa. A - o tema do Rhanon (versão de viagem) no
+    // piano elétrico, só com pad: a lembrança da estrada; A' - o mesmo tema na flauta, com caxixi e um bumbo bem leve;
+    // B - o tema de Jaci na flauta com a harpa em arpejo: a lua voltando; B' - Jaci uma oitava acima, sino dobrando e o
+    // ritmo inteiro, e volta ao começo. Tudo em dó maior / lá menor, então um tema emenda no outro sem troca de tom
+    creditos: {
+      bpm: 76, wet: .55, level: .44, form: ["A", "A2", "B", "B2"], melody: null,
+      chords: {A: P4_CHORDS, B: [{bass: 36, notes: [60, 64, 67, 71]}, {bass: 45, notes: [57, 60, 64, 67]}, {bass: 41, notes: [57, 60, 65, 69]}, {bass: 43, notes: [55, 59, 62, 67]}]},
+      play(i, t, d) {
+        const s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4], jaci = part[0] === "B";
+        const chord = jaci ? this.chords.B[Math.floor(barIn / 2)] : this.chords.A[barIn % 4];
+        if (i % 128 === 0) this.melody = jaci ? themeLine(JACI_THEME, part === "B2" ? 12 : 0) : themeLine(RHANON_THEME.viagem, part === "A2" ? 0 : -12, part === "A2");
+        if (s === 0 && (jaci ? barIn % 2 === 0 : true)) { pad(chord.notes, t, d * (jaci ? 32 : 16), .011); synth("sine", mtof(chord.bass), t, d * (jaci ? 30 : 15), .055); }
+        if (part !== "A" && s % 2 === 1) caxixi(t, s % 4 === 3 ? .008 : .004);
+        if ((part === "A2" || part === "B2") && (s === 0 || s === 10)) kick(t, .06);
+        if (part === "B2" && (s === 4 || s === 12)) snare(t, .02);
+        if (jaci && s % 2 === 0) synth("triangle", mtof(chord.notes[(s / 2) % 4] + 12), t, d * 3, .007);   // harpa em arpejo
+        if (part === "A" && [3, 6, 10, 14].includes(s)) chord.notes.forEach(m => ep(mtof(m), t, .2, .008));
+        const m = this.melody && this.melody[i % 128];
+        if (!m) return;
+        if (part === "A") ep(mtof(m.note + 12), t, m.len * d * .9, .05);
+        else flute(mtof(m.note), t, m.len * d * .95, .03);
+        if (part === "B2") bell(mtof(m.note + 12), t, .01, 1.6);
+      }
+    },
     // batalha no Nordeste: forró acelerado (baião de batalha) com zabumba, triângulo, sanfona puxando os acordes e o tema
     // do Nordeste (NORDESTE_THEME) na sanfona; matraca do boi por baixo. Forma A - A' (oitava acima, com floreios) - A - C
     // (C = ponte só de zabumba e triângulo com virada crescente)
@@ -1507,19 +1515,6 @@ const MUS = (() => {
   return {has: id => !!ALL[id], play, stop: (sec = .6) => { if (X) fadeOut(sec); }, measure, render, beat, get current() { return trackId; }};
 })();
 
-/* ----- motor antigo: só as faixas de entrevista e trabalho ----- */
-const LEGACY = {interview: {step: stepInterview, interval: .16}, work: {step: stepWork, interval: .105}};
-let legacyTimer = null, legacyId = null;
-function legacyStart(id) {
-  if (legacyTimer && legacyId === id) return;
-  legacyStop();
-  legacyId = id;
-  if (!AC || !LEGACY[id]) return;
-  const tr = LEGACY[id]; let step = 0, nextT = AC.currentTime + .05;
-  legacyTimer = setInterval(() => { while (nextT < AC.currentTime + .25) { tr.step(step, nextT); nextT += tr.interval; step = (step + 1) % 256; } }, 60);
-}
-function legacyStop() { if (legacyTimer) clearInterval(legacyTimer); legacyTimer = null; }
-
 /* ----- o que o resto do jogo usa ----- */
 function musicStart(id) {
   id = id || "battleCapo";
@@ -1532,7 +1527,7 @@ function musicStart(id) {
   if (regLocal) id = G.night ? regLocal + "Night" : regLocal;
   if (id === "local" && G.night) id = "localNight";   // à noite a música da exploração muda de clima
   if (id === "map" && MAP_REGION === "norte") id = G.night ? "mapParaNight" : "mapPara";   // mapa do Norte: guitarrada de dia e de noite
-  if (MUS.has(id)) { legacyStop(); MUS.play(id); }
-  else { MUS.stop(.4); legacyStart(id); }
+  if (MUS.has(id)) MUS.play(id);
+  else MUS.stop(.4);
 }
-function musicStop() { legacyStop(); MUS.stop(.7); }
+function musicStop() { MUS.stop(.7); }

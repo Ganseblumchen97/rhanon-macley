@@ -34,7 +34,7 @@ function journalCard(a) {
   c.width = src ? src.width : 20; c.height = src ? src.height : 20;
   const x = c.getContext("2d");
   if (src) { x.drawImage(src, 0, 0); if (!seen) { x.globalCompositeOperation = "source-in"; x.fillStyle = G.nb.on ? "#3a6a9a" : "#2a1a14"; x.fillRect(0, 0, c.width, c.height); } }   // não visto: só a silhueta (azul na tela do notebook)
-  if (a.tint && seen) c.style.filter = a.tint;
+  if (beastTint(a) && seen) c.style.filter = beastTint(a);
   const card = document.createElement("div"); card.className = "cad-card" + (seen ? "" : " nao-visto");
   card.append(c);
   card.insertAdjacentHTML("beforeend", seen

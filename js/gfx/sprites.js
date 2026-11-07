@@ -1,16 +1,8 @@
-/* Montagem dos sprites em canvas: bichos, entrevistador, Rhanon e utilidades de pixel. */
+/* Montagem dos sprites em canvas: bichos, Rhanon e utilidades de pixel. */
 function spriteRaw(rows, pal, W) {
   const c = document.createElement("canvas"), x = c.getContext("2d");
   c.width = W; c.height = rows.length; c.className = "spr"; c.style.setProperty("--n", W);
   rows.forEach((r, y) => [...r.slice(0, W)].forEach((ch, i) => { if (pal[ch]) { x.fillStyle = pal[ch]; x.fillRect(i, y, 1, 1); } }));
-  return c;
-}
-function interviewerSprite() { return sprite(INTERVIEWER, PAL_BUS, 14); }
-function workerSprite() {
-  const pal={...PAL_H,j:"#26364a",c:"#f4ecd8",b:"#315b91",x:"#101820"};
-  const c=sprite(WORKER,pal,14),x=c.getContext("2d");
-  if(G?.betterJob){x.fillStyle=pal.j;x.fillRect(3,7,8,5);x.fillStyle=pal.q;x.fillRect(6,7,2,4);x.fillStyle=pal.x;x.fillRect(4,3,2,1);x.fillRect(8,3,2,1);}
-  else if(G?.job){x.fillStyle=pal.j;x.fillRect(3,7,8,5);x.fillStyle=pal.c;x.fillRect(6,7,2,4);x.fillStyle=pal.q;x.fillRect(6,7,1,4);}
   return c;
 }
 // bicho na batalha: arte em imagem (data/art.js) se houver, senão o desenho em código
@@ -26,14 +18,14 @@ function codeAnimalSprite(a) {
   const rig = beastFrame(a.id), c = document.createElement("canvas"), x = c.getContext("2d");
   if (rig) {   // traço novo (gfx/beasts.js): cópia do quadro parado, em resolução 2x
     c.width = rig.width; c.height = rig.height; x.drawImage(rig, 0, 0);
-    Object.assign(c.dataset, rig.dataset); c.dataset.rig = beastId(a.id);
+    Object.assign(c.dataset, rig.dataset); c.dataset.rig = BOSS_ACC[a.id] ? a.id : beastId(a.id);   // chefe com acessório: quadros próprios
   } else {   // bicho ainda sem desenho: emoji provisório
     c.width = c.height = 20;
     x.font = "16px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
     x.fillText(a.emoji, 10, 11);
   }
   c.className = "spr"; c.style.setProperty("--n", c.width / (+c.dataset.scale || 1) * (a.boss ? 1.35 : 1));
-  if (a.tint) c.style.filter = a.tint;
+  if (beastTint(a)) c.style.filter = beastTint(a);
   return c;
 }
 function sprite(rows, pal, W) { return shadeCanvas(spriteRaw(rows, pal, W)); }

@@ -48,12 +48,6 @@ function setupMapNav() {
   document.addEventListener("keydown", ev => {
     if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
     if (!$("titleScreen").hidden) { menuKey(ev, $("titleScreen").querySelector(".t-menu")); return; }   // setas entre "Iniciar aventura" e "Opções", Z/Enter apertam
-    // entrevistas e missões de trabalho
-    if (["interview", "betterInterview", "work"].includes(mode) && $("over").hidden && $("map").hidden) {
-      const i = "123".indexOf(ev.key) >= 0 ? "123".indexOf(ev.key) : "abc".indexOf(ev.key.toLowerCase());
-      if (ev.key.length === 1 && i >= 0 && activeQuestions && i < activeQuestions[interviewIndex].a.length) answerInterview(i);
-      return;
-    }
     const which = !$("local").hidden ? "local" : !$("map").hidden ? "map" : null;
     if (!which || moving || !$("over").hidden) return;
     const dir = {ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0]}[ev.key];

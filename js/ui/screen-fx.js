@@ -122,7 +122,7 @@ function dawnWipe(mid, label, night) {
   [.3, .38, .44, .5, .58, .64].forEach((p, i) => setTimeout(() => g.replaceChildren(frames[(i + 1) % 2]), DAWN_MS * p));   // bico abrindo no "có-có-ri-cóóó"
 }
 function applyTheme() {
-  const t = G.loc === "curitiba" ? "p4" : "mata", r = document.documentElement;
+  const t = "mata", r = document.documentElement;   // tema único (o "p4" era da Curitiba das entrevistas, removida)
   if (r.dataset.theme === t) return;
   if (!themeReady) r.dataset.theme = t; else wipe(() => { r.dataset.theme = t; });
 }

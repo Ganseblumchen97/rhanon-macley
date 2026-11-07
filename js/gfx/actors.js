@@ -375,7 +375,7 @@ function makeBeastActor() {
     let rp = null;
     if (rig) {
       sx = sy = scale = 1;
-      rp = state === "fidget" ? polishFidgetFrame(act, t - since).pose : state === "prep" ? "crouch" : state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" || state === "bigroar" ? (QUADS[rig] ? "roar" : "attack") : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
+      rp = state === "fidget" ? polishFidgetFrame(act, t - since).pose : state === "prep" ? "crouch" : state === "windup" ? (el < 170 ? "crouch" : el < 330 ? "attack" : "idle") : state === "roar" || state === "bigroar" ? (QUADS[beastId(rig)] ? "roar" : "attack") : state === "hurt" ? "hurt" : state === "defeat" ? (lie ? "ko" : "hurt") : "idle";
       if (rp === "idle" && t % 3400 < 140) rp = "blink";   // pisca de vez em quando
     }
     g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;
@@ -482,7 +482,7 @@ const TITLE_A = (() => {
 const WALKER = (() => {
   const cache = {};
   function frame(key) {
-    const sig = key + JSON.stringify(G?.equip || {}) + (G?.job ? 1 : 0) + (G?.betterJob ? 1 : 0);
+    const sig = key + JSON.stringify(G?.equip || {}) + heroi();   // troca de roupa ou de personagem (Rhanon/Franciscane) refaz o desenho
     if (cache[sig]) return cache[sig];
     // andando: de perfil (o marcador espelha para a esquerda); parado: de frente, respirando
     const c = /^walk\d$/.test(key) ? rigSideCanvas({step: key, dy: key === "walk0" || key === "walk2" ? 1 : 0}, rhanonLook(), OW_SCALE)
@@ -559,7 +559,7 @@ function startAnimationLoop() {
     if (t < HITSTOP_END) { ANIM_LAG += t - last; dt = 0; }   // pausa de impacto: o relógio da batalha não anda
     last = t;
     HERO_A.draw(t - ANIM_LAG); BEAST_A.draw(t - ANIM_LAG); TITLE_A.draw(t, dt); WALKER.tick(t); exploreFrame(t, dt);
-    const battleOn = !$("stage").closest(".game")?.classList.contains("working-mode") && $("map").hidden && $("local").hidden && $("explore").hidden && $("titleScreen").hidden && mode === "hunt";
+    const battleOn = $("map").hidden && $("local").hidden && $("explore").hidden && $("titleScreen").hidden && mode === "hunt";
     if ($("titleScreen").hidden) PFX.frame(dt, HERO_A.unit() || 4, battleOn && $("over").hidden);
   }
   requestAnimationFrame(loop);
