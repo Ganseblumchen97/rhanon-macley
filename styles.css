@@ -789,6 +789,11 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .qte.acertou b{color:#ffd23a}
 .qte.errou{opacity:.3;filter:grayscale(1);transition:opacity .15s}
 @keyframes qteHit{from{opacity:1}to{scale:2;opacity:0}}
+/* golpe do bicho: o anel encosta no alvo no instante do golpe; no fim, pisca dourado = hora do parry */
+.qte.com-parry i{animation-timing-function:linear}
+.qte.parry::before{border-style:solid;border-color:#ffd23a;box-shadow:0 0 0 2px rgba(26,20,38,.45),0 0 18px 5px rgba(255,210,58,.85);animation:none}
+.qte.parry i{border-color:#fff2a0!important;box-shadow:0 0 16px 4px #ffd23a!important}
+.qte.parry b{color:#ffd23a;scale:1.3}
 @media (prefers-reduced-motion:reduce){.qte::before{animation:none}}
 /* caderno de bichos: cartões com desenho, nível, onde vive e a curiosidade; os não vistos ficam só na silhueta */
 .caderno{width:min(860px,94vw);max-height:86vh;overflow:auto}

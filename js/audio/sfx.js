@@ -40,6 +40,8 @@ const SFX = {
   bloqueio: t => { tone(880, t, .2, "square", .06, 820); tone(1320, t, .16, "triangle", .07, 1250); noise(t, .06, .14, 3000); tone(120, t, .1, "sine", .14, 70); },
   // o anel ficou verde: tique discreto marcando a janela do tempo certo
   janela: t => tone(1568, t, .03, "triangle", .035),
+  // o anel ficou dourado: a hora do parry (dois toques agudos, bem curtos)
+  parryJanela: t => { tone(2637, t, .035, "triangle", .045); tone(3136, t + .03, .04, "triangle", .04); },
   // ônibus na estrada: ronco grave do motor
   barco: t => { tone(58, t, .35, "sawtooth", .05, 54); tone(116, t + .02, .12, "square", .02, 110); tone(116, t + .18, .12, "square", .02, 110); noise(t, .25, .03, 300); },   // motor do barco de linha: toc-toc grave
   apito: t => { tone(196, t, .7, "sawtooth", .06, 192); tone(247, t, .7, "square", .025, 244); tone(196, t + .85, 1.1, "sawtooth", .06, 190); tone(247, t + .85, 1.1, "square", .025, 240); },   // apito do barco saindo

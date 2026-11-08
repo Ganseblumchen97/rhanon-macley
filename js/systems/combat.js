@@ -267,13 +267,17 @@ const QTE_EARLY = 250, QTE_LATE = 150;   // janela, em ms, antes e depois do imp
 const PARRY_EARLY = 90, PARRY_LATE = 60, PARRY_HIT = .6;
 let QTE_PARRY = false;   // o último qteTake foi um parry (o bloqueio do bicho olha isto)
 let qte = null, foeImpact = 0;           // qte = {at, el, ok, tried}; foeImpact = quando o último golpe do bicho chega
-function qteArm(impactIn, target) {
+// parry = true (golpe do bicho): o anel fecha até o instante do golpe, fica verde quando o bloqueio abre e pisca dourado
+// (som mais agudo) no pedaço do parry. Nos golpes do Rhanon o anel fecha quando a janela abre, como sempre foi
+function qteArm(impactIn, target, parry = false) {
   qteClear();
   const q = pos(target), el = el$("qte", {left: q.x + "px", top: q.y - 34 + "px"}), lead = Math.max(0, impactIn - QTE_EARLY);
   // alvo fixo (::before), o anel que fecha até ele (i) e a tecla no meio; no controle, o botão dele (ui/gamepad.js)
-  el.innerHTML = `<i></i><u></u><b>${isTouch() ? "☝" : padLabel("z")}</b>`; el.style.setProperty("--dur", lead + "ms");
+  el.innerHTML = `<i></i><u></u><b>${isTouch() ? "☝" : padLabel("z")}</b>`; el.style.setProperty("--dur", (parry ? impactIn : lead) + "ms");
+  if (parry) el.classList.add("com-parry");
   qte = {at: performance.now() + impactIn, el, ok: false, tried: false};
   setTimeout(() => { if (el.isConnected) { el.classList.add("agora"); sfx("janela"); } }, lead);
+  if (parry) setTimeout(() => { if (el.isConnected && !el.classList.contains("errou") && !el.classList.contains("acertou")) { el.classList.add("parry"); sfx("parryJanela"); } }, Math.max(0, impactIn - PARRY_EARLY));
   setTimeout(() => el.remove(), impactIn + QTE_LATE + 260);
 }
 function qteClear() { if (qte && qte.el) qte.el.remove(); qte = null; }
@@ -625,7 +629,7 @@ function foeAttack(kind, d, sp0) {
   const wet = kind !== "roar" && kind !== "fire" && $("beast").classList.contains("submerged");
   const block = d > 0 && kind !== "roar", prep = block ? FOE_PREP : 0, impact = prep + (kind === "roar" ? 400 : kind === "fire" ? 1000 : wet ? 460 : 220);
   foeImpact = Math.max(foeImpact, impact);
-  if (block) { BEAST_A.set("prep"); qteArm(impact, $("hero")); }
+  if (block) { BEAST_A.set("prep"); qteArm(impact, $("hero"), true); }
   setTimeout(() => {
     BEAST_A.set(kind === "roar" || kind === "fire" ? "roar" : "windup");
     if (kind === "roar") { animalCry(e.id, e.boss); anim($("beast"), "hit"); }

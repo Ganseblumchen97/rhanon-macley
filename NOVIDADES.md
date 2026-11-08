@@ -3,6 +3,12 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.90.1 — parry que dá para ver
+
+- O parry ganhou sinal na tela. Quando o bicho ataca, o anel agora fecha até o instante exato do golpe: fica verde
+  quando dá para bloquear e, no finalzinho, pisca dourado com um "tim-tim" agudo. Aperte Z no dourado para o parry;
+  no verde, continua sendo o bloqueio que corta metade. Antes o anel fechava cedo e não havia como saber a hora do parry.
+
 ## 0.90.0 — bicho que morde e parry
 
 - Os bichos batem de verdade agora. Antes, da metade do jogo em diante quase todo golpe tirava 1 de vida. Agora uma luta
