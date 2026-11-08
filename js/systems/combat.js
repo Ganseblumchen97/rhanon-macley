@@ -210,7 +210,7 @@ function pick() {
   if (e.boss && e.far && e.turn % BOSS_HEAVY_EVERY === 0) { e.intent = "forte"; e.known = true; return; }   // o golpe forte vem sempre avisado
   const r = Math.random() * 100;
   e.intent = r < 45 ? "arranhao" : r < 80 ? "bote" : "rugido";
-  e.known = false;
+  e.known = e.lido > 0; if (e.lido > 0) e.lido--;   // Observar leu também o golpe seguinte: chega já conhecido no seu turno
 }
 // o bicho da luta nas frases: foe(1) = "A onça-pintuda", foe() = "a onça-pintuda"
 const foe = cap => theName(e, cap);
@@ -234,7 +234,7 @@ function render() {
   drawXp();
   const logTxt = lines.join("|");   // registro igual: não refaz (a linha nova está no meio da animação de escrever, gfx/polish.js)
   if ($("log").dataset.txt !== logTxt || $("log").childElementCount !== lines.length) { $("log").innerHTML = lines.map((l, i) => (i === lines.length - 1 ? "<p class=\"novo\">" : "<p>") + l + "</p>").join(""); $("log").dataset.txt = logTxt; }
-  $("intentTxt").textContent = e.intent === "forte" ? t("{bicho} junta forças: golpe forte! Defenda.", {bicho: foe(1)}) : e.known ? t("Próximo golpe: {golpe}", {golpe: moveName()}) : t("{bicho} prepara o golpe…", {bicho: foe(1)});
+  $("intentTxt").textContent = e.intent === "forte" ? t("{bicho} junta forças: golpe forte! Defenda.", {bicho: foe(1)}) : e.known ? t("{bicho} prepara: {golpe}!", {bicho: foe(1), golpe: moveName()}) : t("{bicho} prepara o golpe…", {bicho: foe(1)});
   $("intent").className = "intent" + (e.known ? " known" : "") + (e.intent === "forte" ? " forte" : "");
   // estados como ícones (ui/theme.js), com os turnos que faltam; o nome aparece ao passar o mouse e para leitores de tela
   $("status").innerHTML = statusList().map(([k, name, n]) => `<span class="st" title="${name}"><img src="${statusIconURL(k)}" alt="${name}">${n ? `<b>${n}</b>` : ""}</span>`).join("");
@@ -384,8 +384,12 @@ function act(id, ally) {
     say(strong ? t("Reza forte: +{n} PV, e o corpo fica limpo.", {n}) : t("Reza de cura: +{n} PV.", {n}));
     wait = 900;
   } else if (id === "observar") {
-    e.known = true; p.atento = true; sfx("look");
-    say(t("Rhanon estuda {bicho}. Vem aí: {golpe}.", {bicho: foe(), golpe: moveName()}));
+    // revela o golpe de agora (o nome salta em cima do bicho e ele demora mais para bater, dá tempo de ler) e o seguinte,
+    // que aparece na faixa quando o turno voltar; o próximo ataque do Rhanon sai crítico
+    e.known = true; e.lido = 1; p.atento = true; sfx("look"); render();
+    setTimeout(() => pop(moveName().toUpperCase() + "!", $("beast"), "lido"), 350);
+    say(t("Rhanon estuda {bicho}: vem aí {golpe}, e o golpe seguinte também já está lido.", {bicho: foe(), golpe: moveName()}));
+    wait = 1300;
   } else if (id === "defender") {
     p.def = true; p.sp = Math.min(p.msp, p.sp + 3); sfx("guard");
     say(t("Rhanon levanta a guarda."));

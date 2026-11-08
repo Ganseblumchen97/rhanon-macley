@@ -101,17 +101,25 @@ function pop(txt, el, cls, tag) {
   const s = $("fx").getBoundingClientRect(), r = el.getBoundingClientRect(), x = r.left - s.left + r.width / 2, y = r.top - s.top + Math.min(r.height * .3, 40);
   const num = /^[+\u2212-]?\d+$/.test(txt), col = {crit: "#ffd23a", strong: "#f2a20c", heal: "#7dff9a", me: "#ff5a4a"}[cls] || "#fff3c4";
   let d;
-  if (num) {
-    const n = numC(txt, col, cls === "crit" ? 9 : cls === "strong" ? 7 : 6);
+  if (num) {   // número no estilo Persona: letra alta e estreita, contorno grosso, sombra vermelha, cada um um pouco torto
     d = el$("popw", {});
     if (tag) { const t = document.createElement("div"); t.className = "banner mini"; t.textContent = tag; d.appendChild(t); }
     const box = document.createElement("div"); box.className = "popn"; d.appendChild(box);
     if (cls === "crit") { box.appendChild(critStarC(Math.max(17, txt.length * 4 + 11), 17, 7)).classList.add("popstar"); box.style.margin = "26px 0"; }   // espaço para a estrela não cobrir a etiqueta
-    n.className = ""; box.appendChild(n);
+    const n = document.createElement("span"); n.className = "pnum" + (cls ? " p-" + cls : ""); n.textContent = txt.replace("-", "−");   // p-me, e não "me" (classe do painel do herói)
+    n.style.setProperty("--c", col); n.style.rotate = (Math.random() * 16 - 10).toFixed(1) + "deg"; box.appendChild(n);
   }
-  else { d = el$("banner", {}); d.textContent = txt; }
+  else { d = el$("banner", {}); d.textContent = txt; if (cls === "lido") d.classList.add("lido"); }
   d.style.left = x + "px"; d.style.top = y + "px";
-  rm(d, 1050, [
+  if (num) return rm(d, 1100, [   // entra estourando (passa do tamanho e volta), segura e sobe sumindo; sem degraus, para a letra não tremer
+    {transform: "translate(-50%,0) scale(.2)", opacity: 0},
+    {transform: "translate(-50%,-18px) scale(1.5)", opacity: 1, offset: .12},
+    {transform: "translate(-50%,-12px) scale(.92)", opacity: 1, offset: .22},
+    {transform: "translate(-50%,-14px) scale(1)", opacity: 1, offset: .3},
+    {transform: "translate(-50%,-30px) scale(1)", opacity: 1, offset: .8},
+    {transform: "translate(-50%,-44px) scale(.96)", opacity: 0}
+  ], "cubic-bezier(.2,.8,.3,1)"), cls === "crit" && burst({x, y}, ["#f2a20c", "#fff"], 8, 50);
+  rm(d, cls === "lido" ? 1700 : 1050, [
     {transform: "translate(-50%,0) scale(.3)", opacity: 0},
     {transform: "translate(-50%,-16px) scale(1.4)", opacity: 1, offset: .15},
     {transform: "translate(-50%,-10px) scale(1)", opacity: 1, offset: .3},

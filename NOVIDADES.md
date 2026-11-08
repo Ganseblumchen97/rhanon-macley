@@ -3,6 +3,29 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.89.0 — falas com voz e rosto
+
+- As conversas ganharam retrato grande: o rosto de quem fala aparece em pixel art do lado de fora da caixa, bem maior
+  que antes, e muda de expressão conforme a fala (feliz, pensativo, bravo, surpreso, triste). A boca mexe enquanto o
+  texto escreve e o personagem pisca. O retrato do Rhanon e da Franciscane mostra a roupa que está vestida: regata,
+  colete, gibão ou jaqueta.
+- Cada personagem tem voz: um barulhinho a cada letra, diferente para o Pajé, o Rhanon, a Franciscane, o Pytuna e cada
+  morador e vendedor, então dá para saber quem fala só pelo som. O texto também pausa um pouco na vírgula e no ponto.
+  Aperte Z para completar a frase.
+- Observar ficou útil: o nome do golpe salta em cima do bicho ("MORDIDA!"), ele demora mais para bater e, quando o
+  seu turno volta, a faixa já mostra o golpe seguinte ("A capivara prepara: Bote!"). Dá tempo de escolher entre
+  defender e atacar. O próximo ataque continua saindo crítico.
+- Os números de dano mudaram: letra alta e estreita, contorno grosso, sombra vermelha e cada um um pouco torto, como
+  no Persona. Crítico sai maior e amarelo, cura em verde e dano no herói em branco e vermelho.
+- O Rhanon e a Franciscane se mexem com mais fluidez: respiram com a cabeça, as mãos e as tranças acompanhando, e nos
+  golpes a lança gira e passa pelas posições do meio em vez de pular de uma para outra. Na escolha de quem viaja, os
+  dois respiram segurando a lança, e quem está escolhido dá um pulinho e acena.
+- Jogando com a Franciscane, o "ATACA PRIMEIRO!" mostra o nome dela e um close próprio, com os olhos acendendo em luar.
+- Perder uma luta na exploração agora leva direto para a cena de acordar na fogueira da aldeia (ou na pensão da
+  cidade), sem passar pelo mapa.
+- Correções: clicar na tela durante uma fala só passa a fala (antes podia abrir a fogueira atrás dela), e o som de
+  andar no mato alto ficou mais baixo e variado.
+
 ## 0.88.0 — Franciscane, chefes de coroa e créditos de verdade
 
 - Agora dá para escolher quem viaja. Ao começar um jogo novo, escolha entre o Rhanon e a Franciscane Macley: ela tem a

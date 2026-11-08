@@ -14,22 +14,32 @@ function narraNext() {
   if (n.i >= n.lines.length) return narraEnd();
   const l = n.lines[n.i], who = typeof l !== "object" ? "paje" : l.p ? "pytuna" : l.e ? "entrevista" : "rhanon", rh = who === "rhanon";
   const txt = who === "paje" ? l : l.p || l.e || l.r; n.full = t(txt); n.t0 = performance.now(); n.shown = 0;
+  n.voz = rh ? (heroi() === "fran" ? "fran" : "rhanon") : who;
+  // quando cada letra aparece: o ritmo da voz e uma pausa depois da pontuação (mais longa no fim da frase)
+  const cps = (VOZ[n.voz] || {}).cps || NARRA_CPS; let at = 0;
+  n.at = [...n.full].map((c, i, all) => { const prev = all[i - 1] || ""; at += 1000 / cps + (".!?…".includes(prev) ? 220 : ",;:".includes(prev) ? 110 : 0); return at; });
   $("narra").classList.toggle("rhanon", rh); $("narra").classList.toggle("pytuna", who === "pytuna");
   $("narra").querySelector("b").textContent = who === "pytuna" ? "Pytuna" : who === "entrevista" ? t("Entrevistadora") : rh ? heroName() : t("Pajé");
-  narraPortrait(who); sfx(who === "pytuna" ? "roar" : "blip");
+  narraPortrait(who); if (who === "pytuna") sfx("roar");   // os outros já se anunciam pela voz (VOZ em audio/sfx.js)
   $("narra").querySelector("small").innerHTML = padBadge("z") + " ▶";   // Z ou o botão do controle
   requestAnimationFrame(narraType);
 }
 // texto aparecendo aos poucos (respeita "reduzir movimento": aparece inteiro)
 function narraType(now) {
   const n = NARRA_RUN; if (!n) return;
-  const k = REDUCE ? n.full.length : Math.min(n.full.length, Math.floor((now - n.t0) / 1000 * NARRA_CPS));
-  if (k !== n.shown) { n.shown = k; $("narra").querySelector("p").textContent = n.full.slice(0, k); }
-  if (k < n.full.length) requestAnimationFrame(narraType);
+  const el = now - n.t0, all = n.all = [...n.full];
+  let k = REDUCE || el > 1e8 ? all.length : n.shown; while (k < all.length && n.at[k] <= el) k++;
+  if (k !== n.shown) {
+    // um bipe por letra nova (a cada `every` letras, sem espaço nem pontuação); completar a frase com Z não bipa
+    const z = VOZ[n.voz], fast = k - n.shown > 3;
+    if (z && !fast) for (let i = n.shown; i < k; i++) if (/[\p{L}\p{N}]/u.test(all[i]) && (n.letters = (n.letters || 0) + 1) % z.every === 1) { vozBlip(n.voz, all[i]); break; }
+    n.shown = k; $("narra").querySelector("p").textContent = all.slice(0, k).join("");
+  }
+  if (k < all.length) requestAnimationFrame(narraType);
 }
 function narraPress() {
   const n = NARRA_RUN; if (!n) return;
-  if (n.shown < n.full.length) { n.t0 = -1e9; return; }   // primeiro aperto completa a frase
+  if (n.shown < [...n.full].length) { n.t0 = -1e9; return; }   // primeiro aperto completa a frase
   narraNext();
 }
 function narraEnd() {
@@ -37,17 +47,32 @@ function narraEnd() {
   $("narra").hidden = true;
   if (n && n.done) n.done();
 }
-// retrato: o Pajé sentado com a fogueira na frente, o Rhanon de pé, ou Pytuna (fumaça com olhos vermelhos)
+/* retrato grande de quem fala (gfx/portraits.js), do lado de fora da caixa, com expressão: a fala pode dizer qual
+   ({r: "...", f: "bravo"}; chaves de FACE_SHAPE); sem isso, sai do jeito da frase (narraExpr). Enquanto o texto
+   escreve, a boca mexe; de vez em quando pisca; e o busto respira */
 function narraPortrait(who) {
-  const c = $("narra").querySelector("canvas"), x = c.getContext("2d"), rh = who === "rhanon";
-  x.imageSmoothingEnabled = false; x.clearRect(0, 0, c.width, c.height);
-  if (who === "pytuna") { x.fillStyle = "#0a0a14"; x.fillRect(0, 0, 48, 48); drawSmoke(x, 24, 26, 1.1, performance.now()); return; }
-  if (who === "entrevista") { x.fillStyle = "#3a4a6a"; x.fillRect(0, 0, 48, 48); x.drawImage(rigCanvas("front", {face: "happy"}, VILLAGER_LOOK.startup, 1), 8, 4); return; }   // a entrevistadora da empresa
-  const g = x.createRadialGradient(24, 40, 2, 24, 30, 34); g.addColorStop(0, "#c8602a"); g.addColorStop(1, "#2a140a");
-  x.fillStyle = g; x.fillRect(0, 0, 48, 48);
-  const fig = rh ? rigCanvas("front", {face: "happy"}, rhanonLook(), 1) : rigCanvas("front", {sit: true}, VILLAGER_LOOK.xama, 1);
-  x.drawImage(fig, 8, rh ? 4 : 2);
-  if (!rh) { const f = gridC(FLAME, PAL_F, 1); x.drawImage(f, 18, 38); }
+  const n = NARRA_RUN; if (!n) return;
+  n.face = who === "rhanon" ? (heroi() === "fran" ? "fran" : "rhanon") : who;
+  n.expr = narraExpr(n.lines[n.i], who, n.lines); n.look = rhanonLook();
+  const c = $("narra").querySelector("canvas"); c.classList.remove("entra"); void c.offsetWidth; c.classList.add("entra");   // entra deslizando a cada fala
+  if (!n.faceLoop) { n.faceLoop = true; requestAnimationFrame(narraFace); }
+}
+function narraExpr(l, who, lines) {
+  if (l && typeof l === "object" && l.f) return l.f;
+  const txt = typeof l === "object" ? l.p || l.e || l.r || "" : l || "", pyt = lines.some(q => q && q.p);
+  if (who === "pytuna") return /\?/.test(txt) ? "surpreso" : /\.\.\.|…/.test(txt) ? "feliz" : "bravo";   // com reticências, o deboche
+  if (who === "rhanon") return /\?/.test(txt) ? (pyt ? "surpreso" : "pensativo") : pyt ? "bravo" : /!/.test(txt) ? "feliz" : /\.\.\.|…/.test(txt) ? "pensativo" : "normal";
+  if (who === "paje") return pyt || /fumaça|Pytuna|apag|escur/i.test(txt) ? "pensativo" : /!/.test(txt) ? "feliz" : "normal";
+  return /!/.test(txt) ? "feliz" : "normal";
+}
+function narraFace(now) {
+  const n = NARRA_RUN; if (!n) return;
+  requestAnimationFrame(narraFace);
+  if (!n.nextBlink || now > n.nextBlink + 140) n.nextBlink = now + 1800 + Math.random() * 2800;
+  const all = n.all || [], last = all[n.shown - 1] || "", typing = n.shown < all.length;
+  const talk = !REDUCE && typing && /[\p{L}\p{N}]/u.test(last) && Math.floor(now / 95) % 2 === 0;
+  const c = $("narra").querySelector("canvas"), x = c.getContext("2d");
+  portraitDraw(x, n.face, n.expr, {t: now, talk, blink: !REDUCE && now > n.nextBlink, look: n.look});
 }
 /* fumaça de Pytuna: bolhas cinza-escuras girando devagar e dois olhos vermelhos; k = tamanho, alpha = sumindo */
 function drawSmoke(x, cx, cy, k = 1, now = 0, alpha = 1) {
@@ -248,8 +273,18 @@ function pajeHint() {
   return skillPoints() ? NARRA_HINT.pontos : !G.equip.ranged && G.lv >= 4 ? NARRA_HINT.arco : luar && !G.equip.amulet ? NARRA_HINT.talisma
     : sp && specialLock(sp) && NARRA_HINT[w] ? NARRA_HINT[w] : z && G.lv < (z.lv || 1) + 1 ? NARRA_HINT.nivel : NARRA_HINT.tempo;
 }
+/* com o painel aberto, clique ou toque em qualquer lugar só passa a fala: nada chega no cenário, no HUD ou nos botões
+   (antes o clique no mapa virava golpe e abria a fogueira). O clique logo depois da última fala também é engolido. */
+let NARRA_EAT = 0;
 function setupNarration() {
-  $("narra").addEventListener("click", narraPress);
+  const eat = ev => { ev.preventDefault(); ev.stopImmediatePropagation(); };
+  document.addEventListener("pointerdown", ev => {
+    if ($("narra").hidden) return;
+    eat(ev); NARRA_EAT = performance.now() + 400; if (ev.button === 0 || ev.pointerType !== "mouse") narraPress();
+  }, true);
+  for (const k of ["pointerup", "click", "contextmenu", "mousedown", "mouseup"]) document.addEventListener(k, ev => {
+    if (!$("narra").hidden || performance.now() < NARRA_EAT) eat(ev);
+  }, true);
   document.addEventListener("keydown", ev => {
     if ($("narra").hidden) return;
     ev.stopImmediatePropagation(); ev.preventDefault();

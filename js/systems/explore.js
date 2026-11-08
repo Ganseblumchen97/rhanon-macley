@@ -250,6 +250,7 @@ function exitExplore() {
 }
 // volta da batalha para a fase, no mesmo lugar
 function resumeExplore(result) {
+  if (result === "lose" && fromLossWake()) return;   // desmaiou: acorda direto na fogueira da aldeia (ou na pensão da cidade)
   if (!EX || result === "lose") { $("explore").hidden = true; EX = null; return showLocal(); }
   const en = EX.fighting, now = performance.now();
   EX.fighting = null; EX.locked = false; exKeys.clear();
@@ -500,7 +501,7 @@ function grassStir(ent, now, loud) {   // marca o quadrado de mato onde a pessoa
   if (stageTile(tx, ty) !== ",") { if (loud) EX.grassAt = null; return; }
   EX.shake = EX.shake || {};
   for (const dx of [-1, 0, 1]) if (stageTile(tx + dx, ty) === ",") { const k = (tx + dx) + "," + ty; if (!EX.shake[k] || now - EX.shake[k] > 250) EX.shake[k] = now - (dx ? 120 : 0); }
-  if (loud && EX.grassAt !== tx + "," + ty) { EX.grassAt = tx + "," + ty; sfx("mato"); }
+  if (loud && EX.grassAt !== tx + "," + ty) { EX.grassAt = tx + "," + ty; if (now - (EX.grassSfx || 0) > 420) { EX.grassSfx = now; sfx("mato"); } }   // no máximo um farfalhar a cada 0,4 s
 }
 function drawShadow(x, sx, sy, w) { x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(sx - w / 2, sy - 1, w, 2); x.fillRect(sx - w / 2 + 2, sy - 2, w - 4, 4); }
 function drawHeroEnt(x, h, cx, cy, now) {
@@ -518,11 +519,11 @@ function drawHeroEnt(x, h, cx, cy, now) {
     img = rigCanvas(bowAim.y < -.35 ? "back" : "front", {lh: r(left ? B : N), rh: r(left ? N : B)}, {...rhanonLook(), bowBack: false}, OW_SCALE);
   } else if (h.dir === "side" && !art) {   // de perfil: 4 passos; na estocada, braços para frente (a lança vem por fora)
     const sideJab = EX.jab > 0 && Math.abs(h.aim.y) < .5;
-    img = rigSideCanvas({step: walking ? "walk" + step % 4 : "stand", dy: walking ? (step % 2 === 0 ? 1 : 0) : Math.floor(now / 700) % 2, face: now % 3300 < 130 ? "blink" : undefined, weapon: sideJab ? "jab" : EX.jab > 0 ? null : "diag", lean: sideJab ? 2 : 0, side: h.side || 1},
+    img = rigSideCanvas({step: walking ? "walk" + step % 4 : "stand", ...(walking ? {dy: step % 2 === 0 ? 1 : 0} : heroBreath(now, 2200)), face: now % 3300 < 130 ? "blink" : undefined, weapon: sideJab ? "jab" : EX.jab > 0 ? null : "diag", lean: sideJab ? 2 : 0, side: h.side || 1},
       {...rhanonLook(), bowBack: !!G.equip.ranged && !(EX.shoot > 0)}, OW_SCALE);
   } else img = art ? overworldArt(h.dir === "side" ? "down" : h.dir, walking ? step % art.frames : 0)
     : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0), h.side || 1,
-        walking ? {} : {dy: Math.floor(now / 700) % 2, face: now % 3300 < 130 ? "blink" : undefined});   // parado: respira e pisca
+        walking ? {} : {...heroBreath(now, 2200), face: now % 3300 < 130 ? "blink" : undefined});   // parado: respira (heroBreath) e pisca
   const iw = art ? art.w / art.scale : img.width, ih = art ? art.h / art.scale : img.height;
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
   // estocada da lança; de costas (golpe para cima) ela vai atrás do corpo e só a ponta aparece acima da cabeça
@@ -1138,6 +1139,7 @@ function exOpenDialog(kind, msg, look) {
   if (msg) d.insertAdjacentHTML("beforeend", `<p class="hint">${msg}</p>`);
   btn(t("Fechar"), exCloseDialog, false, d);
   d.hidden = false; EX.confirming = null; EX.dialogT = performance.now();
+  if (fresh) exTypeSpeech(d.querySelector("h2 + p"), npcVoiceFor(kind, look));   // quem fala: o texto escreve com a voz dele
   if (kind !== "armeiro" && !(kind === "xama" && d.querySelector(".forge")) && kind !== "tutorial") { menuSelect(d, EX.keepSel ?? menuFirst(d)); EX.keepSel = null; }   // já começa com uma opção escolhida
 }
 /* ---------- notebook do Rhanon (NB_PARTS em data/world.js) e o freela (FREELAS) ---------- */
@@ -1521,18 +1523,25 @@ function campSeat(f, side) {
 }
 // cena de abertura: amanhece, Rhanon acorda do lado da fogueira da aldeia, se espreguiça e o jogo começa
 // a aventura sempre começa de manhã, na cidade onde o save está: na aldeia (fogueira) ou, em Belém, no quarto do motel
-function startIntro() {
+// lost = desmaiou numa luta da exploração: a mesma cena de acordar, com o aviso de que voltou com metade das forças
+function startIntro(lost = false) {
   vit(); G.night = false; save();
   if (curCity() !== "ananindeua") return startExplore(CITY[curCity()].home, () => {   // na cidade: acorda no quarto da pensão
     const m = EX.spots.find(q => q.kind === "tenda"), h = EX.hero;   // sai do quarto pela porta do motel
     if (m) Object.assign(h, {x: m.x, y: m.y + 8, dir: "down", aim: {x: 0, y: 1}});
-    motelScene("intro", hide => wipe(() => { hide(); if (EX) EX.locked = false; exToast(CITY_WAKE[curCity()]); }));
+    motelScene("intro", hide => wipe(() => { hide(); if (EX) EX.locked = false; exToast(lost ? t("De volta à pensão, com metade das forças.") : CITY_WAKE[curCity()]); }));
   });
-  startExplore("aldeia", exIntro);
+  startExplore("aldeia", () => exIntro(lost));
 }
-function exIntro() {
+// derrota na exploração: em vez do mapa da área, a tela corta direto para quem acorda no lugar seguro da cidade
+function fromLossWake() {
+  if (!EX) return false;
+  $("explore").hidden = true; $("exDialog").hidden = true; EX = null; exKeys.clear();
+  startIntro(true); return true;
+}
+function exIntro(lost = false) {
   const h = EX.hero, f = EX.spots.find(s => s.kind === "fogueira"), seat = campSeat(f, -1);
-  EX.camp = {kind: "intro", W: campWake("intro"), t0: performance.now(), dur: campWake("intro") + 2600, x: seat.x, y: seat.y, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
+  EX.camp = {kind: "intro", lost, W: campWake("intro"), t0: performance.now(), dur: campWake("intro") + 2600, x: seat.x, y: seat.y, fx: f.x, fy: f.y, ftx: f.tx, fty: f.ty};
   h.x = EX.camp.x; h.y = EX.camp.y; h.dir = "down"; h.aim = {x: 0, y: 1};
   exToast(t("Aldeia Jasytatá (PA) · manhã na beira do Tapajós..."));
 }
@@ -1563,7 +1572,7 @@ function showTutorial() {
   d.innerHTML = `<h2>${VILLAGER_NAME.aldeao1}</h2><div class="tut"><canvas width="24" height="33"></canvas><p>${(isTouch() ? TUTORIAL_TOQUE : TUTORIAL)[i]}</p></div>`;
   d.querySelector("canvas").getContext("2d").drawImage(villagerSprite("aldeao1"), 0, 0);   // retratinho de quem fala
   btn(last ? t("Bora!") : t("Próximo"), () => { if (last) endTutorial(); else { EX.tutPage++; sfx("blip"); showTutorial(); } }, false, d);
-  d.hidden = false;
+  d.hidden = false; exTypeSpeech(d.querySelector(".tut p"), npcVoiceFor("villager", "aldeao1"));
 }
 function endTutorial() {
   G.tutorial = false; if (!G.nb.tem) { G.nb.tem = true; setTimeout(() => exToast(t("O Mateiro te deu um notebook que a cheia trouxe. Não liga: falta bateria, teclado e carregador. O Seu Bugiganga, da feira, entende disso.")), 2600); }
@@ -1579,7 +1588,8 @@ function campSkip() {
 }
 // fim da cena: o controle volta na hora e o resultado aparece no aviso do topo (sem reabrir o painel da fogueira)
 function exCampEnd() {
-  const {kind, from, msg} = EX.camp; EX.camp = null; EX.dialog = null; exKeys.clear();
+  const {kind, from, msg, lost} = EX.camp; EX.camp = null; EX.dialog = null; exKeys.clear();
+  if (kind === "intro" && lost) return exToast(t("De volta à fogueira, com metade das forças."));   // acordou depois de desmaiar
   if (G.night && !G.tutorial && !G.narrated.pyt_noite && (kind === "noite")) { G.narrated.pyt_noite = true; save(); setTimeout(() => pytunaScene(NARRA_PYT.noite), 500); }   // anoiteceu pela primeira vez
   if (kind === "intro" && G.tutorial && !G.narrated.prologo) { G.narrated.prologo = true; save(); return narrate(NARRA.prologo, startTutorial); }   // o Pajé abre a história
   if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast(t("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata."));
@@ -1735,9 +1745,44 @@ function drawCampSky(x, cx, cy, now) {
   }
   drawFire(x, c.ftx * TILE - cx, c.fty * TILE - cy, now); drawCampHero(x, cx, cy, now);
 }
-function exCloseDialog() { $("exDialog").hidden = true; if (EX) EX.dialog = null; sfx("blip"); }
+/* fala dos painéis escrevendo letra a letra com a voz de quem fala (VOZ/npcVoice em audio/sfx.js). Só o texto de
+   quem fala, só quando o painel abre (comprar ou vender, que reabre o mesmo painel, não reescreve). Os botões já
+   funcionam enquanto escreve; Z, Enter ou Espaço com o texto pela metade só completam a frase */
+let EX_TYPE = null;
+// quem fala em cada painel: o Pajé tem a voz dele; fogueira, tenda, bolsa e afins não falam
+function npcVoiceFor(kind, look) {
+  if (["fogueira", "tenda", "notebook", "inventario", "segredo", "bau", "cabine", "onibus", "lembranca"].includes(kind)) return null;
+  if (kind === "xama") return "paje";
+  const key = look || kind;   // pelo visual de quem fala: cada morador e cada vendedor de região soa diferente
+  const L = VILLAGER_LOOK[key] || {};
+  return npcVoice(key, !!(L.trancas || L.longHair));
+}
+function exTypeSpeech(p, voz) {
+  if (EX_TYPE) EX_TYPE.done();
+  if (!p || !voz || REDUCE) return;
+  const nodes = [], walk = n => n.nodeType === 3 ? nodes.push([n, n.textContent]) : n.childNodes.forEach(walk);
+  walk(p); if (!nodes.length) return;
+  const all = nodes.map(q => [...q[1]]), total = all.reduce((a, q) => a + q.length, 0), z = VOZ[voz] || {}, cps = z.cps || 48;
+  nodes.forEach(q => q[0].textContent = "");
+  const t0 = performance.now(); let shown = 0, letters = 0, stop = false;
+  const show = k => { let left = k; nodes.forEach((q, i) => { const n = Math.max(0, Math.min(all[i].length, left)); q[0].textContent = all[i].slice(0, n).join(""); left -= all[i].length; }); };
+  const done = () => { if (stop) return; stop = true; show(total); EX_TYPE = null; };
+  EX_TYPE = {done, typing: () => !stop};
+  const flat = all.flat();
+  const tick = now => {
+    if (stop || !p.isConnected) return done();
+    const k = Math.max(0, Math.min(total, Math.floor((now - t0) / 1000 * cps)));   // o relógio do quadro pode vir antes do t0: nunca negativo
+    for (let i = shown; i < k; i++) if (flat[i] && /[\p{L}\p{N}]/u.test(flat[i]) && ++letters % (z.every || 2) === 1) { vozBlip(voz, flat[i]); break; }
+    if (k !== shown) { shown = k; show(k); }
+    if (k >= total) return done();
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+function exCloseDialog() { if (EX_TYPE) EX_TYPE.done(); $("exDialog").hidden = true; if (EX) EX.dialog = null; sfx("blip"); }
 // teclado com o painel aberto: setas (ou WASD) escolhem, Z/Enter/Espaço confirmam, X/Esc voltam ou fecham
 function dialogKey(ev) {
+  if (EX_TYPE && EX_TYPE.typing() && ["z", "Z", "Enter", " "].includes(ev.key) && !ev.repeat) { ev.preventDefault(); EX_TYPE.done(); return true; }   // completa a frase
   if (EX.dialog === "tutorial") {   // Z, Espaço ou Enter passam a página; Esc encerra a conversa
     if (["z", "Z", " ", "Enter"].includes(ev.key) && !ev.repeat) { ev.preventDefault(); pressPanel($("exDialog").querySelector(".cmd")); }
     else if (ev.key === "Escape") endTutorial();

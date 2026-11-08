@@ -185,6 +185,15 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 .banner.mini{font-size:15px;padding:1px 8px;box-shadow:3px 3px 0 var(--ink);background:#2f8a4a}
 .popn{position:relative;display:flex;align-items:center;justify-content:center}
 .popn>canvas{position:relative;image-rendering:pixelated}
+/* números de dano (fx.js, pop): Anton com contorno de tinta e a sombra vermelha deslocada, como no Persona 5 */
+.pnum{position:relative;display:block;font:400 clamp(34px,4vw,54px)/1 var(--display);letter-spacing:.02em;color:var(--c,#fff3c4);
+  -webkit-text-stroke:.24em #1a0f0a;paint-order:stroke fill;text-shadow:.1em .1em 0 #e5001c,.16em .16em 0 #1a0f0a;font-style:italic}
+.pnum.p-strong{font-size:clamp(40px,4.8vw,64px)}
+.pnum.p-crit{font-size:clamp(50px,6vw,80px);text-shadow:.1em .1em 0 #e5001c,.16em .16em 0 #1a0f0a,0 0 .4em rgba(255,210,58,.6)}
+.pnum.p-heal{text-shadow:.1em .1em 0 #1f7a3a,.16em .16em 0 #1a0f0a}
+.pnum.p-me{color:#fff;text-shadow:.1em .1em 0 #1a0f0a;-webkit-text-stroke-color:#8a0010}
+/* nome do golpe lido pelo Observar, em cima do bicho */
+.banner.lido{background:var(--paper);color:var(--ink);font-size:30px;rotate:-4deg;box-shadow:5px 5px 0 #e5001c,8px 8px 0 var(--ink)}
 .popn>.popstar{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
 .gshake{animation:gshake .3s steps(6)}
 @keyframes gshake{25%{transform:translate(-6px,3px)}50%{transform:translate(6px,-3px)}75%{transform:translate(-4px,2px)}}
@@ -538,6 +547,8 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .ci-zoom{position:absolute;inset:0;animation:ciZoom 1.4s cubic-bezier(.2,.8,.3,1) forwards}
 .ci-zoom canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
 .ci-glow,.ci-art{filter:drop-shadow(0 0 2px #ffc040) drop-shadow(0 0 9px #ff6a10);animation:ciPulse .16s steps(2) infinite}
+.cutin.fran .ci-glow{filter:drop-shadow(0 0 2px #d8f4ff) drop-shadow(0 0 9px #8f7aff)}   /* Franciscane acende em luar */
+.cutin.fran .ci-strip{border-color:#b48cff}
 .ci-shake{animation:gshake .32s steps(6)}
 .ci-name{position:absolute;left:5vw;top:9vh;margin:0;font-size:clamp(30px,6.5vw,84px);rotate:-7deg;z-index:3;animation:rpop .35s var(--pop) .3s backwards}
 .ci-sub{position:absolute;right:6vw;bottom:10vh;z-index:3;font-family:var(--display);font-size:clamp(20px,3.4vw,40px);letter-spacing:.04em;background:var(--accent);color:var(--on-accent);padding:4px 22px;rotate:-5deg;clip-path:polygon(4% 0,100% 0,96% 100%,0 100%);animation:rpop .35s var(--pop) .45s backwards}
@@ -1448,6 +1459,23 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 /* jogo novo: escolher quem viaja (ui/saves.js, step.heroi) */
 .heroi-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0}
 .heroi-pick .cmd>span{display:grid;justify-items:center;text-align:center;gap:2px;white-space:normal}
-.heroi-pick .cmd small{display:block;font-size:12px;opacity:.85;font-family:var(--fala,inherit)}
-.heroi-fig{width:64px;image-rendering:pixelated}
-@media (max-width:520px){.heroi-pick{grid-template-columns:1fr}.heroi-fig{width:48px}}
+.heroi-fig{width:88px;image-rendering:pixelated;rotate:calc(var(--r,0deg) * -1)}   /* o botão vem torto; o boneco fica em pé */
+@media (max-width:520px){.heroi-pick{grid-template-columns:1fr}.heroi-fig{width:66px}}
+
+/* ===== retrato grande da fala (gfx/portraits.js): o busto de quem fala fica do lado de fora da caixa, saindo por cima
+   dela (Pajé, Pytuna e a entrevistadora à esquerda; quem viaja à direita), e entra deslizando a cada fala.
+   Seletores com #narra para valer por cima do .polido */
+#narra{--pw:clamp(150px,17vw,220px);grid-template-columns:1fr;padding-left:calc(var(--pw) + 6px);overflow:visible}
+#narra.rhanon{padding-left:22px;padding-right:calc(var(--pw) + 6px)}
+#narra canvas.narra-face{position:absolute;bottom:-4px;left:-18px;width:var(--pw);height:calc(var(--pw) * 1.2);border:0;background:none;
+  box-shadow:none;image-rendering:pixelated;filter:drop-shadow(5px 5px 0 rgba(0,0,0,.3));pointer-events:none;z-index:2;order:0}
+#narra.rhanon canvas.narra-face{left:auto;right:-18px}
+#narra canvas.narra-face.entra{animation:narraFaceIn .28s cubic-bezier(.2,.9,.3,1)}
+#narra.rhanon canvas.narra-face.entra{animation-name:narraFaceInR}
+@keyframes narraFaceIn{from{translate:-30px 0;opacity:0}}
+@keyframes narraFaceInR{from{translate:30px 0;opacity:0}}
+.polido #narra b{left:calc(var(--pw) + 4px)}
+.polido #narra.rhanon b{left:auto;right:calc(var(--pw) + 4px)}
+@media (max-width:640px){#narra{--pw:118px}}
+@media (max-height:500px){#narra{--pw:104px}}
+@media (prefers-reduced-motion:reduce){#narra canvas.narra-face.entra{animation:none}}

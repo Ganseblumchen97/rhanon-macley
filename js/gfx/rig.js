@@ -11,7 +11,8 @@ const HERO_PAL = {fran: {s: "#e2aa7a", S: "#b0784c", h: "#5e3a22", H: "#8e6040"}
 const FLAMES = [["#d62828", "#f2740c", "#ffd23a"], ["#f2740c", "#ffd23a", "#fff3a0"], ["#d62828", "#ffd23a", "#f2740c"]];
 
 /* ---------- grade de desenho: cada pixel guarda cor e "parte" (o contorno separa partes) ---------- */
-function rigGrid(S, W = RIG_W, H = RIG_H) {   // W/H: tamanho base (outros desenhos, como bichos, podem ser maiores)
+// opts.inner(cor) = cor da linha entre duas partes (sem ele, preto; os retratos usam a cor escurecida: juntas mais suaves)
+function rigGrid(S, W = RIG_W, H = RIG_H, opts = {}) {   // W/H: tamanho base (outros desenhos, como bichos, podem ser maiores)
   const w = Math.round(W * S), h = Math.round(H * S);
   const col = Array.from({length: h}, () => Array(w).fill(null)), grp = Array.from({length: h}, () => Array(w).fill(0));
   let gid = 1;
@@ -61,7 +62,7 @@ function rigGrid(S, W = RIG_W, H = RIG_H) {   // W/H: tamanho base (outros desen
       for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
         if (col[y][x] === null) {   // contorno por fora
           if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => col[y + dy]?.[x + dx] && col[y + dy][x + dx] !== RIG_K)) out[y][x] = RIG_K;
-        } else if (col[y][x] !== RIG_K && [[1, 0], [0, 1], [-1, 0], [0, -1]].some(([dx, dy]) => grp[y + dy]?.[x + dx] > grp[y][x] && col[y + dy][x + dx] !== RIG_K)) out[y][x] = RIG_K;   // linha entre partes
+        } else if (col[y][x] !== RIG_K && [[1, 0], [0, 1], [-1, 0], [0, -1]].some(([dx, dy]) => grp[y + dy]?.[x + dx] > grp[y][x] && col[y + dy][x + dx] !== RIG_K)) out[y][x] = opts.inner ? opts.inner(col[y][x]) : RIG_K;   // linha entre partes
       }
       const c = document.createElement("canvas"); c.width = w; c.height = h;
       const x = c.getContext("2d");
@@ -107,26 +108,28 @@ function rigTorch(d, C, x0, y0, x1, y1, f) {   // cabo de (x0,y0) até a chama e
 
 /* ---------- o personagem ---------- */
 const RIG_CACHE = new Map();
-// pose: {lf, rf: pés [x,y]; lh, rh: mãos; lean, dy: parte de cima; sit; face; weapon; side; pull; f (quadro da chama)}
+// pose: {lf, rf: pés [x,y]; lh, rh: mãos; lean, dy: parte de cima; sit; face; weapon; side; pull; f (quadro da chama);
+//        hd: a cabeça a mais que o corpo, wy: as mãos a mais, tr: ponta das tranças para o lado (respiração em heroBreath)}
 // look: {pal, shirt, pants, glasses, noBand, bowBack, longHair, feather, top, prop, charm, cap, hat: [feltro, sombra, fita], trancas}
 // trancas = a Franciscane: duas tranças e, sem camisa, a parte de cima da tanga (mesma palha/couro, no mesmo espaço da roupa)
 function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   const key = view + scale + JSON.stringify(pose) + JSON.stringify(look);
   if (RIG_CACHE.has(key)) return RIG_CACHE.get(key);
-  if (RIG_CACHE.size > 600) RIG_CACHE.clear();
+  if (RIG_CACHE.size > 1200) RIG_CACHE.clear();
   const C = {...RIG_PAL, ...(look.pal || {})}, d = rigGrid(scale), back = view === "back";
   const lean = pose.lean || 0, hy = (pose.dy || 0) + (pose.sit ? 6 : 0), hx = 16 + lean, W = pose.weapon, side = pose.side || 1;
+  const hh = hy + (pose.hd || 0), wy = pose.wy || 0;   // cabeça e mãos podem vir um tiquinho atrás do corpo (respiração)
   const X = v => side > 0 ? v : 31 - v;
   const lf = pose.lf || [12, 40], rf = pose.rf || [20, 40], hip = 30 + (pose.sit ? 6 : 0);
-  let lh = pose.lh || [7 + lean, 31 + hy], rh = pose.rh || [25 + lean, 31 + hy];
+  let lh = pose.lh || [7 + lean, 31 + hy + wy], rh = pose.rh || [25 + lean, 31 + hy + wy];
   // posições das mãos que a arma define
   const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
   const diagA = [X(4), 42], diagB = [X(27), 13];
   if (W === "diag") { if (back) { lh = [11 + lean, 28 + hy]; rh = [21 + lean, 28 + hy]; } else { lh = lerp(diagA, diagB, .36); rh = lerp(diagA, diagB, .6); } }
-  if (W === "up") rh = [25 + lean, 30 + hy];
+  if (W === "up") rh = [25 + lean, 30 + hy + wy];
   if (W === "stab") { lh = [17 + lean, 25 + hy]; rh = [23 + lean, 24 + hy]; }
   if (W === "guard") { lh = [11 + lean, 28 + hy]; rh = [20 + lean, 27 + hy]; }
-  if (W === "raise") rh = [26, 14 + hy];
+  if (W === "raise") rh = [26, 14 + hy + wy];
   if (W === "bow") rh = [27, 24 + hy];
   if (W === "bowdraw") { rh = [27, 24 + hy]; lh = [24 - (pose.pull || 0), 24 + hy]; }
   if (W === "torch") rh = [25 + lean, 27 + hy];
@@ -134,10 +137,10 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
 
   if (back && W === "diag") rigSpear(d, C, diagA[0], diagA[1], diagB[0], diagB[1]);   // de costas: o corpo esconde o meio da lança
   if (!back) {   // cabelo de trás, com pontas soltas
-    d.part().ellipse(hx, 12 + hy, 11, 10, C.h)
-      .poly([[hx - 10, 13 + hy], [hx - 11, 22 + hy], [hx - 7, 17 + hy], [hx - 6, 23 + hy], [hx - 4, 18 + hy]], C.h)
-      .poly([[hx + 10, 13 + hy], [hx + 11, 22 + hy], [hx + 7, 17 + hy], [hx + 6, 23 + hy], [hx + 4, 18 + hy]], C.h);
-    if (look.longHair) d.poly([[hx - 10, 14 + hy], [hx + 10, 14 + hy], [hx + 11, 29 + hy], [hx - 11, 29 + hy]], C.h);
+    d.part().ellipse(hx, 12 + hh, 11, 10, C.h)
+      .poly([[hx - 10, 13 + hh], [hx - 11, 22 + hy], [hx - 7, 17 + hh], [hx - 6, 23 + hy], [hx - 4, 18 + hh]], C.h)
+      .poly([[hx + 10, 13 + hh], [hx + 11, 22 + hy], [hx + 7, 17 + hh], [hx + 6, 23 + hy], [hx + 4, 18 + hh]], C.h);
+    if (look.longHair) d.poly([[hx - 10, 14 + hh], [hx + 10, 14 + hh], [hx + 11, 29 + hy], [hx - 11, 29 + hy]], C.h);
   }
   // pernas e pés
   if (pose.sit) { d.part().limb(13, 36, 7, 40, 4, C.s, C.S).limb(19, 36, 25, 40, 4, C.s, C.S); d.part().rect(4, 39, 4, 2, C.S).rect(24, 39, 4, 2, C.S); }
@@ -170,43 +173,44 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   }
   // cabeça
   if (back) {
-    d.part().ellipse(hx, 13 + hy, 10.5, 10.5, C.h)
-      .poly([[hx - 9, 14 + hy], [hx - 8, 24 + hy], [hx - 5, 19 + hy], [hx - 3, 25 + hy], [hx, 20 + hy], [hx + 3, 25 + hy], [hx + 5, 19 + hy], [hx + 8, 24 + hy], [hx + 9, 14 + hy]], C.h)
-      .dots([[hx - 3, 5 + hy], [hx - 2, 5 + hy], [hx - 1, 4 + hy], [hx, 4 + hy], [hx - 4, 6 + hy]], C.H);
-    if (look.longHair) d.poly([[hx - 10, 15 + hy], [hx + 10, 15 + hy], [hx + 10, 29 + hy], [hx - 10, 29 + hy]], C.h);
-    if (!look.noBand) d.part().rect(hx - 10, 10 + hy, 21, 2, C.g).rect(hx - 10, 11 + hy, 21, 1, C.G).rect(hx - 1, 12 + hy, 2, 4, C.g);
+    d.part().ellipse(hx, 13 + hh, 10.5, 10.5, C.h)
+      .poly([[hx - 9, 14 + hh], [hx - 8, 24 + hh], [hx - 5, 19 + hh], [hx - 3, 25 + hh], [hx, 20 + hh], [hx + 3, 25 + hh], [hx + 5, 19 + hh], [hx + 8, 24 + hh], [hx + 9, 14 + hh]], C.h)
+      .dots([[hx - 3, 5 + hh], [hx - 2, 5 + hh], [hx - 1, 4 + hh], [hx, 4 + hh], [hx - 4, 6 + hh]], C.H);
+    if (look.longHair) d.poly([[hx - 10, 15 + hh], [hx + 10, 15 + hh], [hx + 10, 29 + hh], [hx - 10, 29 + hh]], C.h);
+    if (!look.noBand) d.part().rect(hx - 10, 10 + hh, 21, 2, C.g).rect(hx - 10, 11 + hh, 21, 1, C.G).rect(hx - 1, 12 + hh, 2, 4, C.g);
   } else {
-    d.part().ellipse(hx, 14 + hy, 7.5, 7.5, C.s, C.S, .55);
-    const F = pose.face || "normal", e = (x, y) => [hx + x, y + hy];
-    if (look.glasses) d.rect(hx - 6, 13 + hy, 5, 5, RIG_K).rect(hx + 2, 13 + hy, 5, 5, RIG_K).rect(hx - 1, 14 + hy, 3, 1, RIG_K)   // óculos redondinhos: aro, lente e o olho atrás
-      .rect(hx - 5, 14 + hy, 3, 3, RIG_LENS).rect(hx + 3, 14 + hy, 3, 3, RIG_LENS).rect(hx - 4, 15 + hy, 1, 2, RIG_K).rect(hx + 4, 15 + hy, 1, 2, RIG_K).dots([e(-5, 14), e(3, 14)], C.w);
-    else if (F === "blink") d.rect(hx - 4, 16 + hy, 2, 1, RIG_K).rect(hx + 3, 16 + hy, 2, 1, RIG_K);
+    d.part().ellipse(hx, 14 + hh, 7.5, 7.5, C.s, C.S, .55);
+    const F = pose.face || "normal", e = (x, y) => [hx + x, y + hh];
+    if (look.glasses) d.rect(hx - 6, 13 + hh, 5, 5, RIG_K).rect(hx + 2, 13 + hh, 5, 5, RIG_K).rect(hx - 1, 14 + hh, 3, 1, RIG_K)   // óculos redondinhos: aro, lente e o olho atrás
+      .rect(hx - 5, 14 + hh, 3, 3, RIG_LENS).rect(hx + 3, 14 + hh, 3, 3, RIG_LENS).rect(hx - 4, 15 + hh, 1, 2, RIG_K).rect(hx + 4, 15 + hh, 1, 2, RIG_K).dots([e(-5, 14), e(3, 14)], C.w);
+    else if (F === "blink") d.rect(hx - 4, 16 + hh, 2, 1, RIG_K).rect(hx + 3, 16 + hh, 2, 1, RIG_K);
     else if (F === "happy") d.dots([e(-5, 16), e(-4, 15), e(-3, 16), e(2, 16), e(3, 15), e(4, 16)], RIG_K);
-    else if (F === "hurt") d.limb(hx - 5, 15 + hy, hx - 3, 16 + hy, 1, RIG_K).limb(hx - 3, 16 + hy, hx - 5, 17 + hy, 1, RIG_K).limb(hx + 4, 15 + hy, hx + 2, 16 + hy, 1, RIG_K).limb(hx + 2, 16 + hy, hx + 4, 17 + hy, 1, RIG_K);
-    else d.rect(hx - 4, 14 + hy, 2, 3, RIG_K).rect(hx + 3, 14 + hy, 2, 3, RIG_K).dots([e(-4, 14), e(3, 14)], C.w);
+    else if (F === "hurt") d.limb(hx - 5, 15 + hh, hx - 3, 16 + hh, 1, RIG_K).limb(hx - 3, 16 + hh, hx - 5, 17 + hh, 1, RIG_K).limb(hx + 4, 15 + hh, hx + 2, 16 + hh, 1, RIG_K).limb(hx + 2, 16 + hh, hx + 4, 17 + hh, 1, RIG_K);
+    else d.rect(hx - 4, 14 + hh, 2, 3, RIG_K).rect(hx + 3, 14 + hh, 2, 3, RIG_K).dots([e(-4, 14), e(3, 14)], C.w);
     d.dots([e(-6, 17), e(-5, 17), e(-6, 18), e(5, 17), e(6, 17), e(6, 18)], C.r);   // pintura nas bochechas
-    if (F === "hurt") d.rect(hx - 1, 18 + hy, 3, 2, RIG_K).dots([e(0, 18)], C.r);
+    if (F === "hurt") d.rect(hx - 1, 18 + hh, 3, 2, RIG_K).dots([e(0, 18)], C.r);
     else if (F === "happy") d.dots([e(-1, 18), e(0, 19), e(1, 19), e(2, 18)], RIG_K);
     else d.dots([e(0, 19), e(1, 19)], C.S);
-    d.part().poly([[hx - 8, 7 + hy], [hx + 8, 7 + hy], [hx + 8, 12 + hy], [hx + 5, 15 + hy], [hx + 4, 11 + hy], [hx + 1, 14 + hy], [hx - 1, 10 + hy], [hx - 4, 14 + hy], [hx - 5, 11 + hy], [hx - 8, 14 + hy]], C.h)   // franja em pontas
+    d.part().poly([[hx - 8, 7 + hh], [hx + 8, 7 + hh], [hx + 8, 12 + hh], [hx + 5, 15 + hh], [hx + 4, 11 + hh], [hx + 1, 14 + hh], [hx - 1, 10 + hh], [hx - 4, 14 + hh], [hx - 5, 11 + hh], [hx - 8, 14 + hh]], C.h)   // franja em pontas
       .dots([e(-5, 5), e(-4, 5), e(-3, 4), e(-2, 4), e(-4, 6)], C.H);
-    if (!look.noBand) d.part().rect(hx - 8, 9 + hy, 17, 2, C.g).rect(hx - 8, 10 + hy, 17, 1, C.G);
-    if (look.cap) d.part().ellipse(hx, 8 + hy, 8.5, 4.5, look.cap[0]).rect(hx - 9, 10 + hy, 19, 2, look.cap[1]);   // boné (gente da cidade)
-    if (look.hat) d.part().ellipse(hx, 5 + hy, 6.5, 4.5, look.hat[0]).rect(hx - 6, 7 + hy, 13, 2, look.hat[2]).rect(hx - 11, 9 + hy, 23, 2, look.hat[1]).dots([e(-3, 2), e(-2, 2)], look.hat[2]);   // chapéu de feltro de aba larga
+    if (!look.noBand) d.part().rect(hx - 8, 9 + hh, 17, 2, C.g).rect(hx - 8, 10 + hh, 17, 1, C.G);
+    if (look.cap) d.part().ellipse(hx, 8 + hh, 8.5, 4.5, look.cap[0]).rect(hx - 9, 10 + hh, 19, 2, look.cap[1]);   // boné (gente da cidade)
+    if (look.hat) d.part().ellipse(hx, 5 + hh, 6.5, 4.5, look.hat[0]).rect(hx - 6, 7 + hh, 13, 2, look.hat[2]).rect(hx - 11, 9 + hh, 23, 2, look.hat[1]).dots([e(-3, 2), e(-2, 2)], look.hat[2]);   // chapéu de feltro de aba larga
   }
   if (look.trancas) {   // duas tranças: na frente caem por cima dos ombros, de costas descem pelas costas; ponta amarrada com a fita verde
-    const [ax, bx, y0, y1] = back ? [-4, -5, 20, 31] : [-8, -10, 15, 29];
-    [-1, 1].forEach(sd => { const x0 = hx + ax * -sd, x1 = hx + bx * -sd;
-      d.part().limb(x0, y0 + hy, x1, y1 + hy, 2.6, C.h, C.H).dots([[x0 + (x1 - x0) * .35, y0 + hy + (y1 - y0) * .35], [x0 + (x1 - x0) * .7, y0 + hy + (y1 - y0) * .7]], C.H)
-        .part().rect(x1 - 1, y1 + hy, 3, 1, C.g).part().ellipse(x1, y1 + 2 + hy, 1.4, 1.4, C.h); });
+    const [ax, bx, y0, y1] = back ? [-4, -5, 20, 31] : [-8, -10, 15, 29], tr = pose.tr || 0;
+    [-1, 1].forEach(sd => { const x0 = hx + ax * -sd, x1 = hx + bx * -sd + tr, ya = y0 + hh, yb = y1 + hy, mid = q => [x0 + (x1 - x0) * q, ya + (yb - ya) * q];
+      d.part().limb(x0, ya, x1, yb, 2.6, C.h, C.H).dots([mid(.35), mid(.7)], C.H)
+        .part().rect(x1 - 1, yb, 3, 1, C.g).part().ellipse(x1, yb + 2, 1.4, 1.4, C.h); });
   }
-  if (look.feather) d.part().limb(hx + 5, 9 + hy, hx + 7, 2 + hy, 1.5, look.feather);
+  if (look.feather) d.part().limb(hx + 5, 9 + hh, hx + 7, 2 + hh, 1.5, look.feather);
   // armas na frente do corpo
-  if (W === "up") rigSpear(d, C, rh[0] + 1, 43, rh[0] + 1, 4 + hy);
+  if (W === "up") rigSpear(d, C, rh[0] + 1, 43, rh[0] + 1, 4 + hy + wy);
   if (W === "diag" && !back) rigSpear(d, C, diagA[0], diagA[1], diagB[0], diagB[1]);
   if (W === "stab") rigSpear(d, C, 6 + lean, 25 + hy, 28 + lean, 24 + hy);
   if (W === "guard") rigSpear(d, C, 3 + lean, 28 + hy, 27 + lean, 26 + hy);
-  if (W === "raise") rigSpear(d, C, 26, 33 + hy, 26, 4 + hy);
+  if (W === "raise") rigSpear(d, C, 26, 33 + hy + wy, 26, 4 + hy + wy);
+  if (W === "free" && pose.sp) rigSpear(d, C, ...pose.sp);   // lança em qualquer ângulo (quadros entre as poses: spearTrack)
   if (W === "bow") rigBow(d, C, 27, 15 + hy, 33 + hy);
   if (W === "bowdraw") {
     const px = lh[0];
@@ -257,7 +261,8 @@ function rhanonLook() {
   if (q.amulet && EQUIP.amulet[q.amulet]) look.charm = EQUIP.amulet[q.amulet].night ? "#b07ae8" : "#ffd23a";   // talismã no peito
   if (heroi() === "fran") { Object.assign(pal, HERO_PAL.fran); look.trancas = true; }   // Franciscane: pele mais clara, cabelo castanho e duas tranças
   if (Object.keys(pal).length) look.pal = pal;
-  if (T) look.shirt = [T.color, T.shade]; if (L && L.color) look.pants = [L.color, L.shade];
+  if (T) { look.shirt = [T.color, T.shade]; look.veste = q.torso; }   // veste: qual roupa (os retratos desenham o corte de cada uma)
+  if (L && L.color) look.pants = [L.color, L.shade];
   return look;
 }
 // medalhão do HUD (exploração e batalha): o rosto do Rhanon num círculo de mata, como o guardião da floresta.
@@ -271,6 +276,44 @@ function heroMedal() {
   x.beginPath(); x.arc(16, 16, 16, 0, Math.PI * 2); x.fillStyle = g; x.fill(); x.clip();
   x.drawImage(rigCanvas("front", {}, look, 1), 0, 3);   // cabeça e ombros
   return MEDAL_CACHE[key] = c.toDataURL();
+}
+/* respiração mais solta: o corpo sobe e desce 1 pixel e a cabeça, as mãos e as tranças vêm um pouco depois,
+   então um ciclo tem vários quadros diferentes em vez de dois. ms = duração do ciclo; t = relógio (ms).
+   Devolve campos de pose: {dy, hd, wy, tr} */
+function heroBreath(t, ms = 2000) {
+  if (REDUCE) return {dy: 0};
+  const p = t / ms, b = o => (1 - Math.cos((p - o) * Math.PI * 2)) / 2 >= .5 ? 1 : 0, dy = b(0), sw = Math.sin((p - .3) * Math.PI * 2);
+  const out = {dy}, hd = b(.09) - dy, wy = b(.17) - dy, tr = sw > .55 ? 1 : sw < -.55 ? -1 : 0;
+  if (hd) out.hd = hd; if (wy) out.wy = wy; if (tr) out.tr = tr;
+  return out;
+}
+/* lança solta: as poses de arma da batalha (de costas) como pontos [cabo, começo da ponta] e mãos, para dar quadros
+   no meio do caminho entre uma e outra. A lança gira em volta do meio dela (ângulo e comprimento interpolados),
+   as mãos andam em linha reta; tudo arredondado para o pixel. L = inclinação (lean), h = altura do corpo (dy). */
+const SPEAR_KEYS = {
+  up:    (L, h) => ({s: [26 + L, 43, 26 + L, 4 + h], lh: [7 + L, 31 + h], rh: [25 + L, 30 + h]}),
+  guard: (L, h) => ({s: [3 + L, 28 + h, 27 + L, 26 + h], lh: [11 + L, 28 + h], rh: [20 + L, 27 + h]}),
+  pull:  (L, h) => ({s: [-2 + L, 27 + h, 21 + L, 25 + h], lh: [8 + L, 29 + h], rh: [15 + L, 28 + h]}),   // puxada para trás, antes de estocar
+  stab:  (L, h) => ({s: [6 + L, 25 + h, 28 + L, 24 + h], lh: [17 + L, 25 + h], rh: [23 + L, 24 + h]}),
+  raise: (L, h) => ({s: [26, 33 + h, 26, 4 + h], lh: [7 + L, 31 + h], rh: [26, 14 + h]}),
+  diag:  (L, h) => ({s: [4, 42, 27, 13], lh: [11 + L, 28 + h], rh: [21 + L, 28 + h]}),
+  high:  (L, h) => ({s: [3, 9 + h, 27, 7 + h], lh: [10, 15 + h], rh: [22, 14 + h]}),   // atravessada por cima da cabeça (no giro)
+  low:   (L, h) => ({s: [2 + L, 36 + h, 26 + L, 30 + h], lh: [11 + L, 32 + h], rh: [19 + L, 31 + h]})   // ponta baixa, depois do golpe
+};
+function spearPose(a, b, k, L = 0, h = 0) {
+  const A = SPEAR_KEYS[a](L, h), B = SPEAR_KEYS[b](L, h), r = Math.round, mix = (p, q) => [r(p[0] + (q[0] - p[0]) * k), r(p[1] + (q[1] - p[1]) * k)];
+  const pol = s => ({cx: (s[0] + s[2]) / 2, cy: (s[1] + s[3]) / 2, ang: Math.atan2(s[3] - s[1], s[2] - s[0]), len: Math.hypot(s[2] - s[0], s[3] - s[1])});
+  const P = pol(A.s), Q = pol(B.s);
+  let da = Q.ang - P.ang; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
+  const cx = P.cx + (Q.cx - P.cx) * k, cy = P.cy + (Q.cy - P.cy) * k, an = P.ang + da * k, ln = (P.len + (Q.len - P.len) * k) / 2;
+  return {weapon: "free", sp: [r(cx - Math.cos(an) * ln), r(cy - Math.sin(an) * ln), r(cx + Math.cos(an) * ln), r(cy + Math.sin(an) * ln)], lh: mix(A.lh, B.lh), rh: mix(A.rh, B.rh)};
+}
+// track = [[ms, pose], ...] em ordem; el = tempo do estado. Entre dois pontos, sai e chega devagar (smoothstep)
+function spearTrack(track, el, L = 0, h = 0) {
+  let i = 0; while (i < track.length - 1 && el >= track[i + 1][0]) i++;
+  if (i === track.length - 1 || el <= track[0][0]) return spearPose(track[i][1], track[i][1], 0, L, h);
+  const [t0, a] = track[i], [t1, b] = track[i + 1], u = Math.min(1, (el - t0) / (t1 - t0));
+  return spearPose(a, b, REDUCE ? (u < .5 ? 0 : 1) : u * u * (3 - 2 * u), L, h);
 }
 // pés de cada passo (walkA/walkB levantam um pé) e pose de combate (pernas abertas)
 const RIG_LEGS = {stand: {}, walkA: {lf: [12, 38]}, walkB: {rf: [20, 38]}, stance: {lf: [10, 40], rf: [22, 40]}};
@@ -286,50 +329,50 @@ function rigSideCanvas(pose = {}, look = {}, scale = 1) {
     c.width = src.width; c.height = src.height; x.translate(c.width, 0); x.scale(-1, 1); x.drawImage(src, 0, 0);
     RIG_CACHE.set(key, c); return c;
   }
-  const C = {...RIG_PAL, ...(look.pal || {})}, d = rigGrid(scale), lean = pose.lean || 0, hy = pose.dy || 0, W = pose.weapon;
+  const C = {...RIG_PAL, ...(look.pal || {})}, d = rigGrid(scale), lean = pose.lean || 0, hy = pose.dy || 0, hh = hy + (pose.hd || 0), W = pose.weapon;
   const [farFoot, nearFoot] = RIG_SIDE_STEPS[pose.step || "stand"], hip = 30, hx = 16 + lean;
   const skin = look.shirt ? look.shirt : [C.s, C.S], legs = look.pants || [C.s, C.S];
   // mãos: segurando a lança (diagonal baixa ou estocada) ou balançando com o passo
   const swing = {walk0: 1, walk1: 0, walk2: -1, walk3: 0}[pose.step] || 0;
-  const spearA = W === "stab" ? [1 + lean, 26 + hy] : [2, 40], spearB = W === "stab" ? [27 + lean, 26 + hy] : [28, 20 + hy];   // a ponta passa à frente do peito, não do rosto
+  const spearA = W === "stab" ? [1 + lean, 26 + hh] : [2, 40], spearB = W === "stab" ? [27 + lean, 26 + hh] : [28, 20 + hh];   // a ponta passa à frente do peito, não do rosto
   const on = t => [spearA[0] + (spearB[0] - spearA[0]) * t, spearA[1] + (spearB[1] - spearA[1]) * t];
   const stab = W === "stab" || W === "jab";   // jab = mãos da estocada, a lança é desenhada por fora (exploração)
-  const farHand = W ? (stab ? [13 + lean, 26 + hy] : on(.42)) : [16 - swing * 5 + lean, 31 + hy];
-  const nearHand = W ? (stab ? [20 + lean, 26 + hy] : on(.6)) : [16 + swing * 5 + lean, 31 + hy];
+  const farHand = W ? (stab ? [13 + lean, 26 + hh] : on(.42)) : [16 - swing * 5 + lean, 31 + hh];
+  const nearHand = W ? (stab ? [20 + lean, 26 + hh] : on(.6)) : [16 + swing * 5 + lean, 31 + hh];
   if (look.bowBack) {   // arco atravessado nas costas
     d.part();
-    for (let k = 0; k < 6; k++) { const a = k / 6, b = (k + 1) / 6, bx = s => 13 - 6 * s - Math.sin(s * Math.PI) * 2.5 + lean, by = s => 18 + hy + 16 * s; d.limb(bx(a), by(a), bx(b), by(b), 1.5, C.b); }
-    d.part().limb(13 + lean, 18 + hy, 7 + lean, 34 + hy, 1, C.w);
+    for (let k = 0; k < 6; k++) { const a = k / 6, b = (k + 1) / 6, bx = s => 13 - 6 * s - Math.sin(s * Math.PI) * 2.5 + lean, by = s => 18 + hh + 16 * s; d.limb(bx(a), by(a), bx(b), by(b), 1.5, C.b); }
+    d.part().limb(13 + lean, 18 + hh, 7 + lean, 34 + hh, 1, C.w);
   }
   // braço e perna de trás (mais escuros)
-  d.part().limb(16 + lean, 22 + hy, farHand[0], farHand[1], 3, look.shirt ? skin[1] : C.S);
+  d.part().limb(16 + lean, 22 + hh, farHand[0], farHand[1], 3, look.shirt ? skin[1] : C.S);
   d.part().limb(15, hip, farFoot[0], farFoot[1], 4, look.pants ? legs[1] : C.S).rect(farFoot[0] - 1, farFoot[1], 5, 2, "#7a4a2e");
-  d.part().ellipse(hx, 12 + hy, 8.5, 8.5, C.h);   // fundo da cabeça
+  d.part().ellipse(hx, 12 + hh, 8.5, 8.5, C.h);   // fundo da cabeça
   d.part().limb(17, hip, nearFoot[0], nearFoot[1], 4, C.s, C.S).rect(nearFoot[0] - 1, nearFoot[1], 5, 2, C.S);
   if (look.pants) d.part().limb(17, hip, (17 + nearFoot[0]) / 2, (hip + nearFoot[1]) / 2, 5, legs[0], legs[1]);
   // tronco de perfil (pintura e colar só sem camisa)
-  d.part().poly([[12 + lean, 21 + hy], [20 + lean, 21 + hy], [21, hip], [12, hip]], skin[0], skin[1], 18 + lean / 2);
-  if (!look.shirt && look.trancas) d.part().rect(12 + lean, 24 + hy, 9, 3, C.t).rect(12 + lean, 26 + hy, 9, 1, C.T).part().dots([[16 + lean, 22 + hy], [19 + lean, 22 + hy]], C.r);   // parte de cima da tanga
-  else if (!look.shirt) d.dots([[19 + lean, 25 + hy], [19 + lean, 26 + hy], [19 + lean, 27 + hy]], C.r).dots([[15 + lean, 22 + hy], [17 + lean, 23 + hy], [19 + lean, 23 + hy]], C.w);
+  d.part().poly([[12 + lean, 21 + hh], [20 + lean, 21 + hh], [21, hip], [12, hip]], skin[0], skin[1], 18 + lean / 2);
+  if (!look.shirt && look.trancas) d.part().rect(12 + lean, 24 + hh, 9, 3, C.t).rect(12 + lean, 26 + hh, 9, 1, C.T).part().dots([[16 + lean, 22 + hh], [19 + lean, 22 + hh]], C.r);   // parte de cima da tanga
+  else if (!look.shirt) d.dots([[19 + lean, 25 + hh], [19 + lean, 26 + hh], [19 + lean, 27 + hh]], C.r).dots([[15 + lean, 22 + hh], [17 + lean, 23 + hh], [19 + lean, 23 + hh]], C.w);
   const band = look.pants || [C.t, C.T];
   d.part().rect(12, hip - 1, 9, 2, band[0]).rect(12, hip, 9, 1, band[1]);
   if (!look.pants) d.part().poly([[17, hip], [21, hip], [21, hip + 5], [19, hip + 6]], C.t, C.T, 20);
   // rosto de perfil
-  d.part().ellipse(hx + 3, 14 + hy, 5.5, 6.5, C.s, C.S, .8);
-  d.poly([[hx + 7, 12 + hy], [hx + 10, 16 + hy], [hx + 7, 17 + hy]], C.s);   // nariz
-  if (look.glasses) d.rect(hx + 3, 12 + hy, 5, 5, RIG_K).rect(hx + 4, 13 + hy, 3, 3, RIG_LENS).rect(hx + 5, 14 + hy, 1, 2, RIG_K).rect(hx + 1, 13 + hy, 2, 1, RIG_K);
-  else if (pose.face === "blink") d.rect(hx + 5, 15 + hy, 2, 1, RIG_K);
-  else d.rect(hx + 5, 13 + hy, 2, 3, RIG_K).dots([[hx + 5, 13 + hy]], C.w);
-  d.dots([[hx + 5, 18 + hy], [hx + 6, 18 + hy], [hx + 5, 19 + hy]], C.r).dots([[hx + 7, 20 + hy], [hx + 8, 19 + hy]], C.S);
+  d.part().ellipse(hx + 3, 14 + hh, 5.5, 6.5, C.s, C.S, .8);
+  d.poly([[hx + 7, 12 + hh], [hx + 10, 16 + hh], [hx + 7, 17 + hh]], C.s);   // nariz
+  if (look.glasses) d.rect(hx + 3, 12 + hh, 5, 5, RIG_K).rect(hx + 4, 13 + hh, 3, 3, RIG_LENS).rect(hx + 5, 14 + hh, 1, 2, RIG_K).rect(hx + 1, 13 + hh, 2, 1, RIG_K);
+  else if (pose.face === "blink") d.rect(hx + 5, 15 + hh, 2, 1, RIG_K);
+  else d.rect(hx + 5, 13 + hh, 2, 3, RIG_K).dots([[hx + 5, 13 + hh]], C.w);
+  d.dots([[hx + 5, 18 + hh], [hx + 6, 18 + hh], [hx + 5, 19 + hh]], C.r).dots([[hx + 7, 20 + hh], [hx + 8, 19 + hh]], C.S);
   // cabelo por cima da parte de trás da cabeça, orelha e franja
-  d.part().poly([[hx - 8, 7 + hy], [hx - 2, 3 + hy], [hx + 2, 4 + hy], [hx + 2, 13 + hy], [hx, 18 + hy], [hx - 1, 23 + hy], [hx - 3, 19 + hy], [hx - 5, 23 + hy], [hx - 7, 18 + hy], [hx - 9, 21 + hy], [hx - 9, 12 + hy]], C.h)
-    .dots([[hx - 4, 5 + hy], [hx - 3, 5 + hy], [hx - 2, 4 + hy], [hx - 1, 4 + hy]], C.H);
-  if (look.trancas) d.part().limb(hx - 6, 17 + hy, hx - 8, 29 + hy, 2.6, C.h, C.H).dots([[hx - 7, 21 + hy], [hx - 7, 25 + hy]], C.H).part().rect(hx - 9, 29 + hy, 3, 1, C.g).part().ellipse(hx - 8, 31 + hy, 1.4, 1.4, C.h);   // a trança de trás
-  d.part().ellipse(hx + 1, 15 + hy, 1.6, 2.2, C.s).dots([[hx + 1, 15 + hy]], C.S);
-  d.part().poly([[hx, 4 + hy], [hx + 5, 5 + hy], [hx + 8, 8 + hy], [hx + 9, 11 + hy], [hx + 7, 10 + hy], [hx + 6, 12 + hy], [hx + 4, 10 + hy], [hx + 2, 12 + hy], [hx, 10 + hy]], C.h);
+  d.part().poly([[hx - 8, 7 + hh], [hx - 2, 3 + hh], [hx + 2, 4 + hh], [hx + 2, 13 + hh], [hx, 18 + hh], [hx - 1, 23 + hh], [hx - 3, 19 + hh], [hx - 5, 23 + hh], [hx - 7, 18 + hh], [hx - 9, 21 + hh], [hx - 9, 12 + hh]], C.h)
+    .dots([[hx - 4, 5 + hh], [hx - 3, 5 + hh], [hx - 2, 4 + hh], [hx - 1, 4 + hh]], C.H);
+  if (look.trancas) d.part().limb(hx - 6, 17 + hh, hx - 8 - (pose.tr || 0), 29 + hy, 2.6, C.h, C.H).dots([[hx - 7, 21 + hh], [hx - 7 - (pose.tr || 0) / 2, 25 + hy]], C.H).part().rect(hx - 9 - (pose.tr || 0), 29 + hy, 3, 1, C.g).part().ellipse(hx - 8 - (pose.tr || 0), 31 + hy, 1.4, 1.4, C.h);   // a trança de trás
+  d.part().ellipse(hx + 1, 15 + hh, 1.6, 2.2, C.s).dots([[hx + 1, 15 + hh]], C.S);
+  d.part().poly([[hx, 4 + hh], [hx + 5, 5 + hh], [hx + 8, 8 + hh], [hx + 9, 11 + hh], [hx + 7, 10 + hh], [hx + 6, 12 + hh], [hx + 4, 10 + hh], [hx + 2, 12 + hh], [hx, 10 + hh]], C.h);
   if (!look.noBand) {   // faixa do cocar com as pontas soltas atrás
-    d.part().rect(hx - 8, 9 + hy, 18, 2, C.g).rect(hx - 8, 10 + hy, 18, 1, C.G);
-    d.part().limb(hx - 8, 11 + hy, hx - 11, 15 + hy + Math.abs(swing), 1, C.g).limb(hx - 8, 11 + hy, hx - 9, 16 + hy, 1, C.G);
+    d.part().rect(hx - 8, 9 + hh, 18, 2, C.g).rect(hx - 8, 10 + hh, 18, 1, C.G);
+    d.part().limb(hx - 8, 11 + hh, hx - 11, 15 + hh + Math.abs(swing), 1, C.g).limb(hx - 8, 11 + hh, hx - 9, 16 + hh, 1, C.G);
   }
   if (W && W !== "jab") rigSpear(d, C, spearA[0], spearA[1], spearB[0], spearB[1]);
   d.part().limb(17 + lean, 22 + hy, nearHand[0], nearHand[1], 3, skin[0], skin[1]);

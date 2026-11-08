@@ -57,11 +57,14 @@ function makeHeroActor() {
     const el = t - since, battle = mode === "battle";
     const pose = {...(battle ? RIG_LEGS.stance : RIG_LEGS.stand), weapon: weaponOn ? "up" : null};
     let lift = 0, ox = 0, flash = false, rot = 0, flip = false, coil = false, view = "back";   // view: o giro da Fúria passa por perfil e frente
-    const breathe = REDUCE ? 0 : Math.floor(t / (battle ? 420 : 650)) % 2;
+    const breath = heroBreath(t, battle ? 1300 : 2100), breathe = breath.dy;
+    // lança em movimento (rig.js: spearTrack): chamar depois de acertar lean/dy da pose; at = tempo dentro da trilha
+    const sp = (track, at = el) => { if (weaponOn) Object.assign(pose, spearTrack(track, at, pose.lean || 0, pose.dy || 0)); };
     const walk = speed => { const f = Math.floor(t / speed) % 4; Object.assign(pose, RIG_LEGS[["walkA", "stand", "walkB", "stand"][f]]); pose.dy = f % 2 ? 0 : 1; };
     switch (state) {
       case "idle":
-        pose.dy = breathe;
+        Object.assign(pose, breath);
+        if (battle && !REDUCE) pose.lean = Math.round(Math.sin(t / 1900) * .7);   // passa o peso de um pé para o outro
         if (p && battle) {
           if (p.def) { pose.dy = 1; if (weaponOn) pose.weapon = "guard"; }
           if (p.preso > 0) coil = true;
@@ -79,35 +82,37 @@ function makeHeroActor() {
         if (el > 800) set("idle");
         break;
       case "walk": walk(110); break;
-      case "stab":    // lança de perto: recua, estoca para frente e volta à guarda
-        pose.lean = el < 180 ? -1 : el < 620 ? 2 : 0; pose.weapon = el >= 180 && el < 620 ? "stab" : "guard";
+      case "stab":    // lança de perto: baixa à guarda, puxa para trás agachado, estoca passando do ponto e volta em pé
+        pose.lean = el < 90 ? -1 : el < 180 ? -2 : el < 250 ? 3 : el < 620 ? 2 : el < 720 ? 1 : 0;
+        pose.dy = el < 180 || (el >= 620 && el < 720) ? 1 : 0;
+        sp([[0, "up"], [70, "guard"], [170, "pull"], [215, "stab"], [600, "stab"], [700, "low"], [850, "up"]]);
         if (el > 850) set("idle");
         break;
       case "fury": {   // Fúria: estocada alta (pulando), estocada baixa (agachado), com 4 golpes um giro no lugar, e no último gira a lança e salta
         const n = FURY_HITS, gap = REDUCE ? 1 : FURY_GAP, i = Math.max(0, Math.min(n - 1, Math.floor((el - (FURY_LEAD - 150)) / gap)));
         const loc = el - (FURY_LEAD - 150 + i * gap), last = i === n - 1, wind = loc < 150;
         const kind = last ? "final" : n >= 4 && i === n - 2 ? "giro" : i % 2 ? "baixa" : "alta";
-        if (el < FURY_LEAD - 150) { pose.weapon = "guard"; pose.lean = 1; break; }   // correndo até o bicho
+        if (el < FURY_LEAD - 150) { pose.lean = 1; sp([[0, "up"], [FURY_LEAD - 150, "guard"]]); break; }   // correndo até o bicho
         if (kind === "alta") {
-          if (wind) { pose.weapon = "guard"; pose.lean = -1; pose.dy = 1; }
-          else { pose.weapon = "stab"; pose.lean = 2; lift = loc < 260 ? Math.round(Math.sin((loc - 150) / 110 * Math.PI) * 4) : 0; }
+          if (wind) { pose.lean = -1; pose.dy = 1; sp([[0, "guard"], [120, "pull"], [150, "pull"]], loc); }
+          else { pose.lean = 2; lift = loc < 260 ? Math.round(Math.sin((loc - 150) / 110 * Math.PI) * 4) : 0; sp([[150, "pull"], [185, "stab"], [FURY_GAP - 20, "stab"], [FURY_GAP, "guard"]], loc); }
         } else if (kind === "giro") {   // rodopia (costas, perfil, frente, perfil) e acerta de lado com a lança na diagonal
           if (wind) { const f = Math.floor(loc / 38) % 4; view = ["back", "side", "front", "side"][f]; flip = f === 3; pose.weapon = "guard"; lift = 1; }
           else { pose.weapon = "diag"; pose.lean = 3; ox = 2; }
           if (!wind && lastFx !== 8) { lastFx = 8; const [gx, gy] = grid(SX + 26, SY + 18); PFX.burst(10, "ring", ["#ffffff", "#bff3ff"], gx, gy, 22, {life: .5}); }
-        } else if (kind === "baixa") {
-          if (wind) { pose.weapon = "raise"; pose.lean = -1; }
-          else { pose.weapon = "stab"; pose.lean = 3; pose.dy = 2; Object.assign(pose, {lf: [8, 40], rf: [24, 40]}); }
+        } else if (kind === "baixa") {   // a lança vem lá de cima num arco e entra baixa
+          if (wind) { pose.lean = -1; sp([[0, "stab"], [110, "raise"], [150, "raise"]], loc); }
+          else { pose.lean = 3; pose.dy = 2; Object.assign(pose, {lf: [8, 40], rf: [24, 40]}); sp([[150, "raise"], [190, "stab"], [FURY_GAP - 20, "stab"], [FURY_GAP, "guard"]], loc); }
         } else {
-          if (wind) { pose.weapon = ["up", "diag", "raise"][Math.min(2, Math.floor(loc / 50))]; pose.dy = 1; }   // gira a lança
-          else { pose.weapon = "stab"; pose.lean = 3; lift = loc < 330 ? Math.round(Math.sin((loc - 150) / 180 * Math.PI) * 6) : 0; }
+          if (wind) { pose.dy = 1; sp([[0, "up"], [50, "diag"], [100, "high"], [150, "pull"]], loc); }   // gira a lança por cima da cabeça
+          else { pose.lean = 3; lift = loc < 330 ? Math.round(Math.sin((loc - 150) / 180 * Math.PI) * 6) : 0; sp([[150, "pull"], [180, "stab"], [380, "stab"], [480, "low"], [600, "up"]], loc); }
           if (!wind && lastFx !== 9) { lastFx = 9; const [gx, gy] = grid(SX + 30, SY + 14); PFX.burst(10, "star", ["#ffd23a", "#ffffff", "#e5001c"], gx, gy, 20, {life: .6}); }
         }
         if (el > FURY_LEAD + (n - 1) * gap + 450) set("idle");
         break;
       }
       case "throw":   // jogar a lança: ergue para trás, arremessa (fica sem a lança) e pega outra de volta
-        if (el < 330) { pose.weapon = "raise"; pose.lean = -1; pose.dy = 1; }
+        if (el < 330) { pose.lean = -1; pose.dy = 1; sp([[0, "up"], [140, "raise"]]); }
         else { pose.weapon = el > 1000 ? "up" : null; pose.lean = el < 600 ? 2 : 0; pose.rh = el < 600 ? [28, 22] : undefined; }
         if (el > 1150) set("idle");
         break;
@@ -120,20 +125,22 @@ function makeHeroActor() {
         if (el > 2100) set("idle");
         break;
       case "cast":    // especial de água, vento ou raio: ergue a lança, segura no alto e aponta para o bicho
-        pose.weapon = el < 650 ? "up" : el < 1100 ? "diag" : "guard"; pose.lean = el > 650 && el < 1100 ? 1 : 0; pose.dy = el < 650 ? 1 : 0;
+        pose.lean = el > 650 && el < 1100 ? 1 : 0; pose.dy = el < 650 ? 1 : 0;
+        sp([[0, "up"], [220, "raise"], [650, "raise"], [760, "diag"], [1100, "diag"], [1250, "guard"], [1400, "up"]]);
         if (!lastFx && el > 450) { lastFx = 1; const [gx, gy] = grid(SX + 27, SY + 2); PFX.burst(6, "star", ["#ffffff", "#bff3ff"], gx, gy, 12, {life: .5}); }
         if (el > 1400) set("idle");
         break;
       case "ready": {   // chefe apareceu: gira a lança (para cima, diagonal, para trás...), firma a guarda e a ponta brilha
-        const spin = ["up", "diag", "raise", "diag", "up", "guard"], k = Math.min(spin.length - 1, Math.floor(el / 95));
-        if (weaponOn) pose.weapon = spin[k]; pose.dy = k === spin.length - 1 ? 1 : 0; pose.lean = k === spin.length - 1 ? 1 : 0;
+        const firm = el > 520;
+        pose.dy = firm ? 1 : 0; pose.lean = firm ? 1 : 0;
+        sp([[0, "up"], [90, "diag"], [180, "high"], [270, "pull"], [360, "low"], [450, "diag"], [560, "guard"], [1150, "guard"], [1300, "up"]]);
         lift = el < 380 ? Math.round(Math.sin(el / 380 * Math.PI) * 3) : 0;
         if (!lastFx && el > 600) { lastFx = 1; const [gx, gy] = grid(SX + 27, SY + 4); PFX.burst(8, "star", ["#ffffff", "#bff3ff", "#ffd23a"], gx, gy, 16, {life: .6}); PFX.burst(5, "ring", ["#ffffff"], gx, gy, 10, {life: .4}); }
         if (el > 1300) set("idle");
         break;
       }
       case "guard":
-        pose.dy = 1; if (weaponOn) pose.weapon = "guard";
+        pose.dy = 1; sp([[0, "up"], [110, "guard"]]);
         if (!lastFx) { lastFx = 1; const [gx, gy] = grid(SX + 16, SY + 22); PFX.burst(6, "ring", ["#bff3ff", "#ffffff"], gx, gy, 18, {life: .5}); }
         if (el > 600) set("idle");
         break;
@@ -142,8 +149,9 @@ function makeHeroActor() {
         if (!lastFx) { lastFx = 1; const [gx, gy] = grid(SX + 16, SY); PFX.burst(4, "note", ["#ffffff", "#ffd200"], gx, gy, 14, {life: .9, up: 10}); }
         if (el > 700) set("idle");
         break;
-      case "hurt":
-        pose.lean = -2; ox = el < 120 ? -3 : el < 260 ? -1 : 0;
+      case "hurt":   // tranco para trás, a cabeça vem depois e ele volta aos poucos
+        pose.lean = el < 160 ? -2 : el < 300 ? -1 : 0; pose.dy = el < 220 ? 1 : 0; if (el < 90) pose.hd = -1;
+        ox = el < 120 ? -3 : el < 200 ? -2 : el < 280 ? -1 : 0;
         flash = el < 60 || (el > 120 && el < 170);
         if (el > 420) set("idle");
         break;
@@ -163,8 +171,8 @@ function makeHeroActor() {
           const ph = (el % 650) / 650, jump = Math.floor(el / 650) + 1;
           lift = Math.sin(ph * Math.PI) * 9; if (!(ph > .1 && ph < .9)) Object.assign(pose, RIG_LEGS.stand);
           if (jump !== lastFx) { lastFx = jump; const [gx, gy] = grid(SX + 16, SY + 6); PFX.burst(9, "star", ["#ffd200", "#ffffff", "#7dff9a"], gx, gy, 24, {life: .9}); }
-        } else pose.dy = breathe;
-        if (weaponOn) pose.weapon = "raise";
+        } else Object.assign(pose, breath);
+        sp([[0, "up"], [180, "raise"]]);
         break;
       }
       case "defeat":
@@ -444,18 +452,21 @@ const TITLE_A = (() => {
   function emitLocal(glyph, colors, x, y, vx, vy, life) { parts2.push({glyph, color: colors[Math.floor(Math.random() * colors.length)], x, y, vx, vy, life}); }
   function draw(t, dt) {
     if (!cv || !cv.isConnected || !cv.offsetParent) return;
-    const el = t - since, pose = {dy: Math.floor(t / 650) % 2, weapon: "up"};
+    const el = t - since, pose = {...heroBreath(t, 2300), weapon: "up"};
     let lift = 0, fire = false;
     if (t > nextBlink) { blinkUntil = t + 140; nextBlink = t + 2000 + Math.random() * 3500; }
     if (t < blinkUntil) pose.face = "blink";
-    if (REDUCE) pose.dy = 0;
     if (state === "idle" && t > nextAct && !REDUCE) set("camp");
     if (state === "camp") {   // senta na fogueira um tempo, com a lança deitada no chão
-      pose.sit = true; pose.weapon = null; fire = true;
+      pose.sit = true; pose.weapon = null; fire = true; delete pose.wy;
       if (el > 1500 && el < 1700) pose.face = "happy";
       if (el > 8000) { set("idle"); nextAct = t + 6000 + Math.random() * 5000; }
     }
-    if (state === "hop") { lift = Math.sin(Math.min(1, el / 380) * Math.PI) * 6; pose.face = "happy"; if (el > 380) set("idle"); }
+    if (state === "hop") {   // pulinho: agacha antes, sobe, a cabeça e as tranças atrasam na subida e na queda, e agacha ao cair
+      const k = (el - 90) / 380; pose.face = "happy";
+      if (el < 90 || k > 1) { pose.dy = 1; pose.hd = 0; pose.wy = 1; } else { lift = Math.sin(k * Math.PI) * 6; pose.dy = 0; pose.hd = k < .5 ? 1 : -1; pose.wy = k < .5 ? 1 : -1; pose.tr = k < .5 ? 0 : 1; }
+      if (el > 560) set("idle");
+    }
     g.clearRect(0, 0, W, H);
     g.fillStyle = "rgba(0,0,0,.28)";
     const sw = Math.max(8, 22 - Math.round(lift));
@@ -558,7 +569,7 @@ function startAnimationLoop() {
     let dt = Math.min((t - last) / 1000, .05);
     if (t < HITSTOP_END) { ANIM_LAG += t - last; dt = 0; }   // pausa de impacto: o relógio da batalha não anda
     last = t;
-    HERO_A.draw(t - ANIM_LAG); BEAST_A.draw(t - ANIM_LAG); TITLE_A.draw(t, dt); WALKER.tick(t); exploreFrame(t, dt);
+    HERO_A.draw(t - ANIM_LAG); BEAST_A.draw(t - ANIM_LAG); TITLE_A.draw(t, dt); drawHeroPick(t); WALKER.tick(t); exploreFrame(t, dt);
     const battleOn = $("map").hidden && $("local").hidden && $("explore").hidden && $("titleScreen").hidden && mode === "hunt";
     if ($("titleScreen").hidden) PFX.frame(dt, HERO_A.unit() || 4, battleOn && $("over").hidden);
   }

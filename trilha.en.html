@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soundtrack · Jaci: The Fading Moon</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+  :root{--ink:#0c1610;--leaf:#173626;--moss:#2a5a3c;--bone:#f4ecd8;--paper:#e8d9b0;--blood:#e03a2f;--gold:#f2a20c;
+    --display:"Anton",Impact,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--bone);font:15px/1.6 var(--mono);padding:28px 16px 48px}
+  main{max-width:820px;margin:0 auto}
+  a{color:var(--gold)}
+  .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}
+  h1{font:400 clamp(34px,7vw,56px)/1.05 var(--display);letter-spacing:1px;margin:18px 0 6px;text-transform:uppercase}
+  h1 span{display:inline-block;background:var(--blood);padding:2px 14px;transform:skewX(-8deg);box-shadow:5px 5px 0 #000}
+  .lead{color:#d8cfb6;max-width:680px}
+  h2{font:400 22px var(--display);letter-spacing:1px;text-transform:uppercase;margin:34px 0 12px;color:var(--gold)}
+  .faixa{display:grid;grid-template-columns:54px 1fr;gap:4px 16px;align-items:center;background:var(--leaf);border:2px solid #000;
+    box-shadow:4px 4px 0 #000;padding:14px 16px;margin:0 0 14px;border-left:8px solid var(--c)}
+  .faixa .disco{grid-row:span 2;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 50% 50%,#0c1610 0 18%,var(--c) 19% 64%,#0c1610 65% 70%,var(--c) 71%);border:2px solid #000}
+  .faixa.tocando .disco{animation:gira 2.4s linear infinite}
+  @keyframes gira{to{transform:rotate(360deg)}}
+  .faixa h3{margin:0;font:400 21px var(--display);letter-spacing:.5px;text-transform:uppercase}
+  .faixa h3 small{font:400 13px var(--mono);color:#c8c0a8;text-transform:none;letter-spacing:0;margin-left:6px}
+  .faixa p{margin:2px 0 0;color:#d8cfb6;font-size:13.5px}
+  .faixa audio{grid-column:1/-1;width:100%;margin-top:10px;height:36px}
+  .nota{margin-top:30px;font-size:13px;color:#a8a090}
+  @media (max-width:560px){.faixa{grid-template-columns:40px 1fr}.faixa .disco{width:40px;height:40px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><a href="./">▶ Play Jaci: The Fading Moon</a><span><a href="trilha.html" lang="pt-BR">Português</a> · <b>English</b></span><a href="https://github.com/Ganseblumchen97/rhanon-macley">Game page on GitHub</a></div>
+  <h1><span>Soundtrack</span></h1>
+  <p class="lead">All of the game's music is composed in code and played in real time by the browser, with no audio files.
+  Each character and each region has its own theme, a leitmotif: the same melody comes back in different arrangements, in
+  the city, in battle and against the boss, to tell the story through sound. The idea came from Toby Fox's work on Deltarune.</p>
+
+  <h2>Characters</h2>
+  <div class="faixa" style="--c:#3f9a5c"><i class="disco"></i><h3>Rhanon's theme <small>title screen</small></h3>
+    <p>It opens with a leap of a fourth, like a spear thrust, and keeps climbing. Acid jazz with a syncopated bass.</p>
+    <audio controls preload="none" src="midia/tema-rhanon.webm"></audio></div>
+  <div class="faixa" style="--c:#6a6a7a"><i class="disco"></i><h3>Pytuna's theme <small>the villain</small></h3>
+    <p>Low and slow: it rises a half step, leaps the tritone and lands on a note that never resolves. Smoke that never settles.</p>
+    <audio controls preload="none" src="midia/tema-pytuna.webm"></audio></div>
+  <div class="faixa" style="--c:#d8d8f0"><i class="disco"></i><h3>Jaci's theme <small>the moon</small></h3>
+    <p>A leap of a sixth that slowly falls and stops on a floating D: hope, not victory. It plays when a region is calmed.</p>
+    <audio controls preload="none" src="midia/tema-jaci.webm"></audio></div>
+
+  <h2>Regions</h2>
+  <div class="faixa" style="--c:#3f9a5c"><i class="disco"></i><h3>North <small>forest battle</small></h3>
+    <p>The North theme in the São Bento Grande rhythm, the fast capoeira circle, with atabaque drum, pandeiro and flute.</p>
+    <audio controls preload="none" src="midia/norte-batalha.webm"></audio></div>
+  <div class="faixa" style="--c:#e8a020"><i class="disco"></i><h3>Northeast <small>São Luís</small></h3>
+    <p>A bumba-meu-boi song mixed with forró: matraca clappers and big pandeiro underneath, accordion and triangle on top.</p>
+    <audio controls preload="none" src="midia/nordeste.webm"></audio></div>
+  <div class="faixa" style="--c:#c8603a"><i class="disco"></i><h3>Center-West <small>Cuiabá</small></h3>
+    <p>A country "toada": plucked viola caipira, accordion in the back and the theme as a duet in thirds, like a sertanejo duo.</p>
+    <audio controls preload="none" src="midia/centro-oeste.webm"></audio></div>
+  <div class="faixa" style="--c:#3a7ab8"><i class="disco"></i><h3>Southeast <small>Minas Gerais</small></h3>
+    <p>Modern sertanejo: steel-string guitar with a pop strum, claps and the theme sung as a duo. São Paulo gets MPB, and Rio, funk.</p>
+    <audio controls preload="none" src="midia/sudeste-minas.webm"></audio></div>
+  <div class="faixa" style="--c:#e03a2f"><i class="disco"></i><h3>Boss <small>in every region</small></h3>
+    <p>It opens with war drums and a bell toll, then moves on with distorted guitar.</p>
+    <audio controls preload="none" src="midia/chefe.webm"></audio></div>
+
+  <p class="nota">Excerpts recorded from the game itself. Each region has more arrangements of the same theme: village, map, night, water and city.</p>
+</main>
+<script>
+  // uma faixa por vez, e o disco gira enquanto toca (mesmo código da página em português)
+  const audios = [...document.querySelectorAll("audio")];
+  audios.forEach(a => {
+    a.addEventListener("play", () => { audios.forEach(o => { if (o !== a) o.pause(); }); a.parentElement.classList.add("tocando"); });
+    ["pause", "ended"].forEach(ev => a.addEventListener(ev, () => a.parentElement.classList.remove("tocando")));
+  });
+</script>
+</body>
+</html>

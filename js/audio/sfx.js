@@ -46,7 +46,9 @@ const SFX = {
   onibus: t => { tone(70, t, .4, "sawtooth", .05, 60); tone(105, t + .05, .3, "square", .025, 95); noise(t, .3, .04, 200); },
   // esquiva: um "fuup" de ar (ruído agudo descendo) e um toque leve no chão
   esquiva: t => { noise(t, .16, .1, 2200); tone(900, t, .12, "triangle", .04, 300); tone(140, t + .1, .06, "sine", .06, 90); },
-  mato: t => { noise(t, .07, .035, 2800); noise(t + .05, .09, .03, 4200); noise(t + .11, .06, .02, 3400); },   // farfalhar do mato alto (explore.js, grassStir)
+  // farfalhar do mato alto (explore.js, grassStir): baixinho e cada vez um pouco diferente (tamanho, altura e quantas folhas)
+  mato: t => { const r = () => .8 + Math.random() * .4, n = Math.random() < .5 ? 2 : 3;
+    for (let i = 0; i < n; i++) noise(t + i * .045 * r(), .05 * r(), (.014 - i * .003) * r(), (2600 + Math.random() * 1800)); },
   // fúria pronta / golpe da fúria: subida rápida e um acorde forte
   furia: t => { [392, 523, 659, 784].forEach((f, i) => tone(f, t + i * .04, .12, "square", .06)); [523, 659, 784].forEach(f => tone(f, t + .18, .35, "sawtooth", .045)); noise(t + .18, .25, .12, 1200); },
   crit:  t => { noise(t, .18, .25, 400); tone(440, t, .25, "square", .14, 80); tone(880, t + .05, .2, "square", .08, 160); },
@@ -78,6 +80,35 @@ const SFX = {
   critico: t => { tone(1568, t, .08, "square", .08); tone(2093, t + .07, .3, "triangle", .09); noise(t + .02, .3, .24, 300); tone(95, t + .02, .38, "sawtooth", .17, 40); }
 };
 function sfx(n) { if (AC) SFX[n](AC.currentTime); }
+/* vozes da fala (narração letra a letra, ui/narration.js): cada personagem importante tem um "bipe" próprio, para saber
+   quem fala só pelo som. f = altura, type = timbre, d = duração, v = volume, every = um bipe a cada tantas letras,
+   cps = letras por segundo, air = sopro de ruído junto (Pytuna) */
+const VOZ = {
+  paje:       {f: 165, type: "triangle", d: .07, v: .07, every: 2, cps: 36},   // grave e devagar, flauta de madeira
+  rhanon:     {f: 300, type: "square", d: .035, v: .025, every: 2, cps: 48},   // médio e seco
+  fran:       {f: 470, type: "triangle", d: .045, v: .055, every: 2, cps: 48},  // mais aguda e redonda
+  pytuna:     {f: 82, type: "sawtooth", d: .09, v: .035, every: 3, cps: 32, air: .02},   // grave, com chiado de fumaça
+  entrevista: {f: 560, type: "sine", d: .04, v: .06, every: 2, cps: 52}
+};
+/* voz de quem não tem uma própria (moradores, vendedores, clientes): sai do nome de quem fala, sempre a mesma para a
+   mesma pessoa. alta = voz mais aguda (cabelo comprido, tranças: ver npcVoiceFor em explore.js) */
+const NPC_VOZ = {};
+function npcVoice(key, alta) {
+  const id = "npc:" + key + (alta ? "+" : "");
+  if (!VOZ[id]) {
+    let h = 7; for (const c of key) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    const type = ["square", "triangle", "sine"][h % 3];
+    VOZ[id] = {f: (alta ? 300 : 150) + (h >> 3) % 7 * 28, type, d: .04 + (h >> 6) % 3 * .01, v: type === "square" ? .025 : .055, every: 2, cps: 46 + (h >> 9) % 4 * 4};
+  }
+  return id;
+}
+// um bipe da voz; c = a letra (a altura muda um pouco com ela, então a mesma frase soa sempre igual)
+function vozBlip(id, c) {
+  const z = VOZ[id]; if (!AC || !z) return;
+  const t = AC.currentTime, k = 1 + ((c.toLowerCase().charCodeAt(0) % 5) - 2) * .035;
+  tone(z.f * k, t, z.d, z.type, z.v, z.f * k * .92);
+  if (z.air) noise(t, z.d, z.air, 900);
+}
 // abafa a música por um instante (golpe forte, fúria) para o impacto aparecer, e volta ao volume das opções
 function musicDuck(ms = 450) {
   if (!AC || !musicOut) return;
