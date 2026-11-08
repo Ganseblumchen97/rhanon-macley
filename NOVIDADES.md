@@ -3,6 +3,17 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.92.0 — talismãs e armas até o fim da viagem
+
+- Toda cidade fora do Norte agora tem quem faça talismãs com o luar dos chefes, como o Pajé da aldeia: a rezadeira no
+  Nordeste, a raizeira no Centro-Oeste, a benzedeira no Sudeste e a curandeira no Sul. Com elas também dá para
+  esquecer as habilidades.
+- Cada chefe das outras regiões agora tem o seu talismã (os de dia) ou amuleto (os da noite): são 46 novos, do nível
+  32 ao 81. Antes os talismãs paravam nos chefes do Norte. Acalme o chefe e leve o luar dele.
+- O armeiro ganhou 14 peças novas, do nível 34 ao 78, feitas com lembranças dos bichos de cada região: lança de presa
+  de cascavel, gibão de vaqueiro, colete de cervo, jaqueta de tropeiro, poncho do pampa, arco de carcará e outras. As
+  lanças chegam a ATQ 30, e roupas e calças a DEF 25 e 15.
+
 ## 0.91.0 — armeiro em toda cidade
 
 - Toda cidade agora tem armeiro e artesão, com as mesmas peças da feira da Vila Paranã: não precisa mais voltar ao

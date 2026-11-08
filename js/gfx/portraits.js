@@ -59,7 +59,8 @@ function ppTorso(d, P, look, who) {
    Para não parecer "colada": a cava é funda (o ombro e o começo do braço aparecem), a peça tem volume (meio-tom nos
    lados, sombra do lado de lá, dobras) e a borda tem acabamento. Regata: no Rhanon, larga com decote em U; na
    Franciscane, de alcinha. Colete: aberto na frente. Gibão e jaqueta: cobrem os ombros e têm gola */
-const VESTE_CUT = {regata: "regata", colete_sucuri: "colete", colete_tracaja: "colete", gibao_bufalo: "gibao", jaqueta_jacare: "jaqueta"};
+const VESTE_CUT = {regata: "regata", colete_sucuri: "colete", colete_tracaja: "colete", gibao_bufalo: "gibao", jaqueta_jacare: "jaqueta",
+  gibao_vaqueiro: "gibao", colete_cervo: "colete", jaqueta_tropeiro: "jaqueta", poncho_pampa: "gibao"};
 const mirrorX = pts => pts.map(([x, y]) => [80 - x, y]).reverse();
 function ppGarment(d, look, who) {
   if (!look || !look.shirt) return;

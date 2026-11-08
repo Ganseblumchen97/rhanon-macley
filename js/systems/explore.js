@@ -1122,6 +1122,8 @@ function exOpenDialog(kind, msg, look) {
   else if (kind === "armeiro" && SMITH_TALK[foodRegion()]) { say(t("Armeiro"), SMITH_TALK[foodRegion()] + " " + t(isTouch() ? "Toca numa peça pra ver o que ela pede." : "Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
   else if (kind === "artesao") { say(t("Artesão"), t("Roupa tecida à mão, tocha, cuia d'água e chicote de cipó pra espantar bicho. Me traz faísca de poraquê que eu te faço coisa melhor. Arma e armadura é com o armeiro, ali na barraca do meio.")); gearButtons(d); }
   else if (kind === "armeiro") { say(t("Armeiro"), t(isTouch() ? "Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Toca numa peça pra ver o que ela pede." : "Lança, arco, colete... Me traz as lembranças certas e um trocado que eu faço coisa pai d'égua. Escolhe nas setas e aperta Enter pra fabricar.")); forgePanel(d); }
+  else if (kind === "xama" && CHARM_TALK[foodRegion()]) { say(CHARM_MAKER[foodRegion()], CHARM_TALK[foodRegion()] + " " + t(isTouch() ? "Toca num talismã pra ver o que ele pede." : "Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem luar de chefe nenhum pra eu trabalhar. Acalma um chefe e me traz o luar dele."), d);   // rezadeira das cidades fora do Norte
+    if (Object.keys(G.skills).length) btn(t("Esquecer habilidades · R$ {n}", {n: SKILL_RESET(G.lv)}), ask(t("Esquecer todas as habilidades por R$ {n}? Os pontos voltam para gastar de novo.", {n: SKILL_RESET(G.lv)}), skillReset), G.money < SKILL_RESET(G.lv), d); }
   else if (kind === "xama") { say(t("Pajé"), t(isTouch() ? "Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Toca num talismã pra ver o que ele pede." : "Todo chefe que tu acalma solta um pouco do luar que a fumaça prendeu nele. Me traz esse luar que eu faço um talismã. Escolhe nas setas e aperta Enter.")); if (forgeItems().length) forgePanel(d); else lh(t("Ainda não tem luar de chefe nenhum pra eu trabalhar. Acalma um chefe e me traz o luar dele."), d);
     if (Object.keys(G.skills).length) btn(t("Esquecer habilidades · R$ {n}", {n: SKILL_RESET(G.lv)}), ask(t("Esquecer todas as habilidades por R$ {n}? Os pontos voltam para gastar de novo.", {n: SKILL_RESET(G.lv)}), skillReset), G.money < SKILL_RESET(G.lv), d); }
   else if (kind === "tecnico") nbTechnician(say, d);
@@ -1754,7 +1756,7 @@ let EX_TYPE = null;
 // quem fala em cada painel: o Pajé tem a voz dele; fogueira, tenda, bolsa e afins não falam
 function npcVoiceFor(kind, look) {
   if (["fogueira", "tenda", "notebook", "inventario", "segredo", "bau", "cabine", "onibus", "lembranca"].includes(kind)) return null;
-  if (kind === "xama") return "paje";
+  if (kind === "xama" && !CHARM_TALK[foodRegion()]) return "paje";   // a rezadeira das outras regiões tem a voz dela (abaixo)
   const key = look || kind;   // pelo visual de quem fala: cada morador e cada vendedor de região soa diferente
   const L = VILLAGER_LOOK[key] || {};
   return npcVoice(key, !!(L.trancas || L.longHair));
