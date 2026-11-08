@@ -508,6 +508,17 @@ const FOOD_TALK = {norte: "Mandioca, peixe assado, açaí e maniçoba. Barriga c
   sudeste: "Pão de queijo quentinho, frango com quiabo, café coado e feijão tropeiro. Come mais um, sô!",
   sul: "Chipa quentinha, pinhão cozido, chimarrão e barreado. Bah, aqui ninguém passa fome, tchê!"};
 const foodRegion = () => CITY[curCity()].map;
+// fala do armeiro e do artesão fora do Norte (no Norte ficam as falas de sempre, em explore.js); a dica de tecla vem depois
+const SMITH_TALK = {
+  nordeste: "Lança, arco, gibão... Ferro bom se bate quente, visse? Me traz as lembranças certas e um trocado que eu faço coisa arretada.",
+  centroeste: "Lança, arco, colete... Aqui no cerrado a gente faz coisa que aguenta queimada, tchá! Me traz as lembranças certas e um trocado.",
+  sudeste: "Lança, arco, colete... Trem bão de ferro, uai! Me traz as lembranças certas e um trocado que eu faço caprichado.",
+  sul: "Lança, arco, colete... Bah, aqui se forja no capricho, tchê! Me traz as lembranças certas e uns pila."};
+const CRAFTER_TALK = {
+  nordeste: "Renda, couro curtido, tocha, cuia d'água e chicote de cipó. Tudo feito à mão, oxente! Arma e armadura é com o ferreiro aí do lado.",
+  centroeste: "Chapéu de palha, tocha, cuia d'água e chicote de cipó. Coisa de peão, feita com calma. Arma e armadura é com o armeiro do lado.",
+  sudeste: "Tricô, tocha, cuia d'água e chicote de cipó. Feito devagarinho, do jeito mineiro. Arma e armadura é com o armeiro, ali do lado, sô.",
+  sul: "Poncho, tocha, cuia d'água e chicote de cipó. Tudo de lã e couro do pampa. Arma e armadura é com o armeiro aí do lado, tchê."};
 /* Pedidos dos aldeões (um por vez). giver = aldeão que pede (aldeao1 Mateiro, aldeao2 Ancião, aldeao3 Aldeã);
    need: {kill: bicho, n} (vencer, conta a partir do aceite) ou {pelt: bicho, n} (entregar peles);
    night = só aparece à noite; reward: dinheiro e itens da bolsa. */

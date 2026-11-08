@@ -3,6 +3,15 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.91.0 — armeiro em toda cidade
+
+- Toda cidade agora tem armeiro e artesão, com as mesmas peças da feira da Vila Paranã: não precisa mais voltar ao
+  Norte para fazer lança, colete ou comprar tocha. Cada região tem os seus, com roupa e jeito de falar de lá: o
+  ferreiro de chapéu de couro e a rendeira no Nordeste, o peão ferreiro no Centro-Oeste, a tricoteira mineira no
+  Sudeste e o gaúcho de chapéu preto no Sul.
+- No mapa do Brasil, a fumaça do Pytuna agora fica sobre a primeira região que ainda tem chefe tomado, e vai andando
+  conforme você acalma cada uma. Antes ela ia direto para o Sul logo no começo da viagem.
+
 ## 0.90.1 — parry que dá para ver
 
 - O parry ganhou sinal na tela. Quando o bicho ataca, o anel agora fecha até o instante exato do golpe: fica verde

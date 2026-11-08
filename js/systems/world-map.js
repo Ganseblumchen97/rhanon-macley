@@ -121,8 +121,15 @@ function fly(reg) {
 // região de uma cidade (pelo mapa grande dela)
 const regionOfCity = c => Object.keys(REGIONS).find(k => REGIONS[k].map === CITY[c].map);
 /* ---------- mapa do Brasil: as cinco regiões (REGIONS), do Norte ao Sul ----------
-   À esquerda o contorno com um ponto por região (a aberta pulsa, as outras ficam apagadas) e a fumaça de Pytuna no Sul
-   depois que ele foge; à direita a lista (setas escolhem, Z abre, X fecha) e o painel da região escolhida. */
+   À esquerda o contorno com um ponto por região (a aberta pulsa, as outras ficam apagadas) e a fumaça de Pytuna, depois
+   que ele foge pela primeira vez, sobre a primeira região que ainda tem chefe por acalmar (pytunaRegion); à direita a lista (setas escolhem, Z abre, X fecha) e o painel da região escolhida. */
+// onde a fumaça de Pytuna fica no mapa do Brasil: a primeira região, na ordem da viagem, com chefe de dia ou de noite
+// ainda tomado (sem contar a última mata); com tudo acalmado, no Sul, até o final; depois do final, some
+function pytunaRegion() {
+  if (G.fim) return null;
+  return ["norte", "nordeste", "centroeste", "sudeste", "sul"].find(r => Object.keys(ZONES).some(z => !ZONES[z].final && CITY[cityOf(z)] && CITY[cityOf(z)].map === REGIONS[r].map
+    && (!BS()[z] || (NIGHT_ZONES[z] && NIGHT_ZONES[z].boss && !BS()[z + ":noite"])))) || "sul";
+}
 let BR_SEL = "norte", BR_PICK = null;   // BR_PICK: escolhendo destino de voo ("aero" no guichê, "mapa" pelo atalho do mapa grande)
 function openBrasil(pick) {
   vit(); audio();
@@ -135,7 +142,7 @@ function openBrasil(pick) {
   const been = k => k === "norte" || !!G.regions?.[k], land = B.land.map(d => `<path d="${d}"/>`).join("");
   const areas = Object.entries(B.area).map(([k, d]) => `<path class="br-area${been(k) ? " been" : REGIONS[k].open ? "" : " shut"}${k === BR_SEL ? " sel" : ""}" data-k="${k}" d="${d}" style="--rc:${REGIONS[k].color}"/>`).join("");
   const dots = Object.entries(REGIONS).map(([k, r]) => `<g class="br-dot${r.open ? " open" : ""}${k === BR_SEL ? " sel" : ""}" data-k="${k}" transform="translate(${r.pos[0]} ${r.pos[1]})" style="--rc:${r.color}"><circle r="${r.open ? 16 : 13}"/><g class="br-ico" transform="scale(${r.open ? 1.15 : .95})">${MAP_ICON[B.icon[k]][1]}</g><text y="34" text-anchor="middle">${r.n}</text></g>`).join("");
-  const smoke = fled ? `<g class="br-smoke" transform="translate(${REGIONS.sul.pos[0] + 30} ${REGIONS.sul.pos[1] - 26})"><circle r="11" cx="-6"/><circle r="13" cx="6" cy="-4"/><circle r="9" cx="2" cy="6"/><rect x="-6" y="-4" width="4" height="3"/><rect x="3" y="-4" width="4" height="3"/></g>` : "";
+  const pyt = fled && pytunaRegion(), smoke = pyt ? `<g class="br-smoke" transform="translate(${REGIONS[pyt].pos[0] + 30} ${REGIONS[pyt].pos[1] - 26})"><circle r="11" cx="-6"/><circle r="13" cx="6" cy="-4"/><circle r="9" cx="2" cy="6"/><rect x="-6" y="-4" width="4" height="3"/><rect x="3" y="-4" width="4" height="3"/></g>` : "";
   box.innerHTML = `<h2>${t(BR_PICK ? "Escolha o destino" : "Mapa do Brasil")}</h2><div class="br-wrap"><svg viewBox="80 80 400 480" aria-hidden="true"><defs><clipPath id="brLand">${land}</clipPath></defs><g class="land">${land}</g>` +
     `<g clip-path="url(#brLand)">${areas}</g><g class="land-edge">${land}</g>` +
     `<path class="br-trail" d="M${REGIONS.norte.pos} L${REGIONS.nordeste.pos} L${REGIONS.centroeste.pos} L${REGIONS.sudeste.pos} L${REGIONS.sul.pos}"/>${dots}${smoke}</svg><div class="br-side"></div></div>`;
