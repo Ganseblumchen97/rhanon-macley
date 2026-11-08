@@ -117,6 +117,7 @@ function init(opts = {}) {
   const ehp = Math.round(animal.hp * (G.portfolio.mapa_queimadas && !animal.bug && isTomado(animal) ? .9 : 1) * (animal.boss && far ? BOSS_HP_FAR : 1) * beastToughness(animal));
   e = { ...animal, hp:ehp, max:ehp, intent:null, known:false, assustada:false, rematch: !!opts.rematch, far, turn: 0 };   // rematch: revanche pela lembrança do chefe
   if (animal.id === "pytuna") { e.fase = 1; e.luz = 0; pytunaLuz(); }   // noite sem lua nenhuma
+  if (!animal.bug) { const m = foeDmgMult(animal); e.damage = e.damage.map(d => Math.max(1, Math.round(d * m))); }   // dificuldade (FOE_DMG)
   const wf = WEATHER[weatherNow()].foe; if (wf && isTomado(animal) && !opts.rematch) e.damage = e.damage.map(d => Math.round(d * wf));   // fumaça de queimada: o bicho tomado bate mais forte
   busy = false;
   lines = [animal.intro];
@@ -203,6 +204,12 @@ function plateElem(a) {
    forte (BOSS_HEAVY × o dano máximo) que pede guarda (Defender corta para BOSS_HEAVY_GUARD); bicho comum bem abaixo do
    nível do Rhanon aguenta mais (beastToughness), para a luta não acabar no primeiro golpe */
 const BOSS_HP_FAR = 1.4, BOSS_HEAVY_EVERY = 4, BOSS_HEAVY = 1.8, BOSS_HEAVY_GUARD = .3;
+/* bichos batem mais forte (lote de dificuldade da 0.90): os dados de dano foram escritos com a defesa descontando inteira;
+   com a defesa em porcentagem (takeDef), o dano dos dados vezes isto dá uns 10-12% da vida por turno nos comuns e uns 15% nos
+   chefes. Nos primeiros níveis sobe aos poucos (a mata do começo continua tranquila); bugs dos freelas ficam como estão */
+const FOE_DMG = 1.9, BOSS_DMG = 2.3;
+// depois do nível 14 sobe mais um pouco (até +40% no 64): lá a defesa já chegou no teto e a vida do Rhanon é grande
+const foeDmgMult = a => (1 + ((a.boss ? BOSS_DMG : FOE_DMG) - 1) * Math.min(1, ((a.lv || 1) + 2) / 14)) * (1 + Math.min(.4, Math.max(0, (a.lv || 1) - 14) * .008));
 const beastToughness = a => a.boss || a.bug ? 1 : Math.min(1.5, 1 + .08 * Math.max(0, G.lv - (a.lv || 1) - 2));
 const moveName = () => e.intent === "forte" ? t("Golpe forte") : (e.moves || MOVES)[e.intent];
 function pick() {
@@ -256,6 +263,9 @@ function render() {
    Apertar Z (ou Espaço, ou tocar no palco) nessa janela dá "Perfeito!" (+30% de dano) no golpe do Rhanon ou
    "Bloqueio!" (metade do dano) no golpe do bicho. Uma tentativa por golpe: apertar fora da hora perde a chance. */
 const QTE_EARLY = 250, QTE_LATE = 150;   // janela, em ms, antes e depois do impacto (o anel fica verde e faz "tic" quando ela abre)
+// parry: um pedaço curto da janela do bloqueio, colado no impacto. Nele o golpe não passa e o Rhanon revida na hora
+const PARRY_EARLY = 90, PARRY_LATE = 60, PARRY_HIT = .6;
+let QTE_PARRY = false;   // o último qteTake foi um parry (o bloqueio do bicho olha isto)
 let qte = null, foeImpact = 0;           // qte = {at, el, ok, tried}; foeImpact = quando o último golpe do bicho chega
 function qteArm(impactIn, target) {
   qteClear();
@@ -272,10 +282,11 @@ function qtePress() {
   qte.tried = true;
   const dt = performance.now() - qte.at;
   qte.ok = dt >= -QTE_EARLY && dt <= QTE_LATE;
+  qte.parry = dt >= -PARRY_EARLY && dt <= PARRY_LATE;
   qte.el.classList.add(qte.ok ? "acertou" : "errou");
 }
 // no impacto: devolve se acertou o tempo (e encerra a janela); cada janela conta para a fúria
-function qteTake() { const had = !!qte, ok = !!(qte && qte.ok); qteClear(); if (had) furyNote(ok); return ok; }
+function qteTake() { const had = !!qte, ok = !!(qte && qte.ok); QTE_PARRY = ok && !!qte.parry; qteClear(); if (had) furyNote(ok); return ok; }
 /* fúria: FURY_MAX tempos certos seguidos (golpe perfeito ou bloqueio) enchem a barra; errar ou deixar passar zera.
    Cheia, o comando da lança vira "Fúria!": três estocadas seguidas (FURY_HIT do golpe) e a última mais forte (FURY_LAST).
    Antes enchia com 3 (2 com Sangue quente) e cada estocada era um golpe inteiro: quem acertava o tempo vencia chefe em 2 turnos.
@@ -418,14 +429,14 @@ function enemyTurn() {
     say(t("O talismã encanta {bicho}: perdeu a vez.", {bicho: foe()})); pop(t("ENCANTADO!"), $("beast"), "crit"); sfx("look"); BEAST_A.set("hurt");
     foeImpact = 600;
   } else if (i === "forte") {   // o golpe forte avisado: com a guarda levantada, passa só um pedaço
-    let d = Math.round(e.damage[1] * BOSS_HEAVY); if (p.def) d = Math.ceil(d * BOSS_HEAVY_GUARD); d = Math.max(1, d - pdef());
+    let d = Math.round(e.damage[1] * BOSS_HEAVY); if (p.def) d = Math.ceil(d * BOSS_HEAVY_GUARD); d = takeDef(d);
     p.hp -= d; foeAttack("claw", d); shake("gshake");
     say(p.def ? t("A guarda segura o golpe forte d{bicho}: −{n} PV.", {bicho: foe(), n: d}) : t("Golpe forte d{bicho}! −{n} PV.", {bicho: foe(), n: d}));
   } else if (i === "arranhao") {
-    let d = rnd(e.damage[0], Math.max(e.damage[0], Math.min(e.damage[1], e.damage[0]+3))); if (p.def) d = Math.ceil(d / 2); d = Math.max(1, d - pdef());
+    let d = rnd(e.damage[0], Math.round((e.damage[0] + e.damage[1]) / 2)); if (p.def) d = Math.ceil(d / 2); d = takeDef(d);   // golpe fraco: a metade de baixo do dano
     p.hp -= d; foeAttack("claw", d); say(t("{bicho} ataca: −{n} PV.", {bicho: foe(1), n: d}));
   } else if (i === "bote") {
-    let d = rnd(Math.max(e.damage[0], e.damage[1]-4), e.damage[1]); d = Math.max(1, d - pdef());
+    let d = rnd(Math.round((e.damage[0] + e.damage[1]) / 2), e.damage[1]); d = takeDef(d);   // bote: a metade de cima
     if (p.def) {
       d = Math.ceil(d * .35); e.hp = Math.max(0, e.hp - 4); hitBeast();
       say(t("Desviou! O bote pega de raspão: −{n} PV. Contra-ataque: −4.", {n: d}));
@@ -446,6 +457,7 @@ function enemyTurn() {
       say(t("A luz de Jaci cai sobre o Rhanon: ele levanta com {n} PV!", {n: p.hp}));
     }
     if (p.hp <= 0) { render(); return finish("lose"); }
+    if (e.hp <= 0) { render(); return finish("win"); }   // o revide (parry, Revide, talismã de espinho) acalmou o bicho no turno dele
     pick(); busy = false; render();
   }, foeImpact + 150);
 }
@@ -625,11 +637,18 @@ function foeAttack(kind, d, sp0) {
     if (d > 0 && e.cego > 0) { e.cego = 0; if (Math.random() < .5) { p.hp += d; d = 0; say(t("Com areia nos olhos, {bicho} erra o golpe!", {bicho: foe()})); pop(t("ERROU!"), $("hero"), "heal"); sfx("esquiva"); } }   // Salto da duna
     if (d > 0 && e.espanto > 0) { const n = Math.ceil(d * .35); p.hp += n; d -= n; }   // Careta que espanta: com medo, bate mais fraco
     if (d > 0 && p.escudo > 0) { p.escudo--; const n = Math.floor(d / 2); p.hp += n; d -= n; say(t("O escudo de luar segura metade do golpe: evitou {n}.", {n})); pop(t("ESCUDO!"), $("hero"), "heal"); sfx("bloqueio"); }
-    if (block && qteTake()) {   // bloqueio na hora certa: metade do dano volta (Bloqueio firme: 2/3; Contra-ataque perfeito: tudo)
-      const all = hasSkill("bloqueio2"), back = all ? d : Math.floor(d * (hasSkill("bloqueio") ? 2 / 3 : 1 / 2)); p.hp += back; d -= back;
-      if (back) { say(t("Bloqueio! Evitou {n} de dano.", {n: back})); pop(t("BLOQUEIO!"), $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
-      if (all && back) { p.bonus = true; say(t("Contra-ataque perfeito: no próximo turno, o Rhanon age duas vezes!")); }
-      if (hasSkill("revide") && back && e.hp > 0) {   // Revide: metade do que evitou volta para o bicho
+    if (block && qteTake()) {   // bloqueio na hora certa: metade do dano volta (Bloqueio firme: 2/3; Contra-ataque perfeito: tudo); parry: tudo e revida
+      const parry = QTE_PARRY, all = parry || hasSkill("bloqueio2"), back = all ? d : Math.floor(d * (hasSkill("bloqueio") ? 2 / 3 : 1 / 2)); p.hp += back; d -= back;
+      if (parry && e.hp > 0) {   // empurra o golpe com a lança e estoca de volta (Revide deixa o revide mais forte)
+        const n = Math.max(2, Math.round((rnd(6, 10) + G.lv - 1 + weaponAtk()) * PARRY_HIT * (hasSkill("revide") ? 1.5 : 1)));
+        e.hp = Math.max(0, e.hp - n);
+        say(t("Parry! O golpe não passou e {heroi} revidou: −{n}.", {heroi: heroName(), n})); pop(t("PARRY!"), $("hero"), "crit"); sfx("bloqueio"); sfx("perfeito");
+        HERO_A.set("parry"); hitImpact("forte");
+        setTimeout(() => { hitBeast(); pop("−" + n, $("beast"), "strong"); render(); }, 230);
+      }
+      else if (back) { say(t("Bloqueio! Evitou {n} de dano.", {n: back})); pop(t("BLOQUEIO!"), $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
+      if (hasSkill("bloqueio2") && back) { p.bonus = true; say(t("Contra-ataque perfeito: no próximo turno, o Rhanon age duas vezes!")); }
+      if (hasSkill("revide") && back && !parry && e.hp > 0) {   // Revide: metade do que evitou volta para o bicho
         const n = Math.max(1, Math.ceil(back / 2)); e.hp = Math.max(0, e.hp - n);
         setTimeout(() => { hitBeast(); pop("−" + n, $("beast"), "strong"); say(t("Revide! {bicho} perde {n} PV.", {bicho: foe(), n})); render(); }, 150);
       }
@@ -974,9 +993,14 @@ function pickAnimal() {
 }
 // defesa na hora do golpe: com medo (chocalho do Boitatá, uivo do lobo) ela some e o golpe ainda dói mais
 const pdef = () => p && p.medo > 0 ? -2 : defense();
+/* defesa em porcentagem (antes era descontada inteira de cada golpe: com 26 de defesa, um golpe de 20 virava 1 e a metade do
+   jogo em diante quase não doía). Cada ponto ajuda menos que o anterior e o corte para em DEF_CAP; com medo, o golpe entra
+   mais forte */
+const DEF_K = 45, DEF_CAP = .45;
+const takeDef = n => { const d = pdef(), k = d < 0 ? -.15 : Math.min(DEF_CAP, d / (d + DEF_K)); return Math.max(1, Math.round(n * (1 - k))); };
 function special() {
   let s = Array.isArray(e.special) ? e.special[Math.floor(Math.random() * e.special.length)] : e.special, d = rnd(e.damage[0], e.damage[1]);   // lista = sorteia um dos golpes
-  const hit = (n, k) => { if (p.def) n = Math.ceil(n / 2); n = Math.max(1, n - pdef()); p.hp -= n; foeAttack(k || "claw", n); return n; };
+  const hit = (n, k) => { if (p.def) n = Math.ceil(n / 2); n = takeDef(n); p.hp -= n; foeAttack(k || "claw", n); return n; };
   // Pytuna: a fumaça na cara (dano por turno), a noite fechada (tira PE e a defesa) e, de máscara, o eco de um golpe de chefe do caminho
   if (s === "eco") { s = ["estouro", "fogo", "prender", "onda", "frenesi"][rnd(0, 4)]; say(t("Pytuna lembra o jeito de brigar de um chefe do caminho!")); }
   if (s === "fumaca") { const n = hit(d); p.dot = {d: 4, t: 3, n: "Fumaça"}; say(t("{bicho} sopra fumaça na cara do Rhanon! −{n} PV, e mais 4 por turno.", {bicho: foe(1), n})); return; }

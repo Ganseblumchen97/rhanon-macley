@@ -662,11 +662,11 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 /* bicho de água: laguinho no lugar do chão; ele aparece meio submerso, com marola na linha d'água */
 .stage.aquatic::before{display:block;right:7%;top:var(--plat);width:44%;height:30px;background:radial-gradient(ellipse at 50% 40%,#4ab0d8 0 42%,#1f6a8a 76%);box-shadow:0 6px 0 #0a1a28,inset 0 5px 0 rgba(170,225,255,.4)}
 #beast.submerged{translate:0 24%}
-#beast.submerged canvas{clip-path:inset(0 0 30% 0)}
+#beast.submerged canvas{clip-path:inset(0 0 var(--fundo,30%) 0)}
 #beast.submerged::after{content:"";position:absolute;left:-4%;right:-4%;top:69%;height:calc(1.2*var(--px));border-radius:50%;background:repeating-linear-gradient(90deg,rgba(210,240,255,.95) 0 12px,transparent 12px 24px);animation:marola 1.2s steps(2) infinite;pointer-events:none}
 @keyframes marola{50%{translate:6px 0}}
 #beast.submerged.shallow{translate:0 12%}
-#beast.submerged.shallow canvas{clip-path:inset(0 0 16% 0)}
+#beast.submerged.shallow canvas{clip-path:inset(0 0 var(--raso,16%) 0)}
 #beast.submerged.shallow::after{top:82%}
 /* na água, o tremor mexe só o bicho: a marola fica parada e ele continua meio submerso */
 #beast.submerged.lunge,#beast.submerged.hit{animation:none}

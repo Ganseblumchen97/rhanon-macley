@@ -653,6 +653,8 @@ TX.en = {
     "chefe!": "boss!",
     "De volta à pensão, com metade das forças.": "Back at the inn, with half your strength.",
     "De volta à fogueira, com metade das forças.": "Back at the campfire, with half your strength.",
+    "PARRY!": "PARRY!",
+    "Parry! O golpe não passou e {heroi} revidou: −{n}.": "Parry! The blow didn't land and {heroi} struck back: −{n}.",
     "{bicho} prepara: {golpe}!": "{bicho} is winding up: {golpe}!",
     "{bicho} prepara o golpe…": "{bicho} gets ready to strike…",
     "Fúria!": "Fury!",

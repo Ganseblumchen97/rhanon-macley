@@ -656,6 +656,8 @@ TX.es = {
     "chefe!": "¡jefe!",
     "De volta à pensão, com metade das forças.": "De vuelta en la pensión, con la mitad de las fuerzas.",
     "De volta à fogueira, com metade das forças.": "De vuelta junto a la fogata, con la mitad de las fuerzas.",
+    "PARRY!": "¡PARADA!",
+    "Parry! O golpe não passou e {heroi} revidou: −{n}.": "¡Parada! El golpe no entró y {heroi} contraatacó: −{n}.",
     "{bicho} prepara: {golpe}!": "{bicho} prepara: ¡{golpe}!",
     "{bicho} prepara o golpe…": "{bicho} prepara el golpe…",
     "Fúria!": "¡Furia!",

@@ -144,6 +144,13 @@ function makeHeroActor() {
         if (!lastFx) { lastFx = 1; const [gx, gy] = grid(SX + 16, SY + 22); PFX.burst(6, "ring", ["#bff3ff", "#ffffff"], gx, gy, 18, {life: .5}); }
         if (el > 600) set("idle");
         break;
+      case "parry":   // apara o golpe com a lança atravessada (faísca), puxa e estoca de volta, e volta à guarda
+        pose.dy = el < 140 ? 1 : 0; pose.lean = el < 140 ? -1 : el < 200 ? -2 : el < 420 ? 3 : el < 520 ? 1 : 0;
+        sp([[0, "up"], [60, "high"], [140, "high"], [200, "pull"], [235, "stab"], [420, "stab"], [560, "guard"], [700, "up"]]);
+        if (!lastFx && el > 40) { lastFx = 1; const [gx, gy] = grid(SX + 20, SY + 8); PFX.burst(12, "star", ["#ffffff", "#ffd23a", "#bff3ff"], gx, gy, 20, {life: .5}); PFX.burst(6, "ring", ["#ffffff"], gx, gy, 12, {life: .35}); }
+        if (lastFx === 1 && el > 235) { lastFx = 2; const [gx, gy] = grid(SX + 30, SY + 14); PFX.burst(8, "spark", ["#ffffff", "#ffd23a"], gx, gy, 16, {life: .4}); }
+        if (el > 700) set("idle");
+        break;
       case "cheer":   // acerto na entrevista: pulinho com notas
         lift = Math.max(0, Math.sin(Math.min(1, el / 380) * Math.PI) * 6);
         if (!lastFx) { lastFx = 1; const [gx, gy] = grid(SX + 16, SY); PFX.burst(4, "note", ["#ffffff", "#ffd200"], gx, gy, 14, {life: .9, up: 10}); }
@@ -263,6 +270,10 @@ function makeBeastActor() {
     if (src.style.filter) cv.style.filter = src.style.filter;
     const u = n => `calc(var(--px) * -${(n * f).toFixed(2)})`;
     cv.style.margin = `${u(MT)} ${u(MX)} ${u(MB)} ${u(MX)}`;
+    // na água (styles.css, #beast.submerged): quanto do fundo do desenho fica escondido. Medido do desenho (h), não em %
+    // do canvas: com a fumaça de tomado o canvas fica mais alto e o corte subia, deixando um vão entre o bicho e a água
+    const wet = q => `calc(var(--px) * ${((h * q + MB) * f).toFixed(2)})`;
+    cv.style.setProperty("--fundo", wet(.35)); cv.style.setProperty("--raso", wet(.15));
     el.innerHTML = ""; el.appendChild(cv); g = cv.getContext("2d");
     nextHop = animNow() + 1500; nextAct = animNow() + 2500 + Math.random() * 2500;
     set(opts.state || "idle");

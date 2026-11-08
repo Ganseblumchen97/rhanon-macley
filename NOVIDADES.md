@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.90.0 — bicho que morde e parry
+
+- Os bichos batem de verdade agora. Antes, da metade do jogo em diante quase todo golpe tirava 1 de vida. Agora uma luta
+  comum sem defender pode custar quase metade da vida, e os chefes doem ainda mais. A mata do começo continua tranquila.
+- A roupa e o talismã protegem em porcentagem: cortam um pedaço de cada golpe (até uns 45%), em vez de apagar o golpe
+  inteiro. O "Arranhão" e o "Bote" também variam mais: um é a parte fraca do bicho, o outro a forte.
+- Parry: aperte Z bem na hora em que o golpe chega, no finalzinho do anel. O Rhanon (ou a Franciscane) apara com a
+  lança, não toma dano nenhum e revida na hora ("PARRY!"). Apertando um pouco antes, continua valendo o bloqueio de
+  sempre, que corta metade. Com a habilidade Revide, o revide do parry sai mais forte.
+- Se um revide acalmar o bicho no turno dele, a luta termina na hora.
+- Correção: a piranha, o boto e outros bichos de água tomados pela fumaça apareciam flutuando acima da poça, como se
+  estivessem no rio do fundo. Agora ficam dentro da água.
+
 ## 0.89.0 — falas com voz e rosto
 
 - As conversas ganharam retrato grande: o rosto de quem fala aparece em pixel art do lado de fora da caixa, bem maior

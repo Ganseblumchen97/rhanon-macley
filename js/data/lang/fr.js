@@ -659,6 +659,8 @@ TX.fr = {
     "chefe!": "chef !",
     "De volta à pensão, com metade das forças.": "De retour à la pension, avec la moitié des forces.",
     "De volta à fogueira, com metade das forças.": "De retour au feu de camp, avec la moitié des forces.",
+    "PARRY!": "PARADE !",
+    "Parry! O golpe não passou e {heroi} revidou: −{n}.": "Parade ! Le coup n'est pas passé et {heroi} a riposté : −{n}.",
     "{bicho} prepara: {golpe}!": "{bicho} prépare : {golpe} !",
     "{bicho} prepara o golpe…": "{bicho} prépare son coup…",
     "Fúria!": "Furie !",
