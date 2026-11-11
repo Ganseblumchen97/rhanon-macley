@@ -306,6 +306,11 @@ function furyNote(ok) {
   p.furia++;
   if (furyReady()) setTimeout(() => { pop(t("FÚRIA PRONTA!"), $("hero"), "crit"); sfx("furia"); say(t(furyMax() === 3 ? "Três no tempo certo! Fúria pronta: usa a lança." : "Quatro no tempo certo! Fúria pronta: usa a lança.")); render(); }, 420);
 }
+// acertou a fraqueza: aviso pequeno em cima do Rhanon (como o da fúria) e ele gira a lança, pronto para mais um golpe
+function oneMore() {
+  pop(t("MAIS UMA!"), $("hero"), "crit");
+  if (HERO_A.state !== "defeat") { HERO_A.set("ready"); sfx("spear"); }
+}
 function hitBeast() {
   const b = $("beast"); b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit");
   if (BEAST_A.state !== "defeat") BEAST_A.set("hurt");
@@ -381,7 +386,7 @@ function act(id, ally) {
     if (m < 1) setTimeout(() => { say(t("{bicho} resistiu ao golpe.", {bicho: foe(1)})); pop(t("RESISTIU!"), $("beast")); render(); }, wait + 200);
     if (fresh) setTimeout(() => { plateElem(e); if (m === 1) say(t("{elemento} não faz nada de especial n{bicho}. Anotado no caderno.", {elemento: ELEMENTS[k].n, bicho: foe()})); render(); }, wait + 250);   // descobriu: a placa mostra (e o caderno anota)
     if (m > 1) setTimeout(() => { if (e.hp > 0 && !furyReady()) { furyNote(true); render(); } }, wait + 150);   // fraqueza conta um ponto da fúria
-    if (m > 1 && !e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); render(); sfx("more"); pop(t("FRAQUEZA!"), $("beast"), "crit"); }, wait + 200); }
+    if (m > 1 && !e.assustada && e.hp > 0) { e.assustada = true; extra = true; setTimeout(() => { say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); render(); sfx("more"); pop(t("FRAQUEZA!"), $("beast"), "crit"); oneMore(); }, wait + 200); }
   } else if (id === "flecha") {   // tiro com o arco: menos dano que a lança, mas 40% de chance de crítico
     p.sp -= 3;
     let d = rnd(5, 9) + G.lv - 1 + ((EQUIP.ranged[G.equip.ranged] || {}).atk || 0) + charmStat("atk") + skillStat("atk") + (hasSkill("mira") ? 4 : 0), crit = p.atento || Math.random() < .4;   // arco melhor = flecha mais forte
@@ -471,23 +476,76 @@ function enemyTurn() {
 const PYT_HOLD = .6, PYT_DMG = 1.15, PYT_SP = .35;
 const pytunaBosses = () => Object.values(CITY).map(c => c.route.filter(z => ZONES[z] && !ZONES[z].final).pop()).filter(Boolean).map(z => ZONES[z].boss);   // o último chefe de dia de cada cidade
 const pytunaHolds = () => mode === "hunt" && e.boss && !e.rematch && !e.night && !e.possuido && !bugMode && ZONES[curZone] && !BS()[curZone] && pytunaBosses().includes(e.id);
+/* cena da posse: um canvas por cima do palco escurece tudo, a fumaça junta numa nuvem grande com os olhos de Pytuna em cima
+   do chefe (PYT_CINE.form), a nuvem mergulha nele (.dive) e um clarão roxo marca a entrada (entra() é chamada ali) */
+const PYT_CINE = {form: 950, dive: 1400, end: 1900};
+function pytunaCine(entra) {
+  const st = $("stage"); st.querySelector(".pyt-cine")?.remove();
+  if (REDUCE) return entra();
+  const cv = document.createElement("canvas"), sr = st.getBoundingClientRect(), k = Math.max(2, Math.round(sr.width / 360));
+  cv.className = "pyt-cine"; cv.width = Math.ceil(sr.width / k); cv.height = Math.ceil(sr.height / k); st.appendChild(cv);
+  const x = cv.getContext("2d"), W = cv.width, H = cv.height, br = $("beast").getBoundingClientRect();
+  const bx = (br.left + br.width / 2 - sr.left) / k, by = (br.top + br.height * .5 - sr.top) / k, top = Math.max(34, by - Math.max(46, br.height / k * .9));   // a nuvem inteira cabe no palco
+  const t0 = performance.now(), ease = u => 1 - (1 - u) ** 3, cl = u => Math.max(0, Math.min(1, u));
+  let done = false;
+  const frame = now => {
+    if (!cv.isConnected) return;
+    const e = Math.max(0, now - t0), T = PYT_CINE;
+    x.clearRect(0, 0, W, H);
+    // o palco escurece e fica arroxeado; clareia de novo depois que a nuvem entra
+    const dark = e < T.dive ? cl(e / 500) * .62 : .62 * (1 - cl((e - T.dive) / (T.end - T.dive)));
+    x.fillStyle = `rgba(14,6,26,${dark})`; x.fillRect(0, 0, W, H);
+    if (e < T.dive) {
+      const f = ease(cl(e / T.form)), d = ease(cl((e - T.form) / (T.dive - T.form)));
+      // fios de fumaça vindo das bordas para a nuvem
+      for (let i = 0; i < 18; i++) {
+        const a = i / 18 * Math.PI * 2 + 1, u = cl(e / T.form * 1.3 - (i % 5) * .08); if (u <= 0 || u >= 1) continue;
+        const sx = bx + Math.cos(a) * W * .6, sy = top + Math.sin(a) * H * .7;
+        x.globalAlpha = .7 * (1 - u * .4); x.fillStyle = PYT_SMOKE[i % 3];
+        x.beginPath(); x.arc(Math.round(sx + (bx - sx) * ease(u)), Math.round(sy + (top - sy) * ease(u)), 3 + (i % 3) * 2, 0, Math.PI * 2); x.fill();
+      }
+      x.globalAlpha = 1;
+      // a nuvem cresce em cima do chefe, treme, e depois mergulha encolhendo
+      const cy = top + (by - top) * d, kk = (.4 + 2.1 * f) * (1 - d * .7), wob = e > T.form * .6 && d === 0 ? Math.round(Math.sin(e / 28) * 1.5) : 0;
+      drawSmoke(x, bx + wob, cy, kk, now, 1);
+    } else {
+      // entrou: anel roxo e vermelho abrindo a partir do chefe
+      const u = cl((e - T.dive) / (T.end - T.dive));
+      if (!done) { done = true; entra(); }
+      x.globalAlpha = 1 - u; x.lineWidth = 3;
+      x.strokeStyle = "#b06ad6"; x.beginPath(); x.arc(bx, by, 8 + ease(u) * W * .45, 0, Math.PI * 2); x.stroke();
+      x.strokeStyle = "#ff2a2a"; x.beginPath(); x.arc(bx, by, 4 + ease(u) * W * .3, 0, Math.PI * 2); x.stroke();
+      x.globalAlpha = 1;
+    }
+    if (e < T.end) requestAnimationFrame(frame); else { cv.classList.add("out"); setTimeout(() => cv.remove(), 450); }
+  };
+  requestAnimationFrame(frame);
+  setTimeout(() => { if (!done) { done = true; entra(); } }, PYT_CINE.dive + 400);   // garantia (aba em segundo plano não roda os quadros)
+}
 function pytunaPossess() {
   const me = e; e.possuido = true; e.segurando = true; busy = true; render();   // segurando: a vida fica em 0 durante a cena, e nenhuma vitória conta
   const at = (ms, fn) => setTimeout(() => { if (e === me && mode === "hunt" && p.hp > 0) fn(); }, REDUCE ? ms / 3 : ms);
   BEAST_A.set("hurt"); musicStop(); say(t("{bicho} quase volta a si...", {bicho: foe(1)})); render();
-  at(1000, () => {   // a fumaça volta de todo lado para dentro do chefe, e Pytuna fala
-    sfx("rugidoChefe"); musicStart("battlePytuna"); shake("gshake-s"); $("beast").classList.add("possuido");   // o tema de Pytuna em versão de batalha
+  at(1000, () => {   // a fumaça volta de todo lado, junta numa nuvem com olhos em cima do chefe e mergulha nele; Pytuna fala
+    sfx("rugidoChefe"); musicStart("battlePytuna"); shake("gshake-s");   // o tema de Pytuna em versão de batalha
     const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .45);
-    for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2, R = 28 + (i % 3) * 8; PFX.emit("puff", PYT_SMOKE, gx + Math.cos(a) * R, gy + Math.sin(a) * R * .7, -Math.cos(a) * R / 1.1, -Math.sin(a) * R * .7 / 1.1, 1.1); }
+    for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2, R = 28 + (i % 3) * 8; PFX.emit("puff", PYT_SMOKE, gx + Math.cos(a) * R, gy + Math.sin(a) * R * .7 - 14, -Math.cos(a) * R / 1.1, -Math.sin(a) * R * .7 / 1.1, 1.1); }
     say(t("Pytuna puxa a fumaça de volta: \"Esse aí ainda é meu, curumim.\"")); render();
+    pytunaCine(() => {   // a nuvem entrou: o chefe fica tomado de novo
+      if (e !== me || mode !== "hunt") return;
+      $("beast").classList.add("possuido"); sfx("roar"); hitImpact("forte"); shake("gshake");
+      for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2; PFX.emit("puff", PYT_SMOKE, gx, gy, Math.cos(a) * 30, Math.sin(a) * 20, .7); }
+    });
   });
-  at(2600, () => {   // levanta mais forte
+  at(2900, () => {   // levanta mais forte
     e.hp = Math.round(e.max * PYT_HOLD); e.damage = e.damage.map(d => Math.round(d * PYT_DMG)); e.segurando = false;
     BEAST_A.set("bigroar"); animalCry(e.id, true, 1.4); hitImpact("forte"); shake("gshake");
+    const r = $("beast").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .45);
+    PFX.burst(16, "ring", ["#ff2a2a", "#b06ad6", "#ffffff"], gx, gy, 34, {life: .7});   // a onda vermelha e roxa do rugido
     encounterBanner(e.name, t(ending(e, "possuído por Pytuna!", "possuída por Pytuna!")));
     say(t("{bicho} levanta com a fumaça de Pytuna, mais forte!", {bicho: foe(1)})); render();
   });
-  at(4000, () => {   // e a luz de Jaci responde
+  at(4300, () => {   // e a luz de Jaci responde
     const n = Math.max(0, Math.min(p.msp - p.sp, Math.round(p.msp * PYT_SP)));
     p.sp += n; jaciJingle(); HERO_A.set("ready");
     const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width / 2, r.top + r.height * .35);
@@ -942,7 +1000,7 @@ function allyCall(id) {
   setTimeout(() => sp.el.remove(), (REDUCE ? end / 3 : end) + 600);   // garantia, se a luta acabar no meio
   if (fresh) at(end, () => { plateElem(e); render(); });
   let extra = false;
-  if (m > 1 && !e.assustada) { extra = true; at(end - 100, () => { if (e.hp <= 0) return; e.assustada = true; say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); pop(t("FRAQUEZA!"), $("beast"), "crit"); sfx("more"); render(); }); }
+  if (m > 1 && !e.assustada) { extra = true; at(end - 100, () => { if (e.hp <= 0) return; e.assustada = true; say(t("FRAQUEZA! {bicho} recuou {assustado}. Mais uma!", {bicho: foe(1), assustado: ending(e, "assustado", "assustada")})); pop(t("FRAQUEZA!"), $("beast"), "crit"); sfx("more"); oneMore(); render(); }); }
   return {wait: REDUCE ? end / 3 : end, extra};
 }
 // Aliado fiel: no fim do turno, o espírito volta rapidinho e dá um bote mais fraco

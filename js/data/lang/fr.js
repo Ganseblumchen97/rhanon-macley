@@ -753,6 +753,7 @@ TX.fr = {
     "Rhanon joga a lança: −{n}.": "Rhanon lance sa lance : −{n}.",
     "A tocha cospe fogo n{bicho}: −{n}.": "La torche crache du feu sur {bicho} : −{n}.",
     "FRAQUEZA! {bicho} recuou {assustado}. Mais uma!": "FAIBLESSE ! {bicho} recule de peur. Encore une !",
+    "MAIS UMA!": "ENCORE UNE !",
     "FRAQUEZA!": "FAIBLESSE !",
     "Sagui": "Ouistiti",
     "Gato-maracajá": "Margay",

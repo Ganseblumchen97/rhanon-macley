@@ -281,15 +281,26 @@ function impactSound() {
 function cutinSound(kind) {
   if (!AC || muted) return;
   const t = AC.currentTime;
-  if (kind === "ambush") { noise(t, .35, .25, 300); tone(90, t, .4, "sawtooth", .16, 40); tone(880, t, .12, "square", .05, 220); return; }
+  if (kind === "boss") {   // chefe: um ronco grave crescendo, o estalo dos olhos acendendo e o estrondo do rugido
+    tone(46, t, .85, "sawtooth", .12, 70); tone(52, t, .85, "sine", .3, 60);
+    tone(1900, t + .38, .08, "square", .05, 900);
+    noise(t + .82, .7, .3, 200); tone(80, t + .82, .8, "sawtooth", .2, 34); tone(55, t + .9, .7, "sine", .32, 30); return;
+  }
+  if (kind === "ambush") {   // a pancada vem zunindo, bate e os pés arrastam no chão até ele segurar
+    tone(880, t, .12, "square", .05, 220);
+    noise(t + .13, .3, .28, 300); tone(90, t + .13, .4, "sawtooth", .18, 40); tone(60, t + .18, .3, "sine", .25, 34);
+    noise(t + .22, .45, .09, 2200); tone(660, t + .72, .12, "triangle", .05, 990); return;
+  }
   const n = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
   if (!NB) noise(t, .001, 0, 1000);   // cria o buffer de ruído
   n.buffer = NB; n.loop = true; f.type = "bandpass"; f.Q.value = 3;
-  f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(6000, t + .3);
-  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .28); g.gain.exponentialRampToValueAtTime(.0001, t + .34);
-  n.connect(f).connect(g).connect(sfxOut); n.start(t); n.stop(t + .36);
-  tone(140, t + .3, .6, "sine", .35, 38); noise(t + .3, .25, .2, 120);
-  tone(1320, t + .3, .25, "square", .04, 1320); tone(1980, t + .32, .3, "triangle", .03);
+  f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(6000, t + .43);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .41); g.gain.exponentialRampToValueAtTime(.0001, t + .47);
+  n.connect(f).connect(g).connect(sfxOut); n.start(t); n.stop(t + .49);
+  tone(2400, t + .17, .05, "square", .03, 1800);   // os olhos abrindo
+  tone(140, t + .43, .6, "sine", .35, 38); noise(t + .43, .25, .2, 120);
+  tone(1320, t + .43, .25, "square", .04, 1320); tone(1980, t + .45, .3, "triangle", .03);
+  noise(t + .5, .6, .05, 3000);   // a chama crepitando
 }
 // subir de nível: fanfarra curta e triunfante (melodia original no espírito dos RPGs clássicos)
 /* barra de XP enchendo (estilo Pokémon): um tom que sobe junto com a barra, picotado em degraus; no fim, um "plim".

@@ -567,6 +567,29 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 @keyframes ciZoom{from{scale:1.25}to{scale:1.06}}
 @keyframes ciPulse{50%{opacity:.82}}
 .cutin.ambush .ci-dim{background:rgba(50,0,0,.7)}
+/* olhos: a câmera chega devagar, dá um soco quando eles acendem (CI_LIT em ui/cutin.js) e segue escorregando de lado */
+.cutin:is(.first,.vs) .ci-zoom{animation:ciEyes 1.3s linear forwards}
+@keyframes ciEyes{0%{scale:1.34;translate:2.5% 0}30%{scale:1.16;translate:1% 0;animation-timing-function:steps(1)}33%{scale:1.42;translate:0 0;animation-timing-function:cubic-bezier(.2,.8,.3,1)}55%{scale:1.14}100%{scale:1.08;translate:-1.5% 0}}
+/* emboscada: o Rhanon empurrado para trás (canvas em ui/cutin.js) */
+.cutin.ambush .ci-strip{border-color:#e5001c;rotate:4deg;animation:ciStrip .16s var(--snap) backwards}
+.cutin.ambush .ci-zoom{animation:ciZoom .9s cubic-bezier(.2,.8,.3,1) forwards}
+.cutin.ambush .ci-bang{top:4%;left:74%;font-size:clamp(70px,16vw,190px);animation-delay:.13s}
+.cutin.ambush .ci-sub{top:auto;bottom:9vh;animation-delay:.2s}
+.cutin.out:is(.ambush,.boss) .ci-strip{animation:ciSlash .2s ease-in forwards}
+/* encontro com um chefe: faixa mais alta e escura, a câmera chegando perto até o clarão do rugido (ciBoss) */
+.cutin.boss .ci-strip{height:min(56vh,48vw);border-color:#e5001c;rotate:-3deg;animation:ciStrip .2s var(--snap) backwards}
+.cutin.boss .ci-zoom{animation:ciBossZoom 1.75s linear forwards}
+.cutin.boss .ci-dim{background:rgba(8,0,6,.82)}
+.cutin.boss .ci-band{background:#0a0408;border-color:#e5001c}
+@keyframes ciBossZoom{0%{scale:1}46%{scale:1.1;animation-timing-function:steps(1)}50%{scale:1.26;animation-timing-function:cubic-bezier(.2,.8,.3,1)}100%{scale:1.04}}
+/* posse do Pytuna (pytunaCine em combat.js): a nuvem com olhos por cima do palco, que escurece enquanto a cena dura */
+.pyt-cine{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;image-rendering:pixelated;transition:opacity .4s}
+.pyt-cine.out{opacity:0}
+
+/* abertura ilustrada do jogo novo (ui/prologo.js): quadros atrás da fala do Pajé */
+.prologo{position:fixed;inset:0;width:100%;height:100%;z-index:1400;image-rendering:pixelated;background:#06060c;transition:opacity .6s}
+.prologo[hidden]{display:none}
+.prologo.out{opacity:0}
 
 /* ===== teclado nos mapas ===== */
 .node.sel>circle{fill:var(--paper);stroke:var(--blood);stroke-width:5}

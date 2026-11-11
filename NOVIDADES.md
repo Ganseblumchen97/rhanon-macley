@@ -3,6 +3,23 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.93.0 — abertura ilustrada e Rhanon com mais jeito na luta
+
+- O começo do jogo novo ganhou uma abertura ilustrada: enquanto o Pajé conta a história, cada fala vem com um quadro
+  animado atrás, ao som do tema de Jaci, antes de acordar na aldeia.
+- A cena de "ATACA PRIMEIRO!" ficou mais viva: os olhos abrem, olham de lado, franzem e acendem com chama e brasas. Na
+  emboscada, o herói leva o golpe, é arrastado para trás e segura firme. No treino e nos bugs dos freelas aparecem só os
+  olhos, sem o texto.
+- Encontrar um chefe na exploração ganhou cena própria: a silhueta enorme dele aparece na fumaça com o olho vermelho,
+  a tela pisca em preto e branco e ele ruge enquanto o herói firma os pés. E quando o Pytuna toma o último chefe da
+  cidade, dá para ver: o palco escurece, a fumaça junta numa nuvem com olhos em cima do chefe, mergulha nele e o chefe
+  levanta rugindo.
+- Acertar a fraqueza do bicho agora mostra "MAIS UMA!" em cima do herói, que gira a lança pronto para o próximo golpe.
+- Na batalha, o Rhanon (e a Franciscane) varia o jeito de lutar: a estocada sai de três formas (a de sempre, um salto
+  cravando de cima e uma entrada rasteira depois de rodar a lança), o dano tem três reações (tranco, dobra e cambaleio)
+  e, parado, de vez em quando roda a lança, dá pulinhos, ameaça uma estocada ou passa a mão na testa. O tempo do anel
+  continua o mesmo em todas.
+
 ## 0.92.0 — talismãs e armas até o fim da viagem
 
 - Toda cidade fora do Norte agora tem quem faça talismãs com o luar dos chefes, como o Pajé da aldeia: a rezadeira no

@@ -370,10 +370,11 @@ function exHit(en) {
 function exStartBattle(en, opts) {
   if (EX.locked) return;
   EX.locked = true; EX.fighting = en; exKeys.clear();
-  setTimeout(() => battleCutin(opts.enemyFirst ? "ambush" : "first", () => {
+  const kind = en.boss && !opts.rematch && !en.a.bug ? "boss" : opts.enemyFirst ? "ambush" : opts.firstHit ? "first" : "vs";   // chefe tem cena própria
+  setTimeout(() => battleCutin(kind, () => {
     $("explore").hidden = true; fromExplore = true; curZone = en.a.bug ? "codigo" : EX.zone; bossFight = en.boss;   // bug do freela: luta dentro do código
     init({animal: en.a, ...opts});
-  }), opts.enemyFirst ? 0 : 160);
+  }, en.a), opts.enemyFirst ? 0 : 160);
 }
 
 /* ---------- atualização ---------- */
@@ -1535,7 +1536,8 @@ function startIntro(lost = false) {
     if (m) Object.assign(h, {x: m.x, y: m.y + 8, dir: "down", aim: {x: 0, y: 1}});
     motelScene("intro", hide => wipe(() => { hide(); if (EX) EX.locked = false; exToast(lost ? t("De volta à pensão, com metade das forças.") : CITY_WAKE[curCity()]); }));
   });
-  startExplore("aldeia", () => exIntro(lost));
+  // jogo novo: antes de acordar, o Pajé abre a história com os quadros da abertura (ui/prologo.js)
+  startExplore("aldeia", () => G.tutorial && !lost && !G.narrated.prologo ? prologueScene(() => exIntro(false)) : exIntro(lost));
 }
 // derrota na exploração: em vez do mapa da área, a tela corta direto para quem acorda no lugar seguro da cidade
 function fromLossWake() {
@@ -1595,7 +1597,6 @@ function exCampEnd() {
   const {kind, from, msg, lost} = EX.camp; EX.camp = null; EX.dialog = null; exKeys.clear();
   if (kind === "intro" && lost) return exToast(t("De volta à fogueira, com metade das forças."));   // acordou depois de desmaiar
   if (G.night && !G.tutorial && !G.narrated.pyt_noite && (kind === "noite")) { G.narrated.pyt_noite = true; save(); setTimeout(() => pytunaScene(NARRA_PYT.noite), 500); }   // anoiteceu pela primeira vez
-  if (kind === "intro" && G.tutorial && !G.narrated.prologo) { G.narrated.prologo = true; save(); return narrate(NARRA.prologo, startTutorial); }   // o Pajé abre a história
   if (kind === "intro") return G.tutorial ? startTutorial() : rollOffer() ? announceOffer() : exToast(t("Aldeia · chega perto da fogueira ou dos aldeões e aperta Z. A trilha da direita vai pra feira e, depois, pra mata."));
   if (msg) { if (EX.fill) { EX.fill = null; restJingle(); } exToast(msg); exHud(); }   // descanso: já recuperou na cena (pulou: as barras completam)
   else { exToast(rest(kind, true, true)); hudFillStart(from); }   // dormir/anoitecer: as barras enchem depois de acordar
