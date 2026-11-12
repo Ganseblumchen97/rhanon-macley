@@ -15,7 +15,7 @@ const SPECIALS = [
   {id:"arremesso", n:"Jogar a lança", cost:3, d:"Joga a lança com força: 10 a 15 de dano, mas erra 20% das vezes. 3 PE."},
   {id:"tocha",  n:"Tocha",  cost:6, price:80, lv:2, elem:"fogo", d:"Fogo: 14 a 18 de dano. Na fraqueza do bicho, dano maior e “Mais uma!”. 6 PE."},
   {id:"cuia",   n:"Cuia d'água", cost:6, price:140, lv:6, elem:"agua", d:"Água: 14 a 18 de dano. Na fraqueza do bicho, dano maior e “Mais uma!”. 6 PE."},
-  {id:"cipo",   n:"Chicote de cipó", cost:6, price:90, lv:3, elem:"planta", d:"Planta: chicote de cipó ou folhas que cortam, 14 a 18 de dano. Na fraqueza do bicho, dano maior e “Mais uma!”. 6 PE."},
+  {id:"cipo",   n:"Chicote de cipó", cost:6, price:90, lv:3, elem:"planta", d:"Planta: chicote de cipó, 14 a 18 de dano. Na fraqueza do bicho, dano maior e “Mais uma!”. 6 PE."},
   {id:"vento",  n:"Sopro de vento", cost:6, skill:"vento", elem:"vento", d:"Vento: 14 a 18 de dano. Na fraqueza do bicho, dano maior e “Mais uma!”. 6 PE."},
   {id:"raio",   n:"Raio do poraquê", cost:6, price:120, lv:9, craft:{poraque: 2}, elem:"raio", d:"Raio: 14 a 18 de dano. Na fraqueza do bicho, dano maior e “Mais uma!”. 6 PE."},
   {id:"flecha", n:"Flecha", cost:3, d:"Mira com calma: 40% de chance de crítico (dano dobrado). 3 PE. Precisa de arco."},

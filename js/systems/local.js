@@ -208,6 +208,7 @@ function buy(id) {
 function eatItem(id) {
   const it = ITEMS[id]; if (!G.items[id]) return;
   G.items[id]--; G.hp = Math.min(maxHP(G.lv), G.hp + it.hp); G.sp = Math.min(maxSP(G.lv), G.sp + it.sp);
+  if (EX && !$("explore").hidden) EX.eat = {t0: performance.now(), pe: !it.hp};   // na exploração ele come de verdade (drawHeroEnt)
   save(); sfx("heal"); invDone(t("Rhanon comeu {item}: {efeito}.", {item: it.n.toLowerCase(), efeito: itemEffect(it)}));
 }
 function goSub(id) {

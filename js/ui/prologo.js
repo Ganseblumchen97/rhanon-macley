@@ -75,10 +75,10 @@ const PROL_SCENES = [
       for (let i = 0; i < 40; i++) B.rect("#1e1810", rnd() * W, H * .74 + rnd() * H * .26, 2 + rnd() * 3, 1);
     },
     draw(x, W, H, t) {
-      const cx = Math.round(W * .52), gy = Math.round(H * .78), paje = rigCanvas("front", {sit: true, ...heroBreath(t, 2600)}, VILLAGER_LOOK.xama, 2);
+      const cx = Math.round(W * .52), gy = Math.round(H * .78), paje = rigPaint("front", {sit: true, ...heroBreath(t, 2600)}, VILLAGER_LOOK.xama, 2);
       x.drawImage(prolDark(paje, "#0a0e28", .28), cx - 92, gy + 12 - paje.height);
       [[VILLAGER_LOOK.aldeao1, 30, 0], [VILLAGER_LOOK.aldeao3, 58, 6], [{}, 88, 2]].forEach(([look, dx, dy], i) => {
-        const kid = rigCanvas("back", {sit: true, dy: Math.floor(t / 900 + i * .4) % 2}, look, 1.3);
+        const kid = rigPaint("back", {sit: true, dy: Math.floor(t / 900 + i * .4) % 2}, look, 1.3);
         x.drawImage(prolDark(kid), cx + dx, gy + 16 + dy - kid.height);
       });
       prolFire(x, cx, gy, t, H);
@@ -131,7 +131,7 @@ const PROL_SCENES = [
     },
     draw(x, W, H, t, looks) {
       const gy = Math.round(H * .845), u = ciEase(ciClamp(t / 2800)), hx = Math.round(-70 + (W * .4 + 70) * u), walking = u < .98, st = "walk" + Math.floor(t / 130) % 4;
-      const who = (look, weapon, ph) => walking ? rigSideCanvas({step: st, dy: Math.floor(t / 130) % 2 ? 0 : 1, weapon}, look, 2) : rigCanvas("front", {...heroBreath(t + ph, 2400), face: (t + ph * 3) % 3300 < 130 ? "blink" : undefined}, look, 2);
+      const who = (look, weapon, ph) => walking ? rigPaintSide({step: st, dy: Math.floor(t / 130) % 2 ? 0 : 1, weapon}, look, 2) : rigPaint("front", {...heroBreath(t + ph, 2400), face: (t + ph * 3) % 3300 < 130 ? "blink" : undefined}, look, 2);
       const a = who(looks[1], null, 400), b = who({...looks[0], bowBack: false}, walking ? "diag" : undefined, 0);
       x.fillStyle = "rgba(0,0,0,.2)"; x.fillRect(hx + 12, gy, 40, 2); x.fillRect(hx + 56, gy, 40, 2);
       x.drawImage(a, hx + 44, gy - 82); x.drawImage(b, hx, gy - 82);
@@ -158,7 +158,7 @@ const PROL_SCENES = [
     },
     draw(x, W, H, t, looks) {
       const px = Math.round(W * .7), gy = Math.round(H * .79), wave = Math.floor(t / 260) % 2;
-      const par = rigCanvas("front", {rh: wave ? [27, 12] : [25, 14], dy: wave, face: t % 3300 < 130 ? "blink" : undefined}, {...looks[1], shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#3a5a8a", "#24405a"], bowBack: false}, 2);
+      const par = rigPaint("front", {rh: wave ? [27, 12] : [25, 14], dy: wave, face: t % 3300 < 130 ? "blink" : undefined}, {...looks[1], shirt: ["#e8e2cf", "#c8c0a8"], pants: ["#3a5a8a", "#24405a"], bowBack: false}, 2);
       x.drawImage(par, px, gy - 82);
       // o anúncio: sai da mão, sobe girando e vai embora para a esquerda (para o Norte), deixando um rastro pontilhado
       const pos = v => [px + 50 + (-20 - px - 50) * v, gy - 58 - Math.sin(v * Math.PI) * H * .3 - v * H * .12 + Math.sin(v * 22) * 3];
@@ -212,7 +212,7 @@ const PROL_SCENES = [
     },
     draw(x, W, H, t, looks) {
       const B = prolBrush(x), cx = Math.round(W * .52), gy = Math.round(H * .78), k = Math.min(1, t / 7000);
-      const me = rigCanvas("front", {sit: true, face: "blink", dy: Math.floor(t / 1100) % 2}, {...looks[0], bowBack: false}, 2);
+      const me = rigPaint("front", {sit: true, face: "blink", dy: Math.floor(t / 1100) % 2}, {...looks[0], bowBack: false}, 2);
       x.drawImage(me, cx - 86, gy + 12 - me.height);
       if (Math.floor(t / 1100) % 2) { x.fillStyle = "#ffffff"; x.fillRect(cx - 40, gy - 78, 2, 2); x.fillRect(cx - 35, gy - 84, 3, 3); }   // roncando baixinho
       B.rect("#2a1a0e", cx - 14, gy + 2, 28, 4); B.rect("#3a2414", cx - 12, gy, 10, 3); B.rect("#3a2414", cx + 2, gy, 10, 3);

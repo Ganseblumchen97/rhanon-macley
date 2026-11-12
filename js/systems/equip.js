@@ -12,7 +12,7 @@ function eqFigure() {
   const fig = document.createElement("div"), img = document.createElement("img");
   fig.className = "eq-fig";
   fig.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="52" r="44"/><rect x="14" y="22" width="72" height="72"/><line x1="50" y1="4" x2="50" y2="98"/><line x1="4" y1="52" x2="96" y2="52"/></svg>';
-  img.src = rigCanvas("front", EQ_POSE, {...rhanonLook(), bowBack: false}, 1).toDataURL(); img.alt = "";
+  img.src = (HERO_HD() > 1 ? rigPaint("front", EQ_POSE, {...rhanonLook(), bowBack: false}, 3) : rigCanvas("front", EQ_POSE, {...rhanonLook(), bowBack: false}, 1)).toDataURL(); img.alt = "";
   fig.append(img);
   return fig;
 }

@@ -5,6 +5,10 @@
    beastFrame(id, pose, f, evil) -> canvas (com dataset.head = posição da cabeça, para as estrelinhas do desmaio).
    evil = bicho tomado pela fumaça de Pytuna: olho vermelho aceso e cenho franzido (nos que usam bEye). */
 const BEAST_K = 2, BN = "#22100a", BW = "#ffffff", BR = "#e2363d", BEAST_EVIL_EYE = "#ff2a2a";
+let BEAST_PAINT = 0;      // ligado só enquanto beastBase desenha: o rigGrid devolve a grade pintada (bnGrid), nesta resolução a mais
+// bichos pintados (volume e sombra fosca, resolução dobrada); `?visual=velho` e `?bichos=velho` voltam ao traço de antes
+let BEAST_NOVO = !/[?&]bichos=velho/.test(location.search);   // `?bichos=velho` volta ao traço de antes; testes/previa_bichos.html liga e desliga para comparar
+const BEAST_HD = () => (typeof POLISH === "undefined" || POLISH) && BEAST_NOVO ? 2 : 1;
 let BEAST_EVIL = false;   // ligado só enquanto beastFrame desenha um quadro "tomado"
 let BEAST_EYES = null;    // enquanto beastFrame desenha: onde ficaram os olhos (para os acessórios dos chefes)
 const PYT_SMOKE = ["#2a2a34", "#3a3a46", "#1a1a22", "#4a3a5a"];   // fumaça de Pytuna saindo dos bichos tomados
@@ -15,6 +19,7 @@ const isTomado = a => !!a && !a.bug && MOTION[a.id] !== "person";
 // olho: open (aberto, com brilho), angry (sobrancelha), shut (fechado), x (desmaio)
 function bEye(d, x, y, o, n = BN) {
   if (BEAST_EYES && o.eye !== "x") BEAST_EYES.push([x, y]);
+  if (BEAST_PAINT) return bEyePaint(d, x, y, o, n);
   if (o.eye === "x") d.dots([[x - 1, y - 1], [x + 1, y - 1], [x, y], [x - 1, y + 1], [x + 1, y + 1]], n);
   else if (o.eye === "shut") d.rect(x - 1, y, 3, 1, n);
   else if (BEAST_EVIL) {   // tomado: olho vermelho com brilho e sempre bravo
@@ -23,6 +28,20 @@ function bEye(d, x, y, o, n = BN) {
     d.rect(x - 1, y - 1, 2, 2, n).dots([[x - 1, y - 1]], BW);
     if (o.eye === "angry") d.dots([[x - 2, y - 2], [x - 1, y - 2], [x, y - 3], [x + 1, y - 3]], n);
   }
+}
+/* olho dos bichos pintados: desenhado de meio em meio ponto (cada ponto do desenho tem 2x2 pixels), no mesmo lugar e do
+   mesmo tamanho do olho de sempre: bolinha de cantos redondos com brilho em cima e um reflexo mais claro embaixo;
+   fechado = risco fino caído nas pontas; desmaio = X fino; tomado = brasa vermelha com o miolo claro e o cenho franzido. */
+const B_EYE = [".nn.", "nwnn", "nnin", ".nn."], B_EYE_EVIL = [".rr.", "rprr", "rrdr", ".rr."];
+function bEyePaint(d, x, y, o, n) {
+  const px = (i, j, c) => d.rect(x - 1 + i / 2, y - 1 + j / 2, .5, .5, c);
+  const cenho = () => { for (let i = 0; i < 8; i++) px(i - 2, -2 - Math.floor(i / 2), n); for (let i = 0; i < 8; i++) px(i - 2, -1 - Math.floor(i / 2), n); };   // sobrancelha inclinada, em degraus de um pixel
+  if (o.eye === "x") { for (let i = 0; i < 5; i++) { px(i - .5, i - .5, n); px(4.5 - i - 1, i - .5, n); } return; }
+  if (o.eye === "shut") { for (let i = 0; i < 6; i++) px(i - 1, 2 + (i === 0 || i === 5 ? 1 : 0), n); return; }
+  const evil = BEAST_EVIL, M = evil ? B_EYE_EVIL : B_EYE, cor = {n, w: BW, i: bnMix(n, "#c89a5a", .45), r: BEAST_EVIL_EYE, p: "#ffe0d0", d: "#b01414"};
+  M.forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ".") px(i, j, cor[ch]); }));
+  if (evil) { px(-1, 1, "#7a0a0a"); px(-1, 2, "#7a0a0a"); px(4, 1, "#7a0a0a"); px(4, 2, "#7a0a0a"); }   // a brasa vaza um pouco para os lados
+  if (evil || o.eye === "angry") cenho();
 }
 // boca aberta virada para a esquerda, a partir do canto (x, y): dentes em cima e língua
 function bMouth(d, x, y, len, teeth = true) {
@@ -652,7 +671,7 @@ function piranha(pose, f) {
   bEye(d, cx - 8, cy - 4, o);
   if (pose === "ko") {   // de barriga para cima, boiando
     const c = d.canvas(), out = document.createElement("canvas"), x = out.getContext("2d");
-    out.width = c.width; out.height = c.height; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
+    out.width = c.width; out.height = c.height; if (c.dataset.pintado) out.dataset.pintado = "1"; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
     return {c: out, head: [cx - 8, 32 - (cy - 4)]};
   }
   return {c: d.canvas(), head: [cx - 8, cy - 4]};
@@ -728,7 +747,7 @@ function boto(pose, f, hat) {
   }
   if (pose === "ko") {   // de barriga para cima, boiando
     const c = d.canvas(), out = document.createElement("canvas"), x = out.getContext("2d");
-    out.width = c.width; out.height = c.height; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
+    out.width = c.width; out.height = c.height; if (c.dataset.pintado) out.dataset.pintado = "1"; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
     return {c: out, head: [hx, 36 - hy]};
   }
   return {c: d.canvas(), head: [hx, hy]};
@@ -750,7 +769,7 @@ function pirarucu(pose, f) {
   bEye(d, hx + 4, hy - 3, o);
   if (pose === "ko") {
     const c = d.canvas(), out = document.createElement("canvas"), x = out.getContext("2d");
-    out.width = c.width; out.height = c.height; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
+    out.width = c.width; out.height = c.height; if (c.dataset.pintado) out.dataset.pintado = "1"; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
     return {c: out, head: [hx + 4, 32 - (hy - 3)]};
   }
   return {c: d.canvas(), head: [hx + 4, hy - 3]};
@@ -781,7 +800,7 @@ function caranguejo(pose, f) {
   else { claw(cx - 17, cy + 2, 5, false); claw(cx - 13, cy + 6, 3.5, false); }
   if (pose === "ko") {   // de barriga para cima
     const c = d.canvas(), out = document.createElement("canvas"), x = out.getContext("2d");
-    out.width = c.width; out.height = c.height; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
+    out.width = c.width; out.height = c.height; if (c.dataset.pintado) out.dataset.pintado = "1"; x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0);
     return {c: out, head: [cx - 4, 32 - cy]};
   }
   return {c: d.canvas(), head: [cx - 4, cy - 11]};
@@ -944,7 +963,7 @@ function pessoa(look) {
   return (pose, f) => {
     const P = {idle: {dy: f}, blink: {face: "blink"}, crouch: {dy: 2, lf: [10, 40], rf: [22, 40]}, attack: {lean: -2, lh: [1, 20], face: "happy"}, hurt: {lean: 2, face: "hurt"},
       ko: {sit: true, lean: 2, dy: 1, face: "hurt", lh: [7, 39], rh: [27, 39]}}[pose] || {};   // desmaiado: sentado no chão, tonto, mãos apoiadas
-    const S = 1.4, c = rigCanvas("front", P, look, S);   // 1.4 na grade 2x = do tamanho do Rhanon na batalha
+    const S = 1.4, c = rigPaint("front", P, look, S);   // boneco pintado (gfx/boneco.js)   // 1.4 na grade 2x = do tamanho do Rhanon na batalha
     return {c, head: pose === "ko" ? [18 * S, 20 * S] : [16 * S, 13 * S]};
   };
 }
@@ -955,7 +974,7 @@ function saciFrame(pose, f) {
   const P = {idle: {dy: f}, blink: {face: "blink"}, crouch: {dy: 2}, attack: {lean: -2, lh: [1, 20], face: "happy"}, hurt: {lean: 2, face: "hurt"},
     ko: {sit: true, lean: 2, dy: 1, face: "hurt", lh: [7, 39], rh: [27, 39]}}[pose] || {};
   if (pose !== "ko") Object.assign(P, {lf: [16, 40], rf: [16, 40]});
-  const S = 1.4, c = rigCanvas("front", P, SACI_LOOK, S);
+  const S = 1.4, c = rigPaint("front", P, SACI_LOOK, S);
   return {c, head: pose === "ko" ? [18 * S, 20 * S] : [16 * S, 13 * S]};
 }
 // Cuca (Floresta da Tijuca, à noite): a bruxa velha de cara de jacaré, cabelo amarelo comprido, vestido roxo remendado
@@ -1648,16 +1667,16 @@ const BEAST_CACHE = new Map();
 const beastId = id => BEAST_DRAW[id] ? id : BEAST_DRAW[ART[id]] ? ART[id] : null;   // chefes usam o desenho do bicho base
 // quadro do desenho base (guardado), com a posição do olho em dataset.eye
 function beastBase(k, pose, f, evil) {
-  const key = k + pose + f + (evil ? "!" : "");
+  const hd = BEAST_HD(), key = k + pose + f + (evil ? "!" : "") + (hd > 1 ? "+" : "");
   if (!BEAST_CACHE.has(key)) {
-    BEAST_EVIL = evil; BEAST_EYES = [];
+    BEAST_EVIL = evil; BEAST_EYES = []; BEAST_PAINT = hd > 1 ? hd : 0;
     try {
       const r = BEAST_DRAW[k](pose, f);
-      r.c.dataset.scale = BEAST_K; r.c.dataset.head = r.head.join(",");
+      r.c.dataset.scale = BEAST_K * (r.c.dataset.pintado ? hd : 1); r.c.dataset.head = r.head.join(",");
       const e = BEAST_EYES.sort((a, b) => a[0] - b[0])[0];   // o olho mais à frente (todos olham para a esquerda)
       if (e) r.c.dataset.eye = e.join(",");
       BEAST_CACHE.set(key, r.c);
-    } finally { BEAST_EVIL = false; BEAST_EYES = null; }
+    } finally { BEAST_EVIL = false; BEAST_EYES = null; BEAST_PAINT = 0; }
   }
   return BEAST_CACHE.get(key);
 }
@@ -1666,7 +1685,7 @@ function beastFrame(id, pose = "idle", f = 0, evil = false) {
   evil = evil && pose !== "ko";   // desmaiado já voltou a si
   const base = beastBase(k, pose, f, evil);
   if (!BOSS_ACC[id]) return base;
-  const key = id + "@" + pose + f + (evil ? "!" : "");
+  const key = id + "@" + pose + f + (evil ? "!" : "") + (BEAST_HD() > 1 ? "+" : "");
   if (!BEAST_CACHE.has(key)) BEAST_CACHE.set(key, bossDress(id, base, pose));
   return BEAST_CACHE.get(key);
 }
@@ -1675,19 +1694,77 @@ function beastFrame(id, pose = "idle", f = 0, evil = false) {
    O acessório vai por cima do quadro já com a cor do chefe (tint), para a coroa continuar dourada: o quadro sai com a cor
    "assada" e quem desenha não aplica o tint de novo (beastTint). Lugar: o olho (bEye) e o alto da cabeça, achados no próprio
    quadro; dx/dy por chefe acertam o que a busca não pega. Desmaiado (ko): sem acessório (a coroa caiu). */
+// coroa e tiara só em quem tem cabeça redonda (onça, macaco, lobo, cobra, aves); caranguejo, lagartos, peixe, o bode (os chifres) e os de
+// focinho comprido levam a "pintura": marcas douradas de rei em volta do olho, que servem em qualquer cabeça
 const BOSS_ACC = {
-  queixada_chefe: ["cicatriz"], cobra_grande: ["coroa"], onca_rei: ["coroa"], caranguejo_rei: ["coroa"], gaviao_real: ["cicatriz"],
-  bufalo_touro: ["cicatriz"], iguana_rei: ["coroa"], ratao: ["cicatriz"], jacare_canal: ["cicatriz"], sucuarana: ["cicatriz"],
-  mero: ["cicatriz"], surubim: ["cicatriz"], tubarao_rei: ["coroa", "cicatriz"], teiu_rei: ["coroa"], bode_rei: ["coroa"],
-  onca_dagua: ["cicatriz"], guara_rei: ["coroa"], ariranha_mae: ["flor"], preguica_gigante: ["flor"], tamandua_rei: ["coroa"],
-  muriqui_rei: ["coroa"], tatu_rei: ["coroa"], quati_rei: ["coroa"], capivara_rainha: ["tiara", "flor"],
+  queixada_chefe: ["cicatriz"], cobra_grande: ["coroa"], onca_rei: ["coroa"], caranguejo_rei: ["pintura"], gaviao_real: ["cicatriz"],
+  bufalo_touro: ["cicatriz"], iguana_rei: ["pintura"], ratao: ["cicatriz"], jacare_canal: ["cicatriz"], sucuarana: ["cicatriz"],
+  mero: ["cicatriz"], surubim: ["cicatriz"], tubarao_rei: ["pintura"], teiu_rei: ["pintura"], bode_rei: ["pintura"],
+  onca_dagua: ["cicatriz"], guara_rei: ["coroa"], ariranha_mae: ["flor"], preguica_gigante: ["flor"], tamandua_rei: ["pintura"],
+  muriqui_rei: ["coroa"], tatu_rei: ["pintura"], quati_rei: ["pintura"], capivara_rainha: ["tiara", "flor"],
   touro_xucro: ["cicatriz"], leao_marinho: ["cicatriz"], onca_iguacu: ["cicatriz"], gralha_rainha: ["tiara"],
   zabele_rei: ["coroa"]
 };
-const BOSS_ACC_POS = {caranguejo_rei: {coroa: [7, 9]}, tamandua_rei: {coroa: [-4, 0]}};   // acertos finos por chefe: {coroa: [dx, dy], olho: [dx, dy]}
+const BOSS_ACC_POS = {};   // acertos finos por chefe: {coroa: [dx, dy], olho: [dx, dy]}
 const CAN_FILTER = (() => { try { return "filter" in document.createElement("canvas").getContext("2d"); } catch (e) { return false; } })();
 // a cor (CSS filter) que ainda falta aplicar no desenho: nenhuma quando o quadro já sai com ela
 const beastTint = a => a && a.tint && !(BOSS_ACC[a.id] && CAN_FILTER) ? a.tint : "";
+/* acessórios dos chefes no quadro pintado, pixel a pixel (o quadro tem hd pixels por ponto do desenho): a coroa e a tiara
+   acompanham a curva da cabeça, levemente tortas, entram um pouco no pelo e fazem sombra nele; ouro e prata com luz de um
+   lado e sombra do outro, pedras com brilho; a flor tem cinco pétalas e folha; a cicatriz é um risco fino com os pontos
+   da costura. Contorno ameixa só na coroa, na tiara e na flor. cx/top/ex/ey = alto da cabeça e olho, em pontos do desenho. */
+function bossAccPaint(g, it, cx, top, ex, ey, hd) {
+  const W = g.canvas.width, H = g.canvas.height, m = new Map(), put = (x, y, c) => m.set(Math.round(x) + "," + Math.round(y), c);
+  const base = g.getImageData(0, 0, W, H).data, tem = (x, y) => x >= 0 && y >= 0 && x < W && y < H && base[(y * W + x) * 4 + 3] > 0;
+  let fio = true;
+  if (it === "coroa" || it === "tiara") {
+    const big = it === "coroa", R = big ? ["#fff2a0", "#ffd23a", "#d89a1c", "#9a5e10"] : ["#ffffff", "#dfe6f0", "#9aa4b8", "#5e6880"];
+    const hw = big ? 7 : 5, bh = big ? 4 : 3, X0 = cx * hd + 1, Y0 = top * hd + 1;   // meio da coroa e a linha onde ela pousa (um pixel para dentro do pelo)
+    const linha = dx => Y0 + Math.round((dx / hw) ** 2 * 2) + Math.round(dx * .14);    // a base desce nas pontas (dá a volta na cabeça) e pende para trás
+    const tomX = dx => dx < -hw * .45 ? 0 : dx > hw * .45 ? 2 : 1;
+    for (let dx = -hw; dx <= hw; dx++) {
+      const yb = linha(dx);
+      for (let j = 0; j < bh; j++) put(X0 + dx, yb - j, R[Math.min(3, tomX(dx) + (j === 0 ? 1 : 0))]);   // o aro, com a beira de baixo mais escura
+      if (tem(X0 + dx, yb + 1)) put(X0 + dx, yb + 1, "sombra");
+    }
+    const pontas = big ? [[-6, 5], [-3, 3], [0, 6], [3, 3], [6, 5]] : [[-4, 2], [0, 4], [4, 2]];
+    for (const [pc, alt] of pontas) {
+      const yb = linha(pc) - bh;
+      for (let j = 0; j < alt; j++) { const w = Math.max(0, Math.round((alt - 1 - j) * .45)); for (let i = -w; i <= w; i++) put(X0 + pc + i, yb - j, R[Math.min(3, tomX(pc) + (i > 0 ? 1 : 0))]); }
+      put(X0 + pc, yb - alt, R[0]); if (alt > 3) { put(X0 + pc - 1, yb - alt, R[1]); put(X0 + pc + 1, yb - alt, R[2]); put(X0 + pc, yb - alt - 1, R[0]); }   // bolinha na ponta
+    }
+    const gy = linha(0) - 1, gem = big ? ["#ff9a9a", "#e2363d", "#9a1a26"] : ["#ffc0e4", "#e85ab0", "#a03a78"];
+    put(X0 - 1, gy - 1, gem[0]); put(X0, gy - 1, gem[1]); put(X0 - 1, gy, gem[1]); put(X0, gy, gem[2]);   // a pedra do meio
+    if (big) for (const s of [-1, 1]) put(X0 + s * 4, linha(s * 4) - 1, s < 0 ? "#8ae4f4" : "#3a9ab8");
+  } else if (it === "flor") {
+    const X0 = (cx + 7) * hd, Y0 = (top + 3) * hd, P = ["#ffc8e4", "#f48ac0", "#d85a98", "#a03a70"];
+    for (let y = -2; y <= 2; y++) for (let x = -3; x <= 0; x++) if ((x + 1.5) ** 2 / 4 + y * y / 3 <= 1) put(X0 + 5 + x + 2, Y0 + 3 + y, x + y < -1 ? "#5ad07a" : "#237a40");   // folha
+    for (let i = 0; i < 5; i++) {
+      const a = -Math.PI / 2 + i * Math.PI * 2 / 5, px = X0 + Math.cos(a) * 3.2, py = Y0 + Math.sin(a) * 3.2;
+      for (let y = -3; y <= 3; y++) for (let x = -3; x <= 3; x++) { const d = x * x + y * y; if (d <= 5.5) put(px + x, py + y, d > 3.4 && x + y > 0 ? P[2] : x + y < -2 ? P[0] : P[1]); }
+    }
+    for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + (i + .5) * Math.PI * 2 / 5; put(X0 + Math.cos(a) * 2.6, Y0 + Math.sin(a) * 2.6, P[3]); }   // o vão entre as pétalas
+    put(X0 - 1, Y0 - 1, "#fff2a0"); put(X0, Y0 - 1, "#ffd23a"); put(X0 - 1, Y0, "#ffd23a"); put(X0, Y0, "#d89a1c");
+  } else if (it === "cicatriz") {
+    fio = false;
+    const X0 = ex * hd, Y0 = ey * hd;
+    for (const [a, b] of [[-8, -3], [4, 9]]) {   // dois pedaços de risco em diagonal, pulando o olho
+      for (let i = a; i <= b; i++) { if (tem(X0 + i, Y0 + i)) { put(X0 + i, Y0 + i, "#ffd8cc"); if (tem(X0 + i + 1, Y0 + i)) put(X0 + i + 1, Y0 + i, "#8a2a34"); } }
+      for (const i of [a + 1, a + 4]) for (const k of [-2, -1, 1, 2]) if (tem(X0 + i + k + 1, Y0 + i - k)) put(X0 + i + k + 1, Y0 + i - k, "#f0c0b0");   // pontos da costura, atravessados
+    }
+  }
+  else if (it === "pintura") {   // marcas douradas: arco por cima do olho, dois riscos embaixo e um ponto na testa
+    fio = false;
+    const X0 = ex * hd - .5, Y0 = ey * hd - .5, O = ["#fff2a0", "#ffd23a", "#b87a14"], ouro = (x, y, c) => { if (tem(Math.round(x), Math.round(y))) put(x, y, c); };
+    for (let a = 195; a <= 345; a += 6) { const r = a * Math.PI / 180, x = X0 + Math.cos(r) * 5.2, y = Y0 + Math.sin(r) * 4.6; ouro(x, y, a < 260 ? O[0] : O[1]); ouro(x, y + 1, O[2]); }
+    for (const [sx, sy] of [[-2, 5], [2, 5]]) for (let i = 0; i < 4; i++) { ouro(X0 + sx + i * .5, Y0 + sy + i, i ? O[1] : O[0]); ouro(X0 + sx + i * .5 + 1, Y0 + sy + i, O[2]); }
+    for (const [dx, dy, c] of [[0, -9, O[0]], [1, -9, O[1]], [0, -8, O[1]], [1, -8, O[2]]]) ouro(X0 + 1 + dx, Y0 + dy, c);
+  }
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+  if (fio) { g.fillStyle = BN_LINE; for (const k of m.keys()) { if (m.get(k) === "sombra") continue; const [x, y] = k.split(",").map(Number); for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const o = m.get((x + ax) + "," + (y + ay)); if (!o || o === "sombra") g.fillRect(x + ax, y + ay, 1, 1); } } }
+  for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); if (c === "sombra") { if (!fio) continue; g.fillStyle = "rgba(36,20,38,.45)"; } else g.fillStyle = c; g.fillRect(x, y, 1, 1); }
+  g.restore();
+}
 function bossDress(id, base, pose) {
   const W = base.width, H = base.height, c = document.createElement("canvas"); c.width = W; c.height = H;
   const g = c.getContext("2d"), a = typeof ANIMALS !== "undefined" && ANIMALS.find(q => q.id === id);
@@ -1695,7 +1772,9 @@ function bossDress(id, base, pose) {
   g.drawImage(base, 0, 0); g.filter = "none";
   Object.assign(c.dataset, base.dataset);
   if (pose === "ko") return c;
-  const px = g.getImageData(0, 0, W, H).data, on = (x, y) => x >= 0 && y >= 0 && x < W && y < H && px[(y * W + x) * 4 + 3] > 0;
+  const hd = base.dataset.pintado ? BEAST_HD() : 1;   // quadro pintado vem em resolução dobrada: os acessórios são postos nas medidas de sempre
+  const px = g.getImageData(0, 0, W, H).data, on = (x, y) => { x *= hd; y *= hd; if (x < 0 || y < 0 || x >= W || y >= H) return false; for (let j = 0; j < hd; j++) for (let i = 0; i < hd; i++) if (px[((y + j) * W + x + i) * 4 + 3] > 0) return true; return false; };
+  g.setTransform(hd, 0, 0, hd, 0, 0);
   const [hx, hy] = base.dataset.head.split(",").map(Number), adj = BOSS_ACC_POS[id] || {};
   let [ex, ey] = base.dataset.eye ? base.dataset.eye.split(",").map(Number) : [hx - 2, hy - 1];
   if (adj.olho) { ex += adj.olho[0]; ey += adj.olho[1]; }
@@ -1707,6 +1786,7 @@ function bossDress(id, base, pose) {
   const rect = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), w, h); };
   const K = RIG_K;
   for (const it of BOSS_ACC[id]) {
+    if (hd > 1) { bossAccPaint(g, it, cx, top, ex, ey, hd); continue; }   // quadro pintado: acessório pintado
     if (it === "coroa" || it === "tiara") {   // aro com três pontas e uma pedra; a tiara é menor e de prata
       const big = it === "coroa", w = big ? 9 : 7, x0 = cx - (w >> 1), y0 = top - (big ? 3 : 2);
       const ou = big ? ["#ffd23a", "#c8901a", "#fff2a0"] : ["#e8eef4", "#9aa4b8", "#ffffff"], gem = big ? "#e2363d" : "#e85ab0";
@@ -1719,6 +1799,8 @@ function bossDress(id, base, pose) {
     } else if (it === "cicatriz") {   // risco claro em diagonal cortando o olho, com os pontos da costura
       [[-3, -5], [-2, -4], [-1, -3], [0, -2], [2, 2], [3, 3], [4, 4], [5, 5]].forEach(([x, y]) => { dot(ex + x, ey + y, "#ffd0c4"); dot(ex + x + 1, ey + y, "#b03a3a"); });
       [[-3, -3], [-1, -5], [3, 5], [5, 3]].forEach(([x, y]) => dot(ex + x, ey + y, "#ffd0c4"));
+    } else if (it === "pintura") {   // marcas douradas em volta do olho
+      [[-2, -3], [-1, -4], [0, -4], [1, -4], [2, -3], [-1, 3], [1, 3], [0, 4], [2, 4]].forEach(([x, y]) => { if (on(ex + x, ey + y)) dot(ex + x, ey + y, "#ffd23a"); });
     } else if (it === "flor") {   // flor (vitória-régia rosa) presa atrás da orelha
       const fx = cx + 7, fy = top + 3;
       [[0, -2], [-2, 0], [2, 0], [0, 2]].forEach(([x, y]) => { rect(fx + x - 1, fy + y - 1, 3, 3, K); });

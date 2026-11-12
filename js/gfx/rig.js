@@ -13,6 +13,7 @@ const FLAMES = [["#d62828", "#f2740c", "#ffd23a"], ["#f2740c", "#ffd23a", "#fff3
 /* ---------- grade de desenho: cada pixel guarda cor e "parte" (o contorno separa partes) ---------- */
 // opts.inner(cor) = cor da linha entre duas partes (sem ele, preto; os retratos usam a cor escurecida: juntas mais suaves)
 function rigGrid(S, W = RIG_W, H = RIG_H, opts = {}) {   // W/H: tamanho base (outros desenhos, como bichos, podem ser maiores)
+  if (typeof BEAST_PAINT !== "undefined" && BEAST_PAINT && !opts.inner) return bnGrid(S * BEAST_PAINT, W, H);   // bichos pintados (gfx/boneco.js)
   const w = Math.round(W * S), h = Math.round(H * S);
   const col = Array.from({length: h}, () => Array(w).fill(null)), grp = Array.from({length: h}, () => Array(w).fill(0));
   let gid = 1;
@@ -271,10 +272,12 @@ const MEDAL_CACHE = {};
 function heroMedal() {
   const look = rhanonLook(), key = JSON.stringify(look);
   if (MEDAL_CACHE[key]) return MEDAL_CACHE[key];
-  const c = document.createElement("canvas"), x = c.getContext("2d"); c.width = c.height = 32; x.imageSmoothingEnabled = false;
+  const hd = typeof HERO_HD === "function" ? HERO_HD() : 1;   // boneco pintado em resolução dobrada (gfx/boneco.js)
+  const c = document.createElement("canvas"), x = c.getContext("2d"); c.width = c.height = 32 * hd; x.imageSmoothingEnabled = false;
+  x.setTransform(hd, 0, 0, hd, 0, 0);
   const g = x.createRadialGradient(16, 12, 2, 16, 16, 20); g.addColorStop(0, "#6fd07e"); g.addColorStop(1, "#173a22");
   x.beginPath(); x.arc(16, 16, 16, 0, Math.PI * 2); x.fillStyle = g; x.fill(); x.clip();
-  x.drawImage(rigCanvas("front", {}, look, 1), 0, 3);   // cabeça e ombros
+  x.drawImage(hd > 1 ? rigPaint("front", {}, look, hd) : rigCanvas("front", {}, look, 1), 0, 3, RIG_W, RIG_H);   // cabeça e ombros
   return MEDAL_CACHE[key] = c.toDataURL();
 }
 /* respiração mais solta: o corpo sobe e desce 1 pixel e a cabeça, as mãos e as tranças vêm um pouco depois,
@@ -293,6 +296,7 @@ function heroBreath(t, ms = 2000) {
 const SPEAR_KEYS = {
   up:    (L, h) => ({s: [26 + L, 43, 26 + L, 4 + h], lh: [7 + L, 31 + h], rh: [25 + L, 30 + h]}),
   guard: (L, h) => ({s: [3 + L, 28 + h, 27 + L, 26 + h], lh: [11 + L, 28 + h], rh: [20 + L, 27 + h]}),
+  block: (L, h) => ({s: [1 + L, 23 + h, 29 + L, 21 + h], lh: [7 + L, 24 + h], rh: [25 + L, 22 + h]}),   // defesa: atravessada na frente do peito, mãos bem afastadas
   pull:  (L, h) => ({s: [-2 + L, 27 + h, 21 + L, 25 + h], lh: [8 + L, 29 + h], rh: [15 + L, 28 + h]}),   // puxada para trás, antes de estocar
   stab:  (L, h) => ({s: [6 + L, 25 + h, 28 + L, 24 + h], lh: [17 + L, 25 + h], rh: [23 + L, 24 + h]}),
   raise: (L, h) => ({s: [26, 33 + h, 26, 4 + h], lh: [7 + L, 31 + h], rh: [26, 14 + h]}),

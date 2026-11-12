@@ -1,5 +1,7 @@
-/* Retratos grandes das falas (narração, ui/narration.js): o busto de quem fala fica do lado de fora da caixa, em pixel
-   art com mais detalhe que os bonecos do jogo (80x96, contorno automático do rigGrid em gfx/rig.js), com expressão.
+/* Retratos grandes das falas (narração, ui/narration.js): o busto de quem fala fica do lado de fora da caixa.
+   Desde a 0.93 a gente (Rhanon, Franciscane, Pajé, entrevistadora) é desenhada em gfx/retratos.js (112x128, pintada pixel a
+   pixel, com pose por expressão); daqui continuam valendo o Pytuna (ppPytuna, 80x96 ampliado), FACE_SHAPE, pMix e VESTE_CUT.
+   O desenho antigo da gente (80x96, contorno automático do rigGrid em gfx/rig.js) ficou só para consulta.
    portraitDraw(x, who, expr, o): who = "rhanon" | "fran" | "paje" | "pytuna" | "entrevista"; expr = chave de FACE_SHAPE;
    o = {t (relógio em ms), talk (boca aberta), blink, look (rhanonLook: roupa, óculos e talismã de quem viaja)}.
    Cada combinação vira um canvas guardado (PORTRAIT_CACHE); o Pytuna, que é fumaça mexendo, tem quadros pelo relógio. */
@@ -250,10 +252,16 @@ function portraitPixel(who, expr, talk, blink, look, frame) {
   PORTRAIT_CACHE.set(key, c);
   return c;
 }
+// desenha o retrato no canvas da fala (112x128). Gente: o desenho novo, pintado pixel a pixel e com pose por expressão
+// (retratoNovo em gfx/retratos.js); o Pytuna continua a fumaça daqui, ampliada para o tamanho novo
 function portraitDraw(x, who, expr, o = {}) {
+  const t = o.t || 0, bob = REDUCE ? 0 : Math.sin(t / 900) > .2 ? 1 : 0;   // respira: o busto desce um pixel
+  x.setTransform(1, 0, 0, 1, 0, 0); x.imageSmoothingEnabled = false; x.clearRect(0, 0, RT_W, RT_H);
+  if (who === "pytuna") {   // fumaça pintada no tamanho do retrato (retratoPytuna em gfx/retratos.js)
+    x.drawImage(retratoPytuna(expr, Math.floor(t / 150), o.talk ? (Math.floor(t / 190) % 2 ? 2 : 1) : 0, !!o.blink), 0, 0);
+    return;
+  }
   const look = who === "rhanon" || who === "fran" ? o.look : who === "entrevista" ? {shirt: ["#3a3a44", "#22222a"], glasses: true} : null;   // só quem viaja usa a roupa do equipamento
-  const img = portraitPixel(who, expr, !!o.talk, !!o.blink, look, Math.floor((o.t || 0) / 150));
-  const bob = REDUCE ? 0 : Math.sin((o.t || 0) / 900) > .2 ? 1 : 0;   // respira: o busto desce um pixel
-  x.setTransform(1, 0, 0, 1, 0, 0); x.imageSmoothingEnabled = false; x.clearRect(0, 0, PORTRAIT_W, PORTRAIT_H);
-  x.drawImage(img, 0, bob);
+  const talk = o.talk ? (Math.floor(t / 190) % 2 ? 2 : 1) : 0;   // a boca alterna meio aberta e aberta
+  x.drawImage(retratoNovo(who, expr, talk, !!o.blink, look), 0, bob);
 }

@@ -80,12 +80,12 @@ function openSpecialMenu() {
 }// usa um item da bolsa: gasta o turno, como os outros comandos
 function useItem(k) {
   const it = ITEMS[k]; if (busy || !(p.items[k] > 0)) return;
-  buildCmds(); busy = true; preE = e.hp; HERO_A.set("eat");
+  buildCmds(); busy = true; preE = e.hp; HERO_A.set("eat"); eatFx(!it.hp);
   p.items[k]--; p.hp = Math.min(p.max, p.hp + it.hp); p.sp = Math.min(p.msp, p.sp + it.sp);
-  sfx("heal"); pop(it.hp ? "+" + it.hp : "+" + it.sp, $("hero"), "heal"); burst(pos($("hero")), it.hp ? ["#7dff9a", "#fff"] : ["#19a8d8", "#fff"], 8, 40);
   say(t("Rhanon come {item}: {efeito}.", {item: it.n.toLowerCase(), efeito: itemEffect(it)}));
-  render(); $("cmds").firstChild.focus();
-  setTimeout(enemyTurn, 750);
+  $("cmds").firstChild.focus();
+  setTimeout(() => { sfx("heal"); pop(it.hp ? "+" + it.hp : "+" + it.sp, $("hero"), "heal"); render(); }, REDUCE ? 0 : 640);   // as barras sobem depois das mordidas
+  setTimeout(enemyTurn, REDUCE ? 750 : EAT_MS);
 }
 
 // opts: animal (bicho escolhido), firstHit (dano do golpe de abertura na exploração), enemyFirst (o bicho começa)
@@ -380,8 +380,8 @@ function act(id, ally) {
     let d = Math.round((rnd(14, 18) + G.lv - 1 + weaponAtk()) * m * (bugMode ? 1 : weatherBoost(k))); if (p.weak > 0) d = Math.ceil(d / 2);   // clima: chuva fortalece água e raio...
     e.hp = Math.max(0, e.hp - d);
     const v = {bicho: foe(), n: d}, msg = {fogo: t("A tocha cospe fogo n{bicho}: −{n}.", v), agua: t("A cuia joga um jato d'água n{bicho}: −{n}.", v), vento: t("Um sopro de vento acerta {bicho}: −{n}.", v), raio: t("Um raio cai n{bicho}: −{n}.", v),
-      cipo: t("Um chicote de cipó estala n{bicho}: −{n}.", v), folhas: t("Folhas afiadas cortam {bicho}: −{n}.", v)};
-    const kind = k === "fogo" ? "fire" : k === "planta" ? (Math.random() < .5 ? "cipo" : "folhas") : k;   // planta: sorteia o chicote ou as folhas
+      cipo: t("Um chicote de cipó estala n{bicho}: −{n}.", v)};
+    const kind = k === "fogo" ? "fire" : k === "planta" ? "cipo" : k;   // planta é sempre o chicote de cipó
     wait = strike(d, m > 1 ? "crit" : "", kind, msg[kind === "fire" ? "fogo" : kind]);
     if (m < 1) setTimeout(() => { say(t("{bicho} resistiu ao golpe.", {bicho: foe(1)})); pop(t("RESISTIU!"), $("beast")); render(); }, wait + 200);
     if (fresh) setTimeout(() => { plateElem(e); if (m === 1) say(t("{elemento} não faz nada de especial n{bicho}. Anotado no caderno.", {elemento: ELEMENTS[k].n, bicho: foe()})); render(); }, wait + 250);   // descobriu: a placa mostra (e o caderno anota)
@@ -406,12 +406,12 @@ function act(id, ally) {
   } else if (id === "observar") {
     // revela o golpe de agora (o nome salta em cima do bicho e ele demora mais para bater, dá tempo de ler) e o seguinte,
     // que aparece na faixa quando o turno voltar; o próximo ataque do Rhanon sai crítico
-    e.known = true; e.lido = 1; p.atento = true; sfx("look"); render();
-    setTimeout(() => pop(moveName().toUpperCase() + "!", $("beast"), "lido"), 350);
+    e.known = true; e.lido = 1; p.atento = true; sfx("look"); render(); observeFx(e.id);   // a mira fecha no bicho e mostra o vulto do golpe que vem
+    setTimeout(() => pop(moveName().toUpperCase() + "!", $("beast"), "lido"), REDUCE ? 350 : OBS.trava + 80);
     say(t("Rhanon estuda {bicho}: vem aí {golpe}, e o golpe seguinte também já está lido.", {bicho: foe(), golpe: moveName()}));
-    wait = 1300;
+    wait = 1400;
   } else if (id === "defender") {
-    p.def = true; p.sp = Math.min(p.msp, p.sp + 3); sfx("guard");
+    p.def = true; p.guarda = true; p.sp = Math.min(p.msp, p.sp + 3); sfx("guard"); guardFx();
     say(t("Rhanon levanta a guarda."));
   } else if (id === "fugir") {
     const chance = p.preso > 0 ? 0 : 35 + (e.hp < 30 ? 25 : 0) + (e.known ? 15 : 0);
@@ -457,6 +457,7 @@ function enemyTurn() {
   }
   p.def = false; e.assustada = false;
   setTimeout(() => {
+    p.guarda = false;   // o golpe do bicho já passou: o Rhanon sai da pose de defesa (estado "guard" do HERO_A)
     tick(); p.hp = Math.max(0, p.hp);
     if (e.hp <= 0) { render(); return finish("win"); }
     if (p.hp <= 0 && hasSkill("jaci") && !p.jaciUsada) {   // Luz de Jaci: uma vez por luta, levanta com 30% da vida
@@ -708,7 +709,7 @@ function foeAttack(kind, d, sp0) {
         HERO_A.set("parry"); hitImpact("forte");
         setTimeout(() => { hitBeast(); pop("−" + n, $("beast"), "strong"); render(); }, 230);
       }
-      else if (back) { say(t("Bloqueio! Evitou {n} de dano.", {n: back})); pop(t("BLOQUEIO!"), $("hero"), "heal"); sfx("bloqueio"); HERO_A.set("guard"); hitImpact("leve"); }
+      else if (back) { say(t("Bloqueio! Evitou {n} de dano.", {n: back})); pop(t("BLOQUEIO!"), $("hero"), "heal"); sfx("bloqueio"); if (HERO_A.state !== "guard") HERO_A.set("guard"); guardFx(true); hitImpact("leve"); }   // já na defesa: fica como está
       if (hasSkill("bloqueio2") && back) { p.bonus = true; say(t("Contra-ataque perfeito: no próximo turno, o Rhanon age duas vezes!")); }
       if (hasSkill("revide") && back && !parry && e.hp > 0) {   // Revide: metade do que evitou volta para o bicho
         const n = Math.max(1, Math.ceil(back / 2)); e.hp = Math.max(0, e.hp - n);
@@ -779,19 +780,14 @@ function strike(d, cls, kind, msg) {
     return 850;
   }
   if (kind === "throw") {   // jogar a lança: toma impulso, arremessa e ela voa girando de leve até o bicho (ou passa por cima)
-    HERO_A.set("throw"); sfx("guard"); qteArm(590, $("beast"));
+    const miss = d === 0;
+    HERO_A.set("throw"); sfx("guard"); qteArm(THROW_AT, $("beast")); throwFx(miss, cls === "crit");   // a lança voando é pintada em gfx/golpes.js
+    setTimeout(() => sfx("spear"), REDUCE ? 0 : THROW_SAI);
     setTimeout(() => {
-      sfx("spear");
-      const c = spearC(4), miss = d === 0, tx = b.x - a.x - 20, ty = miss ? b.y - a.y - 90 : b.y - a.y;
-      c.style.left = a.x + 20 + "px"; c.style.top = a.y - 30 + "px"; $("fx").appendChild(c);
-      c.animate([{transform: "translate(-50%,-50%) rotate(-12deg)"}, {transform: `translate(calc(-50% + ${tx}px),calc(-50% + ${ty + 30}px)) rotate(${miss ? -20 : 8}deg)`}],
-        {duration: 260, easing: "steps(7)", fill: "forwards"}).onfinish = () => {
-        if (!miss) { c.remove(); hit(["#fff", "#d9b25a", "#f2a20c"]); return; }
-        qteClear(); holdE = null; if (msg) say(msg); render(); sfx("blip"); pop(t("ERROU!"), $("beast"));
-        c.animate([{opacity: 1}, {transform: `translate(calc(-50% + ${tx + 160}px),calc(-50% + ${ty - 10}px)) rotate(-20deg)`, opacity: 0}], {duration: 300, easing: "steps(6)", fill: "forwards"}).onfinish = () => c.remove();
-      };
-    }, REDUCE ? 0 : 330);
-    return 330 + 260 + 120;
+      if (!miss) { hit(["#fff", "#d9b25a", "#f2a20c"]); return; }
+      qteClear(); holdE = null; if (msg) say(msg); render(); sfx("blip"); pop(t("ERROU!"), $("beast"));
+    }, REDUCE ? 0 : THROW_AT);
+    return THROW_AT + 120;
   }
   if (kind === "arrow") {   // flecha: puxa o arco devagar, brilho na ponta, sai reta e rápida
     HERO_A.set("aim"); sfx("guard"); qteArm(1930, $("beast"));
@@ -808,67 +804,21 @@ function strike(d, cls, kind, msg) {
     }, 1700);
     return 1950;
   }
-  if (kind === "cipo") {   // chicote de cipó: o cipó estica do Rhanon até o bicho, estala e volta
-    HERO_A.set("cast"); const at = cipoWhip(a, b); qteArm(at, $("beast"));
-    setTimeout(() => { hit(["#7ac84a", "#ffffff", "#3f9a3a"]); slash($("beast")); }, at);
-    return at + 200;
+  if (kind === "cipo" || kind === "agua" || kind === "vento" || kind === "raio") {   // especiais de elemento: o Rhanon ergue a lança e o efeito próprio de cada um (elemFx, gfx/golpes.js)
+    HERO_A.set("cast"); const at = elemFx(kind, cls === "crit"); qteArm(at, $("beast"));
+    setTimeout(() => { hit({cipo: ["#7ac84a", "#ffffff", "#3f9a3a"], agua: ["#86d6ff", "#ffffff", "#2a8ad8"], vento: ["#e8f4f8", "#ffffff", "#6aa8b8"], raio: ["#fff27a", "#ffffff", "#d8a80c"]}[kind]); if (kind === "cipo") slash($("beast")); }, at);
+    return at + 250;
   }
-  if (kind === "agua" || kind === "vento" || kind === "raio" || kind === "folhas") {   // especiais de elemento: o Rhanon ergue a lança e o elemento atravessa até o bicho
-    HERO_A.set("cast"); const fly = elemFly(kind, a, b); qteArm(fly, $("beast"));
-    setTimeout(() => { hit({agua: ["#86d6ff", "#ffffff", "#2a8ad8"], vento: ["#e8f4f8", "#ffffff", "#6aa8b8"], raio: ["#fff27a", "#ffffff", "#d8a80c"], folhas: ["#7ac84a", "#ffffff", "#3f9a3a"]}[kind]); if (kind === "folhas") slash($("beast")); }, fly);
-    return fly;
-  }
-  // tocha: ergue, assopra (baforadas) e uma onda de chamas atravessa até o bicho
-  HERO_A.set("blow"); qteArm(900 + 8 * 70 + 650, $("beast"));
+  // tocha: ergue, assopra (baforadas) e a labareda cresce até o bicho
+  HERO_A.set("blow"); const at = elemFx("fire", cls === "crit"); qteArm(at, $("beast"));
   setTimeout(() => {
-    sfx("fire");
     for (let i = 0; i < 6; i++) setTimeout(() => {
       const r = $("hero").getBoundingClientRect(), [gx, gy] = PFX.toGrid(r.left + r.width * .66, r.top + r.height * .38);   // do lado da cabeça até a chama
       PFX.emit("puff", ["#e8e4dc", "#ffffff"], gx, gy, 16 + Math.random() * 6, (Math.random() - .5) * 6, .5);
     }, i * 70);
   }, 480);
-  const N = 9, start = 900, fly = 650;
-  for (let i = 0; i < N; i++) setTimeout(() => {
-    const c = gridC(FLAME, PAL_F, 3 + (i % 3)), sx = a.x + 34, sy = a.y - 14, wob = (i % 2 ? -1 : 1) * (10 + i * 2);
-    c.style.left = sx + "px"; c.style.top = sy + "px"; $("fx").appendChild(c);
-    c.animate([{transform: "translate(-50%,-50%) scale(.4)", opacity: .9},
-      {transform: `translate(calc(-50% + ${(b.x - sx) / 2}px),calc(-50% + ${(b.y - sy) / 2 + wob}px)) scale(1)`, opacity: 1, offset: .5},
-      {transform: `translate(calc(-50% + ${b.x - sx}px),calc(-50% + ${b.y - sy}px)) scale(1.3)`, opacity: .7}], {duration: fly, easing: "steps(10)", fill: "forwards"}).onfinish = () => c.remove();
-    if (i % 3 === 0) sfx("fire");
-  }, start + i * 70);
-  setTimeout(() => hit(["#ffd23a", "#f2740c", "#d62828"]), start + (N - 1) * 70 + fly);
-  return start + (N - 1) * 70 + fly;   // ~2,1 s
-}
-/* água, vento, raio e folhas saindo do Rhanon até o bicho (quadradinhos de pixel, como o jato do bicho na água):
-   água faz um arco, vento e folhas vão em espiral (as folhas girando), raio em zigue-zague e rápido. Devolve quando chega (ms). */
-function elemFly(kind, a, b) {
-  const T = {agua: [600, 16, 34], vento: [600, 18, 40], raio: [500, 12, 22], folhas: [600, 14, 45]}[kind], [start, N, gap] = T, fly = kind === "raio" ? 160 : 420;
-  const cols = {agua: ["#86d6ff", "#d2f0ff", "#2a8ad8"], vento: ["#ffffff", "#e8f4f8", "#9ac8d8"], raio: ["#fff27a", "#ffd23a", "#ffffff"], folhas: ["#3f9a3a", "#7ac84a", "#2a6a2a"]}[kind];
-  setTimeout(() => sfx(kind === "agua" ? "agua" : kind === "raio" ? "choque" : kind === "folhas" ? "planta" : "vento"), start);
-  for (let i = 0; i < N; i++) setTimeout(() => {
-    const c = document.createElement("i"), sz = 8 + (i % 3) * 4, sx = a.x + 30, sy = a.y - 24;
-    c.className = "fx-jato"; c.style.cssText = `left:${sx}px;top:${sy}px;width:${sz}px;height:${sz}px;background:${cols[i % 3]}`;
-    $("fx").appendChild(c);
-    const mid = kind === "agua" ? -60 - (i % 3) * 8 : kind === "raio" ? (i % 2 ? 26 : -26) : Math.sin(i * 1.3) * 40, spin = kind === "folhas" ? 540 : 0;   // folha gira no ar
-    if (kind === "folhas") c.style.height = Math.round(sz / 2) + "px";
-    c.animate([{transform: "translate(-50%,-50%) scale(.6)"}, {transform: `translate(calc(-50% + ${(b.x - sx) / 2}px),calc(-50% + ${(b.y - sy) / 2 + mid}px)) rotate(${spin / 2}deg)`, offset: .5},
-      {transform: `translate(calc(-50% + ${b.x - sx}px),calc(-50% + ${b.y - sy}px)) rotate(${spin}deg) scale(1.5)`, opacity: .5}], {duration: fly, easing: "steps(8)", fill: "forwards"}).onfinish = () => c.remove();
-    if (kind === "raio" && i % 4 === 0) sfx("choque");
-  }, start + i * gap);
-  return start + (N - 1) * gap + fly;
-}
-// chicote de cipó: uma corda verde de gomos sai da mão do Rhanon, estica até o bicho, estala e recolhe. Devolve quando estala (ms).
-function cipoWhip(a, b) {
-  const start = 550, reach = 260, sx = a.x + 24, sy = a.y - 20, dx = b.x - sx, dy = b.y - sy, len = Math.hypot(dx, dy), ang = Math.atan2(dy, dx);
-  setTimeout(() => {
-    sfx("planta");
-    const c = document.createElement("i");
-    c.className = "fx-cipo"; c.style.cssText = `left:${sx}px;top:${sy}px;width:${len}px;transform:rotate(${ang}rad)`;
-    $("fx").appendChild(c);
-    c.animate([{clipPath: "inset(0 100% 0 0)"}, {clipPath: "inset(0 0 0 0)", offset: .45}, {clipPath: "inset(0 0 0 0)", offset: .7}, {clipPath: "inset(0 100% 0 0)"}],
-      {duration: reach * 2.2, easing: "steps(10)"}).onfinish = () => c.remove();
-  }, start);
-  return start + reach;
+  setTimeout(() => hit(["#ffd23a", "#f2740c", "#d62828"]), at);
+  return at + 300;
 }
 /* ---------- Chamado do aliado (degrau p6, ALLY_MOVES em data/skills.js) ----------
    Os chefes que o Pytuna segurou (o último chefe de dia de cada cidade), já acalmados, atendem a luz de Jaci: o espírito
@@ -982,7 +932,7 @@ function allyCall(id) {
         e.cego = 1; hit(d, t("Areia nos olhos d{bicho}: o próximo golpe pode errar.", v));
         const [gx, gy] = PFX.toGrid(b.x + $("fx").getBoundingClientRect().left, b.y + $("fx").getBoundingClientRect().top); PFX.burst(18, "puff", ["#e8d27a", "#d8b860", "#fff2c0"], gx, gy, 20, {life: 1.1, up: 4});
       }
-      else if (mv.fx === "careta") { e.espanto = 2; hit(d, t("A careta espanta {bicho}: vai bater mais fraco por 2 turnos.", v)); elemFly("agua", pos($("hero")), b); pop(t("MEDO!"), $("beast"), "crit"); }
+      else if (mv.fx === "careta") { e.espanto = 2; hit(d, t("A careta espanta {bicho}: vai bater mais fraco por 2 turnos.", v)); elemFx("agua"); pop(t("MEDO!"), $("beast"), "crit"); }
       else if (mv.fx === "abraco") {
         const ok = !e.boss || Math.random() < .5; if (ok) e.perde = 1; hit(d, ok ? t("Abraço do tempo: {bicho} fica parado e perde a vez.", v) : t("Abraço do tempo: {bicho} se solta a tempo.", v));
         const [gx, gy] = PFX.toGrid(b.x + $("fx").getBoundingClientRect().left, b.y + $("fx").getBoundingClientRect().top - 30); PFX.burst(8, "star", ["#ffd23a", "#ffffff"], gx, gy, 10, {life: 1.2, up: 6});
@@ -1030,7 +980,7 @@ function furyStrike(ds) {
   const b = pos($("beast")), dx = Math.max(0, b.x - pos($("hero")).x - 70), T0 = REDUCE ? 0 : 900, gap = REDUCE ? 0 : FURY_GAP;
   encounterBanner(t("Fúria da mata"), t(ds.length === 4 ? "quatro golpes!" : "três golpes!")); sfx("furia"); musicDuck(1200);
   setTimeout(() => {   // corre até o bicho e fica colado nele: cada acerto é uma estocada diferente (estado "fury" do HERO_A)
-    FURY_HITS = ds.length; HERO_A.set("fury"); sfx("spear");
+    FURY_HITS = ds.length; HERO_A.set("fury"); sfx("spear"); furyFx(ds.length);   // cortes, brasas e o véu vermelho (gfx/golpes.js)
     const dur = REDUCE ? 1 : FURY_LEAD + gap * ds.length + 300;
     $("hero").animate([{transform: "translateX(0)", easing: "cubic-bezier(.6,0,1,.6)"}, {transform: `translateX(${dx}px)`, offset: 200 / dur}, {transform: `translateX(${dx}px)`, offset: 1 - 260 / dur, easing: "cubic-bezier(.2,.7,.3,1)"}, {transform: "translateX(0)"}],
       {duration: dur});
@@ -1041,7 +991,8 @@ function furyStrike(ds) {
     shown = Math.max(0, shown - d); holdE = last ? null : shown;
     if (i) sfx("spear");
     hitBeast(); slash($("beast")); burst(b, last ? ["#ffd23a", "#ffffff", "#e5001c"] : ["#fff", "#cfd8dc", "#f2a20c"], last ? 20 : 10, last ? 110 : 60);
-    pop(String(d), $("beast"), last ? "crit" : "strong"); sfx("hit"); if (last) sfx("critico");   // o último leva o baque e o brilho do crítico hitImpact(last ? "furia" : "leve");
+    pop(String(d), $("beast"), last ? "crit" : "strong"); sfx("hit"); if (last) sfx("critico");   // o último leva o baque e o brilho do crítico
+    if (last) hitImpact("furia"); else shake("gshake-s");   // só o último pausa (hitStop): os outros atrasariam o Rhanon em relação aos acertos
     if (last) { say(t(ds.length === 4 ? "FÚRIA! Quatro estocadas: −{n}." : "FÚRIA! Três estocadas: −{n}.", {n: ds.join(", −")})); charmOnHit(ds.reduce((a, b) => a + b, 0)); setTimeout(() => pop(t("FÚRIA!"), $("beast"), "crit"), 200); }
     render();
   }, T0 + FURY_LEAD + i * gap));

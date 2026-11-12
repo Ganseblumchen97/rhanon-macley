@@ -514,22 +514,28 @@ function drawHeroEnt(x, h, cx, cy, now) {
   const art = IMG["hero/walk/" + (h.dir === "side" ? "down" : h.dir)];   // arte em imagem (data/art.js): quadros da caminhada lado a lado
   const bowAim = EX.draw ? EX.draw.aim : EX.shoot > 0 && EX.lastAim, pull = EX.draw ? Math.min(1, EX.draw.t / BOW_DRAW) : 0;
   let img, B;
-  if (bowAim && !art) {   // atirando: braços apontados para a mira, uma mão no arco e a outra puxando a corda
+  const comendo = EX.eat && !art ? now - EX.eat.t0 : -1, come = comendo >= 0 && comendo < EX_EAT_MS;
+  if (EX.eat && !come) EX.eat = null;
+  if (come) {   // comendo um item da bolsa: de frente, a mão leva a comida à boca, mastiga e sorri
+    const ch = comendo > 200 && comendo < 650 ? Math.floor((comendo - 200) / 75) % 2 : 0;
+    img = heroRig("front", {lh: comendo < 110 ? [9, 25] : comendo < 680 ? [13, 18 + ch] : undefined, hd: ch, face: comendo > 650 ? "happy" : undefined}, {...rhanonLook(), bowBack: false});
+  } else if (bowAim && !art) {   // atirando: braços apontados para a mira, uma mão no arco e a outra puxando a corda
     B = bowHand(bowAim);
     const N = [B[0] - bowAim.x * (4 + pull * 3), B[1] - bowAim.y * (4 + pull * 3)], r = v => v.map(Math.round), left = bowAim.x < -.1;
-    img = rigCanvas(bowAim.y < -.35 ? "back" : "front", {lh: r(left ? B : N), rh: r(left ? N : B)}, {...rhanonLook(), bowBack: false}, OW_SCALE);
+    img = heroRig(bowAim.y < -.35 ? "back" : "front", {lh: r(left ? B : N), rh: r(left ? N : B)}, {...rhanonLook(), bowBack: false});
   } else if (h.dir === "side" && !art) {   // de perfil: 4 passos; na estocada, braços para frente (a lança vem por fora)
     const sideJab = EX.jab > 0 && Math.abs(h.aim.y) < .5;
-    img = rigSideCanvas({step: walking ? "walk" + step % 4 : "stand", ...(walking ? {dy: step % 2 === 0 ? 1 : 0} : heroBreath(now, 2200)), face: now % 3300 < 130 ? "blink" : undefined, weapon: sideJab ? "jab" : EX.jab > 0 ? null : "diag", lean: sideJab ? 2 : 0, side: h.side || 1},
-      {...rhanonLook(), bowBack: !!G.equip.ranged && !(EX.shoot > 0)}, OW_SCALE);
+    img = heroRigSide({step: walking ? "walk" + step % 4 : "stand", ...(walking ? {dy: step % 2 === 0 ? 1 : 0} : heroBreath(now, 2200)), face: now % 3300 < 130 ? "blink" : undefined, weapon: sideJab ? "jab" : EX.jab > 0 ? null : "diag", lean: sideJab ? 2 : 0, side: h.side || 1},
+      {...rhanonLook(), bowBack: !!G.equip.ranged && !(EX.shoot > 0)});
   } else img = art ? overworldArt(h.dir === "side" ? "down" : h.dir, walking ? step % art.frames : 0)
     : heroOverworld(h.dir, walking ? ["walkA", "stand", "walkB", "stand"][step % 4] : "stand", EX.jab <= 0, !(EX.shoot > 0), h.side || 1,
         walking ? {} : {...heroBreath(now, 2200), face: now % 3300 < 130 ? "blink" : undefined});   // parado: respira (heroBreath) e pisca
-  const iw = art ? art.w / art.scale : img.width, ih = art ? art.h / art.scale : img.height;
+  const iw = art ? art.w / art.scale : OW_W, ih = art ? art.h / art.scale : OW_H;   // o desenho pode vir em resolução maior: ocupa sempre 24x33 do jogo
   const ox = EX.jab > 0 ? Math.round(h.aim.x * 3) : 0, oy = EX.jab > 0 ? Math.round(h.aim.y * 3) : 0;
   // estocada da lança; de costas (golpe para cima) ela vai atrás do corpo e só a ponta aparece acima da cabeça
   const behind = h.dir === "up", jab = () => {
     const bx = sx + ox, by = sy - 12 + oy, L = behind ? 27 : 21;
+    if (BN_OW() > 1) { x.drawImage(bnJabSpear(h.aim, L), bx - 36, by - 36, 72, 72); return; }   // lança pintada, no mesmo traço do boneco
     const sl = spearLook();
     spearShaft(x, bx - h.aim.x * 4, by - h.aim.y * 4, bx + h.aim.x * L, by + h.aim.y * L, sl.p);
     pxl(x, bx + h.aim.x * (L + 1), by + h.aim.y * (L + 1), sl.m); pxl(x, bx + h.aim.x * L, by + h.aim.y * L, sl.band || "#cfd8dc");
@@ -538,14 +544,31 @@ function drawHeroEnt(x, h, cx, cy, now) {
   if (EX.jab > 0 && behind) jab();
   x.drawImage(img, sx - iw / 2 + ox, sy - ih + 1 + oy, iw, ih);
   if (B) drawAimBow(x, sx - iw / 2 + B[0] * OW_SCALE, sy - ih + 1 + B[1] * OW_SCALE, bowAim, pull, !!EX.draw, now);
+  if (come) drawHeroEat(x, sx - iw / 2, sy - ih + 1, comendo, EX.eat.pe);
   if (EX.jab > 0 && !behind) jab();
   drawDodgeCool(x, sx, sy, now);
+}
+// comendo na exploração (EX.eat, ligado em eatItem): a comida na mão some em três mordidas com farelo, e depois sobem
+// sinais de "+" (verde = PV, azul = PE). (x0, y0) = canto do desenho do Rhanon; q = ms desde a primeira mordida
+const EX_EAT_MS = 1000;
+function drawHeroEat(x, x0, y0, q, pe) {
+  const cor = pe ? ["#8a4ab0", "#b88ad8"] : ["#e8b060", "#ffd9a0"], luz = pe ? "#86d6ff" : "#7dff9a", mx = x0 + 13 * OW_SCALE, my = y0 + 18 * OW_SCALE, u3 = 1 / RS;
+  if (q > 110 && q < 650) {
+    const n = q < 200 ? 0 : Math.min(3, 1 + Math.floor((q - 200) / 150)), s = 3 - n * .8;
+    if (s > .5) { x.fillStyle = "#241426"; x.fillRect(mx - s / 2 - u3, my - s / 2 - u3, s + u3 * 2, s + u3 * 2); x.fillStyle = cor[0]; x.fillRect(mx - s / 2, my - s / 2, s, s); x.fillStyle = cor[1]; x.fillRect(mx - s / 2, my - s / 2, u3 * 2, u3 * 2); }
+    for (let j = 0; j < 3; j++) { const dt = q - (200 + j * 150); if (dt < 0 || dt > 240) continue; x.fillStyle = cor[j % 2]; for (let i = 0; i < 3; i++) { const t = dt / 1000; x.fillRect(mx + (i - 1) * 14 * t, my + 1 + 60 * t * t, u3 * 2, u3 * 2); } }
+  }
+  if (q > 560) for (let i = 0; i < 4; i++) {
+    const u = (q - 560 - i * 60) / 380; if (u <= 0 || u >= 1) continue;
+    const px = x0 + OW_W / 2 + (i - 1.5) * 5, py = y0 + 14 - u * 14;
+    x.globalAlpha = 1 - u; x.fillStyle = i % 2 ? "#ffffff" : luz; x.fillRect(px - 1, py - u3, 2 + u3, u3 * 2); x.fillRect(px - u3, py - 1, u3 * 2, 2 + u3); x.globalAlpha = 1;
+  }
 }
 // rolamento: o Rhanon de perfil, encolhido, dá uma volta inteira no ar baixo enquanto avança (lança guardada)
 function drawHeroRoll(x, h, sx, sy) {
   const dg = EX.dodge, k = 1 - Math.max(0, dg.t) / DODGE_TIME, side = dg.vx < -.1 ? -1 : dg.vx > .1 ? 1 : h.side || 1;
-  const img = rigSideCanvas({step: "walk1", dy: 2, weapon: null, side}, {...rhanonLook(), bowBack: false}, OW_SCALE);
-  const iw = img.width, ih = img.height, lift = Math.sin(k * Math.PI) * 3;
+  const img = heroRigSide({step: "walk1", dy: 2, weapon: null, side}, {...rhanonLook(), bowBack: false});
+  const iw = OW_W, ih = OW_H, lift = Math.sin(k * Math.PI) * 3;
   drawShadow(x, sx, sy, 10);
   x.save(); x.translate(sx, sy - ih * .38 - lift); x.rotate(side * k * Math.PI * 2); x.scale(1, .82);
   x.drawImage(img, -iw / 2, -ih / 2, iw, ih); x.restore();
@@ -1067,10 +1090,10 @@ function drawNpc(x, s, cx, cy, now) {
     const b = MUS.beat() ?? now / 625, step = Math.floor(b);   // sem música tocando, segue um ritmo parecido (96 batidas por minuto)
     pose = (POLISH && polishNpcPose(s, now, b)) || {...GINGA[step % 2], dy: b % 1 < .5 ? 1 : 0};   // cada morador com seu jeito (gfx/polish.js)
   }
-  const img = villagerSprite(s.look, pose), hw = img.width / 2, top = sy - img.height + 1 - bob;
+  const img = villagerSprite(s.look, pose), hw = OW_W / 2, top = sy - OW_H + 1 - bob;   // o desenho pode vir em resolução maior: ocupa 24x33 do jogo
   drawShadow(x, sx, sy, pose.sit ? 14 : 10);
-  if (EX.hero.x > s.x + 4) { x.save(); x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -hw, top); x.restore(); }
-  else x.drawImage(img, sx - hw, top);
+  if (EX.hero.x > s.x + 4) { x.save(); x.translate(sx, 0); x.scale(-1, 1); x.drawImage(img, -hw, top, OW_W, OW_H); x.restore(); }
+  else x.drawImage(img, sx - hw, top, OW_W, OW_H);
   if (mark) drawQuestMark(x, sx, top - 4, mark, now);
   if (sleeping && !REDUCE) { const p = (now / 1100 + s.tx * .37) % 1; glyphP(x, "z", "#ffffff", sx + 4 + p * 6, top + 6 - p * 10); }
   if (POLISH && !EX.night && !mark) polishNpcBubble(x, s, sx, top, now);   // balãozinho: "!" quando o Rhanon chega, nota ou reticências
@@ -1576,7 +1599,7 @@ function showTutorial() {
   const d = $("exDialog"), i = EX.tutPage, last = i === TUTORIAL.length - 1;
   EX.dialog = "tutorial"; exKeys.clear();
   d.innerHTML = `<h2>${VILLAGER_NAME.aldeao1}</h2><div class="tut"><canvas width="24" height="33"></canvas><p>${(isTouch() ? TUTORIAL_TOQUE : TUTORIAL)[i]}</p></div>`;
-  d.querySelector("canvas").getContext("2d").drawImage(villagerSprite("aldeao1"), 0, 0);   // retratinho de quem fala
+  { const cvs = d.querySelector("canvas"), im = villagerSprite("aldeao1"); cvs.width = im.width; cvs.height = im.height; cvs.getContext("2d").drawImage(im, 0, 0); }   // retratinho de quem fala, na resolução do desenho
   btn(last ? t("Bora!") : t("Próximo"), () => { if (last) endTutorial(); else { EX.tutPage++; sfx("blip"); showTutorial(); } }, false, d);
   d.hidden = false; exTypeSpeech(d.querySelector(".tut p"), npcVoiceFor("villager", "aldeao1"));
 }
@@ -1619,11 +1642,11 @@ function drawCampHero(x, cx, cy, now) {
   const sleep = campAsleep(c, el);
   let face = sleep || el % 1700 < 140 ? "blink" : (W ? el > W + 500 && el < W + 1100 : el > 800 && el < 1250) ? "happy" : undefined;
   const up = W && el > W + 1300;   // acordou: levanta e se espreguiça com a lança para o alto
-  const img = up ? rigCanvas("front", {weapon: el < W + 2000 ? "raise" : "diag", face: el < W + 2000 ? "happy" : undefined, dy: el < W + 2000 ? 0 : 1}, rhanonLook(), OW_SCALE)
-    : rigCanvas("front", {sit: true, face, dy: sleep ? 1 : 0}, {...rhanonLook(), bowBack: false}, OW_SCALE);
+  const img = up ? heroRig("front", {weapon: el < W + 2000 ? "raise" : "diag", face: el < W + 2000 ? "happy" : undefined, dy: el < W + 2000 ? 0 : 1}, rhanonLook())
+    : heroRig("front", {sit: true, face, dy: sleep ? 1 : 0}, {...rhanonLook(), bowBack: false});
   drawShadow(x, sx, sy, up ? 12 : 18);
   if (!up) { spearShaft(x, sx - 11, sy, sx + 9, sy); pxl(x, sx + 10, sy, "#eef3f5"); }   // lança deitada no chão
-  x.drawImage(img, sx - img.width / 2, sy - img.height + 1);
+  x.drawImage(img, sx - OW_W / 2, sy - OW_H + 1, OW_W, OW_H);
   if (W && el > W && el < W + 400) glyphP(x, "bang", "#ffd23a", sx + 7, sy - 30);   // acordou!
   for (let i = 0; i < 4; i++) {   // fumaça subindo do fogo
     const p = (now / 1700 + i / 4) % 1;

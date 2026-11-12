@@ -3,6 +3,25 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.94.0 — o jogo repaginado: tudo pintado à mão
+
+- Rhanon e Franciscane foram repintados pixel a pixel, no dobro da resolução, com volume e sombra suave, sem a linha
+  preta nas juntas. O traço novo vale em todo lugar: batalha, exploração (agora com vista de perfil própria), tela
+  inicial, mapa, equipamento e escolha de quem viaja.
+- Moradores, aldeões e os inimigos que são gente ganharam o mesmo pincel, com chapéu, boné, óculos, cabelo comprido,
+  pena e objetos na mão.
+- Os bichos também foram repintados, com olhos novos (brilho e reflexo, brasa vermelha nos tomados pela fumaça), e as
+  coroas e enfeites dos chefes vieram junto.
+- Os retratos grandes das falas são novos: pintados à mão e com uma pose para cada expressão.
+- Os especiais de elemento têm efeito novo: o chicote de cipó enrola e estala, o raio corre em galhos com o palco
+  escurecendo, a água sai em arco, o vento faz um redemoinho que empurra o bicho e a labareda cresce. Acertar a
+  fraqueza solta uma onda de choque.
+- A lança arremessada brilha, deixa rastro e fica cravada tremendo, e a Fúria da mata ganhou véu vermelho, brasas e
+  cortes em meia-lua, com um baque no último golpe.
+- Observar, comer e defender agora aparecem na luta: em Observar o herói põe a mão na testa e espia o próximo golpe do
+  bicho; comer tem mordida e farelo, também na exploração; e em Defender ele cruza a lança com um escudo de luz e
+  segura a pose até o golpe passar.
+
 ## 0.93.0 — abertura ilustrada e Rhanon com mais jeito na luta
 
 - O começo do jogo novo ganhou uma abertura ilustrada: enquanto o Pajé conta a história, cada fala vem com um quadro

@@ -332,7 +332,7 @@ function drawCabin(x, ox, oy) {
   x.fillStyle = OUTLINE; x.fillRect(ox, oy + 4, 32, 7); x.fillStyle = "#a8b0b8"; x.fillRect(ox + 1, oy + 5, 30, 5); x.fillStyle = "#7a828a"; for (let k = 2; k < 31; k += 3) x.fillRect(ox + k, oy + 5, 1, 5);   // zinco
   x.fillStyle = OUTLINE; x.fillRect(ox + 6, oy + 13, 20, 10); x.fillStyle = "#bfe8ff"; x.fillRect(ox + 7, oy + 14, 18, 8);
   const p = villagerSprite("aldeao2");   // o cobrador na janela (só a cabeça e os ombros)
-  x.save(); x.beginPath(); x.rect(ox + 7, oy + 14, 18, 8); x.clip(); x.drawImage(p, ox + 16 - Math.round(p.width / 2), oy + 9); x.restore();
+  x.save(); x.beginPath(); x.rect(ox + 7, oy + 14, 18, 8); x.clip(); x.drawImage(p, ox + 16 - OW_W / 2, oy + 9, OW_W, OW_H); x.restore();
   x.fillStyle = "#6d4329"; x.fillRect(ox + 5, oy + 23, 22, 2);   // balcão
   x.fillStyle = OUTLINE; x.fillRect(ox + 9, oy, 14, 5); x.fillStyle = "#f2c230"; x.fillRect(ox + 10, oy + 1, 12, 3);   // placa
   x.fillStyle = OUTLINE; x.fillRect(ox + 12, oy + 2, 8, 1);
@@ -370,7 +370,7 @@ function heroOverworld(dir, legs, weapon, bowBack = true, side = 1, extra = {}) 
   const look = rhanonLook();
   if (!bowBack) look.bowBack = false;
   const walking = legs !== "stand";
-  return rigCanvas(dir === "up" ? "back" : "front", {...RIG_LEGS[legs], dy: walking ? 1 : 0, weapon: weapon ? "diag" : null, side, ...extra}, look, OW_SCALE);
+  return heroRig(dir === "up" ? "back" : "front", {...RIG_LEGS[legs], dy: walking ? 1 : 0, weapon: weapon ? "diag" : null, side, ...extra}, look);   // boneco pintado (gfx/boneco.js); desenhar em OW_W x OW_H
 }
 // número em pixels (glifos 3x5 de GL) para a etiqueta de nível dos bichos
 function drawTinyNumber(x, str, px, py, col) {
@@ -388,7 +388,7 @@ function drawFire(x, sx, sy, t) {
 }
 // pessoa da aldeia/feira: o mesmo esqueleto do Rhanon, de tanga, com as cores e enfeites de VILLAGER_LOOK[look]
 function villagerSprite(look, pose = {}) {
-  return rigCanvas("front", pose, VILLAGER_LOOK[look] || {}, OW_SCALE);
+  return heroRig("front", pose, VILLAGER_LOOK[look] || {});   // boneco pintado (gfx/boneco.js); desenhar em OW_W x OW_H
 }
 // passos da ginga (um por batida): pé que pisa para o lado, braços se alternando no alto
 const GINGA = [{lf: [9, 40], rf: [19, 38], lh: [4, 23], rh: [24, 32]}, {lf: [13, 38], rf: [23, 40], lh: [8, 32], rh: [28, 23]}];

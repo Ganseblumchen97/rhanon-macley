@@ -583,7 +583,7 @@ body:has(#titleScreen:not([hidden])) .game{visibility:hidden}
 .cutin.boss .ci-band{background:#0a0408;border-color:#e5001c}
 @keyframes ciBossZoom{0%{scale:1}46%{scale:1.1;animation-timing-function:steps(1)}50%{scale:1.26;animation-timing-function:cubic-bezier(.2,.8,.3,1)}100%{scale:1.04}}
 /* posse do Pytuna (pytunaCine em combat.js): a nuvem com olhos por cima do palco, que escurece enquanto a cena dura */
-.pyt-cine{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;image-rendering:pixelated;transition:opacity .4s}
+.pyt-cine,.elem-cine{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;image-rendering:pixelated;transition:opacity .4s}
 .pyt-cine.out{opacity:0}
 
 /* abertura ilustrada do jogo novo (ui/prologo.js): quadros atrás da fala do Pajé */
@@ -1495,7 +1495,7 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
    Seletores com #narra para valer por cima do .polido */
 #narra{--pw:clamp(150px,17vw,220px);grid-template-columns:1fr;padding-left:calc(var(--pw) + 6px);overflow:visible}
 #narra.rhanon{padding-left:22px;padding-right:calc(var(--pw) + 6px)}
-#narra canvas.narra-face{position:absolute;bottom:-4px;left:-18px;width:var(--pw);height:calc(var(--pw) * 1.2);border:0;background:none;
+#narra canvas.narra-face{position:absolute;bottom:-4px;left:-18px;width:var(--pw);height:calc(var(--pw) * 1.143);border:0;background:none;
   box-shadow:none;image-rendering:pixelated;filter:drop-shadow(5px 5px 0 rgba(0,0,0,.3));pointer-events:none;z-index:2;order:0}
 #narra.rhanon canvas.narra-face{left:auto;right:-18px}
 #narra canvas.narra-face.entra{animation:narraFaceIn .28s cubic-bezier(.2,.9,.3,1)}

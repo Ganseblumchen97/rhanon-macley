@@ -213,7 +213,7 @@ function endCredits(done) {
       const c = document.createElement("canvas"); c.width = src.width; c.height = src.height; const x = c.getContext("2d"); x.drawImage(src, 0, 0);
       if (!ok) { x.globalCompositeOperation = "source-in"; x.fillStyle = "#24304a"; x.fillRect(0, 0, c.width, c.height); }
       else c.style.filter = (beastTint(a) + " drop-shadow(0 0 5px rgba(255,240,190,.55))").trim();   // acalmado: com a cor dele e o brilho do luar
-      c.style.width = Math.round(src.width / BEAST_K * 2) + "px"; fig.append(c);
+      c.style.width = Math.round(src.width / (+src.dataset.scale || BEAST_K) * 2) + "px"; fig.append(c);
     }
     fig.insertAdjacentHTML("beforeend", `<figcaption>${ok ? esc(a.name) : "???"}</figcaption>`);
     if (!ok) fig.className = "falta";

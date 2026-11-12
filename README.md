@@ -1,6 +1,6 @@
 **Português** · [English](README.en.md)
 
-# Jaci: The Fading Moon (alfa 0.93.0)
+# Jaci: The Fading Moon (alfa 0.94.0)
 
 *Jaci: A Lua que se Apaga* · uma aventura de Rhanon Macley · RPG de turno no navegador
 
@@ -16,14 +16,17 @@ Roda no navegador do computador, com teclado, mouse ou controle. Não precisa in
 >
 > *Foi no tempo em que Jaci, a lua, começou a apagar. Uma fumaça cinza subia de longe e deixava os bichos bravos.*
 >
-> *O Rhanon era um menino da nossa aldeia. Lança na mão e a cabeça cheia de computador. Sonhava com Curitiba, imagina.*
+> *O Rhanon era um menino da nossa aldeia. Lança na mão e a cabeça cheia de computador. Ele e a Franciscane andavam juntos desde pequenos.*
 >
 > — o Pajé, que narra o jogo
 
-Rhanon é um jovem indígena da Aldeia Jasytatá, na beira do Tapajós, que quer trabalhar com programação em Curitiba.
-No caminho pelo Brasil, ele descobre que a fumaça das queimadas e das cidades tomou forma: **Pytuna, a Noite sem Lua**,
-que está apagando Jaci. Os bichos e os encantados de cada lugar ficaram bravos com a fumaça, e só o Rhanon consegue
-acalmá-los. Aqui **ninguém morre**: cada bicho vencido volta a si, agradece e corre para o mato.
+![O Pajé abre a história na fogueira](midia/prologo.png)
+
+Rhanon e Franciscane são um casal da Aldeia Jasytatá, na beira do Tapajós. Um dos dois já conseguiu emprego de
+programação em Curitiba e mandou ao outro o anúncio de uma vaga. No começo você escolhe quem viaja; quem fica espera
+em Curitiba e manda cartas pelo caminho. Atravessando o Brasil, quem viaja descobre que a fumaça das queimadas e das cidades tomou forma: **Pytuna, a Noite sem Lua**,
+que está apagando Jaci. Os bichos e os encantados de cada lugar ficaram bravos com a fumaça, e só a lança da aldeia
+consegue acalmá-los. Aqui **ninguém morre**: cada bicho vencido volta a si, agradece e corre para o mato.
 
 ![Pytuna aparece na primeira noite](midia/pytuna.png)
 
@@ -56,10 +59,13 @@ praça) e trilhas com bichos e lendas de lá.
 |---|---|
 | ![A mata do Norte](midia/mata.png) **Norte:** a aldeia, a mata, o rio e Belém | ![O Ver-o-Peso](midia/belem.png) **Belém:** o Ver-o-Peso e a cidade |
 | ![A beira do rio à noite](midia/noite.png) **De noite**, só a luz do Rhanon e das fogueiras | ![O Pantanal](midia/pantanal.png) **Centro-Oeste:** o Pantanal, a Chapada, Bonito e Brasília |
+| ![As Ladeiras de Ouro Preto](midia/sudeste.png) **Sudeste:** Belo Horizonte, Ouro Preto, o Rio e São Paulo | ![As Cataratas do Iguaçu](midia/sul.png) **Sul:** o Pampa, Florianópolis, Foz do Iguaçu e Curitiba |
 | ![Batalha contra o Boitatá](midia/batalha.png) **Chefe da noite:** o Boitatá | ![O mapa do Brasil](midia/mapa.png) **O mapa do Brasil** |
 
-Prontos: **Norte**, **Nordeste** (São Luís, Teresina, Recife, Petrolina) e **Centro-Oeste**. Em andamento: o **Sudeste**
-(Belo Horizonte e Ouro Preto). O **Sul**, com Curitiba e o fim da história, vem depois.
+A viagem inteira já dá para jogar, do Norte ao Sul: cinco regiões, dezessete lugares e o final em Curitiba, com a última
+mata de araucária, o Pytuna em pessoa e a entrevista de emprego. Personagens e bichos são pintados pixel a pixel,
+com volume e sombra, e cada luta tem cenas próprias: a abertura, o encontro com o chefe e o Pytuna tomando o último
+chefe de cada cidade.
 
 ![Um chefe aparece](midia/chefe.gif)
 

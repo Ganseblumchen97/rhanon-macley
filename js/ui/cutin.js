@@ -147,7 +147,7 @@ function ciImpactBg(x, W, ix, iy, seed, H = CI_H) {
   }
 }
 function ciAmbush(cv) {
-  const x = cv.getContext("2d"), W = cv.width, T = CI_AMB, ground = CI_H - 6, look = rhanonLook(), hero = p => rigSideCanvas(p, look, CI_HERO);
+  const x = cv.getContext("2d"), W = cv.width, T = CI_AMB, ground = CI_H - 6, look = rhanonLook(), hero = p => rigPaintSide(p, look, CI_HERO);
   const hWalk = [0, 1].map(i => hero({step: "walk" + i, weapon: "diag"}));                       // andando distraído
   const hHit = hero({step: "walk0", weapon: "diag", lean: -3, dy: 1, face: "blink"});              // a pancada: corpo jogado para trás
   const hSkid = [hero({step: "walk0", weapon: "diag", lean: -2, dy: 2, face: "blink"}), hero({step: "walk0", weapon: "diag", lean: -1, dy: 2, face: "blink"})];   // arrastando, pernas abertas e abaixado
@@ -211,16 +211,16 @@ const CI_BH = 96, CI_BOSS = {eyes: 380, hit: 820, end: 1650};
 function ciBeast(a, pose, maxH) {
   let src = null; try { src = a && beastFrame(a.id, pose, 0, isTomado(a)); } catch (_) {}
   if (!src) { src = document.createElement("canvas"); src.width = src.height = 40; const g = src.getContext("2d"); g.font = "30px serif"; g.textBaseline = "top"; g.fillText((a && a.emoji) || "❓", 3, 4); }
-  const k = Math.min(2.5, maxH / src.height), c = document.createElement("canvas"); c.width = Math.max(1, Math.round(src.width * k)); c.height = Math.max(1, Math.round(src.height * k));
+  const hd = (+src.dataset.scale || BEAST_K) / BEAST_K, k = Math.min(2.5 / hd, maxH / src.height), c = document.createElement("canvas");   // hd: quadro pintado em resolução dobrada c.width = Math.max(1, Math.round(src.width * k)); c.height = Math.max(1, Math.round(src.height * k));
   const g = c.getContext("2d"); g.imageSmoothingEnabled = false;
   const tint = a && beastTint(a); if (tint && CAN_FILTER) g.filter = tint;
   g.drawImage(src, 0, 0, c.width, c.height);
   const eye = (src.dataset.eye || src.dataset.head || "").split(",").map(Number);   // onde fica o olho, na escala nova
-  c.eye = eye.length === 2 && eye.every(isFinite) ? [eye[0] * k, eye[1] * k] : null; c.k = k;
+  c.eye = eye.length === 2 && eye.every(isFinite) ? [eye[0] * k * hd, eye[1] * k * hd] : null; c.k = k * hd;
   return c;
 }
 function ciBoss(cv, a) {
-  const x = cv.getContext("2d"), W = cv.width, H = CI_BH, T = CI_BOSS, ground = H - 7, look = rhanonLook(), hero = p => rigSideCanvas(p, look, CI_HERO);
+  const x = cv.getContext("2d"), W = cv.width, H = CI_BH, T = CI_BOSS, ground = H - 7, look = rhanonLook(), hero = p => rigPaintSide(p, look, CI_HERO);
   const bIdle = ciBeast(a, "idle", H - 12), bRoar = ciBeast(a, "roar", H - 12);
   const hStand = hero({step: "stand", weapon: "diag"}), hBrace = [hero({step: "walk0", weapon: "diag", lean: -2, dy: 1}), hero({step: "walk0", weapon: "diag", lean: -1, dy: 1})];
   const SIL = new Map(), sil = (c, col) => { let m = SIL.get(c); if (!m) SIL.set(c, m = {}); return m[col] || (m[col] = ciSilhouette(c, col)); };

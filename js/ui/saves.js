@@ -22,7 +22,7 @@ function openSaves(step = null) {
     const pick = box.querySelector(".heroi-pick");
     PICK = [["rhanon", "Rhanon Macley"], ["fran", "Franciscane Macley"]].map(([id, nome], i) => {
       btn(`<b>${nome}</b>`, () => pickChoose(i, n), false, pick);
-      const b = pick.lastElementChild, c = document.createElement("canvas"); c.width = PICK_W; c.height = PICK_H; c.className = "heroi-fig";
+      const b = pick.lastElementChild, c = document.createElement("canvas"); c.width = PICK_W * HERO_HD(); c.height = PICK_H * HERO_HD(); c.className = "heroi-fig";
       b.querySelector("span").prepend(c);
       const keep = [G.heroi, G.equip]; G.heroi = id; G.equip = {}; const look = rhanonLook(); [G.heroi, G.equip] = keep;   // como começa: sem roupa nem arco
       return {id, b, c, g: c.getContext("2d"), look, on: false, since: 0, blink: 0, nextBlink: 1500 + i * 900, off: i * 700};
@@ -71,9 +71,10 @@ function drawHeroPick(t) {
       if (el > 380) pose.lh = [pose.lh[0], pose.lh[1] + (pose.dy || 0)];
     } else if (t < q.blink) pose.face = "blink";
     const g = q.g, L = Math.round(lift);
+    const hd = HERO_HD(); g.setTransform(hd, 0, 0, hd, 0, 0); g.imageSmoothingEnabled = false;
     g.clearRect(0, 0, PICK_W, PICK_H);
     g.fillStyle = "rgba(0,0,0,.3)"; const sw = Math.max(10, 22 - L * 2); g.fillRect(Math.round((PICK_W - sw) / 2), PICK_H - 2, sw, 2);
-    g.drawImage(rigCanvas("front", pose, q.look, 1), 6, PICK_H - 45 - L);
+    g.drawImage(hd > 1 ? rigPaint("front", pose, q.look, hd) : rigCanvas("front", pose, q.look, 1), 6, PICK_H - 45 - L, RIG_W, RIG_H);
   }
 }
 function pickChoose(i, n) {

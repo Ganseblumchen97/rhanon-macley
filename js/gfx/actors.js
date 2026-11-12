@@ -22,6 +22,8 @@ function hitStop(ms) {
 const FURY_GAP = 320, FURY_LEAD = 300;
 let FURY_HITS = 3;
 const HERO_VARS = {stab: 3, hurt: 3};   // quantos jeitos cada estado do Rhanon tem (sorteados em set)
+// resolução do Rhanon na batalha: 2 = boneco pintado em 64x88 (gfx/boneco.js), mostrado do mesmo tamanho; `?visual=velho` volta ao de antes
+const HERO_HD = () => typeof POLISH === "undefined" || POLISH ? 2 : 1;
 const HERO_FIT = .7;   // tamanho de 1 pixel do desenho em relação ao --px do palco (arte 32x44 mais fina que a antiga)
 function makeHeroActor() {
   const W = 48, H = 56, SX = 8, SY = 10;   // o desenho 32x44 fica com os pés na linha 54; linha 55 é a sombra
@@ -46,7 +48,7 @@ function makeHeroActor() {
   function mount(el, opts = {}) {
     look = rhanonLook(); weaponOn = !!opts.weapon;
     mode = opts.mode || "battle";
-    k = IMG["hero/battle"] ? IMG["hero/battle"].scale : 1;
+    k = IMG["hero/battle"] ? IMG["hero/battle"].scale : HERO_HD();
     cv = document.createElement("canvas"); cv.width = W * k; cv.height = H * k;
     cv.className = "spr actor"; cv.style.setProperty("--n", W * HERO_FIT);
     const m = v => (v * .75 * HERO_FIT).toFixed(2);
@@ -174,10 +176,12 @@ function makeHeroActor() {
         if (el > 1300) set("idle");
         break;
       }
-      case "guard":
-        pose.dy = 1; sp([[0, "up"], [110, "guard"]]);
+      case "guard":   // defesa: abre a base, abaixa e atravessa a lança na frente do peito, com as duas mãos afastadas (o escudo de luz é o guardFx, gfx/golpes.js)
+        pose.dy = el < 90 ? 1 : el < 600 ? 2 : 1; pose.lean = el > 90 && el < 600 ? -1 : 0; if (el < 640) { pose.lf = [9, 40]; pose.rf = [23, 40]; }
+        sp([[0, "up"], [110, "block"], [560, "block"], [700, "up"]]);
         if (!lastFx) { lastFx = 1; const [gx, gy] = grid(SX + 16, SY + 22); PFX.burst(6, "ring", ["#bff3ff", "#ffffff"], gx, gy, 18, {life: .5}); }
-        if (el > 600) set("idle");
+        if (el >= 540 && mode === "battle" && typeof p !== "undefined" && p && p.guarda) since = animNow() - 540;   // fica na defesa enquanto a guarda vale (até o golpe do bicho); depois solta e volta
+        if (el > 700) set("idle");
         break;
       case "parry":   // apara o golpe com a lança atravessada (faísca), puxa e estoca de volta, e volta à guarda
         pose.dy = el < 140 ? 1 : 0; pose.lean = el < 140 ? -1 : el < 200 ? -2 : el < 420 ? 3 : el < 520 ? 1 : 0;
@@ -206,17 +210,22 @@ function makeHeroActor() {
         flash = el < 60 || (el > 120 && el < 170);
         if (el > (variant === 2 ? 520 : 420)) set("idle");
         break;
-      case "eat":
-        lift = Math.max(0, Math.sin(Math.min(1, el / 380) * Math.PI) * 5);
-        if (!lastFx && el > 250) { lastFx = 1; const [gx, gy] = grid(SX + 16, SY + 4); PFX.burst(5, "heart", ["#ff6b8a", "#ff9fb4"], gx, gy, 14, {life: .9, up: 10}); }
-        if (el > 900) set("idle");
+      case "eat": {   // come: leva a comida à boca, mastiga três vezes com a cabeça balançando e dá um pulinho (a comida e a luz são o eatFx, gfx/golpes.js)
+        const ch = el > 250 && el < 700 ? Math.floor((el - 250) / 75) % 2 : 0;
+        if (el < 740) { pose.lh = el < 120 ? [9, 25] : [10, 17 + ch]; pose.hd = ch; pose.lean = el > 120 ? -1 : 0; }
+        else lift = Math.max(0, Math.round(Math.sin(Math.min(1, (el - 740) / 300) * Math.PI) * 5));
+        if (!lastFx && el > 740) { lastFx = 1; const [gx, gy] = grid(SX + 16, SY + 4); PFX.burst(5, "heart", ["#ff6b8a", "#ff9fb4"], gx, gy, 14, {life: .9, up: 10}); }
+        if (el > 1100) set("idle");
         break;
-      case "observe":
-        pose.lean = 1;
-        if (!lastFx) { lastFx = 1; const [gx, gy] = grid(SX + 22, SY - 4); PFX.emit("q", ["#ffffff"], gx, gy, 0, -5, .55); }
-        if (lastFx === 1 && el > 520) { lastFx = 2; const [gx, gy] = grid(SX + 23, SY - 4); PFX.emit("bang", ["#ffd200"], gx, gy, 0, -6, .7); sfx("blip"); }
-        if (el > 900) set("idle");
+      }
+      case "observe": {   // estuda o bicho: avança um pé e abaixa, mão na testa, espia de um lado e do outro e acena com a cabeça (a mira é o observeFx, gfx/golpes.js)
+        const espia = el > 430 && el < 700;
+        if (el < 950) { pose.dy = el < 150 ? 1 : 2; pose.lean = el < 200 ? 1 : espia ? 3 : 2; pose.lh = [8 + pose.lean, 13 + pose.dy]; pose.lf = [10, 40]; pose.rf = [23, 40]; ox = espia ? 1 : 0; pose.hd = el > 700 ? 1 : 0; }
+        else pose.hd = el < 1060 ? 1 : 0;
+        if (!lastFx && el > OBS.trava) { lastFx = 1; sfx("blip"); }
+        if (el > 1200) set("idle");
         break;
+      }
       case "victory": {
         if (el < 1300 && !REDUCE) {
           const ph = (el % 650) / 650, jump = Math.floor(el / 650) + 1;
@@ -244,9 +253,9 @@ function makeHeroActor() {
     const sw = rot ? 40 : Math.max(8, 22 - Math.round(lift));
     g.fillRect(Math.round((W - sw) / 2) + ox, H - 1, sw, 1);
 
-    const art = heroArt(t), base = art || (view === "side" ? rigSideCanvas({}, look, 1) : rigCanvas(view, pose, look, 1)), src = flash ? whiteOf(base) : base;
+    const art = heroArt(t), base = art || (view === "side" ? rigSideCanvas({}, look, k) : k > 1 ? rigPaint(view, pose, look, k) : rigCanvas(view, pose, look, 1)), src = flash ? whiteOf(base) : base;
     // arte em imagem: pés na mesma linha do desenho de 32x44
-    const put = () => art ? g.drawImage(src, 16 - art.width / k / 2, 44 - art.height / k, art.width / k, art.height / k) : g.drawImage(src, 0, 0);
+    const put = () => art ? g.drawImage(src, 16 - art.width / k / 2, 44 - art.height / k, art.width / k, art.height / k) : g.drawImage(src, 0, 0, RIG_W, RIG_H);   // o desenho pode vir em resolução maior (k): ocupa sempre 32x44 do jogo
     g.save();
     if (rot) { g.translate(2, H - 1); g.rotate(-Math.PI / 2); put(); }
     else {
@@ -458,7 +467,7 @@ function makeBeastActor() {
       const fr = beastFrame(rig, rp, rp === "idle" || rp === "blink" ? o.dy % 2 : 0, evilNow()), x0 = MX + ox, y0 = MT - lift;
       g.drawImage(flash ? whiteFrame(fr) : fr, x0, y0, w, h);
       if (state === "defeat" && rp === "ko" && !REDUCE) {
-        const [hx, hy] = fr.dataset.head.split(",").map(n => n / k);
+        const [hx, hy] = fr.dataset.head.split(",").map(n => n / BEAST_K);   // a cabeça vem nas medidas do desenho (2 por pixel do jogo), seja qual for a resolução do quadro
         for (let i = 0; i < 3; i++) { const a = t / 280 + i * 2.1; glyphP(g, "star", i === 1 ? "#ffffff" : "#ffd200", x0 + hx - 1 + Math.cos(a) * 6, y0 + hy - 7 + Math.sin(a) * 2); }
       }
     } else if (lie) {
@@ -498,7 +507,7 @@ const TITLE_A = (() => {
   const set = s => { state = s; since = performance.now(); lastFx = 0; };
   function mount(el) {
     look = rhanonLook();
-    cv = document.createElement("canvas"); cv.width = W; cv.height = H; cv.className = "spr title-actor"; cv.style.setProperty("--n", W * 40 / 56);
+    cv = document.createElement("canvas"); cv.width = W * HERO_HD(); cv.height = H * HERO_HD(); cv.className = "spr title-actor"; cv.style.setProperty("--n", W * 40 / 56);
     el.innerHTML = ""; el.appendChild(cv); g = cv.getContext("2d");
     cv.addEventListener("click", () => { if (state !== "hop") { sfx("blip"); set("hop"); for (let i = 0; i < 2; i++) emitLocal("note", ["#ffffff", "#ffd200"], 28 + (i ? 8 : -8), 4, i ? 6 : -6, -12, 1); } });
     nextAct = performance.now() + 4000; set("idle");
@@ -522,12 +531,14 @@ const TITLE_A = (() => {
       if (el < 90 || k > 1) { pose.dy = 1; pose.hd = 0; pose.wy = 1; } else { lift = Math.sin(k * Math.PI) * 6; pose.dy = 0; pose.hd = k < .5 ? 1 : -1; pose.wy = k < .5 ? 1 : -1; pose.tr = k < .5 ? 0 : 1; }
       if (el > 560) set("idle");
     }
+    const hd = HERO_HD();
+    g.setTransform(hd, 0, 0, hd, 0, 0); g.imageSmoothingEnabled = false;
     g.clearRect(0, 0, W, H);
     g.fillStyle = "rgba(0,0,0,.28)";
     const sw = Math.max(8, 22 - Math.round(lift));
     g.fillRect(Math.round(24 - sw / 2), H - 1, sw, 1);
     if (fire) { spearShaft(g, 1, H - 2, 18, H - 2); pxl(g, 19, H - 2, "#cfd8dc"); pxl(g, 20, H - 2, "#eef3f5"); }
-    g.drawImage(rigCanvas("front", pose, look, 1), 8, H - 43 - Math.round(lift));   // pés (linha 41 do desenho) logo acima da sombra
+    g.drawImage(hd > 1 ? rigPaint("front", pose, look, hd) : rigCanvas("front", pose, look, 1), 8, H - 43 - Math.round(lift), RIG_W, RIG_H);   // pés (linha 41 do desenho) logo acima da sombra
     if (fire) {
       // fogueira e fumaça
       const fx = 48, fy = H - 2, k = Math.floor(t / 90) % 3;
@@ -551,8 +562,8 @@ const WALKER = (() => {
     const sig = key + JSON.stringify(G?.equip || {}) + heroi();   // troca de roupa ou de personagem (Rhanon/Franciscane) refaz o desenho
     if (cache[sig]) return cache[sig];
     // andando: de perfil (o marcador espelha para a esquerda); parado: de frente, respirando
-    const c = /^walk\d$/.test(key) ? rigSideCanvas({step: key, dy: key === "walk0" || key === "walk2" ? 1 : 0}, rhanonLook(), OW_SCALE)
-      : rigCanvas("front", {dy: key.endsWith("1") ? 1 : 0}, rhanonLook(), OW_SCALE);
+    const c = /^walk\d$/.test(key) ? heroRigSide({step: key, dy: key === "walk0" || key === "walk2" ? 1 : 0}, rhanonLook())
+      : heroRig("front", {dy: key.endsWith("1") ? 1 : 0}, rhanonLook());   // boneco pintado; a imagem do marcador tem tamanho fixo no SVG
     return cache[sig] = c.toDataURL();
   }
   const st = {mk: {x: null, face: 1, moveT: 0, key: ""}, lmk: {x: null, face: 1, moveT: 0, key: ""}};

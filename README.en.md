@@ -1,6 +1,6 @@
 [Português](README.md) · **English**
 
-# Jaci: The Fading Moon (alpha 0.93.0)
+# Jaci: The Fading Moon (alpha 0.94.0)
 
 *Jaci: A Lua que se Apaga* · a Rhanon Macley adventure · turn-based RPG in the browser
 
@@ -17,14 +17,17 @@ pick the language in Options.
 >
 > *It was back when Jaci, the moon, began to fade. A gray smoke rose from far away and made the animals angry.*
 >
-> *Rhanon was a boy from our village. Spear in hand and a head full of computers. He dreamed of Curitiba, imagine that.*
+> *Rhanon was a boy from our village. Spear in hand and a head full of computers. He and Franciscane had been together since they were little.*
 >
 > — the Pajé (the village shaman), who narrates the game
 
-Rhanon is a young Indigenous man from the Jasytatá village, on the banks of the Tapajós River in the Amazon, who wants to
-work as a programmer in Curitiba. Traveling across Brazil, he finds out that the smoke from wildfires and cities has taken
+![The Pajé opens the story by the fire](midia/prologo.png)
+
+Rhanon and Franciscane are a young Indigenous couple from the Jasytatá village, on the banks of the Tapajós River in the
+Amazon. One of them already landed a programming job in Curitiba and sent the other an ad for an opening. At the start
+you choose who travels; the other waits in Curitiba and writes letters along the way. Crossing Brazil, the traveler finds out that the smoke from wildfires and cities has taken
 shape: **Pytuna, the Moonless Night**, who is putting out Jaci. The animals and the *encantados* (enchanted beings of
-Brazilian folklore) of each place have been driven wild by the smoke, and only Rhanon can calm them down. Here **nobody
+Brazilian folklore) of each place have been driven wild by the smoke, and only the village spear can calm them down. Here **nobody
 dies**: every animal you beat comes back to itself, thanks you and runs back into the woods.
 
 ![Pytuna shows up on the first night](midia/pytuna.png)
@@ -58,10 +61,13 @@ a square) and trails full of local animals and legends.
 |---|---|
 | ![The northern forest](midia/mata.png) **North:** the village, the forest, the river and Belém | ![Ver-o-Peso market](midia/belem.png) **Belém:** the Ver-o-Peso market and the city |
 | ![The riverbank at night](midia/noite.png) **At night**, only Rhanon's light and the campfires | ![The Pantanal](midia/pantanal.png) **Center-West:** the Pantanal, Chapada, Bonito and Brasília |
+| ![The steep streets of Ouro Preto](midia/sudeste.png) **Southeast:** Belo Horizonte, Ouro Preto, Rio and São Paulo | ![Iguaçu Falls](midia/sul.png) **South:** the Pampa, Florianópolis, Foz do Iguaçu and Curitiba |
 | ![Battle against the Boitatá](midia/batalha.png) **Night boss:** the Boitatá, a fire serpent | ![The map of Brazil](midia/mapa.png) **The map of Brazil** |
 
-Done: the **North**, the **Northeast** (São Luís, Teresina, Recife, Petrolina) and the **Center-West**. In progress: the
-**Southeast** (Belo Horizonte and Ouro Preto). The **South**, with Curitiba and the end of the story, comes later.
+The whole journey is playable, from the North to the South: five regions, seventeen stops and the ending in Curitiba,
+with the last araucaria forest, Pytuna himself and the job interview. Characters and animals are painted pixel by
+pixel, with volume and shading, and battles have their own scenes: the opening, the boss encounter and Pytuna taking
+over the last boss of each city.
 
 ![A boss appears](midia/chefe.gif)
 
