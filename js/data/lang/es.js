@@ -750,6 +750,7 @@ TX.es = {
     "Rhanon joga a lança: −{n}.": "Rhanon lanza la lanza: −{n}.",
     "A tocha cospe fogo n{bicho}: −{n}.": "La antorcha escupe fuego sobre {bicho}: −{n}.",
     "FRAQUEZA! {bicho} recuou {assustado}. Mais uma!": "¡DEBILIDAD! {bicho} retrocede del susto. ¡Otra más!",
+    "Oceano Atlântico": "Océano Atlántico",
     "MAIS UMA!": "¡UNA MÁS!",
     "FRAQUEZA!": "¡DEBILIDAD!",
     "Sagui": "Tití",

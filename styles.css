@@ -1084,12 +1084,25 @@ body:is([data-pad="xbox"],[data-pad="ps"],[data-pad="nintendo"]) .ex-help-kbd{di
 .brasil{width:min(900px,94vw);height:min(640px,90vh);overflow:auto}
 .br-wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,1fr);gap:14px;align-items:start}
 .br-wrap svg{width:100%;height:min(500px,64vh)}
-.br-wrap .land path{fill:#3f6a3a}
+.br-wrap .land path{fill:#8fbf6a}
+.br-mar{fill:#a9d8de}
+.br-ondas path{fill:none;stroke:#ffffff;stroke-width:1.2;stroke-linecap:round;opacity:.7}
+.br-vizinho{fill:#e6d9b4;stroke:#b8a678;stroke-width:1.5}
+.br-espuma path{fill:none;stroke:#ffffff;stroke-width:9;stroke-linejoin:round;opacity:.55}
+.br-rosa circle{fill:#f6e9c4;stroke:#6a4a22;stroke-width:1.5}
+.br-rosa path{fill:#b88a4a;stroke:#3a2a14;stroke-width:1;stroke-linejoin:round}
+.br-rosa path.n{fill:#e2363d}
+.br-rosa text{font:400 11px var(--display);fill:#3a2a14}
+.br-oceano{font:italic 600 11px Georgia,serif;fill:#3a7a8a;letter-spacing:2px;opacity:.8}
+.br-terreno,.mapa-mato{pointer-events:none}
+.br-rios-b path{fill:none;stroke:#1e5a86;stroke-width:3.4;stroke-linecap:round;opacity:.55}
+.br-rios path{fill:none;stroke:#6ac0ee;stroke-width:1.8;stroke-linecap:round}
+.br-mato.shut{filter:grayscale(1);opacity:.45}
 .br-wrap .land-edge path{fill:none;stroke:#06120a;stroke-width:3}
-.br-area{fill:var(--rc);fill-opacity:.25;stroke:rgba(6,18,10,.55);stroke-width:2;stroke-dasharray:5 4}
-.br-area.been{fill-opacity:.6}
+.br-area{fill:var(--rc);fill-opacity:.2;stroke:rgba(6,18,10,.55);stroke-width:2;stroke-dasharray:5 4}
+.br-area.been{fill-opacity:.48}
 .br-area.shut{fill:#2a2a2a;fill-opacity:.45}
-.br-area.sel{fill-opacity:.8}
+.br-area.sel{fill-opacity:.62}
 .br-trail{fill:none;stroke:#f6e9c4;stroke-width:3;stroke-dasharray:6 7;opacity:.6}
 .br-dot>circle{fill:#5a5a5a;stroke:#06120a;stroke-width:3}
 .br-dot:not(.open) .br-ico{opacity:.55}
@@ -1454,7 +1467,7 @@ body[data-pad="nintendo"] .cmd .zk::before{content:"B"}
 .polido .pin{animation:pinBob .7s ease-in-out infinite alternate}
 @keyframes pinBob{to{transform:translateY(-4px)}}
 .polido .br-area{transition:fill-opacity .2s,filter .2s,transform .25s cubic-bezier(.2,1.4,.4,1);transform-box:fill-box;transform-origin:center}
-.polido .br-area.sel{transform:translateY(-5px) scale(1.03);filter:drop-shadow(0 6px 0 rgba(6,18,10,.6)) brightness(1.1);stroke:#ffd23a;stroke-width:3;stroke-dasharray:none}
+.polido .br-area.sel{filter:brightness(1.12);stroke:#ffd23a;stroke-width:3;stroke-dasharray:none}
 .polido .br-area:not(.sel):hover{fill-opacity:.7}
 @media (prefers-reduced-motion:reduce){.polido :is(.nuvens,.river-hi,.lroute,#route,.node.sel .micon,.pin){animation:none!important}}
 /* ===== Acabamento: letras. Menus e títulos dos painéis em Lilita One (grossa e arredondada), a narração do Pajé em

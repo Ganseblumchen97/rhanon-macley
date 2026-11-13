@@ -12,6 +12,7 @@ function setupMapRegion() {
   for (const [k, [x, y, ly]] of Object.entries(R.pos)) Object.assign(LOC[k], {x, y, ly});
   const [a, b] = R.route.map(k => LOC[k]), c = R.curve;   // estrada entre as duas cidades: reta ou em curva (uma cidade só: sem estrada)
   $("route").setAttribute("d", R.path ? R.path : !b ? "" : c ? `M${a.x},${a.y} C${a.x + c[0]},${a.y + c[1]} ${b.x + c[2]},${b.y + c[3]} ${b.x},${b.y}` : "M" + R.route.map(k => `${LOC[k].x},${LOC[k].y}`).join(" L"));   // várias cidades: segmentos retos
+  mapaRegiaoMato();   // vegetação e relevo da região (gfx/mapart.js)
 }
 // mapa grande da cidade atual (o Pará ou o Maranhão): chamado ao abrir o jogo e depois de cada voo
 function syncRegion() {
@@ -143,8 +144,8 @@ function openBrasil(pick) {
   const areas = Object.entries(B.area).map(([k, d]) => `<path class="br-area${been(k) ? " been" : REGIONS[k].open ? "" : " shut"}${k === BR_SEL ? " sel" : ""}" data-k="${k}" d="${d}" style="--rc:${REGIONS[k].color}"/>`).join("");
   const dots = Object.entries(REGIONS).map(([k, r]) => `<g class="br-dot${r.open ? " open" : ""}${k === BR_SEL ? " sel" : ""}" data-k="${k}" transform="translate(${r.pos[0]} ${r.pos[1]})" style="--rc:${r.color}"><circle r="${r.open ? 16 : 13}"/><g class="br-ico" transform="scale(${r.open ? 1.15 : .95})">${MAP_ICON[B.icon[k]][1]}</g><text y="34" text-anchor="middle">${r.n}</text></g>`).join("");
   const pyt = fled && pytunaRegion(), smoke = pyt ? `<g class="br-smoke" transform="translate(${REGIONS[pyt].pos[0] + 30} ${REGIONS[pyt].pos[1] - 26})"><circle r="11" cx="-6"/><circle r="13" cx="6" cy="-4"/><circle r="9" cx="2" cy="6"/><rect x="-6" y="-4" width="4" height="3"/><rect x="3" y="-4" width="4" height="3"/></g>` : "";
-  box.innerHTML = `<h2>${t(BR_PICK ? "Escolha o destino" : "Mapa do Brasil")}</h2><div class="br-wrap"><svg viewBox="80 80 400 480" aria-hidden="true"><defs><clipPath id="brLand">${land}</clipPath></defs><g class="land">${land}</g>` +
-    `<g clip-path="url(#brLand)">${areas}</g><g class="land-edge">${land}</g>` +
+  box.innerHTML = `<h2>${t(BR_PICK ? "Escolha o destino" : "Mapa do Brasil")}</h2><div class="br-wrap"><svg viewBox="80 80 400 480" aria-hidden="true"><defs><clipPath id="brLand">${land}</clipPath></defs>${brasilFundo()}<g class="land">${land}</g>` +
+    `<g clip-path="url(#brLand)">${areas}</g>${brasilTerreno(k => !REGIONS[k].open)}<g class="land-edge">${land}</g>` +   // mar, vizinhos, rios, serras e vegetação: gfx/mapart.js
     `<path class="br-trail" d="M${REGIONS.norte.pos} L${REGIONS.nordeste.pos} L${REGIONS.centroeste.pos} L${REGIONS.sudeste.pos} L${REGIONS.sul.pos}"/>${dots}${smoke}</svg><div class="br-side"></div></div>`;
   box.querySelectorAll("svg [data-k]").forEach(el => el.addEventListener("click", () => { BR_SEL = el.dataset.k; sfx("blip"); openBrasil(); }));   // escolhe a região clicando no mapa
   const side = box.querySelector(".br-side");

@@ -73,3 +73,156 @@ function mapIcon(k, r = 15) {
   const a = MAP_ICON[k]; if (!a) return `<circle r="10"/>`;
   return `<g class="micon"><circle class="mdisc" r="${r}" fill="${a[0]}"/><g transform="scale(${(r / 13).toFixed(2)})">${a[1]}</g></g>`;
 }
+
+/* ---------- mapa do Brasil com relevo e vegetação (openBrasil, systems/world-map.js) ----------
+   brasilFundo() = o que fica atrás da terra: mar com ondinhas, os países vizinhos em tom de papel, a espuma da costa e a
+   rosa dos ventos. brasilTerreno(apagada) = o que fica por cima das regiões pintadas: rios, serras e chapadas em lugares
+   fixos (BR_RIOS, BR_FIXOS) e a vegetação de cada região espalhada dentro dela (BR_MATO: floresta fechada no Norte,
+   mandacaru no sertão, árvore torta do cerrado, mata e serra no Sudeste, araucária e capim do pampa no Sul).
+   A espalhada usa sorteio com semente fixa (sempre o mesmo mapa), só dentro do contorno e longe dos pontos das regiões.
+   apagada(k) = região ainda fechada: o desenho dela fica cinza. Tudo em coordenadas do viewBox do mapa (80 80 400 480). */
+const BR_RIOS = [
+  "M100 268 C150 262 200 250 250 222 S310 170 334 152",            // Amazonas
+  "M150 178 C180 200 215 215 240 228", "M180 345 C205 310 225 270 262 214", "M262 300 C265 270 270 240 284 196",   // Negro, Madeira, Tapajós
+  "M300 300 C300 260 305 220 310 178", "M330 330 C328 280 335 220 342 162",                                        // Xingu, Tocantins
+  "M360 400 C362 360 372 330 392 312 S420 298 428 298",            // São Francisco
+  "M222 330 C216 360 222 390 236 420", "M330 390 C300 410 275 430 262 452",                                        // Paraguai, Paraná
+  "M330 460 C305 462 285 458 262 452", "M320 478 C295 476 275 480 252 492"];                                       // Iguaçu, Uruguai
+const BR_GLIFO = {
+  arvore: `<circle r="5" fill="#2b6e38" stroke="#123a1c" stroke-width=".8"/><circle cx="-1.4" cy="-1.6" r="2.8" fill="#4d9c50"/>`,
+  mata: `<circle r="4.4" fill="#2f7a4a" stroke="#123a1c" stroke-width=".8"/><circle cx="-1.2" cy="-1.4" r="2.3" fill="#5aa868"/>`,
+  cacto: `<path d="M0 6V-6M0 0H-3.5V-3.5M0 -1.5H3.5V-5" fill="none" stroke="#1c3a1c" stroke-width="3.4" stroke-linecap="round"/><path d="M0 6V-6M0 0H-3.5V-3.5M0 -1.5H3.5V-5" fill="none" stroke="#5a9a4a" stroke-width="1.9" stroke-linecap="round"/>`,
+  seco: `<path d="M-3 4L0 -1L3 4M0 -1V-4M-2 -3L0 -1L2.5 -3.5" fill="none" stroke="#7a5a2e" stroke-width="1.1" stroke-linecap="round"/>`,
+  cerrado: `<path d="M0 6C-2 3 2 1 0 -2" fill="none" stroke="#5a3c1e" stroke-width="1.6" stroke-linecap="round"/><ellipse cy="-4" rx="5.5" ry="3" fill="#7a9a3a" stroke="#2e3e14" stroke-width=".8"/><ellipse cx="-1.5" cy="-4.8" rx="2.6" ry="1.3" fill="#a0bc54"/>`,
+  morro: `<path d="M-9 5L-1 -8L4 -1L7 -4L11 5Z" fill="#9a8662" stroke="#3e3222" stroke-width=".9" stroke-linejoin="round"/><path d="M-1 -8L4 -1L1 5H-3Z" fill="#6e5c40"/><path d="M-1 -8L-3 -4L0 -5L1.5 -3.5Z" fill="#efe6d0"/>`,
+  serra: `<path d="M-8 4L-2 -6L2 0L5 -3L9 4Z" fill="#5c8a5a" stroke="#1e3a24" stroke-width=".9" stroke-linejoin="round"/><path d="M-2 -6L2 0L0 4H-3Z" fill="#3c6a44"/>`,
+  chapada: `<path d="M-9 5L-6 -4H6L9 5Z" fill="#c08a54" stroke="#4a2e16" stroke-width=".9" stroke-linejoin="round"/><path d="M2 -4H6L9 5H4Z" fill="#94623a"/><path d="M-6 -4H6" stroke="#e8c890" stroke-width="1.2"/>`,
+  araucaria: `<path d="M0 7V-4" stroke="#4a3018" stroke-width="1.5"/><path d="M-6 -3C-3 -1 3 -1 6 -3M-5 -6C-2 -4 2 -4 5 -6M-3 -8.5C-1 -7 1 -7 3 -8.5" fill="none" stroke="#1e4a2a" stroke-width="2.3" stroke-linecap="round"/><path d="M-6 -3C-3 -1 3 -1 6 -3M-5 -6C-2 -4 2 -4 5 -6" fill="none" stroke="#3a7a46" stroke-width="1" stroke-linecap="round"/>`,
+  capim: `<path d="M-3 3L-4 -2M0 3V-3.5M3 3L4 -2" fill="none" stroke="#5a7a2a" stroke-width="1.2" stroke-linecap="round"/>`,
+  duna: `<path d="M-8 3C-4 -4 3 -4 8 3Z" fill="#f2e2b0" stroke="#a88a4a" stroke-width=".8"/><path d="M-1 -2C2 -1 5 1 8 3" fill="none" stroke="#d8c080" stroke-width="1"/>`,
+  coqueiro: `<path d="M0 6C1 2 0 -1 -1 -4" fill="none" stroke="#6a4a22" stroke-width="1.5" stroke-linecap="round"/><path d="M-1 -4L-6 -3M-1 -4L-5 -8M-1 -4L0 -9M-1 -4L4 -7M-1 -4L5 -3" fill="none" stroke="#2e7a3a" stroke-width="1.6" stroke-linecap="round"/>`,
+  brejo: `<path d="M-7 2C-5 0 -3 4 -1 2S3 0 5 2" fill="none" stroke="#3a8ac0" stroke-width="1.4" stroke-linecap="round"/><path d="M4 0V-5M6 0L7.5 -4" stroke="#3a7a3a" stroke-width="1.1" stroke-linecap="round"/>`,
+  queda: `<path d="M-5 -5H5V5H-5Z" fill="#e8f6ff" stroke="#3a6a9a" stroke-width=".9"/><path d="M-3 -5V5M0 -5V5M3 -5V5" stroke="#86c8ee" stroke-width="1.1"/><path d="M-7 6C-3 3 3 3 7 6" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>`
+};
+// o que tem lugar certo: [glifo, x, y, tamanho]
+const BR_FIXOS = [
+  ["morro", 212, 116, 1], ["morro", 158, 172, .9], ["serra", 300, 232, .9], ["serra", 250, 128, .8],                               // Roraima, Pico da Neblina, Carajás, Tumucumaque
+  ["duna", 372, 182, .9], ["duna", 386, 190, .8], ["duna", 399, 197, .7], ["chapada", 404, 302, .9], ["morro", 428, 236, .7], ["serra", 398, 226, .7],   // Lençóis, Diamantina, Borborema, Araripe
+  ["coqueiro", 441, 222, .9], ["coqueiro", 443, 262, .9], ["coqueiro", 426, 318, .9], ["coqueiro", 418, 352, .8],
+  ["chapada", 246, 352, 1], ["chapada", 318, 318, .9], ["brejo", 228, 388, 1], ["brejo", 222, 372, .9], ["brejo", 236, 402, .9], ["brejo", 214, 358, .8],   // Guimarães, Veadeiros, Pantanal
+  ["morro", 384, 392, .9], ["morro", 372, 404, .8], ["morro", 398, 378, .8], ["serra", 380, 356, .9], ["serra", 386, 336, .8], ["serra", 362, 420, .7],   // Mantiqueira, Serra do Mar, Espinhaço
+  ["serra", 326, 468, .9], ["serra", 316, 484, .8], ["queda", 266, 452, .8]];                                                         // Serra Geral e as Cataratas
+// vegetação espalhada por região: [glifo, quantos, distância mínima, filtro (x, y) opcional, tamanho]
+const BR_MATO = {
+  norte: [["arvore", 110, 11.5]],
+  nordeste: [["cacto", 16, 17, (x, y) => x < 432], ["seco", 14, 15, (x, y) => x < 436]],
+  centroeste: [["cerrado", 24, 16]],
+  sudeste: [["mata", 16, 12, (x, y) => x > 350], ["cerrado", 5, 16, (x, y) => x <= 350]],
+  sul: [["araucaria", 11, 15, (x, y) => y < 494], ["capim", 12, 12, (x, y) => y >= 494]]
+};
+// caminho só com M, L, H, V e Z (as áreas das regiões e o contorno) -> lista de pontos
+function brPontos(d) {
+  const tk = d.match(/[MLHVZ]|-?\d+(?:\.\d+)?/g), pts = []; let c = "", i = 0, x = 0, y = 0;
+  while (i < tk.length) {
+    if (/[MLHVZ]/.test(tk[i])) { c = tk[i++]; if (c === "Z") continue; }
+    if (c === "H") x = +tk[i++]; else if (c === "V") y = +tk[i++]; else { x = +tk[i++]; y = +tk[i++]; }
+    pts.push([x, y]);
+  }
+  return pts;
+}
+const brDentro = (P, x, y) => { let d = false; for (let i = 0, j = P.length - 1; i < P.length; j = i++) if ((P[i][1] > y) !== (P[j][1] > y) && x < (P[j][0] - P[i][0]) * (y - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0]) d = !d; return d; };
+let BR_CACHE = null;
+function brasilEspalha() {   // sorteia uma vez (semente fixa) onde fica cada planta
+  if (BR_CACHE) return BR_CACHE;
+  const B = MAP_REGIONS.brasil, terra = brPontos(B.land[0]), out = {}; let s = 20261;
+  const rnd = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648, postos = BR_FIXOS.map(f => [f[1], f[2], 10]);
+  const naTerra = (x, y) => [[0, 0], [6, 0], [-6, 0], [0, 6], [0, -6]].every(([a, b]) => brDentro(terra, x + a, y + b));
+  const livre = (x, y, dist) => Object.values(REGIONS).every(r => Math.hypot(x - r.pos[0], y - r.pos[1]) > 24 && !(Math.abs(x - r.pos[0]) < 40 && y > r.pos[1] + 12 && y < r.pos[1] + 36)) && postos.every(p => Math.hypot(x - p[0], y - p[1]) > Math.max(dist, p[2]) * .85);
+  for (const k of Object.keys(BR_MATO)) {
+    const area = brPontos(B.area[k]); out[k] = [];
+    for (const [g, n, dist, filtro] of BR_MATO[k]) {
+      let postosAqui = 0;
+      for (let tent = 0; tent < 4000 && postosAqui < n; tent++) {
+        const x = 96 + rnd() * 360, y = 96 + rnd() * 450;
+        if (!brDentro(area, x, y) || !naTerra(x, y) || (filtro && !filtro(x, y)) || !livre(x, y, dist)) continue;
+        postos.push([x, y, dist]); out[k].push([g, Math.round(x), Math.round(y), .8 + rnd() * .3]); postosAqui++;
+      }
+    }
+    out[k].sort((a, b) => a[2] - b[2]);   // os de baixo por cima
+  }
+  for (const f of BR_FIXOS) { const k = Object.keys(B.area).find(q => brDentro(brPontos(B.area[q]), f[1], f[2])) || "norte"; out[k].push(f); }
+  return BR_CACHE = out;
+}
+function brasilFundo() {
+  const B = MAP_REGIONS.brasil, land = B.land.map(d => `<path d="${d}"/>`).join(""); let s = 7, ondas = "";
+  const rnd = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648, terra = brPontos(B.land[0]);
+  for (let i = 0; i < 46; i++) { const x = 86 + rnd() * 388, y = 86 + rnd() * 468; if (x > 300 - (y - 80) * .05 && !brDentro(terra, x, y) && !brDentro(terra, x - 14, y) && !brDentro(terra, x, y + 10)) ondas += `<path d="M${x.toFixed(0)} ${y.toFixed(0)}q3 -3 6 0t6 0"/>`; }
+  return `<rect class="br-mar" x="80" y="80" width="400" height="480" rx="10"/><g class="br-ondas">${ondas}</g>` +
+    `<path class="br-vizinho" d="M80 80H304L312 98L250 300L300 548L288 560H80Z"/>` +
+    `<g class="br-espuma">${land}</g>` +
+    `<g class="br-rosa" transform="translate(118 512)"><circle r="15"/><path d="M0 -19L4 -4L19 0L4 4L0 19L-4 4L-19 0L-4 -4Z"/><path class="n" d="M0 -19L4 -4H-4Z"/><text y="-22" text-anchor="middle">N</text></g>` +
+    `<text class="br-oceano" transform="translate(452 452) rotate(-72)" text-anchor="middle">${t("Oceano Atlântico")}</text>`;
+}
+function brasilTerreno(apagada) {
+  const E = brasilEspalha(), rios = BR_RIOS.map(d => `<path d="${d}"/>`).join("");
+  const mato = Object.keys(E).map(k => `<g class="br-mato${apagada(k) ? " shut" : ""}">` + E[k].map(([g, x, y, z]) => `<g transform="translate(${x} ${y}) scale(${(+z).toFixed(2)})">${BR_GLIFO[g]}</g>`).join("") + `</g>`).join("");
+  return `<g class="br-terreno" clip-path="url(#brLand)"><g class="br-rios-b">${rios}</g><g class="br-rios">${rios}</g>${mato}</g>`;
+}
+
+/* ---------- vegetação e relevo nos mapas das regiões e das cidades (os mesmos desenhos do mapa do Brasil: BR_GLIFO) ----------
+   mapaEspalha(...) sorteia, com semente fixa pelo nome do lugar, onde fica cada planta: só dentro do contorno, longe dos
+   pontos clicáveis (e do nome embaixo deles), da trilha, da estrada e do rio. MAPA_MATO_REG = o que nasce em cada região
+   (mapa grande) e MAPA_MATO_CID = em cada tipo de cidade (CITY[...].look). Chamados em setupMapRegion (world-map.js) e
+   buildLocalNodes (local.js); `?visual=velho` deixa os mapas como antes. Lista: [glifo, quantos, distância mínima, filtro (x, y) opcional]. */
+const MAPA_MATO_REG = {
+  norte: [["serra", 4, 80], ["arvore", 120, 21]],
+  nordeste: [["chapada", 3, 90], ["duna", 6, 46], ["coqueiro", 9, 40], ["cacto", 24, 32], ["seco", 20, 28]],
+  centroeste: [["chapada", 5, 74], ["brejo", 9, 42], ["cerrado", 46, 28]],
+  sudeste: [["morro", 10, 50], ["mata", 46, 25]],
+  sul: [["serra", 6, 60], ["araucaria", 30, 27, (x, y) => y < 340], ["capim", 30, 22, (x, y) => y >= 300]]   // araucária em cima (Paraná e Santa Catarina), capim do pampa embaixo
+};
+const MAPA_MATO_CID = {
+  mata: [["arvore", 70, 16]], cidade: [["mata", 16, 24]], litoral: [["duna", 5, 40], ["coqueiro", 16, 26], ["mata", 16, 22]],
+  sertao: [["chapada", 2, 70], ["cacto", 18, 26], ["seco", 18, 22]], cerrado: [["chapada", 3, 64], ["cerrado", 30, 22]],
+  minas: [["morro", 7, 42], ["mata", 24, 20]], sul: [["araucaria", 20, 24], ["capim", 18, 20]]
+};
+// pontos ao longo de um caminho do SVG (para a vegetação não nascer em cima dele); sem medida, lista vazia
+function mapaAmostra(el, passo = 10) {
+  const out = []; if (!el || !el.getAttribute("d")) return out;
+  try { const L = el.getTotalLength(); for (let u = 0; u <= L; u += passo) { const p = el.getPointAtLength(u); out.push([p.x, p.y]); } } catch (_) {}
+  return out;
+}
+// polys = contornos (listas de pontos); evita = [x, y, raio]; nomes = pontos com nome embaixo; esc = tamanho dos desenhos
+function mapaEspalha(chave, polys, mix, evita, nomes, esc, caixa) {
+  let s = 17; for (const ch of chave) s = (s * 31 + ch.charCodeAt(0)) % 2147483647;
+  const rnd = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648, postos = evita.slice(), out = [], m = 7 * esc;
+  const dentro = (x, y) => polys.some(P => brDentro(P, x, y)), naTerra = (x, y) => [[0, 0], [m, 0], [-m, 0], [0, m], [0, -m]].every(([a, b]) => dentro(x + a, y + b));
+  const semNome = (x, y) => nomes.every(([nx, ny]) => !(Math.abs(x - nx) < 46 * esc && y > ny + 10 && y < ny + 40 * esc));
+  for (const [g, n, dist, filtro] of mix) {
+    let k = 0;
+    for (let tent = 0; tent < 5000 && k < n; tent++) {
+      const x = caixa[0] + rnd() * caixa[2], y = caixa[1] + rnd() * caixa[3];
+      if ((filtro && !filtro(x, y)) || !naTerra(x, y) || !semNome(x, y) || !postos.every(p => Math.hypot(x - p[0], y - p[1]) > Math.max(dist * .8, p[2]))) continue;
+      postos.push([x, y, dist * .8]); out.push([g, Math.round(x), Math.round(y), esc * (.85 + rnd() * .3)]); k++;
+    }
+  }
+  return out.sort((a, b) => a[2] - b[2]).map(([g, x, y, z]) => `<g transform="translate(${x} ${y}) scale(${z.toFixed(2)})">${BR_GLIFO[g]}</g>`).join("");
+}
+const mapaPolido = () => typeof POLISH === "undefined" || POLISH;
+function mapaRegiaoMato() {   // mapa grande da região aberta (MAP_REGION)
+  const svg = $("mapsvg"), g = $("mapdeco"); if (!g) return;
+  const R = MAP_REGIONS[MAP_REGION], mix = MAPA_MATO_REG[MAP_REGION];
+  if (!mapaPolido() || !mix) { g.innerHTML = ""; return; }
+  const nomes = Object.values(R.pos).map(p => [p[0], p[1]]), evita = nomes.map(p => [p[0], p[1], 30]);
+  for (const p of mapaAmostra($("route"), 12)) evita.push([p[0], p[1], 13]);
+  for (const p of mapaAmostra(svg.querySelector(".land .river"), 12)) evita.push([p[0], p[1], 12]);
+  g.innerHTML = mapaEspalha("reg-" + MAP_REGION, R.land.map(brPontos), mix, evita, nomes, 1.5, [0, 0, 600, 620]);
+}
+function mapaCidadeMato() {   // mapa da cidade atual
+  const g = $("ldeco"); if (!g) return;
+  const C = CITY[curCity()], mix = MAPA_MATO_CID[C.look || "mata"];
+  if (!mapaPolido() || !mix) { g.innerHTML = ""; return; }
+  const terra = C.land.trim().split(/\s+/).map(p => p.split(",").map(Number)), nomes = C.route.map(k => [SUB[k].x, SUB[k].y]), evita = nomes.map(p => [p[0], p[1], 24]);
+  for (const el of [...document.querySelectorAll("#lroutes .lroute"), $("lriver"), document.querySelector("#lroad .lroad")]) for (const p of mapaAmostra(el, 9)) evita.push([p[0], p[1], 11]);
+  g.innerHTML = mapaEspalha("cid-" + curCity(), [terra], mix, evita, nomes, 1.05, [0, 0, 440, 325]);
+}

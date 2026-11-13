@@ -533,4 +533,5 @@ function buildLocalNodes() {
     n.addEventListener("click", pick);
     n.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pick(); } });
   });
+  mapaCidadeMato();   // vegetação e relevo do mapa da cidade (gfx/mapart.js)
 }

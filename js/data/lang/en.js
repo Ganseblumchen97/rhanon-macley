@@ -747,6 +747,7 @@ TX.en = {
     "Rhanon joga a lança: −{n}.": "Rhanon throws the spear: −{n}.",
     "A tocha cospe fogo n{bicho}: −{n}.": "The torch spits fire at {bicho}: −{n}.",
     "FRAQUEZA! {bicho} recuou {assustado}. Mais uma!": "WEAKNESS! {bicho} backs off, scared. One more!",
+    "Oceano Atlântico": "Atlantic Ocean",
     "MAIS UMA!": "ONE MORE!",
     "FRAQUEZA!": "WEAKNESS!",
     "Sagui": "Marmoset",

@@ -3,6 +3,13 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.94.1 — mapas com a cara de cada lugar
+
+- O mapa do Brasil foi redesenhado: contorno mais fiel, o Oceano Atlântico, os países vizinhos, rios, serras e
+  chapadas, e a vegetação de cada região (mata no Norte, mandacaru no Nordeste, cerrado no Centro-Oeste...).
+- Os mapas das regiões e das cidades também ganharam a vegetação e o relevo de cada lugar, espalhados em volta dos
+  pontos, da trilha e do rio sem cobrir nada.
+
 ## 0.94.0 — o jogo repaginado: tudo pintado à mão
 
 - Rhanon e Franciscane foram repintados pixel a pixel, no dobro da resolução, com volume e sombra suave, sem a linha
