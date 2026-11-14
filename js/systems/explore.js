@@ -191,6 +191,7 @@ function startExplore(zone, after, from) {
       Object.assign(EX.hero, {x: (gx + ix) * TILE + 8, y: (gy + iy) * TILE + 12, dir: ix ? "side" : iy > 0 ? "down" : "up", side: ix || 1, aim: {x: ix, y: iy}});
     }
     if (!st.safe) spawnFish(zone, st.rows);
+    achSetup(zone);   // potes, cestos, mato e pendurados para quebrar (systems/achados.js)
     vit(); G.sub = zone; save();
     curZone = zone; fromLocal = false; exKeys.clear();
     $("explore").classList.toggle("no-help", !!G.tutorial);   // os comandos aparecem só depois do tutorial
@@ -289,6 +290,7 @@ function exStrike() {
   if (EX.ents.some(en => en.alive && en.aquatic && reach(en)) && !EX.ents.some(en => en.alive && !en.aquatic && reach(en))) exToast(t("O peixe tá na água e a lança não alcança. Usa a flecha (X)!"));
   const target = EX.ents.find(en => en.alive && !en.aquatic && [8, 15, 22].some(r => Math.hypot(en.x - (h.x + h.aim.x * r), en.y - entH(en) / 2 - (h.y - 8 + h.aim.y * r)) < 9 + en.hw));
   if (target) exHit(target);
+  else achStrike(h);   // sem bicho no alcance: quebra o pote ou corta o mato (systems/achados.js)
 }
 // flecha: só com arco (EQUIP.ranged, comprado no armeiro da feira)
 const BOW_DRAW = .32;   // segundos puxando a corda antes da flecha sair (ele para de andar nesse tempo)
@@ -334,6 +336,8 @@ function exDodge() {
 // pega a lembrança do chão: vai para a bolsa (vende na feira)
 function pickLoot(l) {
   EX.loot = EX.loot.filter(q => q !== l); vit();
+  if (l.kind === "moeda") { G.money += l.n; save(); sfx("moeda"); exBurst(l.x, l.y - 4, ["#f2c230", "#fff3a0"], 6); exToast(t("Achou R$ {n}.", {n: l.n})); return exHud(); }   // achados (systems/achados.js)
+  if (l.kind === "item") { G.items[l.id] = (G.items[l.id] || 0) + 1; save(); sfx("heal"); exBurst(l.x, l.y - 4, ["#ffffff", "#8fd06a"], 6); exToast(t("Achou: {item}.", {item: ITEMS[l.id].n})); return exHud(); }
   G.pelts[l.id] = (G.pelts[l.id] || 0) + 1; save(); sfx("heal");
   exBurst(l.x, l.y - 4, ["#ffffff", "#ffd23a"], 8);
   exToast(t("Pegou: {pele} (R$ {n} na feira).", {pele: peltName(l.id).toLowerCase(), n: peltValue(l.id)})); exHud();
@@ -344,6 +348,7 @@ const TEETH = new Set(["jacare", "piranha", "jacaretinga", "ourico"]);
 const lootColor = id => ANIMALS.find(a => a.id === id)?.boss ? ["#fff6c8", "#c8d8ff"] : BIRDS.has(id) ? ["#ececf0", "#a8a8b4"]
   : SHED.has(id) ? ["#d8d0a8", "#a8a07a"] : TEETH.has(id) ? ["#f4ecd8", "#c8bca0"] : ["#a86f40", "#7a4a2a"];
 function drawLoot(x, l, cx, cy, now) {
+  if (l.kind) return drawAchLoot(x, l, cx, cy, now);   // moeda ou item achado (systems/achados.js)
   const col = lootColor(l.id);
   const sx = Math.round(l.x - cx), sy = Math.round(l.y - cy) - (Math.floor(now / 300) % 2);
   x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(sx - 4, Math.round(l.y - cy), 8, 1);
@@ -436,6 +441,7 @@ function exUpdate(dt, now) {
   } else if (!sk.hidden) sk.hidden = true;
   if (EX.camp && now - EX.camp.t0 > EX.camp.dur) exCampEnd();
   for (const l of EX.loot) if (now - l.t0 > 500 && Math.hypot(l.x - h.x, l.y - h.y) < 11) pickLoot(l);
+  achUpdate(dt, now);
   EX.dodgeCool = Math.max(0, (EX.dodgeCool || 0) - dt);
   if (EX.dodge) {   // rolando: anda rápido na direção escolhida e deixa poeira
     const dg = EX.dodge, sp = HERO_SPEED * DODGE_SPEED * dt;
@@ -474,6 +480,7 @@ function exUpdate(dt, now) {
     s.x += s.vx * dt; s.y += s.vy * dt; s.left -= Math.hypot(s.vx, s.vy) * dt;
     const hit = EX.ents.find(en => en.alive && Math.hypot(en.x - s.x, en.y - entH(en) / 2 - s.y) < en.hw + 6);
     if (hit) { EX.spear = null; exHit(hit); }
+    else if (achArrow(s, now)) EX.spear = null;   // derrubou o pendurado ou quebrou o pote
     else if (spearBlocked(s.x, s.y + 10)) { s.stuck = .35; sfx("guard"); }
     else if (s.left <= 0) s.stuck = .35;
   }
@@ -703,6 +710,7 @@ function exDraw(now) {
     if (ch === "J") drawChest(x, sx, sy, secretState(EX.zone) >= SECRET_LOOTED, now);
     if (ch === "F") drawFire(x, sx, sy, now);
   }
+  achDrawGround(x, cx, cy);   // caquinhos dos potes quebrados
   EX.loot.forEach(l => drawLoot(x, l, cx, cy, now));   // no chão, embaixo de todo mundo
   const alive = EX.ents.filter(en => en.alive), knocked = EX.ents.filter(en => !en.alive && (en.calm || en.ko) && en.koUntil > now);
   // mato alto: tufos perto de alguém vão para a ordenação, os outros já são desenhados aqui
@@ -723,7 +731,7 @@ function exDraw(now) {
   if (EX.bus) people.push({y: EX.bus.y + EX.bus.h, draw: () => drawBus(x, EX.bus, cx, cy, now)});
   EX.spots.filter(s => s.kind === "lembranca").forEach(s => people.push({y: s.y + 4, draw: () => drawMemento(x, s, cx, cy, now)}));
   [...alive.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...knocked.map(en => ({y: en.y, draw: () => drawAnimalEnt(x, en, cx, cy, now)})), ...people, (EX.camp ? {y: EX.camp.y, draw: () => drawCampHero(x, cx, cy, now)} : {y: h.y, draw: () => drawHeroEnt(x, h, cx, cy, now)})]
-    .concat(tufts).sort((a, b) => a.y - b.y).forEach(o => o.draw());
+    .concat(tufts, achDrawList(x, cx, cy, now)).sort((a, b) => a.y - b.y).forEach(o => o.draw());
   const s = EX.spear;
   if (s) {
     const n = Math.hypot(s.vx, s.vy) || 1, ux = s.vx / n, uy = s.vy / n, sx = s.x - cx, sy = s.y - cy;

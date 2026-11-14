@@ -4,29 +4,54 @@
    comida e uma lembrança que o Pajé conta. G.secrets[zona]: 1 = passagem aberta, 2 = baú já aberto. */
 const SECRET_OPEN = 1, SECRET_LOOTED = 2;
 const secretState = z => (G.secrets || {})[z] || 0;
+// chão alcançável a partir do começo da fase (S), andando só por onde se anda: um Set de "x,y". O recanto e os achados
+// (systems/achados.js) só usam lugares daqui; antes, um bolsão fechado por árvores podia ficar com a entrada do recanto
+function stageReach(rows) {
+  const H = rows.length, sy = rows.findIndex(r => r.includes("S")), out = new Set();
+  if (sy < 0) return out;
+  const anda = ch => ch && !SOLID.includes(ch) && !"YJE".includes(ch), fila = [[rows[sy].indexOf("S"), sy]];
+  out.add(fila[0].join(","));
+  while (fila.length) {
+    const [x, y] = fila.pop();
+    for (const [i, j] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + i, ny = y + j, k = nx + "," + ny;
+      if (ny < 0 || ny >= H || out.has(k) || !anda((rows[ny] || "")[nx])) continue;
+      out.add(k); fila.push([nx, ny]);
+    }
+  }
+  return out;
+}
 // devolve as linhas da fase com o recanto cavado (entrada Y, baú J no fundo); sem lugar que sirva, as linhas de sempre
 function secretRows(zone, rows) {
   if (!SECRETS[zone]) return rows;
   const H = rows.length, W = rows[0].length, at = (x, y) => (rows[y] || "")[x] || "";
   const fill = ch => ch === "T" || ch === "#", walk = ch => ch !== "" && ".,f-".includes(ch);
   const busy = (x, y) => { for (let j = -2; j <= 2; j++) for (let i = -2; i <= 2; i++) if ("SEGBF".includes(at(x + i, y + j) || "_")) return true; return false; };
-  let cands = [];
+  const chega = stageReach(rows);   // a entrada precisa encostar num chão que se alcança andando
+  // borda = true (só quando a busca normal não acha nada): pode cavar na mata da borda do mapa, que também é parede
+  const busca = borda => {
+  const cands = [], lim = borda ? 1 : 2, dentro = (qx, qy) => borda ? qx >= 0 && qy >= 0 && qx < W && qy < H : qx > 0 && qy > 0 && qx < W - 1 && qy < H - 1;
+  const parede = (qx, qy) => (borda && (qx < 0 || qy < 0 || qx >= W || qy >= H)) || fill(at(qx, qy));
   for (const [hw, deep] of [[1, 2], [0, 2], [0, 1]]) {   // recanto 3x2; onde a mata é rala, corredor de 1 ou só o baú atrás da entrada
   if (cands.length) break;
-  for (let y = 2; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+  for (let y = lim; y < H - lim; y++) for (let x = lim; x < W - lim; x++) {
     if (!fill(at(x, y)) || busy(x, y)) continue;
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      if (!walk(at(x - dx, y - dy))) continue;   // a entrada encosta num lugar onde o Rhanon anda
+      if (!walk(at(x - dx, y - dy)) || !chega.has((x - dx) + "," + (y - dy))) continue;   // a entrada encosta num lugar onde o Rhanon chega andando
       const px = dy ? 1 : 0, py = dx ? 1 : 0, pocket = [];   // 2 de fundo atrás da entrada
       for (let d = 1; d <= deep; d++) for (let w = -hw; w <= hw; w++) pocket.push([x + dx * d + px * w, y + dy * d + py * w]);
       const inPocket = (a, b) => pocket.some(([qx, qy]) => qx === a && qy === b);
       // fechado por todos os lados: só se entra pela entrada
-      const ok = pocket.every(([qx, qy]) => qx > 0 && qy > 0 && qx < W - 1 && qy < H - 1 &&
-        [-1, 0, 1].every(j => [-1, 0, 1].every(i => (qx + i === x && qy + j === y) || inPocket(qx + i, qy + j) || fill(at(qx + i, qy + j)))));
+      const ok = pocket.every(([qx, qy]) => dentro(qx, qy) &&
+        [-1, 0, 1].every(j => [-1, 0, 1].every(i => (qx + i === x && qy + j === y) || inPocket(qx + i, qy + j) || parede(qx + i, qy + j))));
       if (ok) cands.push({x, y, pocket, chest: [x + dx * deep, y + dy * deep]});   // baú no fundo, no meio
     }
   }
   }
+  return cands;
+  };
+  let cands = busca(false);
+  if (!cands.length) cands = busca(true);
   if (!cands.length) return rows;
   const c = cands[Math.floor(seeded([...zone].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 9973, 7)) * cands.length)];
   const g = rows.map(r => [...r]);

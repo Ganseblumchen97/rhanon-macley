@@ -3,6 +3,23 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.96.0 — achados nas trilhas
+
+- As trilhas ganharam coisas para quebrar, cortar e derrubar, com a cara de cada região: potes marajoara e cestos de
+  palha no Norte, potes de barro e balaios no Nordeste, cabaças no Centro-Oeste e caixotes no Sudeste, no Sul e nas
+  cidades. Quebre com a lança ou com a flecha.
+- O mato alto agora se corta com a lança, e às vezes sai um trocado do meio dele.
+- Repare nas árvores: tem cacho de açaí, cabaça, ramo de guaraná, ramo de café e pinha pendurados. Só a flecha
+  derruba. Eles balançam de leve e, com chuva ou ventania, o vento empurra até na queda.
+- O que cai vai para a bolsa quando você passa por cima: trocados, comida da região ou uma lembrança dos bichos dali.
+  O dinheiro só cai na primeira vez que você entra na trilha em cada dia.
+- A Franciscane dormindo agora tem a cara dela: cabelo comprido no travesseiro e a trança por cima do ombro.
+- Com a trilha 16 bits, os sons do menu também ficaram no estilo: um toque de madeira e vidro com eco.
+- O encontro com o chefe aproxima no rosto dele, e as coroas do Zabelê-rei e da Gralha-rainha ficam no alto da cabeça.
+- Correções: o recanto secreto às vezes ficava num lugar impossível de alcançar (agora a entrada sempre dá para a
+  trilha); os olhos do herói na tela de Equipamento saíam quebrados; de frente, depois de andar para a esquerda, os
+  braços cruzavam na lança; e o ônibus do mapa tinha outra cor que o da rodoviária.
+
 ## 0.95.0 — trilha 16 bits
 
 - Toda a música ganhou som novo, no estilo dos consoles de 16 bits com mixagem de hoje: baixo, leads e metais em FM

@@ -1705,7 +1705,9 @@ const BOSS_ACC = {
   touro_xucro: ["cicatriz"], leao_marinho: ["cicatriz"], onca_iguacu: ["cicatriz"], gralha_rainha: ["tiara"],
   zabele_rei: ["coroa"]
 };
-const BOSS_ACC_POS = {};   // acertos finos por chefe: {coroa: [dx, dy], olho: [dx, dy]}
+// acertos finos por chefe: {coroa: [dx, dy], olho: [dx, dy]}; topo = a coroa procura o alto da cabeça e se encaixa no meio
+// dele, do tamanho da cabeça (os passarinhos, de cabeça pequena: a busca de sempre punha a coroa na nuca)
+const BOSS_ACC_POS = {zabele_rei: {topo: true}, gralha_rainha: {topo: true}};
 const CAN_FILTER = (() => { try { return "filter" in document.createElement("canvas").getContext("2d"); } catch (e) { return false; } })();
 // a cor (CSS filter) que ainda falta aplicar no desenho: nenhuma quando o quadro já sai com ela
 const beastTint = a => a && a.tint && !(BOSS_ACC[a.id] && CAN_FILTER) ? a.tint : "";
@@ -1713,13 +1715,14 @@ const beastTint = a => a && a.tint && !(BOSS_ACC[a.id] && CAN_FILTER) ? a.tint :
    acompanham a curva da cabeça, levemente tortas, entram um pouco no pelo e fazem sombra nele; ouro e prata com luz de um
    lado e sombra do outro, pedras com brilho; a flor tem cinco pétalas e folha; a cicatriz é um risco fino com os pontos
    da costura. Contorno ameixa só na coroa, na tiara e na flor. cx/top/ex/ey = alto da cabeça e olho, em pontos do desenho. */
-function bossAccPaint(g, it, cx, top, ex, ey, hd) {
+function bossAccPaint(g, it, cx, top, ex, ey, hd, tam = 0) {
   const W = g.canvas.width, H = g.canvas.height, m = new Map(), put = (x, y, c) => m.set(Math.round(x) + "," + Math.round(y), c);
   const base = g.getImageData(0, 0, W, H).data, tem = (x, y) => x >= 0 && y >= 0 && x < W && y < H && base[(y * W + x) * 4 + 3] > 0;
   let fio = true;
   if (it === "coroa" || it === "tiara") {
     const big = it === "coroa", R = big ? ["#fff2a0", "#ffd23a", "#d89a1c", "#9a5e10"] : ["#ffffff", "#dfe6f0", "#9aa4b8", "#5e6880"];
-    const hw = big ? 7 : 5, bh = big ? 4 : 3, X0 = cx * hd + 1, Y0 = top * hd + 1;   // meio da coroa e a linha onde ela pousa (um pixel para dentro do pelo)
+    const hw0 = big ? 7 : 5, hw = tam ? Math.max(4, Math.min(hw0, Math.round(tam * hd * .6))) : hw0, k = hw / hw0;   // tam: largura do alto da cabeça (em pontos)
+    const bh = big ? 4 : 3, X0 = Math.round(cx * hd) + 1, Y0 = top * hd + 1;   // meio da coroa e a linha onde ela pousa (um pixel para dentro do pelo)
     const linha = dx => Y0 + Math.round((dx / hw) ** 2 * 2) + Math.round(dx * .14);    // a base desce nas pontas (dá a volta na cabeça) e pende para trás
     const tomX = dx => dx < -hw * .45 ? 0 : dx > hw * .45 ? 2 : 1;
     for (let dx = -hw; dx <= hw; dx++) {
@@ -1727,7 +1730,7 @@ function bossAccPaint(g, it, cx, top, ex, ey, hd) {
       for (let j = 0; j < bh; j++) put(X0 + dx, yb - j, R[Math.min(3, tomX(dx) + (j === 0 ? 1 : 0))]);   // o aro, com a beira de baixo mais escura
       if (tem(X0 + dx, yb + 1)) put(X0 + dx, yb + 1, "sombra");
     }
-    const pontas = big ? [[-6, 5], [-3, 3], [0, 6], [3, 3], [6, 5]] : [[-4, 2], [0, 4], [4, 2]];
+    const pontas = (big ? [[-6, 5], [-3, 3], [0, 6], [3, 3], [6, 5]] : [[-4, 2], [0, 4], [4, 2]]).map(([x, a]) => [Math.round(x * k), Math.max(2, Math.round(a * (k < 1 ? .85 : 1)))]);
     for (const [pc, alt] of pontas) {
       const yb = linha(pc) - bh;
       for (let j = 0; j < alt; j++) { const w = Math.max(0, Math.round((alt - 1 - j) * .45)); for (let i = -w; i <= w; i++) put(X0 + pc + i, yb - j, R[Math.min(3, tomX(pc) + (i > 0 ? 1 : 0))]); }
@@ -1735,7 +1738,7 @@ function bossAccPaint(g, it, cx, top, ex, ey, hd) {
     }
     const gy = linha(0) - 1, gem = big ? ["#ff9a9a", "#e2363d", "#9a1a26"] : ["#ffc0e4", "#e85ab0", "#a03a78"];
     put(X0 - 1, gy - 1, gem[0]); put(X0, gy - 1, gem[1]); put(X0 - 1, gy, gem[1]); put(X0, gy, gem[2]);   // a pedra do meio
-    if (big) for (const s of [-1, 1]) put(X0 + s * 4, linha(s * 4) - 1, s < 0 ? "#8ae4f4" : "#3a9ab8");
+    if (big && hw >= 6) for (const s of [-1, 1]) put(X0 + s * 4, linha(s * 4) - 1, s < 0 ? "#8ae4f4" : "#3a9ab8");
   } else if (it === "flor") {
     const X0 = (cx + 7) * hd, Y0 = (top + 3) * hd, P = ["#ffc8e4", "#f48ac0", "#d85a98", "#a03a70"];
     for (let y = -2; y <= 2; y++) for (let x = -3; x <= 0; x++) if ((x + 1.5) ** 2 / 4 + y * y / 3 <= 1) put(X0 + 5 + x + 2, Y0 + 3 + y, x + y < -1 ? "#5ad07a" : "#237a40");   // folha
@@ -1781,12 +1784,18 @@ function bossDress(id, base, pose) {
   // alto da cabeça: sobe pela coluna de trás do olho até sair do desenho
   let cx = Math.round((ex + hx) / 2) + 2, top = Math.min(ey, hy);
   while (top > 0 && on(cx, top - 1)) top--;
+  let tam = 0;
+  if (adj.topo) {   // o alto da cabeça: das colunas em volta do olho, as que sobem mais alto; a coroa vai no meio delas
+    const cols = [];
+    for (let x = ex - 5; x <= ex + 8; x++) { if (!on(x, ey)) continue; let t = ey; while (t > 0 && on(x, t - 1)) t--; cols.push([x, t]); }
+    if (cols.length) { const m = Math.min(...cols.map(c => c[1])), run = cols.filter(c => c[1] <= m); cx = (run[0][0] + run[run.length - 1][0]) / 2; top = m; tam = run.length; }
+  }
   if (adj.coroa) { cx += adj.coroa[0]; top += adj.coroa[1]; }
   const dot = (x, y, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), 1, 1); };
   const rect = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), w, h); };
   const K = RIG_K;
   for (const it of BOSS_ACC[id]) {
-    if (hd > 1) { bossAccPaint(g, it, cx, top, ex, ey, hd); continue; }   // quadro pintado: acessório pintado
+    if (hd > 1) { bossAccPaint(g, it, cx, top, ex, ey, hd, tam); continue; }   // quadro pintado: acessório pintado
     if (it === "coroa" || it === "tiara") {   // aro com três pontas e uma pedra; a tiara é menor e de prata
       const big = it === "coroa", w = big ? 9 : 7, x0 = cx - (w >> 1), y0 = top - (big ? 3 : 2);
       const ou = big ? ["#ffd23a", "#c8901a", "#fff2a0"] : ["#e8eef4", "#9aa4b8", "#ffffff"], gem = big ? "#e2363d" : "#e85ab0";

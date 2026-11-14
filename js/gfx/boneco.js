@@ -110,7 +110,7 @@ function rigPaint(view, pose = {}, look = {}, S = 2) {
   const lean = pose.lean || 0, hyB = (pose.dy || 0) + (pose.sit ? 6 : 0), wyB = pose.wy || 0, Wp = pose.weapon, side = pose.side || 1, X = v => side > 0 ? v : 31 - v, hp = pose.sit ? 12 : 0;   // hp: quanto o quadril desce sentado
   let lhB = pose.lh || [7 + lean, 31 + hyB + wyB], rhB = pose.rh || [25 + lean, 31 + hyB + wyB];
   const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], diagA = [X(4), 42], diagB = [X(27), 13];
-  if (Wp === "diag") { if (back) { lhB = [11 + lean, 28 + hyB]; rhB = [21 + lean, 28 + hyB]; } else { lhB = lerp(diagA, diagB, .36); rhB = lerp(diagA, diagB, .6); } }
+  if (Wp === "diag") { if (back) { lhB = [11 + lean, 28 + hyB]; rhB = [21 + lean, 28 + hyB]; } else { lhB = lerp(diagA, diagB, side > 0 ? .36 : .6); rhB = lerp(diagA, diagB, side > 0 ? .6 : .36); } }   // lança espelhada (olhando para a esquerda): as mãos trocam de ponto na haste, senão os braços se cruzam
   if (Wp === "up") rhB = [25 + lean, 30 + hyB + wyB];
   if (Wp === "stab") { lhB = [17 + lean, 25 + hyB]; rhB = [23 + lean, 24 + hyB]; }
   if (Wp === "guard") { lhB = [11 + lean, 28 + hyB]; rhB = [20 + lean, 27 + hyB]; }

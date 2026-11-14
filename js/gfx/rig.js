@@ -126,7 +126,7 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   // posições das mãos que a arma define
   const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
   const diagA = [X(4), 42], diagB = [X(27), 13];
-  if (W === "diag") { if (back) { lh = [11 + lean, 28 + hy]; rh = [21 + lean, 28 + hy]; } else { lh = lerp(diagA, diagB, .36); rh = lerp(diagA, diagB, .6); } }
+  if (W === "diag") { if (back) { lh = [11 + lean, 28 + hy]; rh = [21 + lean, 28 + hy]; } else { lh = lerp(diagA, diagB, side > 0 ? .36 : .6); rh = lerp(diagA, diagB, side > 0 ? .6 : .36); } }   // espelhada: as mãos trocam de ponto, senão os braços se cruzam
   if (W === "up") rh = [25 + lean, 30 + hy + wy];
   if (W === "stab") { lh = [17 + lean, 25 + hy]; rh = [23 + lean, 24 + hy]; }
   if (W === "guard") { lh = [11 + lean, 28 + hy]; rh = [20 + lean, 27 + hy]; }
@@ -261,12 +261,16 @@ function rhanonSleeping(breathe = 0, hd = false) {
     return SLEEP_CACHE[key] = d.canvas();
   }
   const d = rigGrid(1, 84, 26);
+  if (look.trancas) {   // Franciscane: o cabelo comprido espalhado no travesseiro e a trança caída, com a amarração
+    d.part().ellipse(5, 14, 5, 8, C.h, C.H, .5).ellipse(9, 19, 5, 3, C.h, C.H, .5);   // cabelo solto no travesseiro
+  }
   d.part().ellipse(7, 13, 6, 7, C.h, C.H, .5);                          // cabelo atrás da cabeça
   d.part().ellipse(12, 13, 6, 6, C.s, C.S, .5);                         // rosto de perfil, virado para cima
   d.dots([[18, 12], [18, 13]], C.s).dots([[17, 12]], C.S);              // nariz
   if (!look.noBand) d.part().limb(7, 6, 9, 20, 2, C.g, C.G);            // faixa da cabeça
   d.part().poly([[8, 6], [13, 6], [12, 8], [10, 7], [9, 9]], C.h);      // franja
   d.dots([[13, 11], [14, 11]], "#1a1426").dots([[11, 15], [12, 15]], C.r).dots([[16, 16], [17, 16]], C.S);   // olho fechado, pintura na bochecha e boca
+  if (look.trancas) d.dots([[15, 12], [13, 12]], "#1a1426").dots([[16, 16]], "#c0504a");   // cílios e a boca um pouco mais rosada
   // cobertor: sobe no peito, desce na cintura, joelhos e pés fazem montinhos
   const top = [[17, 11], [20, 8 - b], [28, 7 - b], [36, 8 - b], [44, 10], [52, 10], [60, 9], [66, 10], [71, 8], [75, 6], [79, 7], [82, 12]];
   d.part().poly([[17, 25], ...top, [83, 25]], "#c8303a", "#9c2028", 78);
@@ -274,6 +278,7 @@ function rhanonSleeping(breathe = 0, hd = false) {
   d.rect(17, 21, 66, 2, "#9c2028");                                       // dobra embaixo
   d.part().poly([[17, 11], [20, 8 - b], [26, 7 - b], [27, 11], [24, 14], [17, 14]], "#f4ecd8", "#cdbf9a", 25);   // dobra do lençol no pescoço
   d.part().limb(25, 11 - b, 38, 12, 2.5, C.s, C.S).ellipse(39, 12, 2, 1.8, C.s);   // braço por cima do cobertor
+  if (look.trancas) d.part().limb(15, 15, 27, 18 - b, 2.6, C.h, C.H).dots([[18, 16], [21, 17], [24, 17]], C.H).rect(27, 17 - b, 2, 2, C.r);   // a trança da Franciscane por cima do ombro, com a amarração
   return SLEEP_CACHE[key] = d.canvas();
 }
 // visual do Rhanon conforme o que ele veste (G.equip) e o emprego

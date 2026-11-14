@@ -211,7 +211,8 @@ const CI_BH = 96, CI_BOSS = {eyes: 380, hit: 820, end: 1650};
 function ciBeast(a, pose, maxH) {
   let src = null; try { src = a && beastFrame(a.id, pose, 0, isTomado(a)); } catch (_) {}
   if (!src) { src = document.createElement("canvas"); src.width = src.height = 40; const g = src.getContext("2d"); g.font = "30px serif"; g.textBaseline = "top"; g.fillText((a && a.emoji) || "❓", 3, 4); }
-  const hd = (+src.dataset.scale || BEAST_K) / BEAST_K, k = Math.min(2.5 / hd, maxH / src.height), c = document.createElement("canvas");   // hd: quadro pintado em resolução dobrada c.width = Math.max(1, Math.round(src.width * k)); c.height = Math.max(1, Math.round(src.height * k));
+  const hd = (+src.dataset.scale || BEAST_K) / BEAST_K, k = Math.min(4 / hd, maxH / src.height), c = document.createElement("canvas");   // hd: quadro pintado em resolução dobrada
+  c.width = Math.max(1, Math.round(src.width * k)); c.height = Math.max(1, Math.round(src.height * k));   // (antes esta linha estava dentro do comentário: o quadro saía 300x150, esticado)
   const g = c.getContext("2d"); g.imageSmoothingEnabled = false;
   const tint = a && beastTint(a); if (tint && CAN_FILTER) g.filter = tint;
   g.drawImage(src, 0, 0, c.width, c.height);
@@ -221,10 +222,13 @@ function ciBeast(a, pose, maxH) {
 }
 function ciBoss(cv, a) {
   const x = cv.getContext("2d"), W = cv.width, H = CI_BH, T = CI_BOSS, ground = H - 7, look = rhanonLook(), hero = p => rigPaintSide(p, look, CI_HERO);
-  const bIdle = ciBeast(a, "idle", H - 12), bRoar = ciBeast(a, "roar", H - 12);
+  const bIdle = ciBeast(a, "idle", H * 1.7), bRoar = ciBeast(a, "roar", H * 1.7);   // grande: o foco é o rosto, o corpo sai por baixo do quadro
   const hStand = hero({step: "stand", weapon: "diag"}), hBrace = [hero({step: "walk0", weapon: "diag", lean: -2, dy: 1}), hero({step: "walk0", weapon: "diag", lean: -1, dy: 1})];
   const SIL = new Map(), sil = (c, col) => { let m = SIL.get(c); if (!m) SIL.set(c, m = {}); return m[col] || (m[col] = ciSilhouette(c, col)); };
-  const HH = hStand.height, hx = Math.round(W * .16), hy = ground - HH + 4, bx = Math.round(W * .66 - bIdle.width / 2), by = c => ground - c.height + 2;
+  const HH = hStand.height, hx = Math.round(W * .16), hy = ground - HH + 4;
+  // o olho vai a uns 40% da altura, um pouco à direita do meio; quem é baixinho e cabe inteiro fica com os pés no chão
+  const bxOf = c => Math.round(W * .64 - (c.eye ? c.eye[0] + c.k * 4 : c.width / 2)), by = c => Math.max(Math.round(H * .4 - (c.eye ? c.eye[1] : c.height * .3)), ground - c.height + 2);
+  const bx = bxOf(bIdle), bxR = bxOf(bRoar);
   x.imageSmoothingEnabled = false;
   const eyes = (c, px, py, e) => {   // olho vermelho com brilho, piscando ao acender
     if (!c.eye) return;
@@ -240,33 +244,33 @@ function ciBoss(cv, a) {
   };
   const draw = e => {
     x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.clearRect(0, 0, W, H);
-    const bcx = bx + bIdle.width / 2, bcy = by(bIdle) + bIdle.height / 2;
+    const bcx = bx + (bIdle.eye ? bIdle.eye[0] + bIdle.k * 4 : bIdle.width / 2), bcy = by(bIdle) + (bIdle.eye ? bIdle.eye[1] : bIdle.height / 2);   // o rosto
     if (e < T.hit) {   // escuro: a silhueta enorme cresce na fumaça e os olhos acendem
       const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#1a1230"); g.addColorStop(1, "#0c0816"); x.fillStyle = g; x.fillRect(0, 0, W, H);
       const k = ciEase(ciClamp(e / T.eyes));
-      const bl = x.createRadialGradient(bcx, bcy, 4, bcx, bcy, Math.max(bIdle.width, bIdle.height) * .95);   // clarão atrás dele, para a silhueta aparecer
+      const bl = x.createRadialGradient(bcx, bcy, 4, bcx, bcy, H * .9);   // clarão atrás dele, para a silhueta aparecer
       bl.addColorStop(0, `rgba(170,40,70,${.55 * k})`); bl.addColorStop(.6, `rgba(90,30,90,${.3 * k})`); bl.addColorStop(1, "rgba(40,20,60,0)"); x.fillStyle = bl; x.fillRect(0, 0, W, H);
-      smoke(e, 14, bcx, bcy, bIdle.width * .7, bIdle.height * .6, .5 * k);
+      smoke(e, 14, bcx, bcy, H * .75, H * .5, .5 * k);
       x.globalAlpha = k; x.drawImage(sil(bIdle, "#000004"), bx, by(bIdle) + Math.round((1 - k) * 6)); x.globalAlpha = 1;
       eyes(bIdle, bx, by(bIdle), e);
       x.fillStyle = "rgba(0,0,0,.5)"; x.fillRect(0, ground + 3, W, H);
       x.drawImage(sil(hStand, "#05040a"), hx, hy + (e > T.eyes && e < T.eyes + 120 ? -2 : 0));   // o Rhanon de sombra, levando o susto quando os olhos acendem
       return;
     }
-    if (e < T.hit + 80) { ciImpactBg(x, W, bcx - bRoar.width * .25, bcy, 4, H); x.drawImage(sil(bRoar, "#0b0b12"), bx, by(bRoar)); x.drawImage(sil(hBrace[0], "#0b0b12"), hx - 3, hy); return; }
+    if (e < T.hit + 80) { ciImpactBg(x, W, bcx, bcy, 4, H); x.drawImage(sil(bRoar, "#0b0b12"), bxR, by(bRoar)); x.drawImage(sil(hBrace[0], "#0b0b12"), hx - 3, hy); return; }
     // o rugido: ele aparece em cores, tudo treme, o vento corre para a esquerda e o Rhanon firma os pés
     const u = ciClamp((e - T.hit - 80) / (T.end - T.hit - 80)), sh = Math.round(Math.sin(e / 11) * 5 * (1 - u * .6));
     x.translate(sh, 0);
     const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#4a0c14"); g.addColorStop(1, "#16060a"); x.fillStyle = g; x.fillRect(-9, 0, W + 18, H);
     x.save(); x.translate(W, 0); x.scale(-1, 1); ciStreaks(x, e, ["#ff5a4a", "#ffffff", "#ffb0a0"], W, 34, 1.5, H); x.restore();
-    smoke(e, 12, bcx, bcy, bRoar.width * .75, bRoar.height * .65, .55);
+    smoke(e, 12, bcx, bcy, H * .8, H * .55, .55);
     x.fillStyle = "rgba(0,0,0,.4)"; x.fillRect(-9, ground + 3, W + 18, H);
     for (let i = 0; i < 3; i++) {   // ondas do rugido saindo da boca
       const q = (u * 2.2 + i / 3) % 1, r = 10 + q * W * .5;
-      x.strokeStyle = "#fff"; x.globalAlpha = (1 - q) * .7; x.lineWidth = 2; x.beginPath(); x.arc(bx + bRoar.width * .2, bcy, r, Math.PI * .75, Math.PI * 1.25); x.stroke();
+      x.strokeStyle = "#fff"; x.globalAlpha = (1 - q) * .7; x.lineWidth = 2; x.beginPath(); x.arc(bxR + (bRoar.eye ? bRoar.eye[0] - bRoar.k * 3 : bRoar.width * .2), by(bRoar) + (bRoar.eye ? bRoar.eye[1] + bRoar.k * 3 : bRoar.height / 2), r, Math.PI * .75, Math.PI * 1.25); x.stroke();
     }
     x.globalAlpha = 1;
-    const jx = bx + Math.round(Math.sin(e / 9) * 2);
+    const jx = bxR + Math.round(Math.sin(e / 9) * 2);
     x.drawImage(u < .12 ? sil(bRoar, "#fff") : bRoar, jx, by(bRoar));
     eyes(bRoar, jx, by(bRoar), e);
     const back = Math.round(12 * ciEase(u));

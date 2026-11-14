@@ -58,6 +58,11 @@ const SFX = {
   heal:  t => [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * .07, .1, "square", .08)),
   guard: t => tone(150, t, .12, "triangle", .2, 100),
   look:  t => { tone(700, t, .08, "square", .06); tone(1000, t + .1, .08, "square", .06); },
+  // achados das trilhas (systems/achados.js): pote quebrando (estalo e cacos), mato cortado, fruta caindo e a moeda
+  quebra: t => { noise(t, .12, .18, 1800); tone(520, t, .07, "triangle", .06, 280); [0, .03, .06, .1].forEach(d => tone(2200 + Math.random() * 1800, t + d, .025, "square", .022)); },
+  corte: t => { noise(t, .09, .07, 3800); noise(t + .03, .08, .05, 2600); },
+  cai:   t => { tone(170, t, .12, "sine", .12, 70); noise(t, .06, .06, 700); },
+  moeda: t => { tone(1568, t, .06, "square", .04); tone(2093, t + .06, .16, "square", .04); },
   roar:  t => { noise(t, .5, .2, 200); tone(110, t, .5, "sawtooth", .14, 55); },
   // apresentação do chefe: sirene de alerta (dois tons, três vezes) e o rugido longo e grave que faz o chão tremer
   alarme: t => { for (let k = 0; k < 3; k++) { tone(880, t + k * .26, .11, "square", .045); tone(622, t + k * .26 + .13, .11, "square", .045); } },
@@ -81,7 +86,25 @@ const SFX = {
   uivo: t => uivo(t),
   critico: t => { tone(1568, t, .08, "square", .08); tone(2093, t + .07, .3, "triangle", .09); noise(t + .02, .3, .24, 300); tone(95, t + .02, .38, "sawtooth", .17, 40); }
 };
-function sfx(n) { if (AC) SFX[n](AC.currentTime); }
+function sfx(n) { if (!AC) return; if (SFX16[n] && jHd()) return SFX16[n](AC.currentTime); SFX[n](AC.currentTime); }
+/* sons de interface com a trilha 16 bits (MUS.hd): FM curtinho e o eco das vinhetas, no lugar do bipe quadrado.
+   Os sons de golpe, bicho e mundo continuam os mesmos */
+function fmTic(f, t, d, v, ratio = 2, idx = 1.4, eco = 0, pan = 0) {
+  const car = AC.createOscillator(), mod = AC.createOscillator(), ig = AC.createGain(), g = AC.createGain(), p = AC.createStereoPanner();
+  car.frequency.value = f; mod.frequency.value = f * ratio; ig.gain.setValueAtTime(f * idx, t); ig.gain.setTargetAtTime(f * idx * .15, t + .002, d * .3);
+  mod.connect(ig).connect(car.frequency);
+  g.gain.value = 0; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .003); g.gain.setTargetAtTime(0, t + .006, d * .35);
+  p.pan.value = pan; car.connect(g).connect(p).connect(sfxOut); if (eco) { const e = AC.createGain(); e.gain.value = eco; p.connect(e).connect(jEco()); }
+  car.start(t); mod.start(t); car.stop(t + d + .3); mod.stop(t + d + .3);
+}
+const SFX16 = {
+  blip: t => { fmTic(1568, t, .06, .045, 3, 1.1, 0, .12); fmTic(784, t, .05, .02, 1, .6); },   // andar no menu: tique de madeira com um brilho de vidro
+  look: t => { fmTic(1175, t, .22, .05, 3.5, 1.6, .5, -.2); fmTic(1568, t + .08, .3, .045, 3.5, 1.6, .5, .2); },   // abrir painel: sininho de dois tons
+  more: t => [1047, 1319, 1568, 2093].forEach((f, i) => fmTic(f, t + i * .055, .28, .05, 3.5, 1.5, .55, i % 2 ? .25 : -.25)),   // ganhou algo: arpejo de vidro com eco
+  heal: t => [784, 988, 1175, 1568].forEach((f, i) => fmTic(f, t + i * .07, .35, .045, 2, .9, .5, i % 2 ? .2 : -.2)),   // cura: o mesmo arpejo, mais macio
+  moeda: t => { fmTic(1568, t, .12, .05, 3.5, 1.2, .3); fmTic(2093, t + .06, .3, .05, 3.5, 1.2, .5); },
+  missao: t => { fmTic(880, t, .3, .06, 2, 1, .5); fmTic(1320, t + .12, .4, .06, 2, 1, .5); fmTic(1760, t + .26, .5, .04, 3.5, 1.4, .6); },
+};
 /* vozes da fala (narração letra a letra, ui/narration.js): cada personagem importante tem um "bipe" próprio, para saber
    quem fala só pelo som. f = altura, type = timbre, d = duração, v = volume, every = um bipe a cada tantas letras,
    cps = letras por segundo, air = sopro de ruído junto (Pytuna) */

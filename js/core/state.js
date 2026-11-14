@@ -39,7 +39,7 @@ function vit() {
   if (G.heroi !== "fran") G.heroi = "rhanon";   // quem o jogador escolheu no jogo novo (saves antigos: o Rhanon)
   G.hp = Math.min(G.hp ?? maxHP(G.lv), maxHP(G.lv)); G.sp = Math.min(G.sp ?? maxSP(G.lv), maxSP(G.lv));
   if (!G.items) { G.items = {mandioca: G.man ?? 3}; delete G.man; }   // saves antigos guardavam só as mandiocas em G.man
-  G.pelts = G.pelts || {}; G.day = G.day || 1; G.sub = G.sub || "aldeia"; G.night = !!G.night;   // night: é noite (fogueira "descansar até a noite")
+  G.pelts = G.pelts || {}; G.achados = G.achados || {}; G.day = G.day || 1; G.sub = G.sub || "aldeia"; G.night = !!G.night;   // night: é noite (fogueira "descansar até a noite")
   // tutorial: ainda falta a conversa com o caçador (só num jogo sem progresso; saves antigos já passaram dela)
   G.bestiary = G.bestiary || {}; G.questsDone = G.questsDone || {}; G.quest = G.quest || null; G.offer = G.offer || null;   // caderno e pedidos
   if (G.tutorial === undefined) G.tutorial = G.lv === 1 && !G.xp && !Object.keys(G.kills || {}).length;

@@ -227,7 +227,9 @@ body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:2
 /* ônibus andando pela estrada do mapa do Pará */
 #mkbus{pointer-events:none}
 #mapsvg #mkbus rect{display:inline}   /* o mapa esconde os rect (grade); os do ônibus aparecem */
-#mkbus .lat{fill:#e2363d;stroke:#1a1426;stroke-width:2}
+#mkbus .lat{fill:#f4f1e8;stroke:#1a1426;stroke-width:2}   /* o mesmo ônibus da rodoviária (drawRoadBus): branco com faixa verde e amarela */
+#mkbus .faixa{fill:#2a8a5a}
+#mkbus .faixa2{fill:#f2c230}
 #mkbus .win{fill:#bfe8ff;stroke:#1a1426;stroke-width:1}
 #mkbus circle{fill:#1a1426;stroke:#f4ecd8;stroke-width:1}
 #route{fill:none}
