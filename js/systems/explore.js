@@ -1450,6 +1450,8 @@ function motelScene(kind, done) {
   wipe(() => {
     let o = $("motelRoom");
     if (!o) { o = document.createElement("div"); o.id = "motelRoom"; o.className = "motel-room"; o.innerHTML = '<canvas width="192" height="120"></canvas><p></p>'; document.body.appendChild(o); }
+    const cv = o.querySelector("canvas"), hd = BN_OW() > 1 && QUARTO_NOVO ? 2 : 1;   // quarto pintado: tela em resolução dobrada
+    if (cv.width !== 192 * hd) { cv.width = 192 * hd; cv.height = 120 * hd; }
     o.querySelector("p").textContent = skipText();
     o.hidden = false;
     const x = o.querySelector("canvas").getContext("2d"), t0 = performance.now(), D = REDUCE ? 600 : MOTEL_MS;
@@ -1467,7 +1469,106 @@ function motelSky(keys, u) {   // céu da janela em u (0..1): cores de cima e de
   const [ua, a] = keys[i], [ub, b] = keys[Math.min(i + 1, keys.length - 1)], v = ub > ua ? Math.min(1, Math.max(0, (u - ua) / (ub - ua))) : 1, A = MOTEL_SKY[a], B = MOTEL_SKY[b];
   return {top: hexMix(A[0], B[0], v), bottom: hexMix(A[1], B[1], v), light: A[2] + (B[2] - A[2]) * v};
 }
+/* quarto pintado (visual novo, tela 384x240): o que não se mexe (parede, chão, tapete e móveis com volume, bnGrid) é
+   pintado uma vez; por cima, a cada quadro: quem dorme, a luz da janela no chão, o escuro, o abajur e o céu da janela */
+let MOTEL_BG = null;
+function motelRoomBg() {
+  if (MOTEL_BG) return MOTEL_BG;
+  const cv = document.createElement("canvas"); cv.width = 384; cv.height = 240;
+  const x = cv.getContext("2d"), rng = sceneRng(4107), R = (c, a, b, w, h) => { x.fillStyle = c; x.fillRect(a, b, w, h); };
+  // parede: papel listrado com um losanguinho em cada faixa e a sombra do teto
+  R("#cbb994", 0, 0, 384, 148);
+  for (let k = 0; k < 384; k += 24) {
+    R("#d6c6a2", k, 0, 12, 148); R("#bdab86", k + 11, 0, 1, 148);
+    for (let y = (k / 24) % 2 ? 22 : 10; y < 144; y += 24) { R("#b3976a", k + 5, y, 2, 4); R("#b3976a", k + 4, y + 1, 4, 2); }
+  }
+  for (let y = 0; y < 14; y++) R(`rgba(60,40,30,${(.22 * (1 - y / 14)).toFixed(3)})`, 0, y, 384, 1);
+  // lambri de madeira: tábuas em pé, friso em cima e rodapé
+  R("#9c7a56", 0, 148, 384, 36);
+  for (let k = 0; k < 384; k += 16) { R("#86663f", k, 152, 1, 28); R("#aa8862", k + 1, 152, 1, 28); }
+  R("#c49a6a", 0, 148, 384, 2); R("#6d4329", 0, 150, 384, 2); R("#5e3e28", 0, 180, 384, 4);
+  // chão de tábuas corridas, com emendas desencontradas e uns nós
+  for (let r = 0; r < 4; r++) {
+    const y = 184 + r * 14; R(r % 2 ? "#77503a" : "#7f573a", 0, y, 384, 14); R("#8f6646", 0, y, 384, 1); R("#5a3a26", 0, y + 13, 384, 1);
+    for (let k = (r * 37) % 60; k < 384; k += 60 + Math.floor(rng() * 30)) R("#5a3a26", k, y, 1, 13);
+    for (let n = 0; n < 3; n++) { const kx = Math.floor(rng() * 376), ky = y + 4 + Math.floor(rng() * 5); R("#694631", kx, ky, 4, 2); R("#5a3a26", kx + 1, ky, 2, 1); }
+  }
+  // tapete oval trançado do lado da cama
+  const oval = (c, cx, cy, rx, ry) => { for (let y = -ry; y <= ry; y++) { const w = Math.round(rx * Math.sqrt(1 - y * y / (ry * ry))); R(c, cx - w, cy + y, w * 2, 1); } };
+  oval("#3a2418", 252, 219, 74, 15); oval("#e9d9a8", 252, 218, 72, 14); oval("#2f7a52", 252, 218, 66, 11); oval("#e9d9a8", 252, 218, 52, 7); oval("#c8303a", 252, 218, 46, 5);
+  for (let k = 212; k < 294; k += 8) R("#e9d9a8", k, 217, 4, 2);
+  R("rgba(20,10,10,.28)", 30, 186, 186, 6);   // sombra embaixo da cama
+  // móveis com volume
+  const d = bnGrid(2, 192, 120), W = "#6b452a", W2 = "#7a5236", W3 = "#8a6040";
+  d.part().poly([[60, 22], [92, 22], [92, 46], [60, 46]], W);   // quadro: a lua no rio
+  d.rect(63, 25, 26, 18, "#1c2a52").rect(63, 37, 26, 6, "#2f6f8f").rect(79, 28, 4, 4, "#f4ecd8").rect(80, 38, 2, 1, "#cfe4ee").rect(77, 40, 6, .5, "#cfe4ee")
+    .rect(63, 35, 9, 2, "#1d4a34").rect(66, 33.5, 4, 1.5, "#1d4a34").rect(84, 35.5, 5, 1.5, "#1d4a34").dots([[66, 27], [72, 30], [86, 26]], "#f4ecd8");
+  d.part().poly([[116, 12], [172, 12], [172, 17], [116, 17]], W).poly([[116, 17], [121, 17], [121, 51], [116, 51]], W).poly([[167, 17], [172, 17], [172, 51], [167, 51]], W);   // moldura da janela
+  d.part().poly([[113, 51], [175, 51], [175, 56], [113, 56]], W3);   // peitoril
+  d.part().poly([[108, 11], [121, 11], [122.5, 30], [119, 44], [121, 59], [108, 59]], "#b8433a").limb(112, 13, 112, 57, .5, "#8e2c28").limb(116.5, 13, 116, 57, .5, "#8e2c28");   // cortinas, com as pregas
+  d.part().poly([[167, 11], [180, 11], [180, 59], [167, 59], [169, 44], [165.5, 30]], "#b8433a").limb(172, 13, 172.5, 57, .5, "#8e2c28").limb(176.5, 13, 176.5, 57, .5, "#8e2c28");
+  d.part().limb(104, 10, 184, 10, 2, "#4a3020").ellipse(104, 10, 2, 2, "#e2c26a").ellipse(184, 10, 2, 2, "#e2c26a");   // varão
+  d.part().limb(186, 91, 183, 30, 1.6, SPEAR_WOOD).poly([[181.6, 30], [184.4, 30], [182.8, 22]], "#e6edf0").limb(181.8, 31, 184.4, 31, 1.2, "#e2363d");   // a lança encostada na parede
+  d.part().ellipse(18, 55, 5.5, 4.5, W).poly([[12.5, 55], [23.5, 55], [23.5, 98], [12.5, 98]], W);   // cabeceira
+  d.part().ellipse(105.5, 73, 4, 3.2, W).poly([[101.5, 73], [109.5, 73], [109.5, 98], [101.5, 98]], W);   // pé da cama
+  d.part().poly([[21, 85], [103, 85], [103, 93], [21, 93]], W2);   // estrado
+  d.part().limb(26, 79.5, 100, 79.5, 11, "#f1e8d2");   // colchão
+  d.part().ellipse(33.5, 72.5, 11.5, 5.5, "#ffffff");   // travesseiro
+  d.part().poly([[122, 76], [144, 76], [144, 93], [122, 93]], W2).rect(125, 80, 16, 6, W).rect(132, 82.5, 2, 1, "#e2c26a");   // criado-mudo com gaveta
+  d.part().poly([[119, 72.5], [147, 72.5], [147, 76], [119, 76]], W3);
+  if (G.nb && G.nb.tem) d.part().poly([[138.5, 70.5], [146, 70.5], [146, 72.5], [138.5, 72.5]], "#8f9aa8");   // o notebook fechado
+  d.part().ellipse(131, 72, 4, 1.4, "#4a3020").limb(131, 72, 131, 65, 1.6, "#4a3020");   // abajur
+  d.part().poly([[125, 66.5], [137, 66.5], [134.5, 57.5], [127.5, 57.5]], "#d9a83a");
+  d.part().limb(160, 80, 166, 74, 1, "#5e3a22").limb(166, 74, 171, 81, 1, "#5e3a22");   // a bolsa no chão, do lado do criado-mudo
+  d.part().ellipse(165.5, 88, 7.5, 6, "#9a6238").poly([[158.5, 84], [172.5, 84], [171, 88.5], [160, 88.5]], "#b07a48").rect(165, 88, 1.5, 1.5, "#e2c26a");
+  x.drawImage(d.canvas(), 0, 0);
+  return MOTEL_BG = cv;
+}
+// o quarto pintado ainda é rascunho (vai ser refeito): no jogo fica o de sempre; ?quarto=novo mostra o rascunho
+const QUARTO_NOVO = /[?&]quarto=novo/.test(location.search);
 function drawMotelRoom(x, keys, u, now) {
+  if (BN_OW() < 2 || !QUARTO_NOVO) return drawMotelRoomVelho(x, keys, u, now);
+  const sky = motelSky(keys, u), dark = 1 - sky.light, R = (c, a, b, w, h) => { x.fillStyle = c; x.fillRect(a, b, w, h); };
+  const disco = (c, cx, cy, r) => { for (let y = -r; y <= r; y++) { const w = Math.round(Math.sqrt(r * r - y * y)); R(c, cx - w, cy + y, w * 2, 1); } };
+  x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1;
+  x.drawImage(motelRoomBg(), 0, 0);
+  x.drawImage(rhanonSleeping(REDUCE ? 0 : Math.floor(now / 900) % 2, true), 40, 118);   // cabeça no travesseiro, cobertor até os pés
+  if (sky.light > .3) {   // a luz da janela desce de viés até o chão
+    x.fillStyle = `rgba(255,238,180,${((sky.light - .3) * .3).toFixed(3)})`;
+    for (let y = 112; y < 240; y += 2) { const v = (y - 112) / 128; x.fillRect(Math.round(242 - v * 104), y, Math.round(92 + v * 26), 2); }
+  }
+  R(`rgba(8,12,36,${(dark * .72).toFixed(3)})`, 0, 0, 384, 240);   // o quarto escurece junto com o céu
+  if (dark > .3) {   // abajur aceso: a cúpula clara e um círculo de luz quente
+    const a = (dark - .3) * .7, g = x.createRadialGradient(262, 124, 4, 262, 124, 96);
+    g.addColorStop(0, `rgba(255,214,120,${a.toFixed(3)})`); g.addColorStop(1, "rgba(255,214,120,0)");
+    x.fillStyle = g; x.fillRect(160, 30, 210, 190);
+    for (let y = 0; y < 16; y++) R(y < 2 ? "#fff6c8" : "#ffe98a", 256 - Math.round(y * .3), 116 + y, 12 + Math.round(y * .6), 1);
+  }
+  // janela por cima da sombra: o céu muda de cor, com nuvem e sol de dia, estrelas e a lua de noite
+  for (let y = 0; y < 68; y += 2) R(hexMix(sky.top, sky.bottom, y / 66), 242, 34 + y, 92, 2);
+  if (dark > .5) {
+    const a = (dark - .5) * 2;
+    [[250, 42], [262, 58], [276, 40], [292, 50], [300, 74], [270, 80], [254, 88], [326, 84], [284, 92]].forEach(([sx, sy], i) => {
+      x.globalAlpha = a * (REDUCE ? 1 : .55 + .45 * Math.sin(now / 420 + i * 1.9)); R("#ffffff", sx, sy, 2, 2); });
+    x.globalAlpha = a; disco("#f4ecd8", 316, 52, 8); disco(hexMix(sky.top, sky.bottom, .25), 320, 49, 7);   // Jaci minguando
+    x.globalAlpha = 1;
+  } else {
+    const a = 1 - dark * 2, sy = 92 - Math.round(sky.light * 34);
+    x.globalAlpha = a * .35; disco("#fff6c8", 314, sy, 11); x.globalAlpha = a; disco("#ffe070", 314, sy, 7); disco("#fff3a8", 313, sy - 1, 4);
+    x.globalAlpha = a * .8;
+    const cl = REDUCE ? 20 : (now / 260) % 130;   // nuvem passando
+    x.save(); x.beginPath(); x.rect(242, 34, 92, 68); x.clip();
+    R("#ffffff", 226 + cl, 52, 22, 4); R("#ffffff", 230 + cl, 48, 12, 4); R("#eef4fa", 228 + cl, 56, 18, 2);
+    x.restore(); x.globalAlpha = 1;
+  }
+  R("rgba(255,255,255,.1)", 250, 36, 6, 28); R("rgba(255,255,255,.1)", 260, 36, 2, 20);   // reflexo no vidro
+  R("#6b452a", 286, 34, 4, 68); R("#6b452a", 242, 66, 92, 4); R("#8a6040", 286, 34, 1, 68); R("#8a6040", 242, 66, 92, 1);   // cruz da janela
+  x.setTransform(2, 0, 0, 2, 0, 0);
+  if (!REDUCE) for (let i = 0; i < 3; i++) { const p = (now / 1100 + i / 3) % 1; x.globalAlpha = 1 - p * .6; glyphP(x, "z", "#ffffff", 36 + p * 10, 56 - p * 16); }   // zzz
+  x.globalAlpha = 1; x.setTransform(1, 0, 0, 1, 0, 0);
+}
+// quarto antigo (?visual=velho): blocos chapados em 192x120
+function drawMotelRoomVelho(x, keys, u, now) {
   const sky = motelSky(keys, u), dark = 1 - sky.light;
   x.fillStyle = "#c8b89a"; x.fillRect(0, 0, 192, 120);   // parede
   x.fillStyle = "#b8a888"; for (let k = 6; k < 192; k += 12) x.fillRect(k, 0, 1, 92);   // papel de parede listrado

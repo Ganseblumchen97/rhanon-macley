@@ -1618,6 +1618,8 @@ TX.en = {
     "{z} aprende.": "{z} learns it.",
     "Segure {sel} para pular": "Hold {sel} to skip",
     "{dir} anda · analógico direito mira · {z} golpe e conversa · {x} flecha · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades": "{dir} walk · right stick aims · {z} strike and talk · {x} arrow · {sh} dodge · {i} bag · {e} equip · {h} skills",
+    "Trilha": "Soundtrack",
+    "Clássica": "Classic",
     "Ícones dos botões": "Button icons",
     "Automático": "Automatic",
     "Teclado": "Keyboard",

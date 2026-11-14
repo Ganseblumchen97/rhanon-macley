@@ -24,7 +24,7 @@ function getBattleTrackFor(animal) {
   if (regionOfCity(curCity()) === "nordeste" && !animal.bug) return "battleNordeste";   // Nordeste: o tema da região num forró de batalha
   if (regionOfCity(curCity()) === "centroeste" && !animal.bug) return "battleCentroOeste";   // Centro-Oeste: pagode de viola
   if (curCity() === "riodejaneiro") return "battleRio";   // Rio: funk carioca acelerado
-  if (curCity() === "saopaulo") return "battleSaoPaulo";   // São Paulo: samba-rock com o tema em MPB
+  if (curCity() === "saopaulo") return "battleSaoPaulo";   // São Paulo: samba-jazz, a MPB acelerada
   if (regionOfCity(curCity()) === "sudeste" && !animal.bug) return "battleMinas";   // Minas: sertanejo universitário
   if (regionOfCity(curCity()) === "sul" && !animal.bug) return "battleSul";   // Sul: vanerão de gaita
   return BATTLE_CITY.has(curZone) ? "battleGuitarrada" : BATTLE_WATER.has(curZone) ? "battleCarimbo" : "battleCapo";

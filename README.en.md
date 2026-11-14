@@ -1,6 +1,6 @@
 [Português](README.md) · **English**
 
-# Jaci: The Fading Moon (alpha 0.94.1)
+# Jaci: The Fading Moon (alpha 0.95.0)
 
 *Jaci: A Lua que se Apaga* · a Rhanon Macley adventure · turn-based RPG in the browser
 
@@ -76,6 +76,10 @@ over the last boss of each city.
 All the music is made by the game itself, in real time, with no audio files. Every region and every character has a
 **fixed theme (leitmotif)**: the same melody comes back in different arrangements, in the city, in battle, against a
 boss, so it sticks in your head and tells the story through sound. The idea came from Toby Fox's work on Deltarune.
+
+It sounds like the 16-bit consoles with a modern mix: FM bass and brass as on the Mega Drive, the muffled echo of the
+Super Nintendo, and Brazilian instruments (berimbau, viola, guitar, accordion, flute) built by physical modeling. If you
+prefer the simpler classic soundtrack, pick it in Options.
 
 ### 🎧 [Listen to the soundtrack in your browser](https://ganseblumchen97.github.io/rhanon-macley/trilha.en.html)
 

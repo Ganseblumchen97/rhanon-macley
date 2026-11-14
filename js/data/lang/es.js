@@ -1621,6 +1621,8 @@ TX.es = {
     "{z} aprende.": "{z} la aprende.",
     "Segure {sel} para pular": "Mantén {sel} para saltar",
     "{dir} anda · analógico direito mira · {z} golpe e conversa · {x} flecha · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades": "{dir} anda · stick derecho apunta · {z} golpe y hablar · {x} flecha · {sh} esquivar · {i} bolsa · {e} equipar · {h} habilidades",
+    "Trilha": "Banda sonora",
+    "Clássica": "Clásica",
     "Ícones dos botões": "Iconos de los botones",
     "Automático": "Automático",
     "Teclado": "Teclado",

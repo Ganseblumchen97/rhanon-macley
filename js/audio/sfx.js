@@ -229,12 +229,37 @@ const JINGLE = {norte: {motif: [69, 74, 72, 69], home: 74, chord: [62, 66, 69], 
   sudeste: {motif: [74, 78, 81, 83], home: 74, chord: [62, 66, 69], bass: 50},
   sul: {motif: [71, 67, 69, 71], home: 76, chord: [64, 68, 71], bass: 40}};
 const jingleMotif = () => JINGLE[regionOfCity(curCity())] || JINGLE.norte;
+/* nota das vinhetas (vitória, derrota, fuga, subida de nível, descanso, luz de Jaci): com a música 16 bits (MUS.hd) sai em
+   FM com o eco abafado do Super Nintendo, no mesmo som da trilha; sem ela, é a onda de sempre (tone) */
+let JECO = null;
+function jEco() {   // eco das vinhetas (um só, criado na primeira vez)
+  if (JECO && JECO.ctx === AC) return JECO.in;
+  const inp = AC.createGain(), dl = AC.createDelay(1), fb = AC.createGain(), lp = AC.createBiquadFilter(), wet = AC.createGain();
+  dl.delayTime.value = .19; fb.gain.value = .38; lp.type = "lowpass"; lp.frequency.value = 2400; wet.gain.value = .32;
+  inp.connect(dl); dl.connect(lp).connect(fb).connect(dl); lp.connect(wet).connect(sfxOut);
+  JECO = {ctx: AC, in: inp}; return inp;
+}
+const jHd = () => typeof MUS !== "undefined" && !!MUS.hd;
+function jtone(f, t, d, type, v, vibrato) {
+  if (!jHd()) return tone(f, t, d, type, v);
+  // FM: a quadrada vira o lead do Mega Drive (moduladora forte no ataque); a triangular, um FM macio, quase sino
+  const car = AC.createOscillator(), mod = AC.createOscillator(), idx = AC.createGain(), g = AC.createGain(), sq = type === "square";
+  car.frequency.value = f; mod.frequency.value = f * (sq ? 1 : 2);
+  idx.gain.setValueAtTime(f * (sq ? 2.2 : .8), t); idx.gain.setTargetAtTime(f * (sq ? 1 : .25), t + .005, .1);
+  mod.connect(idx).connect(car.frequency);
+  if (vibrato) { const lfo = AC.createOscillator(), dp = AC.createGain(); lfo.frequency.value = 5.5; dp.gain.setValueAtTime(0, t); dp.gain.linearRampToValueAtTime(f * .005, t + Math.min(.4, d)); lfo.connect(dp).connect(car.frequency); lfo.start(t); lfo.stop(t + d + .1); }
+  const vv = v * (sq ? .8 : 1.05);
+  g.gain.value = 0; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vv, t + .005); g.gain.setTargetAtTime(0, t + Math.max(.01, d * .55), d * .25);
+  car.connect(g); g.connect(sfxOut); g.connect(jEco());
+  car.start(t); mod.start(t); car.stop(t + d + .4); mod.stop(t + d + .4);
+}
 function fanfare(kind) {
   if (!AC) return;
   const t = AC.currentTime + .05, out = AC.createGain(), lp = AC.createBiquadFilter();
   out.gain.value = .9; lp.type = "lowpass"; lp.frequency.value = 3800; lp.connect(out).connect(sfxOut);
   const mf = m => 440 * 2 ** ((m - 69) / 12);
   const note = (m, at, dur, vol, timbre, vibrato) => {
+    if (jHd()) return jtone(mf(m), t + at, dur, timbre === "triangle" ? "triangle" : "square", vol * 1.1, vibrato);   // som da trilha 16 bits
     const when = t + at, o = AC.createOscillator(), g = AC.createGain();
     o.type = timbre === "triangle" ? "triangle" : "square"; o.frequency.value = mf(m);
     if (vibrato) { const lfo = AC.createOscillator(), dp = AC.createGain(); lfo.frequency.value = 6; dp.gain.value = mf(m) * .006; lfo.connect(dp).connect(o.frequency); lfo.start(when + .08); lfo.stop(when + dur); }
@@ -328,8 +353,8 @@ function healFillSound(dur) {
 function restJingle() {
   if (!AC || muted) return;
   const t = AC.currentTime + .03, J = jingleMotif();
-  J.chord.forEach((m, i) => { tone(hz(m + 12), t + i * .13, .5, "triangle", .045); tone(hz(m + 24), t + i * .13, .12, "sine", .015); });
-  tone(hz(J.home + 12), t + .42, .9, "triangle", .05); tone(hz(J.bass), t + .42, .9, "triangle", .07);
+  J.chord.forEach((m, i) => { jtone(hz(m + 12), t + i * .13, .5, "triangle", .045); jtone(hz(m + 24), t + i * .13, .12, "sine", .015); });
+  jtone(hz(J.home + 12), t + .42, .9, "triangle", .05); jtone(hz(J.bass), t + .42, .9, "triangle", .07);
 }
 function xpDing() { if (!AC || muted) return; const t = AC.currentTime + .02; tone(hz(84), t, .09, "square", .04); tone(hz(91), t + .08, .22, "square", .035); }
 // chefe acalmado: um pedaço da luz de Jaci volta. O começo do tema dela (JACI_THEME) em sinos, e um brilho subindo no fim
@@ -337,18 +362,18 @@ function jaciJingle() {
   if (!AC || muted) return;
   const t = AC.currentTime + .05;
   [[67, 0, .14], [76, .14, .34], [74, .48, .14], [72, .62, .34], [74, .96, .9]].forEach(([m, at, d]) => {
-    tone(hz(m), t + at, d + .4, "sine", .07); tone(hz(m + 12), t + at, d * .6 + .2, "sine", .02); tone(hz(m), t + at, d * .8, "triangle", .02);
+    jtone(hz(m), t + at, d + .4, "sine", .07); jtone(hz(m + 12), t + at, d * .6 + .2, "sine", .02); jtone(hz(m), t + at, d * .8, "triangle", .02);
   });
-  [86, 91, 93, 98].forEach((m, i) => tone(hz(m), t + 1.1 + i * .07, .35, "sine", .012));   // brilho
+  [86, 91, 93, 98].forEach((m, i) => jtone(hz(m), t + 1.1 + i * .07, .35, "sine", .012));   // brilho
 }
 // subiu de nível: as quatro notas do motivo da região, rápidas e brilhantes, e o acorde de casa subindo até a nota final
 function levelUpJingle() {
   if (!AC || muted) return;
   const J = jingleMotif(), t = AC.currentTime + .05, S = .09, up = [...J.chord.map(m => m + 12), J.home + 12];
-  J.motif.forEach((m, i) => { tone(hz(m + 12), t + i * S, S + .03, "square", .06); tone(hz(m + 24), t + i * S, S, "triangle", .02); });
-  up.slice(0, -1).forEach((m, i) => tone(hz(m), t + (4.6 + i * .7) * S, .1, "square", .055));
+  J.motif.forEach((m, i) => { jtone(hz(m + 12), t + i * S, S + .03, "square", .06); jtone(hz(m + 24), t + i * S, S, "triangle", .02); });
+  up.slice(0, -1).forEach((m, i) => jtone(hz(m), t + (4.6 + i * .7) * S, .1, "square", .055));
   const end = t + (4.6 + (up.length - 1) * .7) * S;
-  tone(hz(up.at(-1)), end, .7, "square", .07); tone(hz(up.at(-1) + 12), end, .6, "triangle", .025);
-  J.chord.forEach((m, i) => tone(hz(m), end + i * .02, .9, "triangle", .03)); tone(hz(J.bass - 12), end, .6, "triangle", .12);
-  tone(hz(J.bass - 12), t, .4, "triangle", .1);
+  jtone(hz(up.at(-1)), end, .7, "square", .07); jtone(hz(up.at(-1) + 12), end, .6, "triangle", .025);
+  J.chord.forEach((m, i) => jtone(hz(m), end + i * .02, .9, "triangle", .03)); jtone(hz(J.bass - 12), end, .6, "triangle", .12);
+  jtone(hz(J.bass - 12), t, .4, "triangle", .1);
 }

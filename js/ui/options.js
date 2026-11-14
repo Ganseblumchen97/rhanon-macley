@@ -7,6 +7,7 @@ try { Object.assign(OPT, JSON.parse(localStorage.getItem(OPT_KEY)) || {}); } cat
 function applyVolumes() {
   if (musicOut) musicOut.gain.value = OPT.music;
   if (sfxOut) sfxOut.gain.value = OPT.sfx;
+  MUS.hd = OPT.trilha === "classica" ? false : "16";   // estilo da trilha: 16 bits (o padrão; MUS.hd, audio/music.js) ou a clássica
 }
 function setVolume(kind, v) {
   OPT[kind] = Math.max(0, Math.min(1, v));
@@ -19,12 +20,17 @@ function openOptions() {
   box.innerHTML = `<h2>${t("Opções")}</h2>
     <label class="opt-row">${t("Música")} <input type="range" min="0" max="100" step="5" value="${Math.round(OPT.music * 100)}" data-k="music"><output>${Math.round(OPT.music * 100)}%</output></label>
     <label class="opt-row">${t("Efeitos")} <input type="range" min="0" max="100" step="5" value="${Math.round(OPT.sfx * 100)}" data-k="sfx"><output>${Math.round(OPT.sfx * 100)}%</output></label>
+    <label class="opt-row">${t("Trilha")} <select data-k="trilha">${[["16", "16 bits"], ["classica", t("Clássica")]].map(([k, n]) => `<option value="${k}"${k === (OPT.trilha === "classica" ? "classica" : "16") ? " selected" : ""}>${n}</option>`).join("")}</select></label>
     <label class="opt-row">${t("Idioma")} <select data-k="lang">${Object.entries(LANGS).map(([k, n]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${n}</option>`).join("")}</select></label>
     ${LANG !== "pt" ? `<p class="hint lang-note">${t(LANG_NOTE)}</p>` : ""}
     <p class="hint">${t("Durante as cenas, segure C para pular.")}</p>
     <label class="opt-row">${t("Ícones dos botões")} <select data-k="padIcons">${[["auto", t("Automático")], ["kbd", t("Teclado")], ["xbox", "Xbox"], ["ps", "PlayStation"], ["nintendo", "Nintendo"]].map(([k, n]) => `<option value="${k}"${k === (OPT.padIcons || "auto") ? " selected" : ""}>${n}</option>`).join("")}</select></label>
     <p class="hint">${padHelp()}</p>
     <p class="hint pad-live" id="padLive"></p>`;
+  box.querySelector('select[data-k="trilha"]').addEventListener("change", ev => {   // troca o som da trilha e recomeça a faixa que está tocando
+    OPT.trilha = ev.target.value; try { localStorage.setItem(OPT_KEY, JSON.stringify(OPT)); } catch (_) {}
+    applyVolumes(); MUS.reload(); sfx("blip");
+  });
   box.querySelector('select[data-k="lang"]').addEventListener("change", ev => setLang(ev.target.value));   // recarrega o jogo no idioma novo
   box.querySelector('select[data-k="padIcons"]').addEventListener("change", ev => {   // ícones do controle: automático, teclado ou um estilo fixo
     OPT.padIcons = ev.target.value; try { localStorage.setItem(OPT_KEY, JSON.stringify(OPT)); } catch (_) {}

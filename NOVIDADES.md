@@ -3,6 +3,19 @@
 Cada versão publicada ganha um número (alfa 0.MENOR.CORREÇÃO): o número do meio sobe quando entra conteúdo
 novo e o último quando são só correções e ajustes. A versão que está no ar aparece no canto da tela inicial.
 
+## 0.95.0 — trilha 16 bits
+
+- Toda a música ganhou som novo, no estilo dos consoles de 16 bits com mixagem de hoje: baixo, leads e metais em FM
+  como no Mega Drive, o eco abafado do Super Nintendo e os instrumentos brasileiros feitos para soar de verdade
+  (berimbau, viola, violão, sanfona, atabaque). As melodias e os arranjos são os mesmos: muda o timbre.
+- A flauta que leva os temas toca como uma flauta de verdade: golpe de língua, notas ligadas, vibrato que cresce
+  nas notas longas e um respiro entre as frases.
+- A batalha em São Paulo virou um samba-jazz, a MPB acelerada, com violão na batida da bossa, flauta e piano
+  elétrico. A MPB da Paulista, de dia e de noite, ficou mais macia.
+- As vinhetas de vitória, derrota, subida de nível, descanso e da luz de Jaci tocam no mesmo estilo da trilha.
+- Prefere a trilha de antes? Em Opções, "Trilha" troca entre 16 bits e Clássica. Num celular mais fraco, a Clássica
+  pesa menos.
+
 ## 0.94.1 — mapas com a cara de cada lugar
 
 - O mapa do Brasil foi redesenhado: contorno mais fiel, o Oceano Atlântico, os países vizinhos, rios, serras e

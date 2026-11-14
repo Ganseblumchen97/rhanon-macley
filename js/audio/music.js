@@ -14,7 +14,7 @@ const hz = n => 440 * 2 ** ((n - 69) / 12);
    tema do Centro-Oeste em dueto), "battleCentroOeste" (batalha no Centro-Oeste: pagode de viola com bateria sertaneja), "localSudeste" (Belo Horizonte e o mapa do Sudeste: sertanejo
    universitário com o tema do Sudeste em dupla), "battleMinas" (batalha em Minas: o mesmo, acelerado), "mpbSudeste" e
    "funkSudeste" (o tema do Sudeste em MPB e em funk carioca: exploração em São Paulo e no Rio), "mpbSudesteNight" e
-   "funkSudesteNight" (as duas à noite), "battleSaoPaulo" (samba-rock) e "battleRio" (funk 150), "battleBoss" (chefe: abertura
+   "funkSudesteNight" (as duas à noite), "battleSaoPaulo" (samba-jazz: a MPB acelerada) e "battleRio" (funk 150), "battleBoss" (chefe: abertura
    sombria, tambores de guerra e guitarra distorcida), "mapPara"/"mapParaNight" (mapa do Pará: guitarrada de dia e de noite);
    "battleP3/P4/P5" são as batalhas antigas (sem uso agora). Entrevista e trabalho seguem com as faixas antigas. */
 const MUS = (() => {
@@ -36,17 +36,406 @@ const MUS = (() => {
     const conv = X.createConvolver(); conv.buffer = buf; return conv;
   }
 
+  /* ===== som novo ("HD", MUS.hd): o mesmo arranjo de cada faixa, com instrumentos e mixagem de produção =====
+     Quando HD está ligado, os instrumentos de baixo (synth, kick, snare, hat, noiseHit, flute, ep, pad, berimbau,
+     atabaque, tapa) desviam para as versões daqui: corda por modelo físico (Karplus-Strong) no berimbau, pele com dois
+     modos no atabaque, flauta com sopro e vibrato que entra devagar, piano elétrico FM, lead analógico no lugar da onda
+     quadrada, baixo com grave e a bateria com batedor, corpo e esteira. Cada voz tem lugar no estéreo e envios de reverb
+     e eco (hdOut); a mixagem (build) ganha equalização, compressor de cola, saturação suave e limitador. As notas e os
+     ritmos não mudam: só o timbre e a mistura. */
+  // volume que nasce em zero: o som começa numa fração de amostra e, com o volume no máximo antes da nota, uma amostra
+  // escapava inteira (o estalo)
+  const gz = () => { const g = X.createGain(); g.gain.value = 0; return g; };
+  /* calibração: cada instrumento novo soa com o mesmo volume do antigo (medidos sozinhos, na mesma nota e na mesma força),
+     para o equilíbrio que os arranjos já têm continuar valendo */
+  const CAL = {bass: .56, sq: 1.2, lead: .84, flute: .55, ep: .28, pad: .7, bell: .77, kick: .31, snare: .19, noise: .41, berimbau: 3.9,
+    viola: 1.6, aco: .64, nylon: 1.05, tapa: .72, triangulo: 1.5, sanfona: .72, guitar: .77, brass: .34, choir: .76, toll: .4, agogo: .67};
+  let HD = false, S16 = false, SUAVE = false;   // S16: a variante "16 bits" (MUS.hd = "16"); SUAVE: a faixa pede som macio (suave: true, como a MPB)
+  function hdOut(node, pan = 0, rev = 0, del = 0) {
+    let o = node;
+    if (pan) { const p = X.createStereoPanner(); p.pan.value = pan; node.connect(p); o = p; }
+    o.connect(bus.mix);
+    if (rev && bus.rev) { const g = gz(); g.gain.value = rev; o.connect(g).connect(bus.rev); }
+    if (del && bus.dly) { const g = gz(); g.gain.value = S16 ? del * 1.6 : del; o.connect(g).connect(bus.dly); }
+  }
+  function hdEnv(g, when, a, vol, hold, rel) {
+    g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + a);
+    if (hold > a) g.gain.setValueAtTime(vol, when + hold);
+    g.gain.setTargetAtTime(0, when + Math.max(a, hold), rel / 3);
+  }
+  let HD_SAT = null;
+  const hdSatCurve = () => HD_SAT || (HD_SAT = (() => { const c = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const v = i / 511.5 - 1; c[i] = Math.tanh(v * 1.6) / Math.tanh(1.6); } return c; })());
+  // metal do chimbal: seis ondas quadradas desafinadas (como no 808) com um pouco de ruído
+  let HD_METAL = null;
+  function hdMetal() {
+    if (HD_METAL && HD_METAL.sampleRate === X.sampleRate) return HD_METAL;
+    const sr = X.sampleRate, b = X.createBuffer(1, Math.floor(sr * .5), sr), d = b.getChannelData(0), fs = [205.3, 304.4, 369.6, 522.7, 540, 800].map(f => f * 2.6);
+    for (let i = 0; i < d.length; i++) { let v = 0; for (const f of fs) v += Math.sign(Math.sin(2 * Math.PI * f * i / sr)); d[i] = v / 6 * .7 + (Math.random() * 2 - 1) * .3; }
+    return HD_METAL = b;
+  }
+  // corda por modelo físico (Karplus-Strong): um estalo de ruído que circula num atraso do tamanho da onda e vai
+  // perdendo o agudo a cada volta, como a corda de verdade; guardada por nota
+  const HD_KS = new Map();
+  function hdString(freq, sec = 1, damp = .996, bright = .5) {
+    const sr = X.sampleRate, key = sr + ":" + freq.toFixed(2) + ":" + sec + ":" + damp + ":" + bright;
+    if (HD_KS.has(key)) return HD_KS.get(key);
+    const n = Math.floor(sr * sec), b = X.createBuffer(1, n, sr), d = b.getChannelData(0), N = Math.max(2, Math.round(sr / freq));
+    let prev = 0; for (let i = 0; i < N; i++) { const r = Math.random() * 2 - 1; prev = prev + (r - prev) * bright; d[i] = prev; }   // estalo (mais ou menos brilhante)
+    for (let i = N; i < n; i++) d[i] = damp * .5 * (d[i - N] + d[i - N - 1 < 0 ? 0 : i - N - 1]);
+    HD_KS.set(key, b); return b;
+  }
+  /* ----- variante 16 bits (S16): o som dos consoles de 16 bits com mixagem de hoje -----
+     FM de dois operadores (como o chip do Mega Drive) no lead e no baixo: a moduladora brilha forte no ataque e vai
+     fechando, o que dá o "estalo" do baixo e o metal do lead; a caixa ganha reverb cortado; o eco vem no jeito do Super
+     Nintendo (retorno abafado e mais presente, ver buildHD) e os pads ficam mais escuros e lentos. */
+  function fmVoz(freq, when, dur, vol, o) {
+    const car = X.createOscillator(), mod = X.createOscillator(), idx = gz(), g = gz(), end = when + dur;
+    car.frequency.value = freq; car.detune.value = o.det || 0; mod.frequency.value = freq * o.ratio; mod.detune.value = o.det || 0;
+    idx.gain.setValueAtTime(freq * o.i0, when); idx.gain.setTargetAtTime(freq * o.i1, when + .004, o.tau);
+    mod.connect(idx).connect(car.frequency);
+    if (o.vib && dur > .35) {   // vibrato que entra devagar nas notas longas
+      const lfo = X.createOscillator(), dep = gz(); lfo.frequency.value = 5.4;
+      dep.gain.setValueAtTime(0, when); dep.gain.setValueAtTime(0, when + .15); dep.gain.linearRampToValueAtTime(freq * .005, when + Math.min(.6, dur * .7));
+      lfo.connect(dep); dep.connect(car.frequency); dep.connect(mod.frequency); lfo.start(when); lfo.stop(end + .4);
+    }
+    hdEnv(g, when, o.a || .004, vol, dur * (o.hold || .9), o.rel || .1);
+    car.connect(g); car.start(when); mod.start(when); car.stop(end + .5); mod.stop(end + .5);
+    return g;
+  }
+  // decai = nota do synth() do arranjo, que cai logo depois do ataque (sem isso, segura a nota inteira)
+  function s16Lead(freq, when, dur, vol, decai) {   // lead FM: duas vozes um pouco desafinadas, uma de cada lado
+    const env = decai ? {hold: .02, rel: dur * .35} : {};
+    for (const [det, pan] of [[-6, -.45], [6, .45]]) hdOut(fmVoz(freq, when, dur, vol * .95, {ratio: 1, i0: 2.2, i1: 1.1, tau: .12, det, vib: !decai, a: .006, ...env}), pan, .2, .32);
+  }
+  function s16Bass(freq, when, dur, vol, decai) {   // baixo FM com estalo, e um seno por baixo para o grave
+    const g = fmVoz(freq, when, dur, vol * .85, {ratio: 1, i0: 2.2, i1: .4, tau: .045, a: .002, hold: decai ? .02 : .85, rel: decai ? dur * .35 : .06}), sat = X.createWaveShaper();
+    sat.curve = hdSatCurve(); g.connect(sat); hdOut(sat);
+    const s = X.createOscillator(), gs = gz(); s.frequency.value = freq; hdEnv(gs, when, .003, vol * .35, decai ? dur * .02 : dur * .85, decai ? dur * .35 : .06);
+    s.connect(gs); hdOut(gs); s.start(when); s.stop(when + dur + .3);
+  }
+  /* flauta de verdade dentro do 16 bits (como as amostras do Super Nintendo): mais do que o timbre, o jeito de tocar.
+     Cada nota começa com o golpe de língua e sobe de leve até a altura (o sopro); notas seguidas e perto saem ligadas,
+     escorregando da anterior sem novo ataque; nas notas longas o vibrato entra aos poucos e o som cresce um pouco; nas
+     pausas entre frases, um respiro. Topo levemente abafado e o eco do SNES por cima. */
+  let FL_LAST = null;   // a nota anterior da flauta (para ligar e respirar)
+  function s16RealFlute(freq, when, dur, vol) {
+    const prev = FL_LAST && when >= FL_LAST.when ? FL_LAST : null, gap = prev ? when - prev.end : 9;
+    const liga = prev && gap < .045 && Math.abs(Math.log2(freq / prev.freq) * 12) <= 2.2;   // liga os passos pequenos; salto e começo de frase têm golpe de língua
+    FL_LAST = {when, end: when + dur, freq};
+    const end = when + dur, longa = dur > .4, body = gz(), f = X.createBiquadFilter(), snes = X.createBiquadFilter();
+    f.type = "lowpass"; f.frequency.value = Math.min(8000, freq * 8); snes.type = "lowpass"; snes.frequency.value = SUAVE ? 4200 : 6500; snes.Q.value = .5;
+    const pres = X.createBiquadFilter(); pres.type = "peaking"; pres.frequency.value = 2600; pres.Q.value = .9; pres.gain.value = SUAVE ? 0 : 4;   // presença: a melodia na frente
+    // volume: ataque (macio se ligada), cresce um pouco nas longas, solta devagar no fim
+    const v = vol * 2.05;
+    body.gain.setValueAtTime(liga ? v * .7 : 0, when); body.gain.linearRampToValueAtTime(v * (longa ? .85 : 1), when + (liga ? .02 : .045));
+    if (longa) body.gain.linearRampToValueAtTime(v * 1.05, when + dur * .85);
+    body.gain.setTargetAtTime(0, when + dur * .92, .06);
+    f.connect(pres).connect(snes).connect(body); hdOut(body, -.12, .2, .2);
+    // altura: escorrega da nota anterior (ligada) ou sobe de um pouco abaixo (golpe de língua); vibrato nas longas
+    const pitch = X.createConstantSource(); pitch.offset.value = 0;
+    if (liga) { pitch.offset.setValueAtTime((prev.freq - freq), when); pitch.offset.setTargetAtTime(0, when, .012); }
+    else { pitch.offset.setValueAtTime(-freq * .022, when); pitch.offset.setTargetAtTime(0, when + .005, .02); }
+    pitch.start(when); pitch.stop(end + .3);
+    let lfo = null;
+    if (longa) {
+      lfo = X.createOscillator(); const dep = gz(); lfo.frequency.value = 5 + Math.random() * .4;
+      dep.gain.setValueAtTime(0, when); dep.gain.setValueAtTime(0, when + .2); dep.gain.linearRampToValueAtTime(freq * .006, when + Math.min(.75, dur * .8));
+      lfo.connect(dep); lfo.start(when); lfo.stop(end + .3); lfo.dep = dep;
+    }
+    for (const [type, mul, k] of [["sine", 1, .78], ["triangle", 1, .22], ["sine", 2, .12], ["sine", 3, .04]]) {
+      const o = X.createOscillator(), og = gz(); o.type = type; o.frequency.value = freq * mul; og.gain.value = k;
+      const pm = gz(); pm.gain.value = mul; pitch.connect(pm).connect(o.frequency); if (lfo) lfo.dep.connect(pm);
+      o.connect(og).connect(f); o.start(when); o.stop(end + .3);
+    }
+    // sopro contínuo na altura da nota
+    const n = noiseSrc(), bp = X.createBiquadFilter(), gn = gz(); bp.type = "bandpass"; bp.frequency.value = Math.min(9000, freq * 2); bp.Q.value = 2;
+    gn.gain.setValueAtTime(0, when); gn.gain.linearRampToValueAtTime(vol * .26, when + .04); gn.gain.setTargetAtTime(0, when + dur * .9, .05);
+    n.connect(bp).connect(gn); hdOut(gn, -.12, .18); n.start(when); n.stop(end + .2);
+    if (!liga) {   // golpe de língua: um "t" curto de ar
+      const t = noiseSrc(), tb = X.createBiquadFilter(), tg = gz(); tb.type = "bandpass"; tb.frequency.value = Math.min(8000, freq * 3.5); tb.Q.value = 1.5;
+      tg.gain.setValueAtTime(vol * .55, when); tg.gain.setTargetAtTime(0, when + .003, .012); t.connect(tb).connect(tg); hdOut(tg, -.15, .15); t.start(when); t.stop(when + .08);
+    }
+    if (gap > .3 && gap < 9) {   // respiro antes de começar a frase
+      const r = noiseSrc(), rf = X.createBiquadFilter(), rg = gz(), t0 = Math.max(when - .22, prev ? prev.end + .02 : when - .22);
+      rf.type = "bandpass"; rf.frequency.value = 1400; rf.Q.value = .8;
+      rg.gain.setValueAtTime(0, t0); rg.gain.linearRampToValueAtTime(vol * .14, t0 + .12); rg.gain.linearRampToValueAtTime(0, when - .02);
+      r.connect(rf).connect(rg); hdOut(rg, -.15, .2); r.start(t0); r.stop(when);
+    }
+  }
+  function s16Snare(when, vol) {   // caixa com reverb cortado (o "gated reverb" da época)
+    hdSnare(when, vol * .9);
+    const n = noiseSrc(), bp = X.createBiquadFilter(), g = gz(); bp.type = "bandpass"; bp.frequency.value = 2400; bp.Q.value = .6;
+    g.gain.setValueAtTime(vol * .5, when); g.gain.setValueAtTime(vol * .4, when + .11); g.gain.linearRampToValueAtTime(0, when + .14);
+    n.connect(bp).connect(g); hdOut(g, 0, .3); n.start(when); n.stop(when + .2);
+  }
+
+  // lead analógico (no lugar da onda quadrada): duas serrilhadas abertas no estéreo, filtro que fecha um pouco depois do
+  // ataque, vibrato que entra devagar nas notas longas, com eco e sala
+  function hdLead(freq, when, dur, vol, cutoff = 2600, decai) {
+    if (S16) return s16Lead(freq, when, dur, vol, decai);
+    const f = X.createBiquadFilter(), g = gz(), end = when + dur, cut = Math.min(cutoff * 1.9, freq * 10);
+    f.type = "lowpass"; f.Q.value = .9; f.frequency.setValueAtTime(cut * 1.6, when); f.frequency.setTargetAtTime(cut, when + .02, .08);
+    hdEnv(g, when, .012, vol * 1.45, dur * .92, .14);
+    f.connect(g); hdOut(g, .08, .26, .14);
+    const lfo = X.createOscillator(), dep = gz(); lfo.frequency.value = 5.2;
+    dep.gain.setValueAtTime(0, when); if (dur > .35) dep.gain.linearRampToValueAtTime(freq * .004, when + Math.min(.6, dur * .7));
+    lfo.connect(dep); lfo.start(when); lfo.stop(end + .3);
+    for (const [det, pan, k] of [[-9, -.65, .62], [9, .65, .62], [0, 0, .3]]) {
+      const o = X.createOscillator(), og = gz(), p = X.createStereoPanner();
+      o.type = k < .5 ? "square" : "sawtooth"; o.frequency.value = freq; o.detune.value = det; og.gain.value = k; p.pan.value = pan;
+      dep.connect(o.frequency); o.connect(og).connect(p).connect(f); o.start(when); o.stop(end + .3);
+    }
+  }
+  // baixo: seno no grave (o que se sente) e serrilhada filtrada com saturação (o que se ouve em caixinha pequena)
+  function hdBass(freq, when, dur, vol, bright = 600, decai) {
+    if (S16) return s16Bass(freq, when, dur, vol, decai);
+    const g = gz(), s = X.createOscillator(), z = X.createOscillator(), f = X.createBiquadFilter(), gsz = gz(), sat = X.createWaveShaper();
+    s.type = "sine"; s.frequency.value = freq; z.type = "sawtooth"; z.frequency.value = freq; sat.curve = hdSatCurve();
+    f.type = "lowpass"; f.Q.value = 1.5; f.frequency.setValueAtTime(bright * 2.4, when); f.frequency.setTargetAtTime(bright, when + .005, .05);
+    gsz.gain.value = .9; hdEnv(g, when, .004, vol * .5, dur * .9, .07);
+    s.connect(g); z.connect(f).connect(gsz).connect(g); g.connect(sat); hdOut(sat);
+    s.start(when); z.start(when); s.stop(when + dur + .3); z.stop(when + dur + .3);
+  }
+  function hdSynth(type, freq, when, dur, vol, cutoff) {
+    if ((type === "triangle" || type === "sawtooth") && freq < 260 && dur > .09) return hdBass(freq, when, dur, vol * CAL.bass, type === "sawtooth" ? Math.min(cutoff || 900, 900) : 520, true), true;
+    if (type === "square" || (type === "sawtooth" && freq >= 260)) return hdLead(freq, when, dur, (type === "sawtooth" ? vol * .8 : vol) * CAL.sq, cutoff || 2600, true), true;
+    return false;
+  }
+  function hdKick(when, vol) {
+    const o = X.createOscillator(), g = gz(), sat = X.createWaveShaper(); sat.curve = hdSatCurve();
+    o.frequency.setValueAtTime(150, when); o.frequency.exponentialRampToValueAtTime(54, when + .05); o.frequency.exponentialRampToValueAtTime(44, when + .3);
+    g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol * .8, when + .002); g.gain.setValueAtTime(vol * .8, when + .03); g.gain.setTargetAtTime(0, when + .03, .085);
+    o.connect(g).connect(sat); hdOut(sat); o.start(when); o.stop(when + .55);
+    const n = noiseSrc(), hp = X.createBiquadFilter(), gn = gz(); hp.type = "highpass"; hp.frequency.value = 3000;   // batedor
+    gn.gain.setValueAtTime(vol * .45, when); gn.gain.exponentialRampToValueAtTime(.0001, when + .012); n.connect(hp).connect(gn); hdOut(gn); n.start(when); n.stop(when + .02);
+  }
+  function hdSnare(when, vol) {
+    for (const [fq, k] of [[185, .55], [330, .3]]) {   // corpo (dois modos da pele)
+      const o = X.createOscillator(), g = gz(); o.type = "triangle";
+      o.frequency.setValueAtTime(fq * 1.08, when); o.frequency.exponentialRampToValueAtTime(fq, when + .03);
+      g.gain.setValueAtTime(vol * k, when); g.gain.setTargetAtTime(0, when + .005, .03); o.connect(g); hdOut(g, 0, .14); o.start(when); o.stop(when + .2);
+    }
+    const n = noiseSrc(), hp = X.createBiquadFilter(), pk = X.createBiquadFilter(), g = gz();   // esteira
+    hp.type = "highpass"; hp.frequency.value = 1100; pk.type = "peaking"; pk.frequency.value = 5200; pk.gain.value = 1;
+    g.gain.setValueAtTime(vol * 1.25, when); g.gain.setTargetAtTime(0, when + .004, .055);
+    n.connect(hp).connect(pk).connect(g); hdOut(g, 0, .18); n.start(when); n.stop(when + .35);
+  }
+  function hdHat(when, vol, open) {
+    const s = X.createBufferSource(), hp = X.createBiquadFilter(), g = gz();
+    s.buffer = hdMetal(); hp.type = "highpass"; hp.frequency.value = 7400;
+    g.gain.setValueAtTime(vol * 2.6, when); g.gain.setTargetAtTime(0, when + .002, open ? .045 : .014);
+    s.connect(hp).connect(g); hdOut(g, .45, open ? .1 : 0); s.start(when, Math.random() * .3); s.stop(when + (open ? .4 : .1));
+  }
+  // percussão de ruído (pandeiro, caxixi, chiado, chocalhos): cada faixa de agudo num lugar do estéreo
+  function hdNoise(when, dur, vol, type, freq, q) {
+    const n = noiseSrc(), f = X.createBiquadFilter(), g = gz();
+    f.type = type; f.frequency.value = freq; f.Q.value = q;
+    g.gain.value = 0; g.gain.setValueAtTime(vol * 2.4, when); g.gain.setTargetAtTime(0, when + .002, dur / 3.2);
+    n.connect(f).connect(g); hdOut(g, freq >= 6000 ? .55 : freq >= 4000 ? -.5 : freq >= 2000 ? .3 : -.2, .08);
+    n.start(when); n.stop(when + dur * 1.6 + .03);
+  }
+  // flauta: corpo em seno com um pouco de triângulo, sopro contínuo na altura da nota, chiado no ataque e vibrato
+  // que entra devagar
+  function hdFlute(freq, when, dur, vol) {
+    const g = gz(), f = X.createBiquadFilter(), end = when + dur;
+    f.type = "lowpass"; f.frequency.value = Math.min(9000, freq * 8);
+    hdEnv(g, when, .06, vol * 1.55, dur * .9, .16);
+    f.connect(g); hdOut(g, -.15, .34, .14);
+    const lfo = X.createOscillator(), dep = gz(); lfo.frequency.value = 5;
+    dep.gain.setValueAtTime(0, when); if (dur > .3) { dep.gain.setValueAtTime(0, when + .18); dep.gain.linearRampToValueAtTime(freq * .006, when + Math.min(.7, dur * .8)); }
+    lfo.connect(dep); lfo.start(when); lfo.stop(end + .4);
+    for (const [type, mul, k] of [["sine", 1, .8], ["triangle", 1, .32], ["sine", 2, .08]]) {
+      const o = X.createOscillator(), og = gz(); o.type = type; o.frequency.value = freq * mul; og.gain.value = k;
+      dep.connect(o.frequency); o.connect(og).connect(f); o.start(when); o.stop(end + .4);
+    }
+    const n = noiseSrc(), bp = X.createBiquadFilter(), gn = gz();   // sopro
+    bp.type = "bandpass"; bp.frequency.value = Math.min(9000, freq * 2); bp.Q.value = 2.2;
+    hdEnv(gn, when, .03, vol * .22, dur * .85, .1); n.connect(bp).connect(gn); hdOut(gn, -.15, .3); n.start(when); n.stop(end + .3);
+    const c = noiseSrc(), cb = X.createBiquadFilter(), cg = gz();   // chiado do ataque
+    cb.type = "bandpass"; cb.frequency.value = Math.min(10000, freq * 4); cb.Q.value = 3;
+    cg.gain.setValueAtTime(vol * .5, when); cg.gain.setTargetAtTime(0, when + .005, .02); c.connect(cb).connect(cg); hdOut(cg, -.1, .2); c.start(when); c.stop(when + .1);
+  }
+  // piano elétrico (FM, como um Rhodes): a modulação forte no ataque dá o "tine" e vai amaciando; solta mais comprido
+  function hdEp(freq, when, dur, vol) {
+    const car = X.createOscillator(), mod = X.createOscillator(), idx = gz(), g = gz(), len = Math.max(dur, .25) + .5;
+    car.frequency.value = freq; mod.frequency.value = freq; idx.gain.setValueAtTime(freq * (SUAVE ? .65 : 1.6), when); idx.gain.setTargetAtTime(freq * (SUAVE ? .08 : .15), when + .005, .12);
+    mod.connect(idx).connect(car.frequency); car.connect(g);
+    g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol * 2.1, when + .003); g.gain.setTargetAtTime(vol * .9, when + .01, .15); g.gain.setTargetAtTime(0, when + Math.max(dur, .2), .18);
+    hdOut(g, Math.max(-.6, Math.min(.6, Math.log2(freq / 440) * .5)), .22);
+    car.start(when); mod.start(when); car.stop(when + len + .5); mod.stop(when + len + .5);
+  }
+  // pad: serrilhadas macias abertas no estéreo, com o filtro respirando devagar
+  function hdPad(notes, when, dur, vol) {
+    const f = X.createBiquadFilter(), g = gz(), lfo = X.createOscillator(), dep = gz(), pE = X.createStereoPanner(), pD = X.createStereoPanner();
+    f.type = "lowpass"; f.frequency.value = S16 ? 620 : 850; f.Q.value = .4; lfo.frequency.value = .18; dep.gain.value = S16 ? 180 : 260; lfo.connect(dep).connect(f.frequency);
+    g.gain.setValueAtTime(.0001, when); g.gain.exponentialRampToValueAtTime(vol * (S16 ? 1.8 : 1.5), when + (S16 ? 1.8 : 1.2));
+    g.gain.setValueAtTime(vol * 1.5, when + dur - .4); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .9);
+    pE.pan.value = -.85; pD.pan.value = .85; pE.connect(f); pD.connect(f); f.connect(g); hdOut(g, 0, .45);
+    for (const m of notes.slice(0, 3)) for (const det of [-9, 9]) { const o = X.createOscillator(); o.type = "sawtooth"; o.frequency.value = mtof(m); o.detune.value = det; o.connect(det < 0 ? pE : pD); o.start(when); o.stop(when + dur + 1); }
+    lfo.start(when); lfo.stop(when + dur + 1);
+  }
+  // berimbau: a corda de aço por modelo físico, com a cabaça abrindo e fechando (o "uóng") e um pouco do som direto
+  function hdBerimbau(m, when, vol) {
+    const fr = mtof(m), s = X.createBufferSource(), f = X.createBiquadFilter(), g = gz(), dry = gz();
+    s.buffer = hdString(fr, .9, .9965, .4); s.playbackRate.setValueAtTime(1.025, when); s.playbackRate.exponentialRampToValueAtTime(1, when + .05);
+    f.type = "bandpass"; f.Q.value = 5; f.frequency.setValueAtTime(fr * 2, when); f.frequency.exponentialRampToValueAtTime(fr * 7, when + .12); f.frequency.exponentialRampToValueAtTime(fr * 2.5, when + .45);
+    const hp = X.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = fr * .9;   // a cabaça não deixa o grave da corda inteiro
+    g.gain.setValueAtTime(vol * 1.9, when); g.gain.setTargetAtTime(0, when + .25, .14); dry.gain.value = .05;
+    s.connect(f).connect(g); s.connect(hp).connect(dry).connect(g); hdOut(g, -.42, .16); s.start(when); s.stop(when + .9);
+  }
+  // atabaque: pele com dois modos (o segundo some antes) e o tapa da mão
+  function hdAtabaque(when, vol, high) {
+    const f0 = high ? 230 : 150, pan = high ? .38 : -.22;
+    for (const [mul, k, tau] of [[1, 1, .09], [1.59, .35, .04]]) {
+      const o = X.createOscillator(), g = gz(); o.frequency.setValueAtTime(f0 * mul * 1.12, when); o.frequency.exponentialRampToValueAtTime(f0 * mul * .62, when + .2);
+      g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol * k * (mul > 1 ? 1.6 : .8), when + .002); g.gain.setTargetAtTime(0, when + .004, tau);
+      o.connect(g); hdOut(g, pan, .1); o.start(when); o.stop(when + .45);
+    }
+    const n = noiseSrc(), bp = X.createBiquadFilter(), gn = gz(); bp.type = "bandpass"; bp.frequency.value = high ? 1400 : 900; bp.Q.value = 1.2;
+    gn.gain.setValueAtTime(vol * .6, when); gn.gain.setTargetAtTime(0, when + .002, .012); n.connect(bp).connect(gn); hdOut(gn, pan, .08); n.start(when); n.stop(when + .06);
+  }
+  function hdTapa(when, vol) {
+    const n = noiseSrc(), bp = X.createBiquadFilter(), g = gz(); bp.type = "bandpass"; bp.frequency.value = 1150; bp.Q.value = 1.1;
+    g.gain.setValueAtTime(vol * 1.2, when); g.gain.setTargetAtTime(0, when + .002, .018); n.connect(bp).connect(g); hdOut(g, .48, .16); n.start(when); n.stop(when + .1);
+    const o = X.createOscillator(), go = gz(); o.frequency.setValueAtTime(380, when); o.frequency.exponentialRampToValueAtTime(300, when + .03);
+    go.gain.setValueAtTime(vol * .7, when); go.gain.setTargetAtTime(0, when + .002, .02); o.connect(go); hdOut(go, .48, .1); o.start(when); o.stop(when + .12);
+  }
+  // sala do som novo: reflexões curtas no começo e uma cauda que vai ficando mais escura
+  function makeRoom(sec = 2.4) {
+    const sr = X.sampleRate, len = Math.floor(sr * sec), buf = X.createBuffer(2, len, sr);
+    for (let c = 0; c < 2; c++) {
+      const d = buf.getChannelData(c); let lp = 0;
+      for (const [ms, k] of [[11, .5], [19, .38], [27, .3], [41, .24], [53, .2]]) d[Math.floor(sr * (ms + c * 3) / 1000)] += k * (c ? -1 : 1);
+      for (let i = Math.floor(sr * .02); i < len; i++) { const u = i / len, a = .55 - .45 * u; lp += ((Math.random() * 2 - 1) - lp) * a; d[i] += lp * Math.pow(1 - u, 2.6) * .7; }
+    }
+    const conv = X.createConvolver(); conv.buffer = buf; return conv;
+  }  /* ----- o resto dos instrumentos no som novo ----- */
+  // sanfona: três palhetas por nota (uma afinada e duas um pouco para cima e para baixo: o tremido da "musette"),
+  // timbre anasalado de palheta, o fole entrando macio e as notas longas inchando um pouco
+  function hdSanfona(freq, when, dur, vol) {
+    const f = X.createBiquadFilter(), nas = X.createBiquadFilter(), g = gz(), end = when + dur, pE = X.createStereoPanner(), pD = X.createStereoPanner();
+    f.type = "lowpass"; f.frequency.value = Math.min(5200, freq * 7); f.Q.value = .6;
+    nas.type = "peaking"; nas.frequency.value = 1250; nas.Q.value = 1.1; nas.gain.value = 4;
+    g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol * .95, when + .035);
+    if (dur > .4) g.gain.linearRampToValueAtTime(vol * 1.1, when + dur * .8); else g.gain.setValueAtTime(vol * .95, when + Math.max(.04, dur - .05));
+    g.gain.setTargetAtTime(0, when + Math.max(.04, dur - .03), .035);
+    pE.pan.value = -.3; pD.pan.value = .3; pE.connect(f); pD.connect(f); f.connect(nas).connect(g); hdOut(g, .05, .18, .08);
+    for (const [det, dest, k] of [[0, null, .5], [-11, pE, .42], [11, pD, .42]]) {
+      const o = X.createOscillator(), sq = X.createOscillator(), og = gz(), sg = gz();
+      o.type = "sawtooth"; o.frequency.value = freq; o.detune.value = det; og.gain.value = k;
+      sq.type = "square"; sq.frequency.value = freq; sq.detune.value = det; sg.gain.value = k * .35;
+      const to = dest || f; o.connect(og).connect(to); sq.connect(sg).connect(to);
+      o.start(when); sq.start(when); o.stop(end + .2); sq.stop(end + .2);
+    }
+  }
+  // corda beliscada por modelo físico: a nota sai de hdString e o tempo de soar vem do quanto a corda segura (damp)
+  function hdPluck(freq, when, dur, vol, o) {
+    const s = X.createBufferSource(), g = gz(), len = Math.min(o.max || 1.4, dur + .4);
+    s.buffer = hdString(freq, o.sec || 1.6, o.damp, o.bright);
+    if (o.vib) {   // vibrato na corda (a guitarrada): mexe a velocidade da leitura
+      const lfo = X.createOscillator(), dep = gz(); lfo.frequency.value = 5.5;
+      dep.gain.setValueAtTime(0, when); dep.gain.linearRampToValueAtTime(.007, when + .3); lfo.connect(dep).connect(s.playbackRate); lfo.start(when); lfo.stop(when + len + .1);
+    }
+    g.gain.setValueAtTime(vol, when); g.gain.setValueAtTime(vol, when + len - .12); g.gain.linearRampToValueAtTime(0, when + len);
+    let out = s;
+    if (o.lp) {   // filtro de topo; com lpTo ele fecha logo depois do toque (a polpa do dedo no náilon)
+      const f = X.createBiquadFilter(); f.type = "lowpass"; f.frequency.setValueAtTime(o.lp, when);
+      if (o.lpTo) f.frequency.setTargetAtTime(o.lpTo, when + .01, .1);
+      s.connect(f); out = f;
+    }
+    if (o.body) { const b = X.createBiquadFilter(); b.type = "peaking"; b.frequency.value = o.body; b.Q.value = 1; b.gain.value = 4; out.connect(b); out = b; }
+    if (o.drive) { const w = X.createWaveShaper(), c = new Float32Array(512); for (let i = 0; i < 512; i++) { const x = i / 255.5 - 1; c[i] = Math.tanh(x * o.drive) / Math.tanh(o.drive); } w.curve = c; out.connect(w); out = w; }
+    out.connect(g); hdOut(g, o.pan || 0, o.rev ?? .16, o.del || 0);
+    s.start(when); s.stop(when + len + .05);
+    if (o.pick) { const n = noiseSrc(), hp = X.createBiquadFilter(), gn = gz(); hp.type = "highpass"; hp.frequency.value = 4500;   // a palheta/unha na corda
+      gn.gain.setValueAtTime(vol * o.pick, when); gn.gain.setTargetAtTime(0, when + .001, .004); n.connect(hp).connect(gn); hdOut(gn, o.pan || 0); n.start(when); n.stop(when + .03); }
+  }
+  // viola caipira: cada par de cordas de aço com a nota e a oitava, um pouco desafinadas (o brilho que "chora")
+  function hdViola(freq, when, dur, vol) {
+    if (freq < 165) return hdPluck(freq, when, dur, vol * 2, {damp: .997, bright: .3, max: 1.3, lp: 1500, body: 180, pick: .05, pan: .15, rev: .12});   // o polegar no baixo: uma corda só, encorpada
+    hdPluck(freq, when, dur, vol * 1.5, {damp: .9965, bright: .38, max: 1.3, lp: 2900, body: 1900, pick: .12, pan: .28, rev: .18});
+    hdPluck(freq * 2 * 1.003, when + .004, dur, vol * .6, {damp: .995, bright: .38, max: 1, lp: 3400, pan: .38, rev: .18});
+  }
+  // violão: de aço (brilhante, com palheta) ou de náilon (macio, abafado)
+  function hdViolao(freq, when, dur, vol, aco) {
+    if (aco) hdPluck(freq, when, dur, vol * 1.6, {damp: .9955, bright: .2, max: 1.1, lp: 1800, body: 1200, pan: -.22, rev: .15});
+    else hdPluck(freq, when, dur, vol * 1.7, {damp: .9945, bright: .14, max: 1.5, lp: Math.min(1600, freq * 6), lpTo: Math.max(260, freq * 2.6), body: 700, pan: -.22, rev: .18});
+  }
+  // guitarra da guitarrada: corda que segura mais, um pouco de saturação, vibrato depois do ataque e eco
+  function hdGuitar(freq, when, dur, vol, bright = 2600) {
+    hdPluck(freq, when, dur, vol * 1.7, {damp: .9982, bright: .8, max: 1.8, sec: 2, lp: Math.max(2400, bright * 1.2), drive: 1.8, vib: dur > .3, pan: .2, rev: .2, del: .22, pick: .25});
+  }
+  // metais em FM (como os naipes do Mega Drive): o brilho cresce no ataque, como quem sopra forte, e assenta
+  function hdBrass(notes, when, dur, vol) {
+    for (const m of notes) for (const [det, pan] of [[-7, -.4], [7, .4]]) {
+      const fq = mtof(m), car = X.createOscillator(), mod = X.createOscillator(), idx = gz(), g = gz();
+      car.frequency.value = fq; car.detune.value = det; mod.frequency.value = fq; mod.detune.value = det;
+      idx.gain.setValueAtTime(fq * .5, when); idx.gain.linearRampToValueAtTime(fq * 4.2, when + .06); idx.gain.setTargetAtTime(fq * 2.6, when + .06, .15);
+      mod.connect(idx).connect(car.frequency); car.connect(g);
+      hdEnv(g, when, .03, vol * 1.2 / Math.sqrt(notes.length), dur * .85, .12); hdOut(g, pan, .22, .08);
+      car.start(when); mod.start(when); car.stop(when + dur + .5); mod.stop(when + dur + .5);
+    }
+  }
+  // guitarra distorcida do chefe: duas gravações (uma de cada lado), saturação pesada e a caixa do amplificador
+  function hdDist(freq, when, dur, vol, cutoff = 1600) {
+    for (const [det, pan] of [[-8, -.55], [8, .55]]) {
+      const ws = X.createWaveShaper(), cab = X.createBiquadFilter(), mid = X.createBiquadFilter(), g = gz();
+      ws.curve = distCurve(); cab.type = "lowpass"; cab.frequency.value = Math.max(2200, cutoff * 1.5); mid.type = "peaking"; mid.frequency.value = 900; mid.gain.value = 4;
+      g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol * .8, when + .005); g.gain.setValueAtTime(vol * .8, when + dur * .75); g.gain.setTargetAtTime(0, when + dur * .75, .04);
+      for (const [type, mul] of [["sawtooth", 1], ["sawtooth", .5]]) { const o = X.createOscillator(); o.type = type; o.frequency.value = freq * mul; o.detune.value = det; o.connect(ws); o.start(when); o.stop(when + dur + .3); }
+      ws.connect(cab).connect(mid).connect(g); hdOut(g, pan, .12);
+    }
+  }
+  // coro: serrilhadas por duas formantes de vogal ("aah"), entrando devagar, com um leve vibrato
+  function hdChoir(notes, when, dur, vol) {
+    const f1 = X.createBiquadFilter(), f2 = X.createBiquadFilter(), g = gz(), lfo = X.createOscillator(), dep = gz(), pE = X.createStereoPanner(), pD = X.createStereoPanner();
+    f1.type = "bandpass"; f1.frequency.value = 720; f1.Q.value = 2.4; f2.type = "bandpass"; f2.frequency.value = 1150; f2.Q.value = 3;
+    g.gain.setValueAtTime(.0001, when); g.gain.exponentialRampToValueAtTime(vol * 2.4, when + .6); g.gain.setValueAtTime(vol * 2.4, when + dur - .3); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .8);
+    pE.pan.value = -.6; pD.pan.value = .6; [pE, pD].forEach(p => { p.connect(f1); p.connect(f2); }); f1.connect(g); f2.connect(g); hdOut(g, 0, .5);
+    lfo.frequency.value = 4.6; dep.gain.value = 5; lfo.connect(dep); lfo.start(when); lfo.stop(when + dur + 1);
+    for (const m of notes) for (const det of [-10, 0, 10]) { const o = X.createOscillator(); o.type = "sawtooth"; o.frequency.value = mtof(m); o.detune.value = det; dep.connect(o.detune); o.connect(det < 0 ? pE : det > 0 ? pD : (m % 2 ? pE : pD)); o.start(when); o.stop(when + dur + 1); }
+  }
+  // sino em FM: moduladora em razão não inteira (o metal) com o brilho caindo devagar
+  function hdBellFM(freq, when, vol, dur, ratio = 3.5, pan = .3) {
+    const car = X.createOscillator(), mod = X.createOscillator(), idx = gz(), g = gz();
+    car.frequency.value = freq; mod.frequency.value = freq * ratio; idx.gain.setValueAtTime(freq * (SUAVE ? .8 : 2), when); idx.gain.setTargetAtTime(freq * .2, when + .005, dur * .25);
+    mod.connect(idx).connect(car.frequency); car.connect(g);
+    g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol * 1.3, when + .003); g.gain.setTargetAtTime(0, when + .01, dur * .35);
+    hdOut(g, pan, .32, .15); car.start(when); mod.start(when); car.stop(when + dur + .5); mod.stop(when + dur + .5);
+  }
+  // surdo: pele grande (dois modos) e a batida abafada
+  function hdSurdo(when, vol) {
+    for (const [mul, k, tau] of [[1, 1, .16], [1.52, .3, .06]]) {
+      const o = X.createOscillator(), g = gz(); o.frequency.setValueAtTime(100 * mul, when); o.frequency.exponentialRampToValueAtTime(50 * mul, when + .3);
+      g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol * k * .95, when + .003); g.gain.setTargetAtTime(0, when + .005, tau);
+      o.connect(g); hdOut(g, -.1, .12); o.start(when); o.stop(when + .7);
+    }
+    const n = noiseSrc(), lp = X.createBiquadFilter(), gn = gz(); lp.type = "lowpass"; lp.frequency.value = 600;
+    gn.gain.setValueAtTime(vol * .3, when); gn.gain.setTargetAtTime(0, when + .002, .015); n.connect(lp).connect(gn); hdOut(gn, -.1); n.start(when); n.stop(when + .06);
+  }
+  // 808 do funk: o grave que cai, com saturação e no centro
+  function hdBumbo808(freq, when, dur, vol) {
+    const o = X.createOscillator(), g = gz(), sat = X.createWaveShaper(); sat.curve = hdSatCurve();
+    o.frequency.setValueAtTime(freq * 3, when); o.frequency.exponentialRampToValueAtTime(freq, when + .05);
+    g.gain.setValueAtTime(vol * .9, when); g.gain.setValueAtTime(vol * .75, when + dur * .5); g.gain.setTargetAtTime(0, when + dur * .5, dur * .18);
+    o.connect(sat).connect(g); hdOut(g); o.start(when); o.stop(when + dur + .3);
+  }
+
+
   /* ----- instrumentos ----- */
   function synth(type, freq, when, dur, vol, cutoff) {
+    if (HD && hdSynth(type, freq, when, dur, vol, cutoff)) return;
     const o = X.createOscillator(), g = X.createGain();
     o.type = type; o.frequency.value = freq;
     g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .005); g.gain.exponentialRampToValueAtTime(.0001, when + dur);
     if (cutoff) { const f = X.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = cutoff; o.connect(f).connect(g); } else o.connect(g);
-    g.connect(bus.mix); o.start(when); o.stop(when + dur + .02);
+    if (HD) hdOut(g, type === "sine" ? .15 : 0, type === "sine" ? .25 : .1); else g.connect(bus.mix);
+    o.start(when); o.stop(when + dur + .02);
   }
-  function bell(freq, when, vol, dur = 1.6) { synth("sine", freq, when, dur, vol); synth("sine", freq * 2.003, when, dur * .5, vol * .25); }
-  function ep(freq, when, dur, vol) { synth("sine", freq, when, dur, vol); synth("triangle", freq * 2, when, dur * .25, vol * .3); }
+  function bell(freq, when, vol, dur = 1.6) { if (HD) return hdBellFM(freq, when, vol * CAL.bell, dur, 3.5, .3); synth("sine", freq, when, dur, vol); synth("sine", freq * 2.003, when, dur * .5, vol * .25); }
+  function ep(freq, when, dur, vol) { if (HD) return hdEp(freq, when, dur, vol * CAL.ep); synth("sine", freq, when, dur, vol); synth("triangle", freq * 2, when, dur * .25, vol * .3); }
   function pad(notes, when, dur, vol = .012) {
+    if (HD) return hdPad(notes, when, dur, vol * CAL.pad);
     const f = X.createBiquadFilter(), g = X.createGain();
     f.type = "lowpass"; f.frequency.value = 900;
     g.gain.setValueAtTime(.0001, when); g.gain.exponentialRampToValueAtTime(vol, when + 1.2);
@@ -58,22 +447,25 @@ const MUS = (() => {
     }
   }
   function noiseHit(when, dur, vol, type, freq, q = .7) {
+    if (HD) return hdNoise(when, dur, vol * CAL.noise, type, freq, q);
     const n = noiseSrc(), f = X.createBiquadFilter(), g = X.createGain();
     f.type = type; f.frequency.value = freq; f.Q.value = q;
     g.gain.value = 0; g.gain.setValueAtTime(vol, when); g.gain.exponentialRampToValueAtTime(.0001, when + dur);
     n.connect(f).connect(g).connect(bus.mix); n.start(when); n.stop(when + dur + .02);
   }
   function kick(when, vol) {
+    if (HD) return hdKick(when, vol * CAL.kick);
     const o = X.createOscillator(), g = X.createGain();
     o.frequency.setValueAtTime(120, when); o.frequency.exponentialRampToValueAtTime(42, when + .12);
     g.gain.value = 0; g.gain.setValueAtTime(vol, when); g.gain.exponentialRampToValueAtTime(.0001, when + .22);
     o.connect(g).connect(bus.mix); o.start(when); o.stop(when + .25);
   }
-  const snare = (when, vol) => { noiseHit(when, .13, vol, "bandpass", 1800); synth("triangle", 190, when, .08, vol * .5); };
-  const hat = (when, vol, open) => noiseHit(when, open ? .12 : .03, vol, "highpass", 7000);
+  const snare = (when, vol) => { if (HD) return S16 ? s16Snare(when, vol * CAL.snare) : hdSnare(when, vol * CAL.snare); noiseHit(when, .13, vol, "bandpass", 1800); synth("triangle", 190, when, .08, vol * .5); };
+  const hat = (when, vol, open) => HD ? hdHat(when, vol, open) : noiseHit(when, open ? .12 : .03, vol, "highpass", 7000);
   // sanfona: duas palhetas um pouco desafinadas entre si (o "musette" que faz o som tremer), timbre de palheta filtrado
   // e o fole entrando macio
   function sanfona(freq, when, dur, vol) {
+    if (HD) return hdSanfona(freq, when, dur, vol * CAL.sanfona);
     const f = X.createBiquadFilter(), g = X.createGain();
     f.type = "lowpass"; f.frequency.value = Math.min(4200, freq * 6); f.Q.value = .8;
     g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .03);
@@ -87,6 +479,7 @@ const MUS = (() => {
   // viola caipira (sertanejo de raiz): cinco pares de cordas de aço beliscados, cada par com a nota e a oitava (um
   // pouquinho desafinadas, o que dá o brilho que "chora"), ataque metálico e o som fechando devagar
   function viola(freq, when, dur, vol) {
+    if (HD) return hdViola(freq, when, dur, vol * CAL.viola);
     const f = X.createBiquadFilter(), g = X.createGain(), end = when + Math.min(dur, 1.2);
     f.type = "lowpass"; f.frequency.setValueAtTime(Math.min(7000, freq * 9), when); f.frequency.exponentialRampToValueAtTime(Math.min(2200, freq * 3), when + .35); f.Q.value = 1.2;
     g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .002); g.gain.exponentialRampToValueAtTime(vol * .35, when + .12); g.gain.exponentialRampToValueAtTime(.0001, end + .15);
@@ -99,11 +492,13 @@ const MUS = (() => {
   function reco(when, vol) { for (let k = 0; k < 4; k++) noiseHit(when + k * .018, .014, vol, "bandpass", 2400, 4); }
   // triângulo: ferro tocado (parciais inarmônicos); aberto soa, fechado (mão abafando) é só um tic
   function triangulo(when, vol, open) {
+    if (HD) vol *= CAL.triangulo;
     for (const [fq, k] of [[2600, 1], [4180, .5], [5930, .3]]) synth("sine", fq, when, open ? .4 : .05, vol * k);
   }
   // violão: corda beliscada que fecha rápido; aco = de aço (o do sertanejo, brilhante, com a palheta), senão de náilon
   // (o da MPB e da bossa, macio). strum = o acorde batido, corda por corda (para cima, up, começa pelas agudas)
   function violao(freq, when, dur, vol, aco) {
+    if (HD) return hdViolao(freq, when, dur, vol * (aco ? CAL.aco : CAL.nylon), aco);
     const f = X.createBiquadFilter(), g = X.createGain(), end = when + Math.min(dur, aco ? 1 : 1.4);
     f.type = "lowpass"; f.frequency.setValueAtTime(Math.min(aco ? 6500 : 3200, freq * (aco ? 8 : 5)), when); f.frequency.exponentialRampToValueAtTime(Math.min(1800, freq * 2.5), when + .25);
     g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .003); g.gain.exponentialRampToValueAtTime(vol * .4, when + .1); g.gain.exponentialRampToValueAtTime(.0001, end + .1);
@@ -116,6 +511,7 @@ const MUS = (() => {
   function strum(notes, when, dur, vol, up, aco) { (up ? [...notes].reverse() : notes).forEach((m, k) => violao(mtof(m), when + k * .011, dur, vol * (1 - k * .08), aco)); }
   // funk carioca: o grave do 808 (cai do agudo para a nota e fica soando) e a palma
   function bumbo808(freq, when, dur, vol) {
+    if (HD) return hdBumbo808(freq, when, dur, vol);
     const o = X.createOscillator(), g = X.createGain(), sat = X.createWaveShaper(), cv = new Float32Array(256);
     for (let k = 0; k < 256; k++) { const v = k / 128 - 1; cv[k] = Math.tanh(v * 2.2); }
     sat.curve = cv; o.type = "sine"; o.frequency.setValueAtTime(freq * 3, when); o.frequency.exponentialRampToValueAtTime(freq, when + .05);
@@ -124,6 +520,7 @@ const MUS = (() => {
   }
   function palma(when, vol) { for (let k = 0; k < 3; k++) noiseHit(when + k * .009, k < 2 ? .01 : .09, vol, "bandpass", 1400, 1.2); }
   function flute(freq, when, dur, vol) {
+    if (HD) return S16 ? s16RealFlute(freq, when, dur, vol * CAL.flute) : hdFlute(freq, when, dur, vol * CAL.flute);
     const o = X.createOscillator(), g = X.createGain(), lfo = X.createOscillator(), depth = X.createGain();
     o.type = "triangle"; o.frequency.value = freq; lfo.frequency.value = 5; depth.gain.value = freq * .005;
     lfo.connect(depth).connect(o.frequency);
@@ -134,6 +531,7 @@ const MUS = (() => {
     noiseHit(when, .09, vol * .25, "bandpass", Math.min(9000, freq * 3), 2);
   }
   function lead(freq, when, dur, vol) {
+    if (HD) return hdLead(freq, when, dur, vol * CAL.lead, 2200);
     const o = X.createOscillator(), f = X.createBiquadFilter(), g = X.createGain(), lfo = X.createOscillator(), depth = X.createGain();
     o.type = "square"; o.frequency.value = freq; f.type = "lowpass"; f.frequency.value = 2200;
     lfo.frequency.value = 6; depth.gain.value = freq * .004; lfo.connect(depth).connect(o.frequency);
@@ -145,18 +543,19 @@ const MUS = (() => {
     const n = noiseSrc(), f = X.createBiquadFilter(), g = X.createGain();
     f.type = "bandpass"; f.Q.value = 1.5; f.frequency.setValueAtTime(300, when); f.frequency.exponentialRampToValueAtTime(6000, when + dur);
     g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + dur - .02); g.gain.linearRampToValueAtTime(0, when + dur);
-    n.connect(f).connect(g).connect(bus.mix); n.start(when); n.stop(when + dur + .02);
+    n.connect(f).connect(g); if (HD) hdOut(g, 0, .3); else g.connect(bus.mix); n.start(when); n.stop(when + dur + .02);
   }
   function clap(when) { noiseHit(when, .05, .025, "bandpass", 1200); noiseHit(when + .012, .09, .03, "bandpass", 1200); }
   function drop(when) {
     const o = X.createOscillator(), g = X.createGain(), f0 = 600 + Math.random() * 500;
     o.frequency.setValueAtTime(f0, when); o.frequency.exponentialRampToValueAtTime(f0 * 2.5, when + .05);
     g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(.015, when + .006); g.gain.exponentialRampToValueAtTime(.0001, when + .08);
-    o.connect(g).connect(bus.mix); o.start(when); o.stop(when + .1);
+    o.connect(g); if (HD) hdOut(g, .35, .2, .2); else g.connect(bus.mix); o.start(when); o.stop(when + .1);
   }
   // instrumentos da mata
   // berimbau: corda com "uóng" da cabaça abrindo e fechando (filtro passa-banda que sobe e desce)
   function berimbau(m, when, vol) {
+    if (HD) return hdBerimbau(m, when, vol * CAL.berimbau);
     const fr = mtof(m), o = X.createOscillator(), body = X.createOscillator(), f = X.createBiquadFilter(), g = X.createGain();
     o.type = "sawtooth"; body.type = "triangle";
     o.frequency.setValueAtTime(fr * 1.025, when); o.frequency.exponentialRampToValueAtTime(fr, when + .05);
@@ -171,12 +570,13 @@ const MUS = (() => {
   const caxixi = (when, vol) => noiseHit(when, .05, vol, "bandpass", 5200, 1.5);
   // atabaque: grave com o tom caindo; tapa é seco e médio
   function atabaque(when, vol, high) {
+    if (HD) return hdAtabaque(when, vol, high);
     const o = X.createOscillator(), g = X.createGain(), f0 = high ? 230 : 150;
     o.type = "sine"; o.frequency.setValueAtTime(f0, when); o.frequency.exponentialRampToValueAtTime(f0 * .55, when + .18);
     g.gain.value = 0; g.gain.setValueAtTime(vol, when); g.gain.exponentialRampToValueAtTime(.0001, when + .28);
     o.connect(g).connect(bus.mix); o.start(when); o.stop(when + .3);
   }
-  const tapa = (when, vol) => { noiseHit(when, .05, vol, "bandpass", 900, 1.4); synth("triangle", 320, when, .05, vol * .6); };
+  const tapa = (when, vol) => { if (HD) return hdTapa(when, vol * CAL.tapa); noiseHit(when, .05, vol, "bandpass", 900, 1.4); synth("triangle", 320, when, .05, vol * .6); };
   // passarinho: dois piados curtos subindo
   function bird(when) {
     const f0 = 2300 + Math.random() * 1400, n = 2 + Math.floor(Math.random() * 2);
@@ -207,9 +607,10 @@ const MUS = (() => {
     });
   }
   // agogô: sino de duas bocas (alto e baixo), metálico
-  function agogo(when, high, vol = .014) { const f = high ? 1320 : 990; synth("sine", f, when, .18, vol); synth("sine", f * 2.76, when, .06, vol * .4); }
+  function agogo(when, high, vol = .014) { if (HD) return hdBellFM(high ? 1320 : 990, when, vol * CAL.agogo, .3, 2.76, .45); const f = high ? 1320 : 990; synth("sine", f, when, .18, vol); synth("sine", f * 2.76, when, .06, vol * .4); }
   // surdo/atabaque grave e comprido, para a música do chefe
   function surdo(when, vol) {
+    if (HD) return hdSurdo(when, vol);
     const o = X.createOscillator(), g = X.createGain();
     o.type = "sine"; o.frequency.setValueAtTime(95, when); o.frequency.exponentialRampToValueAtTime(48, when + .35);
     g.gain.value = 0; g.gain.setValueAtTime(vol, when); g.gain.exponentialRampToValueAtTime(.0001, when + .5);
@@ -218,6 +619,7 @@ const MUS = (() => {
 
   // guitarra da guitarrada paraense: corda beliscada brilhante, com vibrato depois do ataque
   function guitar(freq, when, dur, vol, bright = 2600) {
+    if (HD) return hdGuitar(freq, when, dur, vol * CAL.guitar, bright);
     const f = X.createBiquadFilter(), g = X.createGain(), lfo = X.createOscillator(), depth = X.createGain();
     f.type = "lowpass"; f.frequency.setValueAtTime(bright, when); f.frequency.exponentialRampToValueAtTime(bright * .35, when + Math.min(dur, .6));
     g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .004); g.gain.exponentialRampToValueAtTime(vol * .45, when + .12); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .2);
@@ -235,6 +637,7 @@ const MUS = (() => {
     return DIST = c;
   }
   function dist(freq, when, dur, vol, cutoff = 1600) {
+    if (HD) return hdDist(freq, when, dur, vol, cutoff);
     const ws = X.createWaveShaper(), f = X.createBiquadFilter(), g = X.createGain();
     ws.curve = distCurve(); f.type = "lowpass"; f.frequency.value = cutoff;
     g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .005); g.gain.setValueAtTime(vol, when + dur * .7); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .05);
@@ -243,6 +646,7 @@ const MUS = (() => {
   }
   // metais (acorde de serrilhadas com o filtro abrindo, como um naipe tocando forte)
   function brass(notes, when, dur, vol) {
+    if (HD) return hdBrass(notes, when, dur, vol * CAL.brass);
     const f = X.createBiquadFilter(), g = X.createGain();
     f.type = "lowpass"; f.frequency.setValueAtTime(500, when); f.frequency.exponentialRampToValueAtTime(2800, when + .08); f.frequency.exponentialRampToValueAtTime(900, when + dur);
     g.gain.value = 0; g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vol, when + .03); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .1);
@@ -251,6 +655,7 @@ const MUS = (() => {
   }
   // coro grave (um "aah" escuro): pad com formante de vogal
   function choir(notes, when, dur, vol) {
+    if (HD) return hdChoir(notes, when, dur, vol * CAL.choir);
     const f = X.createBiquadFilter(), f2 = X.createBiquadFilter(), g = X.createGain();
     f.type = "bandpass"; f.frequency.value = 700; f.Q.value = 1.2; f2.type = "lowpass"; f2.frequency.value = 1400;
     g.gain.setValueAtTime(.0001, when); g.gain.exponentialRampToValueAtTime(vol, when + .5); g.gain.setValueAtTime(vol, when + dur - .3); g.gain.exponentialRampToValueAtTime(.0001, when + dur + .6);
@@ -258,7 +663,7 @@ const MUS = (() => {
     for (const m of notes) for (const det of [-12, 0, 12]) { const o = X.createOscillator(); o.type = "sawtooth"; o.frequency.value = mtof(m); o.detune.value = det; o.connect(f); o.start(when); o.stop(when + dur + .7); }
   }
   // sino grave de alerta (badalada)
-  function toll(m, when, vol) { synth("sine", mtof(m), when, 3, vol); synth("sine", mtof(m) * 2.4, when, 1.4, vol * .35); synth("sine", mtof(m) * 3.9, when, .6, vol * .2); }
+  function toll(m, when, vol) { if (HD) return hdBellFM(mtof(m), when, vol * 1.2 * CAL.toll, 3.2, 1.4, 0); synth("sine", mtof(m), when, 3, vol); synth("sine", mtof(m) * 2.4, when, 1.4, vol * .35); synth("sine", mtof(m) * 3.9, when, .6, vol * .2); }
 
   // viradas e melodias das batalhas (iguais às da vitrine)
   function battleFill(t, d, s, barIn, build) {
@@ -818,7 +1223,7 @@ const MUS = (() => {
     // São Paulo (exploração de dia): MPB. Violão de náilon na batida da bossa, piano elétrico com acordes de
     // sétima e nona, escovinha e o tema do Sudeste na flauta; B no piano elétrico, A' com o vibrafone dobrando
     mpbSudeste: {
-      bpm: 116, wet: .34, level: .42, swing: .1, form: ["I", "A", "B", "A2"], melody: null,
+      bpm: 116, wet: .34, level: .42, suave: true, swing: .1, form: ["I", "A", "B", "A2"], melody: null,
       chords: [{bass: 38, notes: [54, 57, 61, 64]}, {bass: 47, notes: [51, 54, 57, 60]}, {bass: 40, notes: [55, 59, 62, 66]}, {bass: 45, notes: [55, 59, 61, 66]}],
       chordsB: [{bass: 43, notes: [54, 59, 62, 66]}, {bass: 43, notes: [52, 58, 62, 67]}, {bass: 42, notes: [52, 57, 61, 64]}, {bass: 45, notes: [55, 59, 61, 66]}],
       bossa: [0, 3, 6, 10, 13],   // a batida do violão da bossa (os acordes); o polegar faz o baixo no 1 e no 3
@@ -883,7 +1288,7 @@ const MUS = (() => {
     // São Paulo à noite: bossa de apartamento. O violão de náilon na batida da bossa, bem devagar e baixinho, escovinha
     // só no um, o baixo macio e o tema na flauta grave; na parte B o piano elétrico responde. Garoa: um chiado fino
     mpbSudesteNight: {
-      bpm: 80, wet: .5, level: .4, swing: .1, form: ["I", "A", "B", "A2"], melody: null,
+      bpm: 80, suave: true, wet: .5, level: .4, swing: .1, form: ["I", "A", "B", "A2"], melody: null,
       play(i, t, d) {
         const N = TRACKS.mpbSudeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
         const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)];
@@ -920,25 +1325,34 @@ const MUS = (() => {
     },
     // batalha em São Paulo: samba-rock. Bumbo e caixa de rock com o balanço do samba, agogô, o violão batendo na batida
     // da bossa acelerada e o tema na guitarra (lead); B no piano elétrico. Forma A - A' - B - C (ponte de bateria)
+    // batalha em São Paulo: samba-jazz (a MPB acelerada, no jeito dos trios dos anos 60), com os acordes e o tema do
+    // Sudeste da MPB: bumbo de samba com a antecipação antes de cada tempo, condução em semicolcheias, aro e violão de
+    // náilon na batida da bossa, ganzá empurrando, baixo de samba (tônica e quinta) e o tema na flauta e no piano elétrico.
+    // Forma A - A2 (tema uma oitava acima, com o piano dobrando) - B (a resposta no piano) - C (ponte de percussão e a virada)
     battleSaoPaulo: {
-      bpm: 140, wet: .2, level: .42, swing: .06, form: ["A", "A2", "B", "C"], melody: null,
+      bpm: 150, wet: .22, level: .4, swing: .05, suave: true, form: ["A", "A2", "B", "C"], melody: null,
+      baixo: [[0, 0, .1], [3, 0, .05], [4, 7, .08], [8, 0, .1], [11, 12, .05], [12, 7, .08]],   // [passo, intervalo, força]
       play(i, t, d) {
         const N = TRACKS.mpbSudeste, s = i % 16, bar = Math.floor(i / 16), barIn = bar % 8, part = this.form[Math.floor(bar / 8) % 4];
         const chord = (part === "B" ? N.chordsB : N.chords)[Math.floor(barIn / 2)], bridge = part === "C" && barIn < 4, build = part === "C" && barIn >= 4;
         if (i % 128 === 0) { this.melody = part === "C" ? null : themeLine(part === "B" ? SUDESTE_THEME.B : SUDESTE_THEME.A, part === "A2" ? 12 : 0, part !== "A"); hat(t, .02, true); }
-        if (s === 0 || s === 7 || s === 10) kick(t, .1);
-        if (!battleFill(t, d, s, barIn, build) && (s === 4 || s === 12)) snare(t, .03);
-        hat(t, s % 2 ? .004 : .008);
-        if (s === 2 || s === 6 || s === 11) agogo(t, s !== 6, .012);
-        if (bridge) return;
-        if (N.bossa.includes(s)) strum(chord.notes, t, d * 1.8, .009, s % 2 === 1, false);
-        if (s % 4 === 0) synth("triangle", mtof(chord.bass - 12 + (s === 8 ? 7 : 0)), t, d * 2, .1);
-        if (s === 0 && barIn % 2 === 0) chord.notes.forEach(m => ep(mtof(m + 12), t, d * 16, .005));
+        // bateria de samba-jazz: bumbo no tempo e na antecipação, condução, aro na clave da bossa e a caixa no 2 e no 4
+        if (s % 4 === 0 || s % 4 === 3) kick(t, s % 4 === 0 ? .085 : .04);
+        hat(t, s % 4 === 2 ? .009 : .0045, s === 14 && barIn % 2 === 1);
+        if (N.bossa.includes(s)) noiseHit(t, .025, .016, "bandpass", 2600, 3);   // aro (a baqueta no aro da caixa)
+        if (!battleFill(t, d, s, barIn, build) && !bridge && (s === 4 || s === 12)) snare(t, .022);
+        ganza(t, s % 4 === 2 ? .012 : .005);
+        if (bridge) { if (s === 0 || s === 8) surdo(t, .07); return; }
+        // baixo de samba e o violão na batida da bossa; piano elétrico em acordes curtos no contratempo
+        const bl = this.baixo.find(([at]) => at === s);
+        if (bl) synth("triangle", mtof(chord.bass - 12 + bl[1]), t, d * 1.6, bl[2]);
+        if (N.bossa.includes(s)) chord.notes.forEach((m, k) => violao(mtof(m), t + k * .005, d * 1.6, .013));
+        if (part !== "A" && (s === 2 || s === 10)) chord.notes.forEach(m => ep(mtof(m + 12), t, d * 1.2, .006));
         const m = this.melody && this.melody[i % 128];
         if (!m) return;
         const len = m.len * d * .9;
-        if (part === "B") ep(mtof(m.note), t, len, .034);
-        else { lead(mtof(m.note - (part === "A2" ? 0 : 12)), t, len, .018); flute(mtof(m.note), t, len, .01); }
+        if (part === "B") { ep(mtof(m.note), t, len, .03); flute(mtof(m.note - 12), t, len, .012); }
+        else { flute(mtof(m.note), t, len, .03); if (part === "A2") ep(mtof(m.note - 12), t, len, .014); }
       }
     },
     // Pytuna em cena: zumbido grave do coro, vento, coração batendo e a badalada; o tema de Pytuna (PYTUNA_THEME) numa voz
@@ -1447,7 +1861,36 @@ const MUS = (() => {
   };
   const ALL = {...TRACKS, ...BATTLE};
 
+  // mixagem do som novo: envio de sala (rev) e de eco pingue-pongue de 3/16 (dly), grave e "ar" um pouco acima,
+  // compressor de cola, saturação suave e limitador
+  let HD_LEVEL = .26;
+  function buildHD(tr) {
+    const m = X.createGain(), mix = X.createGain(), lv = X.createGain();
+    m.gain.value = .0001; lv.gain.value = LEVEL * HD_LEVEL; SUAVE = !!tr.suave;
+    const rev = X.createGain(), room = makeRoom(), rhp = X.createBiquadFilter(), wet = X.createGain(), amb = X.createGain();
+    rhp.type = "highpass"; rhp.frequency.value = 260; wet.gain.value = .85; amb.gain.value = tr.wet * .45;
+    rev.connect(room).connect(rhp).connect(wet).connect(m); mix.connect(amb).connect(rev);   // um pouco de sala em tudo
+    const dly = X.createGain(), dl = X.createDelay(2), dr = X.createDelay(2), fb = X.createGain(), lp = X.createBiquadFilter(), pl = X.createStereoPanner(), pr = X.createStereoPanner(), dOut = X.createGain();
+    dl.delayTime.value = dr.delayTime.value = 60 / tr.bpm / 4 * 3; fb.gain.value = S16 ? .46 : .3; lp.type = "lowpass"; lp.frequency.value = S16 ? 2200 : 3400;
+    pl.pan.value = -.6; pr.pan.value = .6; dOut.gain.value = S16 ? .62 : .5;
+    if (S16) { const e = X.createGain(); e.gain.value = .07; mix.connect(e).connect(dly); }   // um pouco de eco em tudo, como no SNES
+    dly.connect(dl); dl.connect(pl).connect(dOut); dl.connect(dr); dr.connect(pr).connect(dOut); dr.connect(lp).connect(fb).connect(dl);
+    dOut.connect(m); dOut.connect(rev); mix.connect(m);
+    const lo = X.createBiquadFilter(), hi = X.createBiquadFilter(), comp = X.createDynamicsCompressor(), sat = X.createWaveShaper(), lim = X.createDynamicsCompressor();
+    lo.type = "lowshelf"; lo.frequency.value = 80; lo.gain.value = S16 ? 1.5 : .5; hi.type = "highshelf"; hi.frequency.value = 6000; hi.gain.value = S16 ? 1.5 : 5.5;
+    comp.threshold.value = -20; comp.ratio.value = 2.5; comp.attack.value = .015; comp.release.value = .22; comp.knee.value = 8;
+    sat.curve = hdSatCurve(); lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = .002; lim.release.value = .08;
+    let topo = hi;
+    if (SUAVE) {   // faixa macia: topo mais baixo, um filtro leve em cima e corpo no médio-grave
+      hi.gain.value = -3.5; hi.frequency.value = 4500;
+      const corpo = X.createBiquadFilter(), teto = X.createBiquadFilter(); corpo.type = "peaking"; corpo.frequency.value = 220; corpo.Q.value = .7; corpo.gain.value = 2.5;
+      teto.type = "lowpass"; teto.frequency.value = 8500; teto.Q.value = .5; hi.connect(corpo).connect(teto); topo = teto;
+    }
+    m.connect(lo).connect(hi); topo.connect(comp).connect(lv).connect(sat).connect(lim).connect(DEST);
+    return {master: m, mix, rev, dly};
+  }
   function build(tr) {
+    if (HD) return buildHD(tr);
     const m = X.createGain(), mix = X.createGain(), dry = X.createGain(), wet = X.createGain(), verb = makeReverb(), comp = X.createDynamicsCompressor(), lv = X.createGain();
     m.gain.value = .0001; dry.gain.value = .7; wet.gain.value = tr.wet; lv.gain.value = LEVEL;
     mix.connect(dry).connect(m); mix.connect(verb).connect(wet).connect(m);
@@ -1495,13 +1938,33 @@ const MUS = (() => {
     timer = setInterval(schedule, 100);
   }
   // teste: renderiza alguns segundos de uma faixa fora do tempo real (devolve o AudioBuffer, para ouvir ou gravar)
-  async function render(id, sec = 20, rate = 44100) {
-    const save = {X, DEST, bus, track, step, nextTime};
-    const off = new OfflineAudioContext(2, Math.floor(rate * sec), rate);
-    X = off; DEST = off.destination; track = ALL[id]; bus = build(track); step = 0; nextTime = .05;
-    bus.master.gain.setValueAtTime(track.level, 0);
-    schedule(sec - .5);
-    ({X, DEST, bus, track, step, nextTime} = save);
+  // monta por trechos (pausa a cada segundo e agenda só o seguinte): montar tudo de uma vez deixa milhares de nós
+  // trabalhando em silêncio. hd = com o som novo (o padrão é o que estiver ligado)
+  async function render(id, sec = 20, rate = 44100, hd = HD && S16 ? "16" : HD) {
+    const snap = () => ({X, DEST, bus, track, step, nextTime, HD, S16, SUAVE, FL_LAST}), load = q => ({X, DEST, bus, track, step, nextTime, HD, S16, SUAVE, FL_LAST} = q);
+    const live = snap(), off = new OfflineAudioContext(2, Math.floor(rate * sec), rate);
+    load({X: off, DEST: off.destination, bus: null, track: ALL[id], step: 0, nextTime: .05, HD: !!hd, S16: hd === "16" || hd === "16f", SUAVE: false, FL_LAST: null});
+    bus = build(track); bus.master.gain.setValueAtTime(track.level, 0);
+    let st = snap(); load(live);
+    const chunk = upTo => {
+      const back = snap(); load(st);
+      const d = 60 / track.bpm / 4;
+      while (nextTime < Math.min(upTo, sec - .3)) { track.play(step, nextTime + (track.swing && step % 2 ? d * track.swing : 0), d); nextTime += d; step++; }
+      st = snap(); load(back);
+    };
+    chunk(1.2);
+    for (let w = 1; w < sec - .3; w++) off.suspend(w).then(() => { chunk(w + 1.2); off.resume(); });
+    return off.startRendering();
+  }
+  // teste: grava instrumentos soltos, sem faixa (fn recebe os instrumentos e agenda as notas a partir de 0,05 s)
+  async function renderInst(fn, sec = 3, hd = "16", rate = 44100) {
+    const snap = () => ({X, DEST, bus, track, step, nextTime, HD, S16, SUAVE, FL_LAST}), load = q => ({X, DEST, bus, track, step, nextTime, HD, S16, SUAVE, FL_LAST} = q);
+    const live = snap(), off = new OfflineAudioContext(2, Math.floor(rate * sec), rate);
+    load({X: off, DEST: off.destination, bus: null, track: {bpm: 120, wet: .2, level: .4}, step: 0, nextTime: 0, HD: !!hd, S16: hd === "16", SUAVE: false, FL_LAST: null});
+    try {
+      bus = build(track); bus.master.gain.setValueAtTime(track.level, 0);
+      fn({synth, kick, snare, hat, noiseHit, flute, lead, ep, pad, bell, berimbau, atabaque, tapa, sanfona, viola, violao, strum, bumbo808, palma, guitar, dist, brass, choir, toll, surdo, agogo, triangulo, ganza, reco, mtof});
+    } finally { load(live); }
     return off.startRendering();
   }
   // teste: pico e volume médio de alguns segundos da faixa
@@ -1512,7 +1975,7 @@ const MUS = (() => {
   }
   // tempo da música tocando agora, em batidas (para os aldeões dançarem no ritmo); null sem música
   function beat() { if (!track || !X || X.state !== "running") return null; const d = 60 / track.bpm / 4; return (step - (nextTime - X.currentTime) / d) / 4; }
-  return {has: id => !!ALL[id], play, stop: (sec = .6) => { if (X) fadeOut(sec); }, measure, render, beat, get current() { return trackId; }};
+  return {get hd() { return HD && S16 ? "16" : HD; }, set hd(v) { HD = !!v; S16 = v === "16" || v === "16f"; }, set hdLevel(v) { HD_LEVEL = v; }, has: id => !!ALL[id], renderInst, play, reload() { const id = trackId; if (!id) return; track = null; play(id, .6); }, stop: (sec = .6) => { if (X) fadeOut(sec); }, measure, render, beat, get current() { return trackId; }};
 })();
 
 /* ----- o que o resto do jogo usa ----- */

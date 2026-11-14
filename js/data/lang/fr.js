@@ -1624,6 +1624,8 @@ TX.fr = {
     "{z} aprende.": "{z} pour l'apprendre.",
     "Segure {sel} para pular": "Maintiens {sel} pour passer",
     "{dir} anda · analógico direito mira · {z} golpe e conversa · {x} flecha · {sh} esquiva · {i} bolsa · {e} equipar · {h} habilidades": "{dir} marcher · stick droit pour viser · {z} frapper et parler · {x} flèche · {sh} esquive · {i} sac · {e} équiper · {h} compétences",
+    "Trilha": "Bande-son",
+    "Clássica": "Classique",
     "Ícones dos botões": "Icônes des boutons",
     "Automático": "Automatique",
     "Teclado": "Clavier",

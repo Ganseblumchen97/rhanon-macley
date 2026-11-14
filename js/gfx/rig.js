@@ -233,13 +233,34 @@ function rigCanvas(view, pose = {}, look = {}, scale = 1) {
   RIG_CACHE.set(key, c);
   return c;
 }
-/* Rhanon dormindo na cama do motel, visto de lado (84x26): cabeça no travesseiro olhando para cima, cobertor até os pés
-   com o relevo do corpo e o braço por cima. breathe (0/1) sobe o peito. Desenho próprio porque ele só respira. */
+/* Quem viaja dormindo na cama da pensão, visto de lado (84x26): cabeça no travesseiro olhando para cima, cobertor até os
+   pés com o relevo do corpo e o braço por cima. breathe (0/1) sobe o peito. Desenho próprio porque só respira.
+   hd: pintado com volume, em resolução dobrada (bnGrid, gfx/boneco.js), com a trança da Franciscane no travesseiro. */
 const SLEEP_CACHE = {};
-function rhanonSleeping(breathe = 0) {
-  const look = rhanonLook(), key = breathe + JSON.stringify(look);
+function rhanonSleeping(breathe = 0, hd = false) {
+  const look = rhanonLook(), key = breathe + (hd ? "hd" : "") + JSON.stringify(look);
   if (SLEEP_CACHE[key]) return SLEEP_CACHE[key];
-  const C = {...RIG_PAL, ...(look.pal || {})}, d = rigGrid(1, 84, 26), b = breathe ? 1 : 0;
+  const C = {...RIG_PAL, ...(look.pal || {})}, b = breathe ? 1 : 0;
+  if (hd) {
+    const d = bnGrid(2, 84, 26), red = "#c8303a", fold = "#a02630";
+    if (look.trancas) d.part().limb(5, 17, 1.5, 23, 2.4, C.h).dots([[2, 21]], C.r);   // trança caída no travesseiro
+    d.part().ellipse(7.5, 13, 6.5, 7.5, C.h);                              // cabelo atrás da cabeça
+    d.part().ellipse(12.5, 13.5, 5.5, 5.8, C.s);                           // rosto de perfil, virado para cima
+    d.ellipse(18, 12.5, 1.2, 1.4, C.s);                                    // nariz
+    if (!look.noBand) d.part().limb(8, 6, 9.5, 19, 1.8, C.g);              // faixa da cabeça
+    d.part().poly([[7, 5.5], [14, 6], [13, 8.5], [10.5, 7.5], [9, 10]], C.h);   // franja
+    d.rect(13, 11.5, 3, .5, "#1a1426").dots([[15.5, 12]], "#1a1426");      // olho fechado, com o cílio
+    d.rect(11, 15.5, 2, .5, C.r).rect(11.5, 16.5, 1.5, .5, C.r);           // pintura na bochecha
+    d.rect(16, 16.5, 1.5, .5, C.S);                                        // boca
+    // cobertor: um volume só (peito, joelhos e pés fazem os montinhos; a sombra fica embaixo)
+    d.part().limb(22, 17.5, 80, 17.5, 13, red).ellipse(29, 14.5 - b, 10, 7.5, red).ellipse(60, 15, 7, 6, red).ellipse(77, 12.5, 4.5, 7, red);
+    for (let x = 33; x < 76; x += 9) d.limb(x, 10, x, 24, .5, fold);       // listras
+    d.limb(21, 22.5, 82, 22.5, 1, fold);                                   // dobra embaixo
+    d.part().limb(19, 10.5 - b, 25, 9 - b, 3.4, "#f4ecd8").limb(19.5, 13, 24, 15, 2.6, "#f4ecd8");   // dobra do lençol no pescoço
+    d.part().limb(25, 11.5 - b, 38, 12.5, 2.8, C.s).ellipse(39.5, 12.5, 2, 1.8, C.s);                // braço por cima do cobertor
+    return SLEEP_CACHE[key] = d.canvas();
+  }
+  const d = rigGrid(1, 84, 26);
   d.part().ellipse(7, 13, 6, 7, C.h, C.H, .5);                          // cabelo atrás da cabeça
   d.part().ellipse(12, 13, 6, 6, C.s, C.S, .5);                         // rosto de perfil, virado para cima
   d.dots([[18, 12], [18, 13]], C.s).dots([[17, 12]], C.S);              // nariz
